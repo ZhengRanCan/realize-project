@@ -13,6 +13,9 @@ build/
 # 运行与脚本临时产物（npm run ai:plan / check-plan 的中间结果，含内网网关地址）
 tmp/
 commit-msg.txt
+
+# 应用运行后写在项目根目录的人工审批结果（本地数据，样例见 fixtures/human-review.sample.json）
+/human-review.json
 *.log
 npm-debug.log*
 yarn-error.log*

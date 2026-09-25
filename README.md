@@ -225,7 +225,7 @@ design-review.json   分析结果，decisions[].status 一律 pending
 human-review.json    人类真实审批状态，只由用户点击保存写入
 ```
 
-实现上做了硬隔离：主进程没有自动保存 human-review 的代码路径；保存时 merge 回人工侧已有字段并原子替换（临时文件 + rename）；重新加载 design-review.json 不会覆盖人工结果。六个 `EV-*` 断言在 `npm run selftest` 中持续守着这一点。
+实现上做了硬隔离：主进程没有自动保存 human-review 的代码路径；保存时 merge 回人工侧已有字段并原子替换（临时文件 + rename）；重新加载 design-review.json 不会覆盖人工结果。`npm run selftest` 的末尾四项检查（分离读写、needs-evidence 仍阻塞 Gate、fixture 未被污染、根目录不自动生成 human-review.json）持续守着这一点。
 
 ---
 
@@ -270,19 +270,74 @@ realize-project/
 
 ---
 
-## 8. 运行方式
+## 8. 克隆并运行
+
+仓库地址：<https://github.com/ZhengRanCan/realize-project>
+
+### 8.1 环境要求
+
+| 项目 | 要求 |
+|---|---|
+| Node.js | 18 LTS 或更高（含 `npm`） |
+| 操作系统 | Windows / macOS / Linux 桌面环境 |
+| 网络 | 首次 `npm install` 需要联网下载 Electron；安装完成后应用本身**完全离线**运行 |
+| 其他 | 无需数据库、云服务或账号；无 AI 调用 |
+
+### 8.2 三步跑起来
 
 ```bash
+git clone https://github.com/ZhengRanCan/realize-project.git
+cd realize-project
 npm install
+npm start
+```
+
+启动后会停在首屏，点 **「打开 fixture（context-consumption.json）」** 进入方案总览；点 **「使用测试样本」** 可在右侧原文面板查看被审文档。首屏三个入口都不需要你先手工准备文件 —— fixture 与测试样本都随仓库一起克隆下来了。
+
+### 8.3 可用命令
+
+```bash
 npm start            # 启动；点「打开 fixture（context-consumption.json）」进入
 npm run validate     # 校验 design-review fixture（Schema + 一致性）
 npm run audit        # 覆盖审计：原文每节被引用 / 每条 Decision 能关联
 npm run check-plan   # 闸门：overview-plan 是否合格（PASS / PASS WITH WARNINGS / FAIL）
-npm run test:plan    # check-plan 的自动测试（17 个用例，无 GUI / 无 AI）
+npm run test:plan    # check-plan 的自动测试（22 个用例，无 GUI / 无 AI）
 npm run source       # 从 Markdown 重新切分原文分段（供 Source 回查）
 npm run simulate     # 无 GUI 跑通 fixture → human-review.json → Gate
 npm run selftest     # 在真实 Electron 渲染进程内自检整条链路，然后退出
 ```
+
+`npm run selftest` 最适合新克隆下来先跑一次：它在真实 Electron 渲染进程里验完 import → 两页渲染 → 审批 → 保存 → Gate 整条链路后自动退出，不依赖 GUI 手工点击。
+
+### 8.4 不需要任何凭据
+
+克隆后开箱即用。**AI 分析尚未接入**，因此不存在 API key 配置步骤 —— 应用只加载仓库里已有的结构化结果，不发起任何模型请求。
+
+`npm run ai:plan` 是唯一会调用外部模型的脚本，它是可选的、且**不参与上述任何流程**。如果你想用它，凭据按以下优先级解析，凭据不会进入仓库：
+
+```bash
+# 方式一：环境变量
+export OVERVIEW_PLAN_BASE_URL=https://your-gateway/v1
+export OVERVIEW_PLAN_API_KEY=sk-...
+export OVERVIEW_PLAN_MODEL=your-model
+```
+
+方式二：复用 DSH 本机设置 `~/.dsh/settings.yaml` 里的 `apiUrl` 与 `apiKey`。两者都没有时脚本会明确报错并退出，不会静默失败。
+
+### 8.5 常见问题
+
+- **`npm install` 很慢或卡在 Electron 下载** —— Electron 二进制约 100 MB 以上，国内网络可设镜像后重装：
+  ```bash
+  npm config set ELECTRON_MIRROR https://npmmirror.com/mirrors/electron/
+  rm -rf node_modules package-lock.json && npm install
+  ```
+- **Windows 上克隆后中文目录名乱码** —— `测试文档/` 与 UTF-8 文件需要 Git 关闭路径转义并保持 LF：
+  ```bash
+  git config --global core.quotepath false
+  ```
+  换行符由仓库内的 `.gitattributes` 统一为 LF，无需手工设置 `core.autocrlf`。
+- **`human-review.json` 在哪** —— 首次点「保存」时才生成在项目根目录。它是本地人工审批结果，不属于仓库内容。
+- **想换成自己的文档** —— 目前 fixture 是按 `ai/analysis-protocol.phase2.md` 人工抽取的，**没有自动转换 Markdown 的入口**；换文档需要按 `schema/design-review.schema.json` 重做一份结构化 JSON。
 
 ---
 
