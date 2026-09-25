@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Overview 形状草稿 2（steps / diff / combo / matrix）</title>
+<style>
+  :root {
+    --bg:#fff; --bg-2:#f7f9fc; --bg-3:#eef1f6; --line:#d8dee8; --line-2:#c2cad6;
+    --fg:#12161c; --dim:#4a5563; --mute:#6b7787;
+    --accent:#1f5fd0; --accent-bg:#e7effc; --accent-line:#a9c5f0;
+    --ok:#1f7a45; --ok-bg:#e7f5ec; --ok-line:#a8d5bb;
+    --warn:#8a6100; --warn-bg:#fdf3e0; --warn-line:#e6cd97;
+    --danger:#ab2b25; --danger-bg:#fdeceb; --danger-line:#eeb2ad;
+    --info:#4c3fa3; --info-bg:#efedfb; --info-line:#c3bcee;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 32px 80px; background:var(--bg); color:var(--fg);
+    font:14px/1.65 "Segoe UI","Microsoft YaHei",system-ui,sans-serif; }
+  main { max-width:1080px; margin:0 auto; }
+  h1 { max-width:1080px; margin:0 auto 6px; font-size:22px; }
+  .sub { max-width:1080px; margin:0 auto 24px; color:var(--dim); font-size:13.5px; }
+  .block { border:1px solid var(--line); border-radius:10px; margin-bottom:16px; }
+  .block-head { display:flex; align-items:center; gap:10px; padding:12px 16px;
+    border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .block-id { font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; color:var(--mute); }
+  .block-title { font-size:15px; font-weight:600; }
+  .spacer { flex:1; }
+  .src { font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; color:var(--dim);
+    background:var(--bg-3); border:1px solid var(--line); border-radius:6px; padding:2px 7px; cursor:pointer; }
+  .src:hover { background:#eaeef4; color:var(--accent); }
+  .block-body { padding:16px; }
+  .block-subtitle { font-size:12px; color:var(--mute); text-transform:uppercase;
+    letter-spacing:.07em; font-weight:600; margin:22px 0 10px; }
+  .block-subtitle:first-child { margin-top:0; }
+  .why { font-size:12.5px; color:var(--dim); background:var(--bg-2);
+    border-left:2px solid var(--line-2); padding:8px 12px; margin-bottom:14px; }
+  code { font-family:"Cascadia Mono",Consolas,monospace; background:var(--bg-3);
+    padding:1px 5px; border-radius:4px; font-size:12px; }
+
+  /* steps：反例 walkthrough */
+  .steps { display:flex; flex-direction:column; gap:0; }
+  .step { display:grid; grid-template-columns:34px 1fr; gap:12px; padding:9px 0; }
+  .step + .step { border-top:1px solid var(--bg-3); }
+  .step-n {
+    width:24px; height:24px; border-radius:50%; background:var(--bg-3); border:1px solid var(--line-2);
+    display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:600; color:var(--dim);
+  }
+  .step-body { font-size:13px; }
+  .step-note { font-size:12px; color:var(--mute); margin-top:3px; }
+  .verdict {
+    margin-top:12px; padding:10px 14px; border-radius:8px; font-size:13px;
+    background:var(--danger-bg); border:1px solid var(--danger-line);
+  }
+  .verdict b { color:var(--danger); }
+
+  /* diff：现状 / 目标 差异对照 */
+  .diff { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line);
+    border-radius:8px; overflow:hidden; }
+  .diff-col { padding:12px 14px; font-size:13px; }
+  .diff-col + .diff-col { border-left:1px solid var(--line); }
+  .diff-col.current { background:var(--warn-bg); }
+  .diff-col.target { background:var(--ok-bg); }
+  .diff-head { font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+    font-weight:600; margin-bottom:9px; }
+  .diff-col.current .diff-head { color:var(--warn); }
+  .diff-col.target .diff-head { color:var(--ok); }
+  .diff-line { padding:4px 0; border-bottom:1px dashed rgba(0,0,0,.08); }
+  .diff-line:last-child { border-bottom:none; }
+  .diff-line .who { font-family:"Cascadia Mono",Consolas,monospace; font-size:11.5px; color:var(--dim); }
+  .diff-mark { font-weight:700; margin-right:5px; }
+  .diff-mark.gone { color:var(--danger); }
+  .diff-mark.keep { color:var(--ok); }
+  .diff-mark.add { color:var(--accent); }
+
+  /* combo：枚举组合 */
+  .combo { border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .combo-row { display:grid; grid-template-columns:290px 1fr; }
+  .combo-row + .combo-row { border-top:1px solid var(--line); }
+  .combo-key { padding:9px 12px; background:var(--bg-2); font-size:12px;
+    font-family:"Cascadia Mono",Consolas,monospace; }
+  .combo-val { padding:9px 12px; font-size:12.5px; border-left:1px solid var(--line); }
+  .combo-val.ok { background:var(--ok-bg); }
+  .combo-val.warn { background:var(--warn-bg); }
+  .combo-val.bad { background:var(--danger-bg); }
+  .combo-val.info { background:var(--info-bg); }
+  .cell { text-align:center; font-weight:600; }
+  .cell.y { color:var(--ok); }
+  .cell.n { color:var(--danger); }
+
+  /* matrix */
+  table.matrix { width:100%; border-collapse:collapse; font-size:13px; }
+  table.matrix th, table.matrix td { border:1px solid var(--line); padding:8px 11px;
+    text-align:left; vertical-align:top; }
+  table.matrix thead th { background:var(--bg-3); font-size:12px; }
+  table.matrix .rowhead { background:var(--bg-2); white-space:nowrap;
+    font-family:"Cascadia Mono",Consolas,monospace; font-size:12.5px; }
+
+  /* checklist */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .checklist { margin:0; padding:0; list-style:none; }
+  .checklist li { font-size:13px; padding:5px 0 5px 22px; position:relative;
+    border-bottom:1px solid var(--bg-3); }
+  .checklist li:last-child { border-bottom:none; }
+  .checklist li.bad::before { content:"✗"; position:absolute; left:4px; color:var(--danger); font-weight:700; }
+  .checklist li.good::before { content:"✓"; position:absolute; left:4px; color:var(--ok); font-weight:700; }
+  .checklist .why2 { display:block; font-size:11.5px; color:var(--mute); }
+  .panel-title { font-size:12px; font-weight:600; margin-bottom:8px; }
+  .panel-title.bad { color:var(--danger); }
+  .panel-title.good { color:var(--ok); }
+  .footnote { font-size:12px; color:var(--mute); margin-top:12px; }
+</style>
+</head>
+<body>
+
+<h1>Overview 形状草稿 2</h1>
+<p class="sub">
+  第一批样张（<code>overview-shape.html</code>）演示了 flow / 阶梯 / 能-不能对照 / 正反例清单。
+  这一批补齐剩下四种形状：<strong>steps（反例走查）、diff（现状-目标差异）、combo（状态枚举）、matrix（边界表）</strong>。
+  全部是静态样张，不接进应用。
+</p>
+
+<main>
+
+  <!-- ====== steps ====== -->
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-12</span>
+      <span class="block-title">为什么不做第四级：worked-example-first 反例</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §6</span>
+    </div>
+    <div class="block-body">
+      <div class="why">
+        原文用一整节的篇幅做一个反例推演。用"分步走查"承载比散文更省力：前三步都成立，第四步却推不出来。
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-n">1</div>
+          <div class="step-body">DeepTutor Recommended：<code>worked-example-first</code></div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div class="step-body">本次生成：Receipt = yes，Availability = yes，Consumption = yes</div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div class="step-body">最终课程：确实使用了 worked example
+            <div class="step-note">到这里可以说：Output Alignment —— 该推荐策略在课程中得到体现</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <div class="step-body"><strong>但不能进一步确定</strong>：这个 worked example 是因为 DeepTutor 才出现的
+            <div class="step-note">
+              因为 OpenMAIC 的默认生成模板本来可能也会生成 worked example。
+              要证明"没有 DeepTutor 就不会有这个输出"，需要反事实比较、控制变量或其他因果设计
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="verdict">
+        <b>结论：</b>Influence 作为第四级会承诺反事实因果，明显强于当前产品目标，
+        也不是普通 Output Alignment 可以保证的 —— 因此不进入本协议的必要产品状态。
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== diff ====== -->
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-04b</span>
+      <span class="block-title">同一份 context，两条链的取用方式差异</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §9, §13</span>
+    </div>
+    <div class="block-body">
+      <div class="why">
+        diff 形状的用法：<strong>不重复画整条链</strong>，只把"哪里不同"并排。
+        适合放在主运行链图之后作为补充，或单独承载某一处差异。
+      </div>
+      <div class="diff">
+        <div class="diff-col current">
+          <div class="diff-head">现在</div>
+          <div class="diff-line">
+            <span class="diff-mark keep">=</span>
+            <span class="who">outline route</span>
+            读取 projection
+          </div>
+          <div class="diff-line">
+            <span class="diff-mark add">＋</span>
+            <span class="who">scene-content route</span>
+            <strong>也</strong>附加完整 formal context<br>
+            <span class="who">appendFormalTeachingPrompt()</span>
+          </div>
+          <div class="diff-line">
+            <span class="diff-mark gone">✗</span>
+            没有 attempt 级别的消费记录
+          </div>
+        </div>
+        <div class="diff-col target">
+          <div class="diff-head">目标</div>
+          <div class="diff-line">
+            <span class="diff-mark keep">=</span>
+            <span class="who">outline generation</span>
+            是唯一消费点
+          </div>
+          <div class="diff-line">
+            <span class="diff-mark gone">✗</span>
+            <span class="who">scene-content route</span>
+            不再附加完整 context<br>
+            <span class="who">只继承 outline 派生约束</span>
+          </div>
+          <div class="diff-line">
+            <span class="diff-mark add">＋</span>
+            需要 generation-level 的 Consumption 证据
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== combo ====== -->
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-14a</span>
+      <span class="block-title">5 种状态组合的产品解释</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §7</span>
+    </div>
+    <div class="block-body">
+      <div class="why">
+        原文里这是一张 5 行表格。combo 形状把它保留成表，但给每行加语义色 ——
+        最后一行"形成完整证据"是唯一的好结局，颜色要能一眼看出来。
+      </div>
+      <div class="combo">
+        <div class="combo-row" style="background:var(--bg-3); font-size:12px;">
+          <div class="combo-key" style="background:var(--bg-3);">
+            Receipt · Availability · Consumption · Alignment
+          </div>
+          <div class="combo-val" style="border-left:1px solid var(--line); background:var(--bg-3);">
+            产品解释
+          </div>
+        </div>
+        <div class="combo-row">
+          <div class="combo-key"><span class="cell n">否</span> · <span class="cell n">否</span> · <span class="cell n">否</span> · 不可归因或失败</div>
+          <div class="combo-val bad">上下文没有到达，不能声称 DeepTutor 参与。</div>
+        </div>
+        <div class="combo-row">
+          <div class="combo-key"><span class="cell y">是</span> · <span class="cell n">否</span> · <span class="cell n">否</span> · 不可归因或失败</div>
+          <div class="combo-val warn">收到但未形成合法可用上下文。</div>
+        </div>
+        <div class="combo-row">
+          <div class="combo-key"><span class="cell y">是</span> · <span class="cell y">是</span> · <span class="cell n">否</span> · 可能表面成功</div>
+          <div class="combo-val warn">上下文可用但未实际参与生成；<strong>不能声称 context-grounded generation</strong>。</div>
+        </div>
+        <div class="combo-row">
+          <div class="combo-key"><span class="cell y">是</span> · <span class="cell y">是</span> · <span class="cell y">是</span> · 未通过</div>
+          <div class="combo-val info">上下文参与了生成，但最终课程没有充分体现相关语义。</div>
+        </div>
+        <div class="combo-row">
+          <div class="combo-key"><span class="cell y">是</span> · <span class="cell y">是</span> · <span class="cell y">是</span> · 通过或带 warning</div>
+          <div class="combo-val ok">形成完整的 context-grounded generation 证据。</div>
+        </div>
+      </div>
+      <p class="footnote">
+        最后一种状态仍然不证明：DeepTutor 判断一定正确；课程一定有效；学生一定学会；某个输出变化严格由 DeepTutor 导致。
+      </p>
+    </div>
+  </section>
+
+  <!-- ====== matrix + checklist ====== -->
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-14b</span>
+      <span class="block-title">明确不决定的 9 项 / 明确不承诺的 5 项</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §15</span>
+    </div>
+    <div class="block-body">
+      <div class="why">
+        §15 是全文的"非主张"清单，之前完全没进 Overview。
+        这类内容用 ✗ 清单承载最直接：它们不是"待办"，而是<strong>已经被排除的承诺</strong>。
+      </div>
+      <div class="two-col">
+        <div>
+          <div class="panel-title">本文不决定（9 项）</div>
+          <ul class="checklist">
+            <li class="bad">最终 Receipt / Availability / Consumption 的 JSON 字段</li>
+            <li class="bad">Context Consumption evidence 的具体结构</li>
+            <li class="bad">生成器如何消费上下文（Prompt / planner / 模板 / 混合）</li>
+            <li class="bad">是否需要记录生成设计决策</li>
+            <li class="bad">由 OpenMAIC 内部判断，还是产生受控跨边界结果</li>
+            <li class="bad">未消费或不可用时：阻止生成 / 回退普通课堂 / 允许草稿</li>
+            <li class="bad">与未来实验性因果分析的关系</li>
+          </ul>
+        </div>
+        <div>
+          <div class="panel-title">本文不承诺（5 项）</div>
+          <ul class="checklist">
+            <li class="bad">DeepTutor 的语义一定正确</li>
+            <li class="bad">模型内部推理被理解或被验证</li>
+            <li class="bad">Prompt 中包含上下文就一定发生 Consumption</li>
+            <li class="bad">最终输出一定发生了由 DeepTutor 引起的变化</li>
+            <li class="bad">Output Alignment 可以由 Consumption 单独证明</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  document.querySelectorAll('.src').forEach((tag) => {
+    tag.addEventListener('click', () => {
+      tag.style.outline = '2px solid #1f5fd0';
+      setTimeout(() => { tag.style.outline = 'none'; }, 600);
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1238 @@
+{
+  "planVersion": 1,
+  "designRef": {
+    "id": "DESIGN-CONTEXT-CONSUMPTION",
+    "path": "fixtures/context-consumption.json"
+  },
+  "shapeVocabularyVersion": "shape-catalog-v1",
+  "sourceUnits": [
+    {
+      "id": "SU-001",
+      "section": "§0",
+      "kind": "non-goal",
+      "statement": "本文只讨论 Context Consumption 的产品语义层级，不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-002",
+      "section": "§0",
+      "kind": "boundary",
+      "statement": "Context-side chain 与 Output-side chain 保持分离，二者共同支持 context-grounded generation 的产品叙事，但不承诺严格反事实因果。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-003",
+      "section": "§1",
+      "kind": "definition",
+      "statement": "Context Consumption 保留 Receipt → Availability → Consumption 三个递进层级。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-004",
+      "section": "§1",
+      "kind": "definition",
+      "statement": "Receipt 表示上下文到达了系统；Availability 表示合法、冻结、版本一致的上下文已可被本次生成使用；Consumption 表示本次生成任务实际把其中的教学语义作为课程设计输入。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-005",
+      "section": "§1",
+      "kind": "invariant",
+      "statement": "三个层级不能互相替代：Receipt ≠ Availability，Availability ≠ Consumption。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-006",
+      "section": "§1",
+      "kind": "rationale",
+      "statement": "Context Influence 若定义为\"生成结果出现可归因于 DeepTutor 上下文的变化或取舍\"，就已经进入 Output Alignment 甚至比它更强，因为它包含反事实与因果意味。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-007",
+      "section": "§1",
+      "kind": "target-state",
+      "statement": "明确不采用 Receipt → Availability → Consumption → Influence 的四级结构。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-008",
+      "section": "§2",
+      "kind": "definition",
+      "statement": "产品语义上保留两条相互关联但不互相吞并的链：Context-side chain 与 Output-side chain。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-009",
+      "section": "§2",
+      "kind": "definition",
+      "statement": "Context-side chain 回答：DeepTutor 的冻结教学语义有没有到达本次生成，并被生成任务实际作为课程设计输入使用。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-010",
+      "section": "§2",
+      "kind": "definition",
+      "statement": "Output-side chain 回答：最终生成的 outline 和 scene 是否在可观察意义上体现了相关目标、知识范围和教学设计要求。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-011",
+      "section": "§2",
+      "kind": "boundary",
+      "statement": "两条链共同支持 context-grounded generation narrative，已经足以构成产品需要的可追踪叙事，不需要额外承诺\"某个具体输出变化严格由 DeepTutor 导致\"。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-012",
+      "section": "§3",
+      "kind": "definition",
+      "statement": "Context Receipt 表示 OpenMAIC 或其服务端 Fusion 层收到了一份来自课前语义交换链的上下文结果，至少可以识别它属于某个请求或 session lineage。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-013",
+      "section": "§3",
+      "kind": "boundary",
+      "statement": "Receipt 能说明：系统收到了某个 Proposal / 冻结上下文或相关传输结果；传输层或接收层记录了到达事实；后续系统有机会继续进行授权、版本和语义关联检查。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-014",
+      "section": "§3",
+      "kind": "boundary",
+      "statement": "Receipt 不能说明：上下文已经通过合法性校验、属于当前生成请求、已经冻结、当前生成一定可以使用它、生成器实际读过或使用了其中的教学语义、最终 outline 或 scene 已经对齐。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-015",
+      "section": "§3",
+      "kind": "negative-case",
+      "statement": "以下事实都只能证明 Receipt，不能证明 Availability 或 Consumption：Proposal 到达 HTTP 或消息入口、响应被写入日志、响应被保存到 session、上下文对象出现在内存或数据库中、生成接口的调用参数中存在一个 context 字段。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-016",
+      "section": "§3",
+      "kind": "negative-case",
+      "statement": "如果收到的 Proposal 版本未知、请求 lineage 不一致、引用越权或冻结失败，系统仍然可能有 Receipt，但不能继续声称 Availability。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-017",
+      "section": "§4",
+      "kind": "definition",
+      "statement": "Context Availability 表示合法、冻结、版本一致的课前语义上下文已经准备好，并且在本次 outline generation 的授权边界内可被使用。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-018",
+      "section": "§4",
+      "kind": "invariant",
+      "statement": "Availability 至少意味着：来自受信任的服务端路径、请求/session/Frozen Context lineage 一致、schema 与 revision 与 digest 与引用范围和授权关系通过检查、使用的是同一个冻结上下文、仍在有效生命周期内、生成阶段具有访问该合法上下文的服务端能力。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-019",
+      "section": "§4",
+      "kind": "boundary",
+      "statement": "Availability 仍然不能说明生成器已经真正使用了上下文；它只说明\"如果生成器需要，它现在可以合法、稳定地使用这份上下文\"。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-020",
+      "section": "§4",
+      "kind": "negative-case",
+      "statement": "一个上下文可以有 Receipt 但没有 Availability：digest 与当前请求不一致、包含越权知识引用、Frozen Context 尚未成功创建、context 属于旧 revision、浏览器提交了看似完整但未经服务器授权的上下文、生成请求已经切换到另一个 lesson session。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-021",
+      "section": "§4",
+      "kind": "boundary",
+      "statement": "Receipt = 上下文到了；Availability = 合法上下文已经准备好并可用。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-022",
+      "section": "§5",
+      "kind": "definition",
+      "statement": "Context Consumption 表示本次 outline generation 实际使用了冻结上下文中的教学语义，并将其作为课程设计输入，而不是仅仅收到、保存或附加了上下文。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-023",
+      "section": "§5",
+      "kind": "definition",
+      "statement": "被消费的对象是经过验证和冻结的教学语义：学习目标、授权且相关的知识范围、必要前置关系、learner projection、Required design constraints、Recommended approaches、Evaluation Focus、生成约束与范围建议与明确排除项。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-024",
+      "section": "§5",
+      "kind": "non-claim",
+      "statement": "Consumption 不要求把 raw Proposal、DeepTutor 内部响应、工具轨迹或模型推理直接交给生成器。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-025",
+      "section": "§5",
+      "kind": "invariant",
+      "statement": "Receipt 是\"我们收到了上下文\"；Availability 是\"我们确认它合法、冻结、版本一致，并且本次生成可以使用\"；Consumption 是\"本次生成任务确实把其中的教学语义纳入了课程设计\"。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-026",
+      "section": "§5",
+      "kind": "negative-case",
+      "statement": "以下情况都不能单独证明 Consumption：Proposal 被成功接收、Frozen Context 被成功保存、context 在生成请求参数中出现、context 被原样附加到 Prompt、Prompt 长度增加、生成接口成功返回 outline、输出中偶然出现了 Proposal 中的关键词。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-027",
+      "section": "§5",
+      "kind": "boundary",
+      "statement": "Prompt 可以是 Consumption 的承载方式，但不是产品定义，也不是充分条件；产品要求的是教学语义成为 outline-design task 的真实输入。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-028",
+      "section": "§5",
+      "kind": "invariant",
+      "statement": "Consumption 不要求盲目服从：某项 Recommended 被纳入设计考虑后最终没有采用，仍可能满足 Consumption，会在 Output Alignment 中记录为 Not adopted，但不能伪称为已经采用。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-029",
+      "section": "§5",
+      "kind": "consequence",
+      "statement": "如果系统完全没有把某项 guidance 纳入生成设计考虑，问题可能反映 Consumption 不充分，而不应仅由 Output Alignment 的最终采用状态解释。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-030",
+      "section": "§5",
+      "kind": "invariant",
+      "statement": "Consumption 不要求最终输出必须明显不同：冻结上下文判断学习者与课程同通用设计一致时，最终 outline 可能与默认 outline 相近。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-031",
+      "section": "§5",
+      "kind": "rationale",
+      "statement": "若要求可见差异，系统会为了证明个性化而强行制造结构差异，反而可能破坏合理的课程设计。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-032",
+      "section": "§6",
+      "kind": "counterexample",
+      "statement": "worked-example-first 反例：Receipt/Availability/Consumption 全为 yes 且课程确实使用了 worked example，但不能确定这个 worked example 是因为 DeepTutor 才出现的，因为默认生成模板本来可能也会生成它。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-033",
+      "section": "§6",
+      "kind": "rationale",
+      "statement": "要证明\"没有 DeepTutor 就不会有这个输出\"需要反事实比较、控制变量或其他因果设计，这明显强于当前产品目标，也不是普通 Output Alignment 可以保证的。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-034",
+      "section": "§6",
+      "kind": "target-state",
+      "statement": "Context Influence 不作为 Context Consumption 的第四级，也不作为本协议的必要产品状态；它可以在未来研究或实验评估中作为独立问题讨论。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-035",
+      "section": "§7",
+      "kind": "definition",
+      "statement": "完整叙事是：本次生成收到并准备了合法、冻结、版本一致的课前教学语义；该语义实际参与了 outline generation；最终生成的 outline 和 scene 又在可观察意义上体现了相关目标、知识范围和教学设计要求。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-036",
+      "section": "§7",
+      "kind": "boundary",
+      "statement": "这条叙事可以分别报告两条链的状态，不需要压缩成一个不可解释的\"个性化成功\"布尔值。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-037",
+      "section": "§7",
+      "kind": "example",
+      "statement": "5 种状态组合各有产品解释：从\"上下文没有到达\"到\"上下文可用但未实际参与生成\"，再到\"形成了完整的 context-grounded generation 证据\"。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-038",
+      "section": "§7",
+      "kind": "non-claim",
+      "statement": "即使是最后一种状态仍然不证明：DeepTutor 判断一定正确、课程一定有效、学生一定学会、某个输出变化严格由 DeepTutor 导致。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-039",
+      "section": "§8",
+      "kind": "boundary",
+      "statement": "Context Consumption 关注冻结教学语义是否到达并实际参与生成；Output Alignment 关注最终 outline / scene 是否体现相关教学要求。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-040",
+      "section": "§8",
+      "kind": "invariant",
+      "statement": "Consumption ≠ Output Alignment，Output Alignment ≠ Consumption。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-041",
+      "section": "§8",
+      "kind": "example",
+      "statement": "Consumption = yes 而 Output Alignment = no 表示上下文确实参与了生成，但结果没有满足相关 Required 或没有充分体现目标、范围与教学设计。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-042",
+      "section": "§8",
+      "kind": "example",
+      "statement": "Consumption = no 而 Output Alignment = apparently yes 表示结果可能来自默认模板、通用教学模式或偶然相似，不能把它归因于 DeepTutor。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-043",
+      "section": "§8",
+      "kind": "invariant",
+      "statement": "这两个目标只有共同成立时，才能支持\"本次课程在可追踪意义上消费并体现了课前教学语义\"。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-044",
+      "section": "§9",
+      "kind": "current-state",
+      "statement": "当前课前 outline 入口是 app/api/generate/scene-outlines-stream/route.ts。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-045",
+      "section": "§9",
+      "kind": "responsibility",
+      "statement": "该入口已负责：解析课程生成请求、调用 freezeFormalFusionForOutline() 或恢复已冻结的正式 Fusion context、通过 appendFormalTeachingPrompt() 将 generation projection 追加到 outline generation 输入、调用 outline LLM stream、解析规范化与持久化 outline。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-046",
+      "section": "§9",
+      "kind": "target-state",
+      "statement": "Context Consumption 的 primary production responsibility 位于这条链路，而不是 scene runtime：freeze/resolve → outline generation route → server-derived generation projection → outline prompt 或等价 planner input → outline stream / Outline Generation Attempt → outline 持久化。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-047",
+      "section": "§9",
+      "kind": "current-state",
+      "statement": "lib/fusion/generation-session.ts 已存在一个很小的 FormalGenerationContextProjection，并由 appendFormalTeachingPrompt() 渲染为 Frozen lesson guidance。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-048",
+      "section": "§9",
+      "kind": "current-state",
+      "statement": "当前投影主要包含 topic、mapping lineage、knowledge reference IDs、guidance revision 和 recommended approaches；后续仍需决定哪些冻结教学语义必须进入 outline generation，以及怎样区分\"投影已注入\"与\"生成过程实际消费\"。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-049",
+      "section": "§9",
+      "kind": "current-state",
+      "statement": "当前 outline route 还会在正式 Fusion 分支调用 completeFormalLessonOutlines()，将 checkpoint/remediation pair 追加到生成结果；该行为属于既有 F60 边界修正对象，不应被当作 Context Consumption 的证明。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-050",
+      "section": "§9",
+      "kind": "negative-case",
+      "statement": "未来 Context Consumption 的成功不应依赖自动生成 checkpoint/remediation；其目标是让普通 outline 生成消费冻结教学语义。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-051",
+      "section": "§9",
+      "kind": "current-state",
+      "statement": "Scene content 的当前入口是 app/api/generate/scene-content/route.ts，底层生成在 lib/generation/scene-generator.ts，完整组装在 lib/generation/scene-builder.ts；这些路径主要接收一个 SceneOutline。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-052",
+      "section": "§9",
+      "kind": "boundary",
+      "statement": "SceneGenerationContext 是跨页 speech coherence context，不是 DeepTutor 的 Frozen Context。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-053",
+      "section": "§9",
+      "kind": "current-state",
+      "statement": "当前正式 Fusion scene-content route 会恢复服务器存储的 outline，并调用 appendFormalTeachingPrompt()，因此代码上仍存在\"scene prompt 直接附加 formal context\"的路径。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-054",
+      "section": "§9",
+      "kind": "target-state",
+      "statement": "后续应把这条现有路径理解为需要收敛的边界：FrozenLessonGenerationContext → outline generation projection → context-shaped Outline Revision → scene generation from authoritative outline。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-055",
+      "section": "§9",
+      "kind": "invariant",
+      "statement": "Scene generation 可以继承必要的 context lineage、outline revision 和由 outline 派生的局部设计约束，但不应重新读取完整 raw Proposal、learner projection、DeepTutor 内部响应或另一个 context revision。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-056",
+      "section": "§9",
+      "kind": "target-state",
+      "statement": "Scene generation 的主要消费对象应是 context-shaped outline，而不是完整 Frozen Context。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-057",
+      "section": "§10",
+      "kind": "responsibility",
+      "statement": "Receipt 对应\"接收和记录课前 context lineage\"，概念入口是 freezeFormalFusionForOutline() / resolveFormalFusion() 及 session store，成功边界是服务端收到并能关联 context/request/session。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-058",
+      "section": "§10",
+      "kind": "responsibility",
+      "statement": "Availability 对应\"在当前 outline attempt 中恢复合法、冻结、版本一致 context\"，概念入口是 resolveFormalFusion()、contextFrom()、正式 Fusion session recovery，成功边界是当前生成可安全读取同一 Frozen Context。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-059",
+      "section": "§10",
+      "kind": "responsibility",
+      "statement": "Consumption 对应\"将冻结语义投影到 outline generation 并作为课程设计输入\"，概念入口是 projectFormalGenerationContext()、appendFormalTeachingPrompt()、outline route / generator orchestration，成功边界是当前 Outline Generation Attempt 实际使用 generation-facing teaching semantics。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-060",
+      "section": "§10",
+      "kind": "non-claim",
+      "statement": "这张职责表不表示现有函数已经满足最终产品验收，只说明未来 Feature 应沿现有职责边界改造。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-061",
+      "section": "§11",
+      "kind": "definition",
+      "statement": "Context Consumption 的 Subject 不是抽象的 Frozen Context，也不是最终 scene，而是 Frozen Context × Outline Generation Attempt。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-062",
+      "section": "§11",
+      "kind": "definition",
+      "statement": "需要区分三种粒度：Outline Generation Request（一次服务端请求）、Outline Generation Attempt（请求中的一次实际生成尝试，可能有重试）、Outline Revision（生成成功并被接受后形成的课纲版本）。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-063",
+      "section": "§11",
+      "kind": "invariant",
+      "statement": "Consumption 可以在 outline 生成结果最终失败时仍然成立：只要某一次实际 Attempt 已经合法使用了 generation-facing projection。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-064",
+      "section": "§11",
+      "kind": "boundary",
+      "statement": "反之，outline 成功返回也不能自动证明 Consumption：如果 projection 没有成为真实生成输入，只能算 Receipt 或 Availability。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-065",
+      "section": "§12",
+      "kind": "negative-case",
+      "statement": "freezeFormalFusionForOutline() 成功保存 frozenLessonGenerationContext，但 outline generation 没有读取其投影。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-066",
+      "section": "§12",
+      "kind": "negative-case",
+      "statement": "resolveFormalFusion() 成功恢复 context，但生成器继续使用普通 requirements 和默认模板。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-067",
+      "section": "§12",
+      "kind": "negative-case",
+      "statement": "projectFormalGenerationContext() 被调用，却只生成 lineage 元数据，没有把教学目标、范围或 guidance 转化为设计输入。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-068",
+      "section": "§12",
+      "kind": "negative-case",
+      "statement": "appendFormalTeachingPrompt() 返回了包含 context 文本的 Prompt，但生成 orchestration 没有要求 outline 依据这些语义设计。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-069",
+      "section": "§12",
+      "kind": "negative-case",
+      "statement": "formal context 出现在 scene-content prompt 中，但 outline generation 本身没有消费它。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-070",
+      "section": "§12",
+      "kind": "negative-case",
+      "statement": "浏览器提交的 outline、mapping、digest 或 guidance 与服务器 context 不一致，而服务端没有以存储的 outline/context 为权威。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-071",
+      "section": "§12",
+      "kind": "negative-case",
+      "statement": "completeFormalLessonOutlines() 自动追加 checkpoint/remediation pair，但没有证明普通 outline generation 消费了 DeepTutor 语义。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-072",
+      "section": "§12",
+      "kind": "boundary",
+      "statement": "这些情况可以分别表示 Receipt 或 Availability，不能仅凭函数调用、Prompt 字符串或生成结果存在就升级为 Consumption。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-073",
+      "section": "§13",
+      "kind": "current-state",
+      "statement": "当前 scene pipeline 是：SceneOutline → scene-content route / generateSceneContent() → scene actions → complete Scene。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-074",
+      "section": "§13",
+      "kind": "rationale",
+      "statement": "这个 pipeline 的主要职责是实现已经产生的 outline，而不是重新决定整节课的目标、知识范围和教学顺序。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-075",
+      "section": "§13",
+      "kind": "consequence",
+      "statement": "若让每个 scene generator 都独立直接消费完整 Frozen Context，会造成：每个 scene 重新解释同一份 guidance、scene 之间可能使用不同 context revision、scene 层决定覆盖 outline 层的整体课程设计、learner/context 数据重复进入多个 Prompt、token 成本增加、后续 realized alignment 难以判断偏差来自 outline 还是 scene。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-076",
+      "section": "§13",
+      "kind": "target-state",
+      "statement": "OpenMAIC 后续应以 outline generation 作为 Primary Consumption Point；scene generation 主要继承 context-shaped outline，并只使用必要 lineage 或由 outline 派生的局部约束。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-077",
+      "section": "§14",
+      "kind": "responsibility",
+      "statement": "Context Consumption 主要改造：generation-session / context projection、scene-outlines-stream route、outline generation orchestration、outline attempt 与 revision lineage。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-078",
+      "section": "§14",
+      "kind": "responsibility",
+      "statement": "Output Alignment 主要新增或改造：outline preflight assessment、scene realization assessment、objective 与 knowledge-scope 与 guidance judgments、evidence 与 limitations 与 aggregation、derived outlineCoverage。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-079",
+      "section": "§14",
+      "kind": "boundary",
+      "statement": "两者在 outline revision 和 context lineage 处衔接，但不能用一个替代另一个。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-080",
+      "section": "§14",
+      "kind": "evidence-requirement",
+      "statement": "Context Consumption 的最低证据应以 generation-level 为主：一次 Outline Generation Attempt 使用了哪个 Frozen Context 和哪个 generation-facing projection；Output Alignment 则需要在后续阶段形成局部 Judgment 与可定位 Evidence。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-081",
+      "section": "§15",
+      "kind": "open-question",
+      "statement": "本文确定三级递进，但不决定：最终 JSON 字段、Consumption evidence 的具体结构、生成器如何消费上下文、是否需要记录生成设计决策。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-082",
+      "section": "§15",
+      "kind": "open-question",
+      "statement": "本文也不决定：Consumption 是否由 OpenMAIC 内部判断还是产生受控跨边界结果、未消费或不可用时是阻止生成还是回退普通课堂还是允许草稿、与未来实验性因果分析的关系。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-083",
+      "section": "§15",
+      "kind": "non-claim",
+      "statement": "本文不承诺：DeepTutor 的语义一定正确、模型内部推理被理解或被验证、Prompt 中包含上下文就一定发生 Consumption、最终输出一定发生了由 DeepTutor 引起的变化、Output Alignment 可以由 Consumption 单独证明。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-084",
+      "section": "§15",
+      "kind": "target-state",
+      "statement": "后续可以在本语义模型基础上再单独讨论概念性 JSON，但该 JSON 应表达 Receipt / Availability / Consumption 的语义差异，不应重新加入 Context Influence 作为第四级。",
+      "importance": "supporting"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "O-01",
+      "title": "这是什么文档",
+      "stage": "what",
+      "shape": "prose",
+      "covers": [
+        "SU-001"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§0",
+          "role": "non-claim"
+        },
+        {
+          "section": "§15",
+          "role": "non-claim"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-012"
+      ],
+      "defaultExpanded": true,
+      "capacityNote": "prose 只用于文档定位声明；全篇仅此一处。"
+    },
+    {
+      "id": "O-02",
+      "title": "核心主张：保留三级递进",
+      "stage": "what",
+      "shape": "ladder",
+      "covers": [
+        "SU-003",
+        "SU-004",
+        "SU-005"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§1",
+          "role": "definition"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-001"
+      ],
+      "defaultExpanded": true
+    },
+    {
+      "id": "O-03",
+      "title": "明确不采用：把 Context Influence 作为第四级",
+      "stage": "what",
+      "shape": "diff",
+      "covers": [
+        "SU-007",
+        "SU-006"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§1",
+          "role": "target-state"
+        },
+        {
+          "section": "§6",
+          "role": "rationale"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-002"
+      ],
+      "defaultExpanded": true
+    },
+    {
+      "id": "O-04",
+      "title": "系统骨架：消费点放在哪一层",
+      "stage": "what",
+      "shape": "current-target-flow",
+      "covers": [
+        "SU-044",
+        "SU-045",
+        "SU-046",
+        "SU-047",
+        "SU-053",
+        "SU-054",
+        "SU-055",
+        "SU-056"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§9",
+          "role": "current-flow"
+        },
+        {
+          "section": "§9",
+          "role": "target-flow"
+        },
+        {
+          "section": "§13",
+          "role": "rationale"
+        },
+        {
+          "section": "§10",
+          "role": "responsibility"
+        },
+        {
+          "section": "§14",
+          "role": "responsibility"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-007",
+        "DEC-008",
+        "DEC-011",
+        "FACT-001",
+        "FACT-002",
+        "FACT-003",
+        "FACT-005"
+      ],
+      "defaultExpanded": true,
+      "capacityNote": "这是全文篇幅最大的一节（§9 占 18.3%）。容量超出推荐值，理由：现状与目标必须并排才看得出\"要动哪条链\"，拆块会丢失对照。"
+    },
+    {
+      "id": "O-04b",
+      "title": "为什么不把消费点放在 scene",
+      "stage": "what",
+      "shape": "checklist",
+      "covers": [
+        "SU-075",
+        "SU-074",
+        "SU-076"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§13",
+          "role": "rationale"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-007"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-04c",
+      "title": "三个产品层级 → 现有生产职责映射",
+      "stage": "what",
+      "shape": "matrix",
+      "covers": [
+        "SU-057",
+        "SU-058",
+        "SU-059",
+        "SU-060"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§10",
+          "role": "responsibility"
+        },
+        {
+          "section": "§14",
+          "role": "responsibility"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-011",
+        "DEC-003"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-05",
+      "title": "两条链：Context-side 与 Output-side",
+      "stage": "how",
+      "shape": "flow",
+      "covers": [
+        "SU-002",
+        "SU-008",
+        "SU-009",
+        "SU-010",
+        "SU-011",
+        "SU-035",
+        "SU-036"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§2",
+          "role": "definition"
+        },
+        {
+          "section": "§7",
+          "role": "definition"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-003"
+      ],
+      "defaultExpanded": true
+    },
+    {
+      "id": "O-06",
+      "title": "两条链各自回答什么（职责边界）",
+      "stage": "how",
+      "shape": "capability-matrix",
+      "covers": [
+        "SU-039",
+        "SU-021",
+        "SU-019",
+        "SU-043"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§2",
+          "role": "definition"
+        },
+        {
+          "section": "§8",
+          "role": "boundary"
+        },
+        {
+          "section": "§14",
+          "role": "boundary"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-003"
+      ],
+      "defaultExpanded": true
+    },
+    {
+      "id": "O-07",
+      "title": "三个层级分别能说明什么、不能说明什么",
+      "stage": "how",
+      "shape": "capability-matrix",
+      "covers": [
+        "SU-013",
+        "SU-014",
+        "SU-018",
+        "SU-022"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§3",
+          "role": "boundary"
+        },
+        {
+          "section": "§4",
+          "role": "boundary"
+        },
+        {
+          "section": "§5",
+          "role": "definition"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-004"
+      ],
+      "defaultExpanded": true,
+      "capacityNote": "每行都是成对的\"能 / 不能\"，是本形状的典型用法。"
+    },
+    {
+      "id": "O-08",
+      "title": "消费的对象是什么、不是什么",
+      "stage": "how",
+      "shape": "two-column-comparison",
+      "covers": [
+        "SU-023",
+        "SU-024"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§5",
+          "role": "definition"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-007",
+        "DEC-006"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-09",
+      "title": "Consumption 的定义与递进关系",
+      "stage": "prove",
+      "shape": "ladder",
+      "covers": [
+        "SU-025",
+        "SU-027"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§5",
+          "role": "definition"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-005"
+      ],
+      "defaultExpanded": true
+    },
+    {
+      "id": "O-10",
+      "title": "HOW DO WE KNOW：怎样证明某个状态真的发生了",
+      "stage": "prove",
+      "shape": "ladder",
+      "covers": [
+        "SU-080",
+        "SU-012",
+        "SU-017"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§3",
+          "role": "evidence"
+        },
+        {
+          "section": "§4",
+          "role": "evidence"
+        },
+        {
+          "section": "§5",
+          "role": "evidence"
+        },
+        {
+          "section": "§11",
+          "role": "evidence"
+        },
+        {
+          "section": "§12",
+          "role": "evidence"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-005",
+        "DEC-010",
+        "Q-002"
+      ],
+      "defaultExpanded": true
+    },
+    {
+      "id": "O-10b",
+      "title": "这些都不能单独证明 Consumption",
+      "stage": "prove",
+      "shape": "checklist",
+      "covers": [
+        "SU-015",
+        "SU-016",
+        "SU-020",
+        "SU-026",
+        "SU-065",
+        "SU-066",
+        "SU-067",
+        "SU-068",
+        "SU-069",
+        "SU-070",
+        "SU-071",
+        "SU-072"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§5",
+          "role": "boundary"
+        },
+        {
+          "section": "§12",
+          "role": "counterexample"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-010",
+        "GAP-004",
+        "GAP-005"
+      ],
+      "defaultExpanded": true,
+      "capacityNote": "§12 的七类情况必须成组出现才有说服力，拆开会让读者以为只是孤立反例。"
+    },
+    {
+      "id": "O-10c",
+      "title": "两个反直觉判断",
+      "stage": "prove",
+      "shape": "checklist",
+      "covers": [
+        "SU-063",
+        "SU-064",
+        "SU-062"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§11",
+          "role": "definition"
+        },
+        {
+          "section": "§12",
+          "role": "boundary"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-009"
+      ],
+      "defaultExpanded": true
+    },
+    {
+      "id": "O-11",
+      "title": "Consumption 不要求什么",
+      "stage": "prove",
+      "shape": "two-column-comparison",
+      "covers": [
+        "SU-028",
+        "SU-029",
+        "SU-030",
+        "SU-031"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§5",
+          "role": "invariant"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-005",
+        "DEC-006"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-11b",
+      "title": "Possible mismatch states：Consumption 与 Alignment 不一致的两种情况",
+      "stage": "prove",
+      "shape": "combo",
+      "covers": [
+        "SU-040",
+        "SU-041",
+        "SU-042"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§8",
+          "role": "example"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-003"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-13",
+      "title": "5 种状态组合的产品解释",
+      "stage": "boundary",
+      "shape": "combo",
+      "covers": [
+        "SU-037",
+        "SU-038",
+        "SU-036"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§7",
+          "role": "example"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-001",
+        "DEC-003"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-12",
+      "title": "为什么不做第四级：worked-example-first 反例",
+      "stage": "boundary",
+      "shape": "walkthrough",
+      "covers": [
+        "SU-032",
+        "SU-033",
+        "SU-034"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§6",
+          "role": "counterexample"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-002"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-14",
+      "title": "代码侧的边界与反模式",
+      "stage": "boundary",
+      "shape": "checklist",
+      "covers": [
+        "SU-048",
+        "SU-049",
+        "SU-050",
+        "SU-051",
+        "SU-052",
+        "SU-073",
+        "SU-077",
+        "SU-078",
+        "SU-079"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§9",
+          "role": "current-state"
+        },
+        {
+          "section": "§12",
+          "role": "boundary"
+        },
+        {
+          "section": "§13",
+          "role": "current-state"
+        },
+        {
+          "section": "§14",
+          "role": "responsibility"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-008",
+        "DEC-010",
+        "GAP-001",
+        "GAP-004"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-15",
+      "title": "明确不决定的 9 项 / 明确不承诺的 5 项",
+      "stage": "boundary",
+      "shape": "checklist",
+      "covers": [
+        "SU-081",
+        "SU-082",
+        "SU-083",
+        "SU-084"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§15",
+          "role": "non-claim"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-012",
+        "Q-001",
+        "Q-003",
+        "Q-006",
+        "Q-007"
+      ],
+      "defaultExpanded": false
+    },
+    {
+      "id": "O-16",
+      "title": "Consumption Subject：以哪一次 Attempt 为准",
+      "stage": "boundary",
+      "shape": "flow",
+      "covers": [
+        "SU-061",
+        "SU-080"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§11",
+          "role": "definition"
+        },
+        {
+          "section": "§14",
+          "role": "evidence"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-009"
+      ],
+      "defaultExpanded": false,
+      "capacityNote": "回推检查发现的缺口：§11 的 Subject 定义与 §14 的 generation-level 证据要求原先没有任何区块承载，补此块。"
+    }
+  ],
+  "duplicatesMerged": [
+    {
+      "sourceUnits": [
+        "SU-005",
+        "SU-025",
+        "SU-040"
+      ],
+      "keptInBlock": "O-02",
+      "reason": "§1、§5、§8 三处从不同角度重述\"层级/维度不能互相替代\"，语义同一，合并为一次边界表达。"
+    },
+    {
+      "sourceUnits": [
+        "SU-014",
+        "SU-019",
+        "SU-026"
+      ],
+      "keptInBlock": "O-07",
+      "reason": "三处都是\"上层状态不足以推出下层状态\"的否定式边界，合并进\"能说明 / 不能说明\"对照表。"
+    },
+    {
+      "sourceUnits": [
+        "SU-015",
+        "SU-020"
+      ],
+      "keptInBlock": "O-10b",
+      "reason": "§3 与 §4 各列一组\"不能证明升级\"的情形，措辞不同、作用相同，合并为一组反例清单。"
+    },
+    {
+      "sourceUnits": [
+        "SU-033",
+        "SU-006"
+      ],
+      "keptInBlock": "O-12",
+      "reason": "§6 的因果论证在 §1 已被简略提过一次；保留完整的反例推演，简略版并入同一结论。"
+    },
+    {
+      "sourceUnits": [
+        "SU-049",
+        "SU-071"
+      ],
+      "keptInBlock": "O-14",
+      "reason": "checkpoint/remediation 自动追加在 §9 与 §12 各出现一次，语义相同，合并为一条反模式。"
+    },
+    {
+      "sourceUnits": [
+        "SU-047",
+        "SU-048"
+      ],
+      "keptInBlock": "O-04",
+      "reason": "两处都描述同一个 FormalGenerationContextProjection 的现状，合并为骨架图上的一个节点细节。"
+    },
+    {
+      "sourceUnits": [
+        "SU-069",
+        "SU-053"
+      ],
+      "keptInBlock": "O-14",
+      "reason": "§9 与 §12 都指出\"formal context 只出现在 scene prompt 而 outline 未消费\"，同一反模式，合并。"
+    }
+  ]
+}

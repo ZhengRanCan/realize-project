@@ -1,0 +1,279 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://local.design-review/overview-plan.schema.json",
+  "title": "overview-plan.json",
+  "description": "Stage 1（Semantic Coverage Planning）的产物。只负责结构合法性；语义规则（覆盖、陷阱、阈值）由 scripts/check-plan.js 负责。",
+  "type": "object",
+  "required": [
+    "planVersion",
+    "designRef",
+    "shapeVocabularyVersion",
+    "sourceUnits",
+    "blocks",
+    "duplicatesMerged"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "sourceUnitId": {
+      "type": "string",
+      "pattern": "^SU-[0-9]{3}$"
+    },
+    "blockId": {
+      "type": "string",
+      "pattern": "^O-[0-9]{2}[a-z]?$"
+    },
+    "reviewObjectId": {
+      "type": "string",
+      "pattern": "^(DEC|FACT|GAP|Q|MODEL)-[0-9]{3}$"
+    },
+    "sectionLabel": {
+      "type": "string",
+      "pattern": "^§([0-9]|[12][0-9])$"
+    },
+    "sourceUnit": {
+      "type": "object",
+      "required": [
+        "id",
+        "section",
+        "kind",
+        "statement",
+        "importance"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/sourceUnitId"
+        },
+        "section": {
+          "description": "该语义单元所在的原文章节（§0 文档头，§1-§15 章节）。",
+          "$ref": "#/definitions/sectionLabel"
+        },
+        "kind": {
+          "description": "语义类型。有限枚举；不要无限扩张。",
+          "enum": [
+            "definition",
+            "invariant",
+            "current-state",
+            "target-state",
+            "rationale",
+            "consequence",
+            "boundary",
+            "negative-case",
+            "example",
+            "counterexample",
+            "open-question",
+            "non-goal",
+            "non-claim",
+            "responsibility",
+            "evidence-requirement"
+          ]
+        },
+        "statement": {
+          "description": "该单元陈述了什么。一句话；必须是原文的语义，不是新增结论。",
+          "type": "string",
+          "minLength": 4
+        },
+        "importance": {
+          "description": "core = 丢失即视为验收失败；supporting = 可折叠但不应消失。",
+          "enum": [
+            "core",
+            "supporting"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "sourceRef": {
+      "type": "object",
+      "description": "回原文导航用。不能用它代替 semantic coverage（covers 才是覆盖声明，sourceRefs 只回答\"点开哪个 Source 去哪\"）。",
+      "required": [
+        "section"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "$ref": "#/definitions/sectionLabel"
+        },
+        "role": {
+          "description": "这一节在这个区块里承担什么角色。",
+          "enum": [
+            "definition",
+            "current-flow",
+            "target-flow",
+            "current-state",
+            "target-state",
+            "rationale",
+            "consequence",
+            "boundary",
+            "counterexample",
+            "responsibility",
+            "evidence",
+            "non-claim",
+            "open-question",
+            "invariant",
+            "example",
+            "non-goal"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "stage",
+        "shape",
+        "covers",
+        "sourceRefs",
+        "reviewObjects",
+        "defaultExpanded"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/blockId"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 2
+        },
+        "stage": {
+          "description": "与 design-review.json 的 overview.sections[].id 一致。",
+          "enum": [
+            "what",
+            "how",
+            "prove",
+            "boundary"
+          ]
+        },
+        "shape": {
+          "description": "受控词汇表，见 docs/shape-catalog.md。",
+          "enum": [
+            "flow",
+            "current-target-flow",
+            "matrix",
+            "capability-matrix",
+            "diff",
+            "ladder",
+            "walkthrough",
+            "combo",
+            "checklist",
+            "two-column-comparison",
+            "prose"
+          ]
+        },
+        "covers": {
+          "description": "本区块承载的 sourceUnit id。这是语义覆盖的唯一声明。",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/sourceUnitId"
+          }
+        },
+        "sourceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/sourceRef"
+          }
+        },
+        "reviewObjects": {
+          "description": "关联的 Review Object 编号。允许为空数组（纯定义块可能不关联任何决策）。",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/reviewObjectId"
+          }
+        },
+        "defaultExpanded": {
+          "type": "boolean"
+        },
+        "capacityNote": {
+          "description": "可选：说明为什么这个区块的容量没有超出 shape catalog 的推荐值。",
+          "type": "string"
+        }
+      }
+    },
+    "duplicateMerge": {
+      "type": "object",
+      "required": [
+        "sourceUnits",
+        "keptInBlock",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sourceUnits": {
+          "description": "被合并掉的重复语义单元（至少两个）。",
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/definitions/sourceUnitId"
+          }
+        },
+        "keptInBlock": {
+          "$ref": "#/definitions/blockId"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 4
+        }
+      }
+    }
+  },
+  "properties": {
+    "planVersion": {
+      "const": 1
+    },
+    "designRef": {
+      "type": "object",
+      "description": "指向被规划的 design-review.json，用于交叉校验 reviewObjects。",
+      "required": [
+        "id",
+        "path"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "shapeVocabularyVersion": {
+      "type": "string",
+      "description": "对应的 shape catalog 版本，见 docs/shape-catalog.md。",
+      "minLength": 1
+    },
+    "sourceUnits": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/sourceUnit"
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/block"
+      }
+    },
+    "duplicatesMerged": {
+      "description": "显式记录重复语义的合并，用于审计\"为什么没有逐句搬运\"。允许为空数组。",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/duplicateMerge"
+      }
+    }
+  }
+}

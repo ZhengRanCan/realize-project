@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Overview 形状草稿（静态，未接入应用）</title>
+<style>
+  :root {
+    --bg:#fff; --bg-2:#f7f9fc; --bg-3:#eef1f6; --line:#d8dee8; --line-2:#c2cad6;
+    --fg:#12161c; --dim:#4a5563; --mute:#6b7787;
+    --accent:#1f5fd0; --accent-bg:#e7effc; --accent-line:#a9c5f0;
+    --ok:#1f7a45; --ok-bg:#e7f5ec; --ok-line:#a8d5bb;
+    --warn:#8a6100; --warn-bg:#fdf3e0; --warn-line:#e6cd97;
+    --danger:#ab2b25; --danger-bg:#fdeceb; --danger-line:#eeb2ad;
+    --info:#4c3fa3; --info-bg:#efedfb; --info-line:#c3bcee;
+    --hover:#eaeef4;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:28px 32px 80px; background:var(--bg); color:var(--fg);
+    font:14px/1.65 "Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  }
+  .doc-note {
+    max-width:1080px; margin:0 auto 26px; padding:14px 16px;
+    background:var(--warn-bg); border:1px solid var(--warn-line); border-radius:8px;
+    font-size:13px; color:var(--fg);
+  }
+  .doc-note b { color:var(--warn); }
+  h1 { max-width:1080px; margin:0 auto 6px; font-size:22px; }
+  .sub { max-width:1080px; margin:0 auto 24px; color:var(--dim); font-size:13.5px; }
+  main { max-width:1080px; margin:0 auto; }
+
+  /* ---------- 区块骨架 ---------- */
+  .block {
+    border:1px solid var(--line); border-radius:10px; margin-bottom:16px; background:var(--bg);
+  }
+  .block.ambient { background:var(--accent-bg); border-color:var(--accent-line); }
+  .block-head {
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:12px 16px; border-bottom:1px solid var(--line);
+  }
+  .block-id { font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; color:var(--mute); }
+  .block-title { font-size:15px; font-weight:600; }
+  .block-stage {
+    font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:600;
+    color:var(--mute); border:1px solid var(--line-2); border-radius:999px; padding:1px 8px;
+  }
+  .spacer { flex:1; }
+  .src {
+    font-family:"Cascadia Mono",Consolas,monospace; font-size:11px; color:var(--dim);
+    background:var(--bg-3); border:1px solid var(--line); border-radius:6px; padding:2px 7px;
+    cursor:pointer;
+  }
+  .src:hover { background:var(--hover); color:var(--accent); }
+  .fold {
+    font-size:11px; color:var(--dim); background:var(--bg-3);
+    border:1px solid var(--line); border-radius:6px; padding:2px 8px; cursor:pointer;
+  }
+  .block-body { padding:16px; }
+  .block.collapsed .block-body { display:none; }
+  .block.collapsed .block-head { border-bottom:none; }
+  .block-subtitle { font-size:12px; color:var(--mute); text-transform:uppercase; letter-spacing:.07em;
+    font-weight:600; margin:0 0 10px; }
+  .block-sub { margin-top:22px; }
+
+  /* ---------- HTML 流程图（现状 / 目标） ---------- */
+  .flow { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .lane {
+    border:1px solid var(--line); border-radius:8px; padding:12px 14px; background:var(--bg-2);
+  }
+  .lane.target { background:var(--ok-bg); border-color:var(--ok-line); }
+  .lane.current { background:var(--warn-bg); border-color:var(--warn-line); }
+  .lane-label {
+    font-size:11px; text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:10px;
+  }
+  .lane.current .lane-label { color:var(--warn); }
+  .lane.target .lane-label { color:var(--ok); }
+  .node {
+    background:var(--bg); border:1px solid var(--line); border-radius:7px; padding:7px 10px;
+    font-size:12.5px; position:relative;
+  }
+  .node + .arrow { height:14px; }
+  .arrow { position:relative; }
+  .arrow::before {
+    content:""; position:absolute; left:22px; top:0; bottom:0; width:1px; background:var(--line-2);
+  }
+  .arrow::after {
+    content:""; position:absolute; left:18px; bottom:-1px;
+    border-left:4px solid transparent; border-right:4px solid transparent; border-top:5px solid var(--line-2);
+  }
+  .arrow.changed::before { background:var(--warn); width:2px; }
+  .arrow.changed::after { border-top-color:var(--warn); }
+  .arrow .edge-note {
+    position:absolute; left:34px; top:50%; transform:translateY(-50%);
+    font-size:11px; color:var(--warn); background:var(--bg); padding:0 4px;
+  }
+  .node.changed { border-color:var(--warn-line); background:#fffdf7; }
+  .node.target-node { border-color:var(--ok-line); }
+  .node-title { font-weight:600; }
+  .node-detail { font-size:11.5px; color:var(--dim); margin-top:2px; }
+  .node-badges { margin-top:5px; display:flex; gap:4px; flex-wrap:wrap; }
+  .node-badge {
+    font-family:"Cascadia Mono",Consolas,monospace; font-size:10px;
+    border:1px solid var(--accent-line); background:var(--accent-bg); color:var(--accent);
+    border-radius:4px; padding:0 4px; cursor:pointer;
+  }
+  .node-badge:hover { background:var(--accent); color:#fff; }
+  .lane-branch { margin-top:10px; padding-top:10px; border-top:1px dashed var(--line-2); }
+  .branch-label { font-size:11px; color:var(--dim); margin-bottom:6px; }
+
+  /* ---------- 能 / 不能 对照 ---------- */
+  table.matrix { width:100%; border-collapse:collapse; font-size:13px; }
+  table.matrix th, table.matrix td {
+    border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;
+  }
+  table.matrix thead th { background:var(--bg-3); font-size:12px; }
+  table.matrix td.yes { background:var(--ok-bg); }
+  table.matrix td.no { background:var(--danger-bg); }
+  table.matrix .rowhead {
+    background:var(--bg-2); font-weight:600; white-space:nowrap;
+    font-family:"Cascadia Mono",Consolas,monospace; font-size:12.5px;
+  }
+  .cell-label { font-size:11px; font-weight:600; display:block; margin-bottom:3px; }
+  td.yes .cell-label { color:var(--ok); }
+  td.no .cell-label { color:var(--danger); }
+
+  /* ---------- 阶梯 ---------- */
+  .ladder { display:flex; flex-direction:column; gap:0; }
+  .rung {
+    display:grid; grid-template-columns:120px 1fr; gap:14px; align-items:start;
+    padding:10px 0;
+  }
+  .rung + .rung { border-top:1px dashed var(--line-2); }
+  .rung-tag {
+    font-family:"Cascadia Mono",Consolas,monospace; font-size:12px; font-weight:600;
+    text-align:right; padding-top:2px;
+  }
+  .rung.one .rung-tag { color:var(--accent); }
+  .rung.two .rung-tag { color:var(--info); }
+  .rung.three .rung-tag { color:var(--ok); }
+  .rung-body { font-size:13px; }
+  .rung-detail { font-size:12.5px; color:var(--dim); margin-top:3px; }
+
+  /* ---------- 正反例清单 ---------- */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .checklist { margin:0; padding:0; list-style:none; }
+  .checklist li {
+    font-size:13px; padding:5px 0 5px 22px; position:relative; border-bottom:1px solid var(--bg-3);
+  }
+  .checklist li:last-child { border-bottom:none; }
+  .checklist li.bad::before { content:"✗"; position:absolute; left:4px; color:var(--danger); font-weight:700; }
+  .checklist li.good::before { content:"✓"; position:absolute; left:4px; color:var(--ok); font-weight:700; }
+  .checklist li.mute::before { content:"—"; position:absolute; left:4px; color:var(--mute); }
+  .checklist .why { display:block; font-size:11.5px; color:var(--mute); }
+  .panel-title { font-size:12px; font-weight:600; margin-bottom:8px; }
+  .panel-title.bad { color:var(--danger); }
+  .panel-title.good { color:var(--ok); }
+
+  /* ---------- 状态矩阵（2x2） ---------- */
+  .combo { display:grid; grid-template-columns:auto 1fr; gap:0; }
+  .combo > div { border:1px solid var(--line); padding:9px 11px; font-size:12.5px; }
+  .combo .combo-key { background:var(--bg-2); font-family:"Cascadia Mono",Consolas,monospace; font-size:11.5px; }
+  .combo .combo-val.warn { background:var(--warn-bg); }
+  .combo .combo-val.info { background:var(--info-bg); }
+
+  /* ---------- 指标 / 次级 ---------- */
+  .footnote { font-size:12px; color:var(--mute); margin-top:12px; }
+  .why-this { font-size:12.5px; color:var(--dim); background:var(--bg-2);
+    border-left:2px solid var(--line-2); padding:8px 12px; margin-bottom:14px; }
+  code { font-family:"Cascadia Mono",Consolas,monospace; background:var(--bg-3);
+    padding:1px 5px; border-radius:4px; font-size:12px; }
+</style>
+</head>
+<body>
+
+<h1>Overview 形状草稿</h1>
+<p class="sub">
+  静态样张：只用来确认<strong>承载形式</strong>，不是最终文案，也不接进应用。
+  每个区块右上角是 <code>Source: §…</code> 标签，用来回原文核对；"折叠"按钮示意默认收起。
+</p>
+
+<div class="doc-note">
+  <b>看什么：</b>① O-04 的主运行链是否用 HTML 排版（而不是 Mermaid）更好读；
+  ② O-07 的"能说明 / 不能说明"对照表是否是这篇文档最该有的形状；
+  ③ O-10 的证明链是不是"独立形状"；
+  ④ 区块右上角 Source 标签 + 折叠按钮是否够用。
+</div>
+
+<main>
+
+  <!-- ============ 甲 · 这是什么 ============ -->
+
+  <section class="block ambient">
+    <div class="block-head">
+      <span class="block-id">O-01</span>
+      <span class="block-title">这是什么文档</span>
+      <span class="block-stage">甲 · 这是什么</span>
+      <span class="spacer"></span>
+      <span class="src" title="点击回原文">Source: §头, §15</span>
+    </div>
+    <div class="block-body">
+      <p style="margin:0 0 10px; font-size:15px;">
+        本文只确定 <strong>Context Consumption 的产品语义层级</strong>：
+        把"课前教学上下文有没有被真正用上"拆成三个可分别判定的状态。
+      </p>
+      <p style="margin:0; font-size:13px; color:var(--dim);">
+        它不是 Feature 合同、不是架构 SSOT、不是最终 schema，<strong>也不构成实现授权</strong>。
+        因此本文里的"目标"描述都还没有实现，需要人工逐条批准后才能进入实现。
+      </p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-04</span>
+      <span class="block-title">系统骨架：消费点放在哪一层</span>
+      <span class="block-stage">甲 · 这是什么</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §9, §10, §13, §14</span>
+      <span class="fold">折叠</span>
+    </div>
+    <div class="block-body">
+      <div class="why-this">
+        这是全文所占篇幅最大的一节（§9 占原文 18.3%）。原文用文字描述了两条链的现状与目标，
+        这里把它变成一张可对照的骨架图：<strong>左边是现在，右边是想改成什么</strong>，改动点标在边上。
+      </div>
+
+      <p class="block-subtitle">(a) 主运行链：现状 vs 目标</p>
+      <div class="flow">
+
+        <div class="lane current">
+          <div class="lane-label">现在</div>
+          <div class="node">
+            <div class="node-title">Frozen Context</div>
+            <div class="node-detail">freezeFormalFusionForOutline() / resolveFormalFusion()</div>
+          </div>
+          <div class="arrow"><span class="edge-note"></span></div>
+          <div class="node">
+            <div class="node-title">outline route</div>
+            <div class="node-detail">scene-outlines-stream/route.ts</div>
+            <div class="node-badges"><span class="node-badge">DEC-011</span></div>
+          </div>
+          <div class="arrow changed"><span class="edge-note">scene 也直接吃完整 context</span></div>
+          <div class="lane-branch">
+            <div class="branch-label">分支</div>
+            <div class="node changed">
+              <div class="node-title">scene-content route</div>
+              <div class="node-detail">
+                恢复 outline 后仍调用 <code>appendFormalTeachingPrompt()</code>，
+                <strong>直接附加 formal context</strong>
+              </div>
+              <div class="node-badges"><span class="node-badge">DEC-008</span><span class="node-badge">GAP-001</span></div>
+            </div>
+            <div class="arrow"></div>
+            <div class="node changed">
+              <div class="node-title">scene</div>
+              <div class="node-detail">每个 scene 有机会独立重新解释整份 guidance</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lane target">
+          <div class="lane-label">目标</div>
+          <div class="node target-node">
+            <div class="node-title">Frozen Context</div>
+            <div class="node-detail">同一份冻结上下文，版本一致</div>
+          </div>
+          <div class="arrow changed">
+            <span class="edge-note">消费点收敛到这里</span>
+          </div>
+          <div class="node target-node changed">
+            <div class="node-title">outline generation</div>
+            <div class="node-detail">generation projection → planner / prompt → Outline Generation Attempt</div>
+            <div class="node-badges"><span class="node-badge">DEC-007</span><span class="node-badge">DEC-009</span></div>
+          </div>
+          <div class="arrow"></div>
+          <div class="node target-node">
+            <div class="node-title">context-shaped Outline Revision</div>
+            <div class="node-detail">生成成功并被接受后形成的课纲版本</div>
+          </div>
+          <div class="arrow changed"><span class="edge-note">只继承，不重读</span></div>
+          <div class="node target-node changed">
+            <div class="node-title">scene</div>
+            <div class="node-detail">只继承 context lineage、outline revision 与 outline 派生的局部约束</div>
+            <div class="node-badges"><span class="node-badge">DEC-008</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="block-subtitle block-sub">(b) 为什么不放在 scene：7 项反面代价</p>
+      <div class="two-col" style="grid-template-columns:1fr 1fr;">
+        <ul class="checklist">
+          <li class="bad">每个 scene 重新解释同一份 guidance</li>
+          <li class="bad">scene 之间可能使用不同 context revision</li>
+          <li class="bad">scene 层决定覆盖 outline 层的整体课程设计</li>
+          <li class="bad">learner / context 数据重复进入多个 Prompt</li>
+        </ul>
+        <ul class="checklist">
+          <li class="bad">token 成本增加</li>
+          <li class="bad">后续 realized alignment 难以判断偏差来自 outline 还是 scene</li>
+          <li class="mute">（以上都是 §13 的原文代价，不是推测）</li>
+        </ul>
+      </div>
+
+      <p class="block-subtitle block-sub">(c) 三个产品层级 → 现有生产职责</p>
+      <table class="matrix">
+        <thead>
+          <tr><th>产品层级</th><th>生产职责</th><th>当前代码入口</th><th>成功边界</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="rowhead">Receipt</td>
+            <td>接收和记录课前 context lineage</td>
+            <td><code>freezeFormalFusionForOutline()</code> / session store</td>
+            <td>服务端收到并能关联 context/request/session；<strong>不代表可用或已消费</strong></td>
+          </tr>
+          <tr>
+            <td class="rowhead">Availability</td>
+            <td>在当前 outline attempt 中恢复合法、冻结、版本一致的 context</td>
+            <td><code>resolveFormalFusion()</code> / <code>contextFrom()</code></td>
+            <td>当前生成可安全读取同一 Frozen Context；<strong>不代表 generator 已使用</strong></td>
+          </tr>
+          <tr>
+            <td class="rowhead">Consumption</td>
+            <td>把冻结语义投影到 outline generation 并作为课程设计输入</td>
+            <td><code>projectFormalGenerationContext()</code> / <code>appendFormalTeachingPrompt()</code></td>
+            <td>当前 Outline Generation Attempt 实际使用 generation-facing teaching semantics</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="footnote">
+        这张表说明"未来应该沿现有职责边界改造"，<strong>不表示现有函数已经满足验收</strong>（对应 DEC-011）。
+      </p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-07</span>
+      <span class="block-title">三个层级分别能说明什么、不能说明什么</span>
+      <span class="block-stage">乙 · 它怎么跑</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §3, §4, §5</span>
+      <span class="fold">折叠</span>
+    </div>
+    <div class="block-body">
+      <div class="why-this">
+        全文的地基。原文用三段散文分别讲三级"能说明 / 不能说明"，这里并成一张三行对照表 ——
+        这是最典型的"散文换表格"：内容一条不少，但一眼能扫完。
+      </div>
+      <table class="matrix">
+        <thead>
+          <tr><th style="width:130px;">层级</th><th>能说明</th><th>不能说明</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="rowhead">Receipt</td>
+            <td class="yes">
+              <span class="cell-label">✓</span>
+              收到了某个 Proposal / 冻结上下文或传输结果；传输层或接收层记录了到达事实；
+              后续系统有机会继续做授权、版本和语义关联检查
+            </td>
+            <td class="no">
+              <span class="cell-label">✗</span>
+              已通过合法性校验；属于当前生成请求；已经冻结；当前生成一定可以使用它；
+              生成器实际读过或使用了其中的教学语义；最终 outline / scene 已经对齐
+            </td>
+          </tr>
+          <tr>
+            <td class="rowhead">Availability</td>
+            <td class="yes">
+              <span class="cell-label">✓</span>
+              来自受信任服务端路径（非浏览器伪造）；请求 / session / Frozen Context lineage 一致；
+              schema、revision、digest、引用范围、授权检查通过；是同一个冻结上下文；
+              生命周期内仍有效；生成阶段具备服务端访问能力
+            </td>
+            <td class="no">
+              <span class="cell-label">✗</span>
+              生成器已经真正使用了上下文。它只说明："<em>如果生成器需要，它现在可以合法、稳定地使用这份上下文。</em>"
+            </td>
+          </tr>
+          <tr>
+            <td class="rowhead">Consumption</td>
+            <td class="yes">
+              <span class="cell-label">✓</span>
+              本次 outline generation 实际使用了冻结上下文中的教学语义，并将其作为<strong>课程设计输入</strong>，
+              而不是仅仅收到、保存或附加了上下文
+            </td>
+            <td class="no">
+              <span class="cell-label">✗</span>
+              不能由"收到 / 保存 / 附加 / Prompt 变长 / 生成成功"推出 —— 见 O-10
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 丙 · 怎么算发生了 ============ -->
+
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-10</span>
+      <span class="block-title">HOW DO WE KNOW？怎样证明某个状态真的发生了</span>
+      <span class="block-stage">丙 · 怎么算发生了</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §3, §4, §5, §12</span>
+      <span class="fold">折叠</span>
+    </div>
+    <div class="block-body">
+      <div class="why-this">
+        这一节不是"再定义三个名词"，而是规定<strong>怎样举证</strong>。
+        它同时装下两个最容易被误解的判断：成功返回不等于发生了消费；生成失败也不等于没消费。
+      </div>
+
+      <p class="block-subtitle">证据阶梯</p>
+      <div class="ladder">
+        <div class="rung one">
+          <div class="rung-tag">Receipt<br>Evidence</div>
+          <div class="rung-body">
+            到达记录
+            <div class="rung-detail">能关联到某个请求或 session lineage；传输 / 接收事实被记录</div>
+          </div>
+        </div>
+        <div class="rung two">
+          <div class="rung-tag">Availability<br>Evidence</div>
+          <div class="rung-body">
+            合法性证据
+            <div class="rung-detail">
+              schema / revision / digest / 引用范围 / 授权 / lineage 一致性检查结果；
+              使用的是同一个 Frozen Context
+            </div>
+          </div>
+        </div>
+        <div class="rung three">
+          <div class="rung-tag">Consumption<br>Evidence</div>
+          <div class="rung-body">
+            generation-level 证据
+            <div class="rung-detail">
+              某次 <strong>Outline Generation Attempt</strong> 使用了哪个 Frozen Context、
+              哪个 generation-facing projection
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-subtitle block-sub">这些都不能单独证明 Consumption</p>
+      <div class="two-col">
+        <ul class="checklist">
+          <li class="bad">context stored<span class="why">上下文被保存了</span></li>
+          <li class="bad">context field exists<span class="why">生成请求参数里出现 context 字段</span></li>
+        </ul>
+        <ul class="checklist">
+          <li class="bad">prompt contains context<span class="why">Prompt 里包含了上下文文本</span></li>
+          <li class="bad">generation succeeded<span class="why">生成接口成功返回了 outline</span></li>
+        </ul>
+      </div>
+
+      <p class="block-subtitle block-sub">最低证据方向（注意：不是已确定的证据结构）</p>
+      <div class="lane target" style="padding:12px 14px;">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12.5px;">
+          <span class="node" style="padding:5px 9px;">Frozen Context</span>
+          <span style="color:var(--ok);">→</span>
+          <span class="node" style="padding:5px 9px;">Projection</span>
+          <span style="color:var(--ok);">→</span>
+          <span class="node" style="padding:5px 9px;">Generation Attempt</span>
+          <span style="color:var(--ok);">→</span>
+          <span class="node" style="padding:5px 9px;">Consumption Evidence</span>
+        </div>
+      </div>
+      <p class="footnote">
+        原文只确定"最低证据应以 generation-level 为主"，<strong>没有决定 evidence 的具体结构</strong> ——
+        这仍是未决项 <span class="node-badge">Q-002</span>。
+      </p>
+
+      <p class="block-subtitle block-sub">两个反直觉判断</p>
+      <div class="two-col">
+        <ul class="checklist">
+          <li class="bad">生成成功 ≠ 发生了 Consumption
+            <span class="why">如果 projection 没有成为真实生成输入，只能算 Receipt 或 Availability</span></li>
+        </ul>
+        <ul class="checklist">
+          <li class="good">生成失败 ≠ 没发生 Consumption
+            <span class="why">只要某次实际 Attempt 已合法使用了 generation-facing projection</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <span class="block-id">O-11</span>
+      <span class="block-title">Consumption 不要求什么 / 可能出现的不一致状态</span>
+      <span class="block-stage">丙 · 怎么算发生了</span>
+      <span class="spacer"></span>
+      <span class="src">Source: §5, §8</span>
+      <span class="fold">折叠</span>
+    </div>
+    <div class="block-body">
+      <div class="why-this">
+        这里混了两件不同性质的事，所以拆成两个形状：左边是"不要求"，右边是"状态关系"。
+      </div>
+
+      <p class="block-subtitle">(a) What Consumption does NOT require</p>
+      <div class="two-col">
+        <div>
+          <div class="panel-title">不要求盲目服从</div>
+          <ul class="checklist">
+            <li class="good">某项 Recommended 被纳入设计考虑后最终没采用，仍可能满足 Consumption
+              <span class="why">会在 Output Alignment 记为 <code>Not adopted</code>，但不得伪称已经采用</span></li>
+            <li class="bad">完全没有把某项 guidance 纳入生成设计考虑
+              <span class="why">这反映 Consumption 不充分，不能用 Alignment 的最终采用状态解释过去</span></li>
+          </ul>
+        </div>
+        <div>
+          <div class="panel-title">不要求最终输出明显不同</div>
+          <ul class="checklist">
+            <li class="good">冻结上下文判断学习者与课程同通用设计一致时，输出可以接近默认 outline</li>
+            <li class="bad">为"证明个性化"而强行制造结构差异
+              <span class="why">反而可能破坏合理的课程设计</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="block-subtitle block-sub">(b) Possible mismatch states</p>
+      <div class="combo" style="max-width:640px;">
+        <div class="combo-key">Consumption = yes / Alignment = no</div>
+        <div class="combo-val warn">上下文确实参与了生成，但结果没有满足相关 Required 或没有充分体现目标、范围和教学设计</div>
+        <div class="combo-key">Consumption = no / Alignment = apparently yes</div>
+        <div class="combo-val info">结果可能来自默认模板、通用教学模式或偶然相似；<strong>不能把它归因于 DeepTutor</strong></div>
+      </div>
+      <p class="footnote">只有两个目标共同成立，才支持"本次课程在可追踪意义上消费并体现了 DeepTutor 的课前教学语义"。</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // 折叠 / Source 标签的最小交互：只为说明形状，不是最终实现。
+  document.querySelectorAll('.fold').forEach((btn, index) => {
+    const block = btn.closest('.block');
+    if (index % 2 === 1) {
+      block.classList.add('collapsed');
+      btn.textContent = '展开';
+    }
+    btn.addEventListener('click', () => {
+      block.classList.toggle('collapsed');
+      btn.textContent = block.classList.contains('collapsed') ? '展开' : '折叠';
+    });
+  });
+  document.querySelectorAll('.src, .node-badge').forEach((tag) => {
+    tag.addEventListener('click', () => {
+      tag.style.outline = '2px solid var(--accent)';
+      setTimeout(() => { tag.style.outline = 'none'; }, 600);
+      console.log('回原文 / 跳决策：', tag.textContent);
+    });
+  });
+</script>
+</body>
+</html>

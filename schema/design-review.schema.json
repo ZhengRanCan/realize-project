@@ -1,0 +1,981 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://local.design-review/design-review.schema.json",
+  "title": "design-review.json",
+  "description": "AI 对设计文档的结构化分析结果。此文件可被 AI 重新生成；人工审批状态不存放在此处，只存放在 human-review.json。",
+  "type": "object",
+  "required": [
+    "design",
+    "summary",
+    "overview",
+    "facts",
+    "decisions",
+    "gaps",
+    "openQuestions"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "description": "支撑 Fact / Gap / Decision 的来源。第一版不强制保存精确行号。evidenceType 决定这条证据的可信级别。",
+      "required": [
+        "type",
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "description": "document-claim = 文档中的主张，未经源码核对；source-verified = 已由源码 / 测试 / 配置核对的事实。",
+          "enum": [
+            "document-claim",
+            "source-verified"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "description": "document-claim 类型：文档路径或文件名。"
+        },
+        "section": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "description": "source-verified 类型：源码 / 测试 / 配置路径。"
+        },
+        "symbol": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "startLine": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "endLine": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z]+-[0-9]{3}$"
+    },
+    "cell": {
+      "type": "object",
+      "description": "表格 / 阶梯 / 组合里的一个格子。variant 只表达语义色，不承载新语义。",
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "variant": {
+          "enum": [
+            "plain",
+            "current",
+            "target",
+            "ok",
+            "warn",
+            "bad",
+            "info",
+            "muted"
+          ]
+        }
+      }
+    },
+    "checklistItem": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        },
+        "variant": {
+          "enum": [
+            "ok",
+            "bad",
+            "muted"
+          ]
+        }
+      }
+    },
+    "checklistPanel": {
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "variant": {
+          "enum": [
+            "plain",
+            "ok",
+            "bad",
+            "warn",
+            "info"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/checklistItem"
+          }
+        }
+      }
+    },
+    "flowNode": {
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detail": {
+          "type": "string"
+        },
+        "state": {
+          "description": "changed = 这次设计要改动的位置；target = 目标形态；current = 现状形态（默认值）。",
+          "enum": [
+            "current",
+            "changed",
+            "target"
+          ]
+        },
+        "tier": {
+          "enum": [
+            "primary",
+            "secondary"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "description": "涉及的代码入口 / 符号（document-claim 级别，未核对源码）。"
+        },
+        "badges": {
+          "description": "挂在这个节点上的 Review Object 编号，用于跳转。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "flowLane": {
+      "type": "object",
+      "required": [
+        "label",
+        "nodes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "variant": {
+          "enum": [
+            "plain",
+            "current",
+            "target"
+          ]
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "node"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "node": {
+                "$ref": "#/definitions/flowNode"
+              },
+              "edge": {
+                "description": "从这个节点指向下一个节点的边。",
+                "type": "object",
+                "required": [
+                  "kind"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "plain",
+                      "changed",
+                      "problem"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "overviewBlock": {
+      "type": "object",
+      "description": "Overview 的一个视觉区块。承载形式由 content.type 决定；Important 语义的完整性比句子完整性重要。",
+      "required": [
+        "id",
+        "title",
+        "stage",
+        "sources",
+        "defaultExpanded",
+        "content"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^O-[0-9]{2}[a-z]?$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stage": {
+          "enum": [
+            "what",
+            "how",
+            "prove",
+            "boundary"
+          ]
+        },
+        "role": {
+          "description": "ambient = 常驻在页面顶部、不参与折叠的性质声明。",
+          "enum": [
+            "ambient",
+            "normal"
+          ]
+        },
+        "sources": {
+          "description": "对应原文章节标签，用于回原文核对。",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "defaultExpanded": {
+          "type": "boolean"
+        },
+        "reviewObjects": {
+          "description": "可关联的 Review Object 编号（Decision / Fact / Gap / Open Question / Semantic Model）。",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "content": {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "enum": [
+                "prose",
+                "flow",
+                "ladder",
+                "matrix",
+                "checklist",
+                "steps",
+                "combo",
+                "diff"
+              ]
+            },
+            "parts": {
+              "description": "type=prose",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "variant": {
+                    "enum": [
+                      "lead",
+                      "secondary",
+                      "quiet"
+                    ]
+                  }
+                }
+              }
+            },
+            "caption": {
+              "type": "string",
+              "description": "图的标题（type=flow / ladder / combo / steps）。"
+            },
+            "lanes": {
+              "description": "type=flow",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/flowLane"
+              }
+            },
+            "tiers": {
+              "description": "type=ladder",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "label",
+                  "text"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "detail": {
+                    "type": "string"
+                  },
+                  "variant": {
+                    "enum": [
+                      "plain",
+                      "ok",
+                      "warn",
+                      "bad",
+                      "info"
+                    ]
+                  }
+                }
+              }
+            },
+            "columns": {
+              "description": "type=matrix 的表头；第一列渲染为行首标签。",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            },
+            "rows": {
+              "description": "type=matrix 的行；每行长度必须等于 columns 长度。",
+              "type": "array",
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/definitions/cell"
+                }
+              }
+            },
+            "panels": {
+              "description": "type=checklist：每一组是一个带标题的清单。",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/definitions/checklistPanel"
+              }
+            },
+            "steps": {
+              "description": "type=steps",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "verdict": {
+              "description": "type=steps：走查结束后的结论条。",
+              "type": "object",
+              "required": [
+                "text"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "variant": {
+                  "enum": [
+                    "ok",
+                    "warn",
+                    "bad",
+                    "info",
+                    "plain"
+                  ]
+                }
+              }
+            },
+            "pairs": {
+              "description": "type=combo：左侧是组合键（通常是状态组合），右侧是解释。",
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "key",
+                  "value"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "keyVariants": {
+                    "description": "键里每个 token 的语义色，长度需要与 key 的 token 数一致（可选）。",
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "ok",
+                        "warn",
+                        "bad",
+                        "info",
+                        "muted",
+                        "plain"
+                      ]
+                    }
+                  },
+                  "value": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "variant": {
+                    "enum": [
+                      "plain",
+                      "ok",
+                      "warn",
+                      "bad",
+                      "info"
+                    ]
+                  }
+                }
+              }
+            },
+            "sides": {
+              "description": "type=diff：左右两栏的差异对照。",
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "required": [
+                  "label",
+                  "lines"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "variant": {
+                    "enum": [
+                      "current",
+                      "target"
+                    ]
+                  },
+                  "lines": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "mark",
+                        "text"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "mark": {
+                          "enum": [
+                            "keep",
+                            "add",
+                            "gone"
+                          ]
+                        },
+                        "text": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "note": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "note": {
+              "type": "string",
+              "description": "区块末尾的脚注。"
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "design": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "status",
+        "sourceDocuments"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "description": "一句话摘要：这个方案整体在说什么。Overview 首屏展示，帮助人在进入细节前先看懂整体。",
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "in-review",
+            "reviewed"
+          ]
+        },
+        "sourceDocuments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type",
+              "path"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "enum": [
+                  "document",
+                  "source-directory"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string"
+              },
+              "lines": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "role": {
+                "enum": [
+                  "primary",
+                  "referenced-not-analyzed",
+                  "supporting"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "pendingDecisions",
+        "gaps",
+        "openQuestions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "pendingDecisions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gaps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "openQuestions": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "description": "方案总览的分段与区块声明。UI 只负责按顺序绘制，分组与默认折叠状态由数据声明。",
+      "required": [
+        "sections"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "title",
+              "purpose",
+              "blocks"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "enum": [
+                  "what",
+                  "how",
+                  "prove",
+                  "boundary"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "purpose": {
+                "type": "string",
+                "minLength": 1
+              },
+              "blocks": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/definitions/overviewBlock"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "statement",
+          "evidence"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/definitions/id"
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/evidence"
+            }
+          }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "type",
+          "reviewLevel",
+          "question",
+          "proposal",
+          "rationaleSummary",
+          "alternatives",
+          "rationale",
+          "consequences",
+          "dependsOn",
+          "affects",
+          "evidence",
+          "status"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/definitions/id"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "enum": [
+              "architecture-boundary",
+              "semantic-model",
+              "data-contract",
+              "process-boundary",
+              "product-scope"
+            ]
+          },
+          "reviewLevel": {
+            "description": "root = 需要人工独立批准的核心判断，默认出现在 Overview 与 Review Queue；supporting = 支撑 root 的次级判断，通过关联展开；derived = 由 root 推导出的判断，通过关联展开。",
+            "enum": [
+              "root",
+              "supporting",
+              "derived"
+            ]
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "proposal": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rationaleSummary": {
+            "description": "一句话原因：为什么提出这个 Proposal。Decisions 列表默认展示，Full Rationale 折叠后可看完整论证。",
+            "type": "string",
+            "minLength": 1
+          },
+          "alternatives": {
+            "type": "array",
+            "description": "不得为了填字段虚构 alternatives；无明确 alternative 时允许为空数组。",
+            "items": {
+              "type": "object",
+              "required": [
+                "label"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "rationale": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "consequences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "affects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "relatedGaps": {
+            "description": "与此 Decision 直接相关的 Gap，用于 Decision Detail 的 Related Gap。",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "relatedQuestions": {
+            "description": "与此 Decision 关联的 Open Question。Open Question 不再单独成页，而是作为 Decision 的附属信息出现。",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/evidence"
+            }
+          },
+          "status": {
+            "description": "AI 生成时必须是 pending。人工审批状态不写回此字段。",
+            "const": "pending"
+          }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "severity",
+          "current",
+          "target",
+          "evidence",
+          "affectedFiles",
+          "relatedDecisions"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/definitions/id"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "current": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/evidence"
+            }
+          },
+          "affectedFiles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "relatedDecisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/id"
+            }
+          }
+        }
+      }
+    },
+    "openQuestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "question",
+          "context",
+          "category",
+          "blocking",
+          "relatedDecisions"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/definitions/id"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "context": {
+            "type": "string"
+          },
+          "category": {
+            "description": "architecture-blocking / implementation-blocking 是真正阻塞实现的类别；deferred 表示已决定延后；research 表示属于研究问题，不阻塞实现。",
+            "enum": [
+              "architecture-blocking",
+              "implementation-blocking",
+              "deferred",
+              "research"
+            ]
+          },
+          "blocking": {
+            "description": "人工主张：这个问题是否阻塞。必须与 category 一致；Implementation Gate 只把 architecture-blocking / implementation-blocking 且未关闭的问题算作阻塞。",
+            "type": "boolean"
+          },
+          "relatedDecisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/id"
+            }
+          },
+          "relatedGaps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/id"
+            }
+          }
+        }
+      }
+    }
+  }
+}

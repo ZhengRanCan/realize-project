@@ -1,0 +1,47 @@
+{
+  "model": "gpt-5.6-sol",
+  "runs": [
+    {
+      "run": "run-1",
+      "model": "gpt-5.6-sol",
+      "latencyS": 215,
+      "promptTokens": 16127,
+      "completionTokens": 9816,
+      "units": 77,
+      "blocks": 18,
+      "merged": 9,
+      "core": 73,
+      "hardErrors": 1,
+      "warnings": 6,
+      "verdict": "FAIL"
+    },
+    {
+      "run": "run-2",
+      "model": "gpt-5.6-sol",
+      "latencyS": 291,
+      "promptTokens": 16127,
+      "completionTokens": 10059,
+      "units": 74,
+      "blocks": 20,
+      "merged": 5,
+      "core": 71,
+      "hardErrors": 3,
+      "warnings": 4,
+      "verdict": "FAIL"
+    },
+    {
+      "run": "run-3",
+      "model": "gpt-5.6-sol",
+      "latencyS": 185,
+      "promptTokens": 16127,
+      "completionTokens": 9968,
+      "units": 75,
+      "blocks": 18,
+      "merged": 9,
+      "core": 73,
+      "hardErrors": 1,
+      "warnings": 5,
+      "verdict": "FAIL"
+    }
+  ]
+}

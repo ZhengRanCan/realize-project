@@ -1,0 +1,20 @@
+# 统一换行符为 LF：避免 Windows(core.autocrlf=true) 与 macOS/Linux 之间的整文件差异
+* text=auto eol=lf
+
+# 明确二进制文件，禁止任何换行符转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.zip binary
+
+# 生成物：GitHub 语言统计与 diff 折叠
+package-lock.json linguist-generated=true -diff
+app/renderer/vendor/mermaid.min.js linguist-vendored=true -diff
+docs/source-sections.json linguist-generated=true
+fixtures/context-consumption.json linguist-generated=true
+fixtures/context-consumption.overview-plan.json linguist-generated=true

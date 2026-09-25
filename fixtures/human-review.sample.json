@@ -1,0 +1,124 @@
+{
+  "reviewVersion": 1,
+  "designId": "DESIGN-CONTEXT-CONSUMPTION",
+  "designReviewPath": "fixtures\\context-consumption.json",
+  "updatedAt": "2026-09-25T07:25:35.061Z",
+  "decisions": {
+    "DEC-001": {
+      "status": "approved",
+      "comment": "三级语义边界清晰，与 Receipt/Availability 的区分成立。"
+    },
+    "DEC-002": {
+      "status": "approved",
+      "comment": "同意不引入反事实因果承诺。"
+    },
+    "DEC-003": {
+      "status": "approved",
+      "comment": "Consumption 与 Output Alignment 必须分开报告。"
+    },
+    "DEC-004": {
+      "status": "approved",
+      "comment": ""
+    },
+    "DEC-005": {
+      "status": "needs-revision",
+      "comment": "需要补充说明如何在不依赖输出差异的前提下证明实际消费。"
+    },
+    "DEC-006": {
+      "status": "approved",
+      "comment": ""
+    },
+    "DEC-007": {
+      "status": "approved",
+      "comment": "Primary Consumption Point 定在 outline generation 合理。"
+    },
+    "DEC-008": {
+      "status": "needs-evidence",
+      "comment": "需要源码证据确认 scene-content route 的 formal 分支实际行为。"
+    },
+    "DEC-009": {
+      "status": "approved",
+      "comment": ""
+    },
+    "DEC-010": {
+      "status": "approved",
+      "comment": ""
+    },
+    "DEC-011": {
+      "status": "approved",
+      "comment": ""
+    },
+    "DEC-012": {
+      "status": "approved",
+      "comment": "本文件不构成实现授权，确认。"
+    }
+  },
+  "openQuestions": {
+    "Q-001": {
+      "status": "pending",
+      "comment": ""
+    },
+    "Q-002": {
+      "status": "deferred",
+      "comment": "已知，延后到实现设计阶段解决。"
+    },
+    "Q-003": {
+      "status": "deferred",
+      "comment": "已知，延后到实现设计阶段解决。"
+    },
+    "Q-004": {
+      "status": "pending",
+      "comment": ""
+    },
+    "Q-005": {
+      "status": "deferred",
+      "comment": "已知，延后到实现设计阶段解决。"
+    },
+    "Q-006": {
+      "status": "deferred",
+      "comment": "已知，延后到实现设计阶段解决。"
+    },
+    "Q-007": {
+      "status": "pending",
+      "comment": ""
+    },
+    "Q-008": {
+      "status": "deferred",
+      "comment": "已知，延后到实现设计阶段解决。"
+    },
+    "Q-009": {
+      "status": "deferred",
+      "comment": "已知，延后到实现设计阶段解决。"
+    },
+    "Q-010": {
+      "status": "pending",
+      "comment": ""
+    }
+  },
+  "gaps": {
+    "GAP-001": {
+      "status": "confirmed",
+      "comment": ""
+    },
+    "GAP-002": {
+      "status": "confirmed",
+      "comment": ""
+    },
+    "GAP-003": {
+      "status": "confirmed",
+      "comment": ""
+    },
+    "GAP-004": {
+      "status": "confirmed",
+      "comment": ""
+    },
+    "GAP-005": {
+      "status": "confirmed",
+      "comment": ""
+    },
+    "GAP-006": {
+      "status": "confirmed",
+      "comment": ""
+    }
+  }
+}

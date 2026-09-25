@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';" />
+  <title>Design Review</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 首屏：Import / Start（agent.md 第九节） -->
+  <section id="screen-start" class="screen">
+    <div class="start-card">
+      <h1>Design Review</h1>
+      <p class="muted">
+        把长设计文档转换成有限、明确、可验证、可批准的 Review Objects。
+        当前阶段只读取结构化分析结果，不调用 AI。
+      </p>
+
+      <div class="start-block">
+        <div class="start-label">Markdown 设计文档（本轮测试样本）</div>
+        <div class="start-row">
+          <button id="btn-pick-markdown" class="btn">选择 Markdown 文件</button>
+          <button id="btn-use-default-markdown" class="btn ghost">使用测试样本</button>
+        </div>
+        <div id="md-info" class="file-hint">尚未选择 Markdown。</div>
+      </div>
+
+      <div class="start-block">
+        <div class="start-label">Source 目录（Phase 3，本轮不启用）</div>
+        <button class="btn" disabled>选择源码目录</button>
+      </div>
+
+      <div class="start-block">
+        <div class="start-label">结构化分析结果</div>
+        <div class="start-row">
+          <button id="btn-load-fixture" class="btn primary">打开 fixture（context-consumption.json）</button>
+          <button id="btn-open-json" class="btn ghost">打开其他 design-review.json</button>
+        </div>
+        <div id="fixture-info" class="file-hint"></div>
+      </div>
+
+      <div id="start-error" class="error-box hidden"></div>
+
+      <details class="start-details">
+        <summary>AI 分析（Phase 2）尚未接入</summary>
+        <p class="muted">
+          agent.md 要求把 Review UI 先验证完，再决定是否值得让 AI 生成 <code>design-review.json</code>。
+          本版本只加载已经存在的结构模型，并把它与人工审批状态分离保存。
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Review 页面 -->
+  <section id="screen-review" class="screen hidden">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="doc-title" id="design-title">—</div>
+        <div class="doc-meta">
+          <span id="design-id" class="pill"></span>
+          <span id="design-status" class="pill"></span>
+          <span id="model-path" class="mono muted small"></span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <nav class="view-switch">
+          <button class="nav-item active" data-view="overview">方案总览</button>
+          <button class="nav-item" data-view="decisions">决策清单 <span id="nav-decision-count" class="nav-count"></span></button>
+        </nav>
+        <div id="gate-badge" class="gate-badge pending">—</div>
+        <button id="btn-save" class="btn primary">保存 human-review.json</button>
+        <button id="btn-reload" class="btn ghost">重新加载</button>
+        <button id="btn-back" class="btn ghost">返回</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="toc-pane">
+        <nav id="toc" class="toc"></nav>
+        <div class="toc-foot">
+          <div id="stage-indicator" class="stage-indicator">当前阅读：—</div>
+          <div id="save-state" class="muted small">未保存</div>
+          <button id="btn-reveal" class="link-btn">打开 human-review.json 位置</button>
+        </div>
+      </aside>
+
+      <main id="main" class="main"></main>
+
+      <aside id="source-panel" class="source-pane hidden">
+        <div class="source-head">
+          <div id="source-head" class="source-head-inner"></div>
+          <button id="source-close" class="btn tiny ghost">关闭</button>
+        </div>
+        <div id="source-body" class="source-body"></div>
+      </aside>
+    </div>
+  </section>
+
+  <script src="vendor/mermaid.min.js"></script>
+  <script src="../shared/semantics.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

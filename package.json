@@ -1,0 +1,22 @@
+{
+  "name": "design-review-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI Design Review MVP - Markdown design document -> structured design-review.json -> Electron Review UI -> human-review.json",
+  "main": "app/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "selftest": "electron . --selftest",
+    "validate": "node scripts/validate-fixture.js",
+    "audit": "node scripts/audit-overview.js",
+    "check-plan": "node scripts/check-plan.js",
+    "test:plan": "node scripts/test-check-plan.js",
+    "source": "node scripts/extract-source-sections.js",
+    "simulate": "node scripts/simulate-review.js",
+    "ai:plan": "node scripts/ai-plan.js",
+    "compare-plan": "node scripts/compare-plan.js"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}

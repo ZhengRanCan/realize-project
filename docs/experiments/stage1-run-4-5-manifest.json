@@ -1,0 +1,29 @@
+{
+  "model": "gpt-5.6-sol",
+  "promptSha256": "62e8e544c69dd32c",
+  "note": "run-6 因网关订阅额度不足（HTTP 403）未能生成，见报告",
+  "runs": [
+    {
+      "run": "run-4",
+      "prompt": "62e8e544c69dd32c",
+      "units": 76,
+      "blocks": 20,
+      "kind误用": 0,
+      "hard": 0,
+      "warn": 4,
+      "判定": "PASS",
+      "latencyS": 181
+    },
+    {
+      "run": "run-5",
+      "prompt": "62e8e544c69dd32c",
+      "units": 82,
+      "blocks": 22,
+      "kind误用": 0,
+      "hard": 0,
+      "warn": 3,
+      "判定": "PASS",
+      "latencyS": 209
+    }
+  ]
+}
