@@ -1,0 +1,1205 @@
+<<<FRAMEWORK_MAP>>>
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "goal-plan-stage-task-target-model",
+    "title": "Goal / Plan / Stage / Task target model contract",
+    "sourcePath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+    "role": "target",
+    "scope": {
+      "text": "本文档是规划域 F40 的 target data model contract：定义 Goal / UserProfile / PlanBundle(Plan+Stage[]+Task[]) 目标核心链、planner 临时输入与执行事实的归属、DailyPlan[] 的 legacy 边界与迁移方向；改动 models/、planner、replanner、storage 或页面数据消费前以本文档为 source of truth。",
+      "sectionRefs": ["§Purpose"]
+    },
+    "nonGoalSummary": {
+      "text": "F40 只做模型与迁移方向评审：不删除 DailyPlan[]、不改 daily-plans:{goalId} 存储键、不改兼容读取与 adapter、不实现 AI 或 planner 重写；F41 只在纯 models/ 层实现目标新增；扩展字段、DeepSeek/replanner schema、确定性 planner 改造、消费者迁移与破坏性删除均留作后续特性，不属于本文档。",
+      "sectionRefs": ["§Purpose", "§DailyPlan legacy boundary", "§Migration direction"]
+    }
+  },
+  "thesis": "目标规划域把 Goal / UserProfile / PlanBundle(Plan+Stage[]+Task[]) 定为持久真相，把 planner 输入与计算视图排除在真相之外，并把 DailyPlan[] 降为迁移期兼容面。",
+  "elements": [
+    {
+      "id": "E-Goal",
+      "label": "Goal（用户原始目标意图 + 目标范围硬约束）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-01", "T-05"],
+      "sectionRefs": ["§Goal", "§F40 conclusion"]
+    },
+    {
+      "id": "E-UserProfile",
+      "label": "UserProfile（跨目标用户上下文与表达/排期偏好）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-01", "T-06"],
+      "sectionRefs": ["§UserProfile", "§F40 conclusion"]
+    },
+    {
+      "id": "E-PlannerInputs",
+      "label": "planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-01", "T-03", "T-04"],
+      "sectionRefs": ["§Initial planning flow", "§Replanning flow", "§F40 conclusion"]
+    },
+    {
+      "id": "E-InitialPlanning",
+      "label": "初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-01", "T-03"],
+      "sectionRefs": ["§Initial planning flow"]
+    },
+    {
+      "id": "E-Replanning",
+      "label": "重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-01", "T-04", "T-09"],
+      "sectionRefs": ["§Replanning flow", "§Stage", "§PlanChangeSummary"]
+    },
+    {
+      "id": "E-PlanBundle",
+      "label": "PlanBundle 聚合（Plan + Stage[] + Task[]）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-01", "T-07", "T-08", "T-09", "T-10"],
+      "sectionRefs": ["§PlanBundle", "§Plan", "§Stage", "§Task", "§F40 conclusion"]
+    },
+    {
+      "id": "E-ExecutionEvidence",
+      "label": "任务范围执行证据（FocusSession[] / TaskResult[]）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-12"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-DailyReview",
+      "label": "DailyReview[]（日范围执行历史事实，可读不可改写）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-12", "T-14", "T-15"],
+      "sectionRefs": ["§DailyReview", "§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-TodayTaskSelection",
+      "label": "TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-13", "T-11"],
+      "sectionRefs": ["§TodayTaskSelection", "§Task Card computed contract"]
+    },
+    {
+      "id": "E-PlanChangeSummary",
+      "label": "PlanChangeSummary[]（一次确定性调整的持久收据）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-16"],
+      "sectionRefs": ["§PlanChangeSummary"]
+    },
+    {
+      "id": "C-PlanStructureAndState",
+      "label": "模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-05", "T-07", "T-08", "T-09", "T-10", "T-11", "T-13"],
+      "sectionRefs": ["§Plan", "§Stage", "§Task", "§Goal", "§PlanBundle", "§Task Card computed contract", "§TodayTaskSelection", "§DailyReview"]
+    },
+    {
+      "id": "C-HistoryIntegrity",
+      "label": "执行历史不可改写、不得静默丢失与显式失败",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-04", "T-12", "T-14", "T-16"],
+      "sectionRefs": ["§Replanning flow", "§Plan", "§DailyReview", "§PlanChangeSummary", "§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "C-TruthAndConsumptionBoundary",
+      "label": "真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-02", "T-05", "T-06", "T-14", "T-15", "T-17", "T-18", "T-19"],
+      "sectionRefs": ["§Computed views", "§PlanBundle", "§Plan", "§Goal", "§UserProfile", "§DailyReview", "§DailyReviewPromptDismissal", "§DailyPlan legacy boundary", "§Migration direction", "§Initial planning flow", "§PlanChangeSummary"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "ED-01",
+      "from": "E-PlannerInputs",
+      "to": "E-Goal",
+      "type": "consumes",
+      "label": "InitialPlanContext / ReplanContext 以 Goal 的目标意图与目标范围硬约束为输入",
+      "qualifiers": { "cardinality": { "from": "many", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-02",
+      "from": "E-PlannerInputs",
+      "to": "E-UserProfile",
+      "type": "consumes",
+      "label": "上下文纳入跨目标的表达与排期偏好",
+      "qualifiers": { "cardinality": { "from": "many", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-03",
+      "from": "E-PlannerInputs",
+      "to": "E-PlanBundle",
+      "type": "consumes",
+      "label": "ReplanContext 注入由 service 从 storage 读出的 currentPlanBundle",
+      "qualifiers": { "cardinality": { "from": "many", "to": "zero-or-one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-04",
+      "from": "E-InitialPlanning",
+      "to": "E-PlannerInputs",
+      "type": "consumes",
+      "label": "消费 service 运行时组装、不持久化的 InitialPlanContext",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-05",
+      "from": "E-InitialPlanning",
+      "to": "E-PlanBundle",
+      "type": "produces",
+      "label": "产出第一个 PlanBundle",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-06",
+      "from": "E-Replanning",
+      "to": "E-PlannerInputs",
+      "type": "consumes",
+      "label": "消费 ReplanContext（当前 PlanBundle、反馈、复盘与阶段进展）",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-07",
+      "from": "E-Replanning",
+      "to": "E-DailyReview",
+      "type": "consumes",
+      "label": "复盘与用户反馈作为重规划的触发与输入",
+      "qualifiers": { "cardinality": { "from": "zero-or-many", "to": "zero-or-many" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-08",
+      "from": "E-Replanning",
+      "to": "E-ExecutionEvidence",
+      "type": "consumes",
+      "label": "重规划读取 FocusSession 与 TaskResult 并保留已提交执行历史",
+      "qualifiers": { "cardinality": { "from": "zero-or-many", "to": "zero-or-many" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-09",
+      "from": "E-Replanning",
+      "to": "E-PlanBundle",
+      "type": "produces",
+      "label": "产出新计划版本",
+      "qualifiers": { "cardinality": { "from": "zero-or-one", "to": "zero-or-one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-10",
+      "from": "E-Replanning",
+      "to": "E-PlanChangeSummary",
+      "type": "produces",
+      "label": "产出解释本次确定性调整的持久收据",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-11",
+      "from": "E-DailyReview",
+      "to": "E-ExecutionEvidence",
+      "type": "relates-to",
+      "label": "Review 引用或汇总当日该 Goal 的 Task 结果",
+      "qualifiers": { "cardinality": { "from": "one", "to": "many" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-12",
+      "from": "E-TodayTaskSelection",
+      "to": "E-PlanBundle",
+      "type": "relates-to",
+      "label": "选择引用当前 active PlanBundle 中的 Task",
+      "qualifiers": { "cardinality": { "from": "many", "to": "one" }, "ownership": "reference" }
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "C-PlanStructureAndState",
+      "attachedTo": ["E-PlanBundle", "E-Goal", "E-TodayTaskSelection", "E-DailyReview", "E-PlanChangeSummary"]
+    },
+    {
+      "elementId": "C-HistoryIntegrity",
+      "attachedTo": ["E-Replanning", "E-DailyReview", "E-ExecutionEvidence"]
+    },
+    {
+      "elementId": "C-TruthAndConsumptionBoundary",
+      "attachedTo": ["E-PlanBundle", "E-Goal", "E-UserProfile", "E-PlannerInputs", "E-TodayTaskSelection", "E-DailyReview", "E-PlanChangeSummary"]
+    }
+  ],
+  "topics": [
+    {
+      "id": "T-00",
+      "title": "文档范围与权威",
+      "proposition": "本文档是规划域 F40 的 target data model contract：只做模型与迁移方向评审，后续迁移以它为 source of truth。",
+      "sectionRefs": ["§Purpose"]
+    },
+    {
+      "id": "T-01",
+      "title": "核心规划链与持久真相",
+      "proposition": "目标域核心链是 Goal + UserProfile → 临时 planner 输入 → PlanBundle；重规划产出新 PlanBundle/受控变更集或显式 infeasible，DailyReview 是执行事实，DailyPlan[] 不是未来核心模型。",
+      "sectionRefs": ["§F40 conclusion"]
+    },
+    {
+      "id": "T-02",
+      "title": "模型分层",
+      "proposition": "模型分四层：持久真相、临时 planner 输入、计算视图、遗留兼容；四层可同时成立，是判读维度而非互斥状态。",
+      "sectionRefs": ["§Model layers"]
+    },
+    {
+      "id": "T-03",
+      "title": "初始规划流",
+      "proposition": "初始规划在没有执行历史时从用户意图与可复用用户上下文组装临时上下文，AI 输出经校验后成为第一个 PlanBundle。",
+      "sectionRefs": ["§Initial planning flow"]
+    },
+    {
+      "id": "T-04",
+      "title": "重规划流",
+      "proposition": "现实偏离计划（拒绝/反馈/阶段完成/复盘部分或跳过/容量或截止变化/不可行）时重规划更新或替换计划，并保留执行历史。",
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "T-05",
+      "title": "Goal 语义与边界",
+      "proposition": "Goal 承载用户原始目标意图与目标范围硬约束，不承载表达风格、执行反馈、计划策略或展示文案。",
+      "sectionRefs": ["§Goal"]
+    },
+    {
+      "id": "T-06",
+      "title": "UserProfile 语义与边界",
+      "proposition": "UserProfile 承载跨目标的排期偏好与表达偏好；MBTI/仪式偏好只影响表达与轻度排序，实际执行精力属 DailyReview。",
+      "sectionRefs": ["§UserProfile"]
+    },
+    {
+      "id": "T-07",
+      "title": "PlanBundle 聚合",
+      "proposition": "PlanBundle 是初始规划与重规划的主要持久输出，页面只消费由它派生的 service/view-model 输出。",
+      "sectionRefs": ["§PlanBundle"]
+    },
+    {
+      "id": "T-08",
+      "title": "Plan 状态与 detailedThrough",
+      "proposition": "Plan 用 structureType、detailedThrough、status 与 adjustmentRisk 表达计划窗口与可行性；infeasible 必须显式，未决风险不得被静默升降级。",
+      "sectionRefs": ["§Plan"]
+    },
+    {
+      "id": "T-09",
+      "title": "Stage 长程阶段",
+      "proposition": "Stage 覆盖整个计划窗口、用于长程概览与细化，其日期必须落在父计划内，完成不自动完成 Goal。",
+      "sectionRefs": ["§Stage"]
+    },
+    {
+      "id": "T-10",
+      "title": "Task 与依赖",
+      "proposition": "Task 是 detailedThrough 之前的具体执行单元，依赖用 dependsOnTaskIds 显式表达且必须同属一个 PlanBundle、无环。",
+      "sectionRefs": ["§Task"]
+    },
+    {
+      "id": "T-11",
+      "title": "Task Card 计算契约",
+      "proposition": "卡片状态由计算得出（done→closed、存在未完成显式依赖→locked、其余→available），唯一推荐按 scheduledDate → priority → 稳定 id 确定性产生。",
+      "sectionRefs": ["§Task Card computed contract"]
+    },
+    {
+      "id": "T-12",
+      "title": "执行事实与日复盘",
+      "proposition": "FocusSession、TaskResult 与 DailyReview 是三个独立领域概念：前者提供任务范围执行证据，后者是该 Goal/date 的日范围事实。",
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "T-13",
+      "title": "今日任务选择",
+      "proposition": "TodayTaskSelection 授权今日执行哪些 Task（每 Goal/Plan/date 一条、必须引用 active PlanBundle），它不是执行事实也不是排期变更。",
+      "sectionRefs": ["§TodayTaskSelection"]
+    },
+    {
+      "id": "T-14",
+      "title": "DailyReview 事实与隐私",
+      "proposition": "DailyReview 是历史事实，重规划可读不可改写；备注是用户私密数据，默认不得日志或上传。",
+      "sectionRefs": ["§DailyReview"]
+    },
+    {
+      "id": "T-15",
+      "title": "复盘提示 dismissal",
+      "proposition": "DailyReviewPromptDismissal 只是用户跳过复盘提示的 UI 历史，不构成执行或复盘真相，也不能授权其他日期或 Plan。",
+      "sectionRefs": ["§DailyReviewPromptDismissal"]
+    },
+    {
+      "id": "T-16",
+      "title": "PlanChangeSummary 收据",
+      "proposition": "PlanChangeSummary 解释一次确定性调整的收据，引用稳定 Task id 与日期，不是第二个 Plan 真相源。",
+      "sectionRefs": ["§PlanChangeSummary"]
+    },
+    {
+      "id": "T-17",
+      "title": "DailyPlan[] legacy 边界",
+      "proposition": "DailyPlan[] 只是迁移未完成期间的遗留存储与兼容读写面（含已知风险），不属于未来核心模型，删除留待独立特性。",
+      "sectionRefs": ["§DailyPlan legacy boundary"]
+    },
+    {
+      "id": "T-18",
+      "title": "计算视图",
+      "proposition": "DailyTaskView / TodaySuggestionView / PlanBundleCalendarView 等计算视图由 services/selectors 从 PlanBundle、DailyReview、UserProfile 生成，不是持久真相。",
+      "sectionRefs": ["§Computed views"]
+    },
+    {
+      "id": "T-19",
+      "title": "迁移方向",
+      "proposition": "F40 之后的迁移拆分为若干后续特性（扩字段、定义 AI/replanner schema、改造确定性 planner、替换消费面、破坏性删除 DailyPlan[] 与旧存储键），都不属于 F40。",
+      "sectionRefs": ["§Migration direction"]
+    },
+    {
+      "id": "T-20",
+      "title": "历史沿革",
+      "proposition": "F16/F39/F41/F56/F58 记录了目标模型逐次成形的历史：校验、运行时输入类型、可选字段、创建屏与确认写入路径。",
+      "sectionRefs": ["§Historical notes", "§2026-05-26 F16", "§2026-06-26 F39", "§2026-06-27 F41", "§2026-07-03 F56", "§2026-07-09 F58"]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 13,
+    "topicCount": 21,
+    "edgeCount": 12,
+    "attachmentCount": 3,
+    "note": "13 个 element = 10 个结构 element（Goal / UserProfile / planner 临时输入 / 两个流程 / PlanBundle / 执行证据 / DailyReview / TodayTaskSelection / PlanChangeSummary）+ 3 个 constraint element。相对 preferred budget 12 超出 1：文档把执行事实（FocusSession/TaskResult）、日复盘、确定性调整收据与今日选择分别定义为独立持久真相集合，合并会丢掉结构语义。已做的压缩：InitialPlanContext 与 ReplanContext 合为一个临时输入元素；FocusSession[] 与 TaskResult[] 合为一个执行证据元素；计算视图、DailyReviewPromptDismissal、迁移方向、DailyPlan[] legacy 面与历史沿革不单列元素，改由 Topic 导航 + constraint 承载。"
+  }
+}
+<<<MAP_SELECTION>>>
+{
+  "selectionVersion": 1,
+  "document": {
+    "title": "Goal / Plan / Stage / Task target model contract",
+    "sourcePath": "测试文档/fixture-d-goal-plan-task-state-model.md"
+  },
+  "inventoryRef": {
+    "path": "semantic-inventory.json",
+    "sha256": "unavailable-in-stage-b-input",
+    "itemCount": 136
+  },
+  "dispositions": [
+    {
+      "semanticId": "S-01",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-00" },
+      "reason": "文档定位与权威声明（本契约是迁移前的 source of truth），由 document.scope 与 T-00 命题承载；它不是目标模型上的结构对象。"
+    },
+    {
+      "semanticId": "S-02",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-00" },
+      "reason": "F40 的非目标清单（不删 DailyPlan[]、不改键、不改兼容读取、不实现 AI/planner 重写）写入 document.nonGoalSummary 并由 T-00 覆盖；non-goal 属导航语义而非结构节点。"
+    },
+    {
+      "semanticId": "S-03",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-00" },
+      "reason": "F41 的范围边界（只在纯 models/ 层实现，其余留作后续）与 S-02 同属文档范围/non-goal 定位语义，由 T-00 与 document.nonGoalSummary 承载。"
+    },
+    {
+      "semanticId": "S-04",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "两条链的枢纽即该临时输入元素：Goal/UserProfile/currentPlanBundle 由 ED-01/ED-02/ED-03 汇入，E-InitialPlanning 与 E-Replanning 再消费它并由 ED-05/ED-09 产出 PlanBundle。"
+    },
+    {
+      "semanticId": "S-05",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-Goal" },
+      "reason": "Goal 的语义定义（原始目标意图 + 目标范围硬约束）就是该元素本身。"
+    },
+    {
+      "semanticId": "S-06",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-UserProfile" },
+      "reason": "UserProfile 的语义定义（跨目标上下文与表达/排期偏好）就是该元素本身。"
+    },
+    {
+      "semanticId": "S-07",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "该条把 InitialPlanContext 与 ReplanContext 并列为『临时 planner 输入、非持久核心模型』，正是把二者合并为一个 intermediate 元素的依据。"
+    },
+    {
+      "semanticId": "S-08",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlanBundle" },
+      "reason": "『PlanBundle 是核心持久规划聚合』即该输出元素的定义。"
+    },
+    {
+      "semanticId": "S-09",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "『DailyReview 是执行历史/事实，可为重规划提供信息但不得被改写』是该约束（宿主 E-DailyReview 与 E-Replanning）的核心条目。"
+    },
+    {
+      "semanticId": "S-10",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "条目给出的是规则（DailyPlan[] 不属于未来核心模型，只作 legacy storage/adapter 兼容保留），落入真相与 legacy 边界约束。"
+    },
+    {
+      "semanticId": "S-11",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-02" },
+      "reason": "四层划分是可同时成立的判读维度（不是互斥 state）；各层成员已分别成为 element（持久真相、临时输入）或约束条目，分层本身只作导航命题。"
+    },
+    {
+      "semanticId": "S-12",
+      "disposition": "represented",
+      "target": { "kind": "attachment", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "『初始规划不得依赖 DailyReview[]（此时尚无执行历史）』是输入端前置条件，按『约束挂到被约束的输入端产物』挂在 E-PlannerInputs 上。"
+    },
+    {
+      "semanticId": "S-13",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "InitialPlanContext 的生命周期（service 运行时组装、只含首次生成前数据、不作为独立长生命周期模型存储）是该临时输入元素的属性。"
+    },
+    {
+      "semanticId": "S-14",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "由该上下文派生的压缩 AI 专用 schema 是同一临时输入元素的派生形态。"
+    },
+    {
+      "semanticId": "S-15",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "『AI 输出在成为 PlanBundle 之前必须经过校验』属写入权限/真相边界条目。"
+    },
+    {
+      "semanticId": "S-16",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-Replanning" },
+      "reason": "六类触发条件（拒绝/不喜欢、自由反馈、阶段完成、复盘部分或跳过、容量或截止变化、不可行）构成该流程元素的触发契约。"
+    },
+    {
+      "semanticId": "S-17",
+      "disposition": "represented",
+      "target": { "kind": "edge", "id": "ED-03" },
+      "reason": "该条即 ED-03 的边义：service 从 storage 读出 currentPlanBundle 并注入 ReplanContext。"
+    },
+    {
+      "semanticId": "S-18",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "『ReplanContext 是临时输入对象、不是持久真相来源』是该元素的定义属性。"
+    },
+    {
+      "semanticId": "S-19",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "ReplanAiInput 是 ReplanContext 派生的显式输入形态（压缩为当前阶段、未完成任务、已完成事实与用户反馈）；确定性 replanner 消费完整 PlanBundle 由 ED-03/ED-06 表达。"
+    },
+    {
+      "semanticId": "S-20",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "『重规划必须保留已完成任务事实与历史 DailyReview[]』是该不变量的首条。"
+    },
+    {
+      "semanticId": "S-21",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "『重规划不得静默丢弃未完成任务』作为不变量条目承载（并与 retainedTaskIds 的显式化互相印证）。"
+    },
+    {
+      "semanticId": "S-22",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "失败路径：无法在截止前产出可行计划必须显式返回 infeasible，作为该约束的显式失败条目（不得 omitted）。"
+    },
+    {
+      "semanticId": "S-23",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-Goal" },
+      "reason": "『Goal 回答想要什么、什么算完成、截止、可分配时间』是 Goal 元素的语义内容。"
+    },
+    {
+      "semanticId": "S-24",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "adjustmentRisk 仅在 status='needs_adjustment' 时存在、缺失时保守回退 infeasible，属 Plan 状态不变量（挂在 E-PlanBundle）。"
+    },
+    {
+      "semanticId": "S-25",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "preferredApproach 的来源限定（用户措辞、已确认澄清回答或用户显式补充）是 Goal 侧不变量条目。"
+    },
+    {
+      "semanticId": "S-26",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "preferredApproach 不覆盖截止/每日容量/显式硬约束、不得从 MBTI/塔罗/状态卡/行为画像推断，是同一 Goal 边界不变量。"
+    },
+    {
+      "semanticId": "S-27",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-Goal" },
+      "reason": "originalInput / taskType / successCriteria / scopeNotes / startingPoint / constraints 是 Goal 元素的字段意图集合。"
+    },
+    {
+      "semanticId": "S-28",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "『什么不属于 Goal（MBTI/塔罗→UserProfile、执行反馈→DailyReview、计划策略→Plan、展示文案→计算视图）』是真相归属边界，挂到被约束的 E-Goal 侧。"
+    },
+    {
+      "semanticId": "S-29",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "『同一时刻至多一个 active plan』是单实体槽位唯一性，按契约用约束承载而不是造自环 relationGap。"
+    },
+    {
+      "semanticId": "S-30",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "dailyAvailableMinutes 必须为正整数是目标范围的规划约束，属结构/状态不变量条目。"
+    },
+    {
+      "semanticId": "S-31",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-Goal" },
+      "reason": "『每日预算是计划生成约束、不承诺用户每天恰好工作那么久』是 Goal 规划约束字段的语义澄清，不另立节点。"
+    },
+    {
+      "semanticId": "S-32",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "F58 的 Goal 创建规则（从措辞/截止/每日预算开始，其余字段仅在显式提取、澄清确认或假设披露时加入）是 Goal 创建不变量。"
+    },
+    {
+      "semanticId": "S-33",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "『Goal 完成在目标层级判定、不由单个任务自动完成』是完成判定不变量。"
+    },
+    {
+      "semanticId": "S-34",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Goal 取消必须显式处理相关 Plan/Stage/Task/Review 是级联不变量（与 dismissal 的 Goal 级联同组）。"
+    },
+    {
+      "semanticId": "S-35",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-UserProfile" },
+      "reason": "排期偏好（workStyle、preferredFocusMinutes、默认 energyLevel）与表达偏好（mbti、ritualPreference、个性化语气）的边界即该元素的语义切分。"
+    },
+    {
+      "semanticId": "S-36",
+      "disposition": "represented",
+      "target": { "kind": "attachment", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "energyLevel 的归属规则（UserProfile 是默认/当前偏好，实际执行精力属 DailyReview.energy）是真相归属边界，挂在两侧元素上。"
+    },
+    {
+      "semanticId": "S-37",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "MBTI 与仪式偏好只能影响表达与轻度排序、不得作为预测/诊断/硬任务决策依据，是使用权限边界。"
+    },
+    {
+      "semanticId": "S-38",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlanBundle" },
+      "reason": "『初始规划与重规划的主要输出』由 ED-05 与 ED-09 两条 produces 边共同承载，节点即该聚合元素。"
+    },
+    {
+      "semanticId": "S-39",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "页面应消费由 PlanBundle 派生的 service/view-model 输出而非原始 storage 结构，是消费纪律条目。"
+    },
+    {
+      "semanticId": "S-40",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "『PlanBundle 必须可 JSON 序列化』是聚合的结构不变量。"
+    },
+    {
+      "semanticId": "S-41",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "ID 必须稳定且不依赖标题文本，是标识结构不变量（Task id 生成规则同组）。"
+    },
+    {
+      "semanticId": "S-42",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "目标在截止/容量内不可完成时 Plan.status='infeasible' 必须被显式设置，是 Plan 状态不变量。"
+    },
+    {
+      "semanticId": "S-43",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "『只携带可追溯摘要元数据、不持久化完整 prompt 或临时上下文』是写入/持久化边界。"
+    },
+    {
+      "semanticId": "S-44",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-Replanning" },
+      "reason": "『可创建新计划版本或返回受控变更集』由该流程的 ED-09 / ED-10 表达；『必须保留历史事实』部分归 C-HistoryIntegrity。"
+    },
+    {
+      "semanticId": "S-45",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "未决 adjustmentRisk 不得在未显式重新确立可行性前被清除/升降级、合并取更严重级别，是 Plan 状态不变量。"
+    },
+    {
+      "semanticId": "S-46",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "权限边界：AI 不得直接改写 storage 中的既有计划，必须由 service 校验并应用结果。"
+    },
+    {
+      "semanticId": "S-47",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "缺失 structureType 时保留 legacy 分阶段计划契约、不虚构用户偏好的默认回退。"
+    },
+    {
+      "semanticId": "S-48",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "detailedThrough 必须落在 startDate 与 deadline 之间、其后 Task 被严格校验拒绝、缺失时保留 legacy 范围，均为结构与日期不变量。"
+    },
+    {
+      "semanticId": "S-49",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "F67 初始规划契约（新的成功初始计划要求 structureType 与 detailedThrough）是同一约束的前置条件条目。"
+    },
+    {
+      "semanticId": "S-50",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "detailedThrough = min(deadline, today + 6 calendar days) 是具体阈值，按契约用约束元素承载而不是塞进边属性。"
+    },
+    {
+      "semanticId": "S-51",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Stage 范围覆盖整个 Plan 窗口（含今天与截止日期）是阶段-计划区间不变量。"
+    },
+    {
+      "semanticId": "S-52",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "具体 Task 只存在于 detailedThrough 当天或之前、其后保持 Stage 层级而不虚构每日事实，是同一日期语义的另一条。"
+    },
+    {
+      "semanticId": "S-53",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Stage.estimatedMinutes 表示整周期工作量、可超出已物化 Task 之和，是阶段工作量语义不变量。"
+    },
+    {
+      "semanticId": "S-54",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Stage 分钟总数必须适配 inclusive plan days × dailyAvailableMinutes，是容量上限不变量。"
+    },
+    {
+      "semanticId": "S-55",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "每个初始 Task 属于一个 Stage 且 scheduledDate 落在该 Stage 范围内，是 Task-Stage 归属不变量。"
+    },
+    {
+      "semanticId": "S-56",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "client key 只是临时转换标识、持久化依赖用 Task.dependsOnTaskIds，是标识语义不变量。"
+    },
+    {
+      "semanticId": "S-57",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Task id 由 planId + clientTaskKey 稳定生成、不依赖标题或输出数组顺序，同属标识不变量。"
+    },
+    {
+      "semanticId": "S-58",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlanBundle" },
+      "reason": "Stage 的长程定位（长程概览与细化、不替代近程 Task）由 Plan+Stage[]+Task[] 聚合元素承载，并由 T-09 导航。"
+    },
+    {
+      "semanticId": "S-59",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "『Stage 完成不会自动完成 Goal』是完成判定不变量（与 Goal 层级判定一致）。"
+    },
+    {
+      "semanticId": "S-60",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-Replanning" },
+      "reason": "Stage 完成可触发对未来 stages/tasks 的重规划，属该流程元素的触发契约。"
+    },
+    {
+      "semanticId": "S-61",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Stage 日期范围必须落在父计划日期范围之内，是区间包含不变量。"
+    },
+    {
+      "semanticId": "S-62",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "与 S-53 是同一语义的另一种说法（Stage.estimatedMinutes 为整阶段粗粒度正整数估计、不要求等于已物化近程 Task 之和），已由 C-PlanStructureAndState 承载，此处不重复表达。"
+    },
+    {
+      "semanticId": "S-63",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "依赖必须引用同一 PlanBundle 的 Task，且自依赖、重复引用、缺失引用与环均无效，是依赖完整性不变量。"
+    },
+    {
+      "semanticId": "S-64",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "依赖仅当被引用 Task 为 done 时满足，todo/partial/skipped 仍未满足，是依赖判定不变量。"
+    },
+    {
+      "semanticId": "S-65",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "『仅凭排期顺序不构成依赖』是防止把顺序误读为锁的语义澄清，写进同一约束。"
+    },
+    {
+      "semanticId": "S-66",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Task.id 必须稳定且不得依赖 title，是标识不变量条目。"
+    },
+    {
+      "semanticId": "S-67",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "scheduledDate 为目标执行日期、Task.date 仅 legacy、多个任务可共享同一 scheduledDate，是 Task 字段语义条目。"
+    },
+    {
+      "semanticId": "S-68",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "阈值/上限：estimatedMinutes 必须为正整数，且单日任务分钟总数不得超过计划的 dailyAvailableMinutes。"
+    },
+    {
+      "semanticId": "S-69",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "minimumLine 是必需字段且必须保持显式，是 Task 结构不变量。"
+    },
+    {
+      "semanticId": "S-70",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "『任务完成不等于目标完成、任务跳过不等于目标取消』是完成/取消判定不变量。"
+    },
+    {
+      "semanticId": "S-71",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-TodayTaskSelection" },
+      "reason": "done 的 Task 计算为 closed，是该元素（承载 Task Card 计算契约）的三个卡片状态之一。"
+    },
+    {
+      "semanticId": "S-72",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-TodayTaskSelection" },
+      "reason": "存在至少一个未完成显式依赖 → 计算为 locked，属同一计算契约。"
+    },
+    {
+      "semanticId": "S-73",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-TodayTaskSelection" },
+      "reason": "其余 todo / partial / 历史 skipped → 计算为 available，属同一计算契约。"
+    },
+    {
+      "semanticId": "S-74",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-TodayTaskSelection" },
+      "reason": "默认候选窗口止于目标日期、调用方可在后续特性显式放宽，是选择/卡片契约的默认窗口语义。"
+    },
+    {
+      "semanticId": "S-75",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-TodayTaskSelection" },
+      "reason": "调用方有意纳入未来日期时未来排期不成为硬锁，是该契约的条件分支。"
+    },
+    {
+      "semanticId": "S-76",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-TodayTaskSelection" },
+      "reason": "唯一推荐按 scheduledDate → priority → 稳定 Task id 确定性产生，是该元素承载的确定性契约。"
+    },
+    {
+      "semanticId": "S-77",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "selector 不读 storage、不调 AI、不写推荐事实、不改动 PlanBundle，是读写权限/纯度边界。"
+    },
+    {
+      "semanticId": "S-78",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "三个独立概念中 FocusSession[]/TaskResult[] 归该元素、DailyReview 另立 E-DailyReview（两者由 ED-11 关联）；UI 串接不使其同一化由 C-HistoryIntegrity 兜底。"
+    },
+    {
+      "semanticId": "S-79",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "FocusSession 恰好属于一个 Goal/Plan/Task 且在开始时即持久化，是该执行证据元素的归属属性。"
+    },
+    {
+      "semanticId": "S-80",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "running → paused → running → completed（cancelled 为终态）是该元素的内部生命周期，L0 不单列 state 节点。"
+    },
+    {
+      "semanticId": "S-81",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "挂钟时间由时间戳恢复并封顶于目标时长，使进程缺失不依赖活跃页面 interval，是该元素的恢复机制。"
+    },
+    {
+      "semanticId": "S-82",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "TaskResult 的持久化字段集合（归属 id、执行日期、结果状态、FocusSession 引用、派生/手动分钟、努力度、备注、时间戳、状态变更时间戳）是该元素的内容定义。"
+    },
+    {
+      "semanticId": "S-83",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-DailyReview" },
+      "reason": "日范围信息、可汇总当日 Task 结果、planId 仅记录 Plan 上下文等属该元素；『每 Goal/date 只有一个 DailyReview』的槽位唯一性写进 C-PlanStructureAndState。"
+    },
+    {
+      "semanticId": "S-84",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "与 S-101 是同一兼容边界语义的另一种说法（任务结果嵌入 DailyReview.taskResults，同时保留 legacy completed/partial/skipped id 数组），已由 C-TruthAndConsumptionBoundary 承载，此处不重复表达。"
+    },
+    {
+      "semanticId": "S-85",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "单任务『记录进展』可同事务提交 Task result 与 DailyReview 字段，但该便利不使两个概念同一化；配对写入的原子性同属该约束（宿主含 E-DailyReview 与 E-ExecutionEvidence）。"
+    },
+    {
+      "semanticId": "S-86",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "F61 引入的 Goal 范围 FocusSession[] 与 TaskResult[] 专用存储即该元素；保留嵌入 Review 字段的兼容边界记入 C-TruthAndConsumptionBoundary。"
+    },
+    {
+      "semanticId": "S-87",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "焦点计时产生任务范围的执行证据、其本身不是 DailyReview，正是该元素与 E-DailyReview 的分工表述。"
+    },
+    {
+      "semanticId": "S-88",
+      "disposition": "represented",
+      "target": { "kind": "attachment", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "任务状态与投入分钟不得存为日级 energy、日 energy 不得复制到每个 Task 结果，是真相归属规则，挂在 E-ExecutionEvidence 与 E-DailyReview 上。"
+    },
+    {
+      "semanticId": "S-89",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "重规划可读取 FocusSession 与 TaskResult，但必须保留已提交的执行历史（ED-08 表达读取，约束表达保留义务）。"
+    },
+    {
+      "semanticId": "S-90",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "TaskResult.status='skipped' 表示今日未完成、不取消该 Task，是事实语义不变量。"
+    },
+    {
+      "semanticId": "S-91",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "保存 TaskResult 通过一次 storage 编排的配对写入（带快照回滚）更新 PlanBundle Task 状态，是原子性不变量。"
+    },
+    {
+      "semanticId": "S-92",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "FocusSession/TaskResult 的有效性不要求存在 DailyReview，是事实独立性与原子性同组的条目。"
+    },
+    {
+      "semanticId": "S-93",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "每 Goal/Plan/date 至多一条 TodayTaskSelection 是单实体槽位唯一性 → 约束承载（不造自环 gap）。"
+    },
+    {
+      "semanticId": "S-94",
+      "disposition": "represented",
+      "target": { "kind": "edge", "id": "ED-12" },
+      "reason": "该条即 ED-12 的边义：选择必须引用当前 active PlanBundle 中的 Task。"
+    },
+    {
+      "semanticId": "S-95",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "未来 Task 只能经有界的近程候选服务被选中、且仅在显式依赖已满足时成立，是选择范围不变量。"
+    },
+    {
+      "semanticId": "S-96",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "允许跨 Stage 选择、单凭 Stage 顺序不构成授权或锁，是选择范围/授权不变量。"
+    },
+    {
+      "semanticId": "S-97",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "选择可授权在 scheduledDate 之前执行、但绝不改写该日期，是授权与排期事实分离的不变量。"
+    },
+    {
+      "semanticId": "S-98",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-ExecutionEvidence" },
+      "reason": "FocusSession.date 与 TaskResult.date 存储真实执行日期，是该元素字段归属语义。"
+    },
+    {
+      "semanticId": "S-99",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "旧日期与旧 Plan 的选择只作历史、不能授权不同日期或当前 Plan，是授权边界条目。"
+    },
+    {
+      "semanticId": "S-100",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "选择不是 TaskResult/DailyReview/Replan、也不表示计划排期已改变，是真相归属条目。"
+    },
+    {
+      "semanticId": "S-101",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "legacy id 数组可归一化为 taskResults，energy 与嵌入 taskResults 在独立迁移移除前保持兼容字段，属兼容/真相边界。"
+    },
+    {
+      "semanticId": "S-102",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "基于 workload 的 Review 可省略 legacy energy；兼容视图可用展示回退，但不得把回退持久化为用户事实。"
+    },
+    {
+      "semanticId": "S-103",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "DailyReview 草稿可含客观 TaskResult 摘要、不得虚构 workload 反馈或备注，是事实纪律条目。"
+    },
+    {
+      "semanticId": "S-104",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "DailyReview 是历史事实、重规划可读但不得静默改写，与 S-09 同属该约束（ED-07 表达读取）。"
+    },
+    {
+      "semanticId": "S-105",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "Review 备注是用户私密数据、默认不得被日志记录或上传，属隐私/写入边界。"
+    },
+    {
+      "semanticId": "S-106",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "DailyReviewPromptDismissal 是 UI 提示历史、不是执行或复盘真相，归入真相归属边界（宿主 E-DailyReview 与 E-PlanBundle）。"
+    },
+    {
+      "semanticId": "S-107",
+      "disposition": "represented",
+      "target": { "kind": "attachment", "id": "C-PlanStructureAndState" },
+      "reason": "每 Goal/Plan/executionDate 至多一条 dismissal 是槽位唯一性，作为约束条目挂在 E-DailyReview 上。"
+    },
+    {
+      "semanticId": "S-108",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "dismissal 只表示用户显式跳过该 Yesterday Summary 提示，不得据此创建空 DailyReview 或推断 workload/note。"
+    },
+    {
+      "semanticId": "S-109",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "资格仅限当前 Goal/当前 Plan 在今天之前最近一次 TaskResult 日期，是提示作用域规则。"
+    },
+    {
+      "semanticId": "S-110",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "历史 dismissal 不能授权、编辑或压制不同的 Goal/Plan/executionDate，是授权边界条目。"
+    },
+    {
+      "semanticId": "S-111",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-PlanStructureAndState" },
+      "reason": "Goal 删除会移除该 Goal 范围的 dismissal 集合，与 Goal 取消级联同属级联不变量。"
+    },
+    {
+      "semanticId": "S-112",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "PlanChangeSummary 是解释一次确定性调整的持久收据、不是第二个 Plan 真相源（ED-10 表达产出，约束表达其非真相地位）。"
+    },
+    {
+      "semanticId": "S-113",
+      "disposition": "represented",
+      "target": { "kind": "attachment", "id": "C-PlanStructureAndState" },
+      "reason": "每 Goal/Plan/trigger fingerprint 至多一条 summary（幂等，重复重试返回既有收据且不触发重规划），作为唯一性条目挂在 E-PlanChangeSummary 上。"
+    },
+    {
+      "semanticId": "S-114",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "summary 引用稳定 Task id 与日期、绝不复制私密的 TaskResult/DailyReview 备注，是隐私边界。"
+    },
+    {
+      "semanticId": "S-115",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "satisfiedTaskIds 在 Plan 历史中仍是已完成 Task、不意味着物理删除，是历史保留不变量。"
+    },
+    {
+      "semanticId": "S-116",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "retainedTaskIds 使未变更的未完成工作显式化、从而不能被静默丢失，是『不得静默丢失』的显式化机制。"
+    },
+    {
+      "semanticId": "S-117",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "acknowledgedAt 只表示用户消费了 Today 通知，确认不删除历史、不改变 Plan 事实。"
+    },
+    {
+      "semanticId": "S-118",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "TaskResult 触发只能调整其当前 Plan 的未完成工作；DailyReview 触发只能使用显式 workload 评分，是调整范围边界。"
+    },
+    {
+      "semanticId": "S-119",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-HistoryIntegrity" },
+      "reason": "PlanBundle + summary 持久化是原子的，DailyReview 触发时同一事务还需纳入该 Review，是原子性不变量。"
+    },
+    {
+      "semanticId": "S-120",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "Replanner 保持纯粹且确定性、存储/编排归属于 replanner.ts 之外的服务，是读写权限/纯度条目。"
+    },
+    {
+      "semanticId": "S-121",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "DailyPlan[] 的当前角色（遗留持久日计划形状、兼容读写面、迁移未完成期的 adapter 输入/输出）写进 legacy 边界条目，由 T-17 导航；为保持 L0 规模不单列 legacy 元素。"
+    },
+    {
+      "semanticId": "S-122",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "DailyPlan[] 的未来角色（消费者迁移后由独立破坏性迁移/修复特性删除）同属 legacy 边界条目，并由 T-17 / T-19 导航。"
+    },
+    {
+      "semanticId": "S-123",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "F40 只记录删除方向（不删 DailyPlan[] 代码、不改 daily-plans:{goalId} 键、不改兼容读取或 adapter）作为冻结规则条目，并写入 document.nonGoalSummary。"
+    },
+    {
+      "semanticId": "S-124",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "『新特性不得把 DailyPlan[] 扩展为真相源』是 legacy 冻结/真相边界条目。"
+    },
+    {
+      "semanticId": "S-125",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-17" },
+      "reason": "迁移风险清单（plan.ts 仍定义 DailyPlan、planner 仍有 legacy 输出路径、storage 仍读写旧键、plan-view 等仍消费兼容 API）是背景/风险清单式信息，属导航语义；风险不是目标模型的结构对象。"
+    },
+    {
+      "semanticId": "S-126",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "『计算视图不是持久真相』是真相归属边界的核心条目，由 T-18 导航。"
+    },
+    {
+      "semanticId": "S-127",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "面向页面的数据应由 services/selectors 从 PlanBundle、DailyReview、UserProfile 生成，是消费纪律条目。"
+    },
+    {
+      "semanticId": "S-128",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "页面不得从原始 storage 直接组装长期计划状态，是同一消费纪律的禁止项。"
+    },
+    {
+      "semanticId": "S-129",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "Today 建议可改变展示优先级或文案、但不改变核心计划事实，是视图与真相分离的边界。"
+    },
+    {
+      "semanticId": "S-130",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-19" },
+      "reason": "F40 之后的六步迁移路线是后续特性清单（路线图语义），由 T-19 命题承载；这些步骤不是本文档定义的结构对象。"
+    },
+    {
+      "semanticId": "S-131",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-19" },
+      "reason": "『不得把这些后续步骤视为 F40 的一部分』是 non-goal，写入 document.nonGoalSummary 并由 T-19 覆盖（non-goal 不得 omitted）。"
+    },
+    {
+      "semanticId": "S-132",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-20" },
+      "reason": "F16 的历史记录（改期跟踪字段与用更新 scheduledDate 表示 partial/skipped 后续处理）；其中『历史事实保留在 DailyReview.taskResults』已由 E-DailyReview 与 C-HistoryIntegrity 承载，本条本身是历史沿革。"
+    },
+    {
+      "semanticId": "S-133",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-20" },
+      "reason": "F39 与 F40 的关系（F40 取代 F39 的狭窄校验焦点）属历史沿革，不产生新的目标模型结构语义。"
+    },
+    {
+      "semanticId": "S-134",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "F41 把 InitialPlanContext、ReplanContext、ReplanReason、UserPlanFeedback 确立为模型层运行时输入类型，其结构位置即该元素；其余保留项（DailyPlan[]、Task.date、legacy review id 数组、存储键、adapter）是历史记录加 C-TruthAndConsumptionBoundary 的冻结规则。"
+    },
+    {
+      "semanticId": "S-135",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-TruthAndConsumptionBoundary" },
+      "reason": "F56 历史记录中仍有约束力的部分：初始计划预览候选是临时 service/session 数据、不是持久真相，确认前不得影响 Today 或 Calendar。"
+    },
+    {
+      "semanticId": "S-136",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-PlannerInputs" },
+      "reason": "F58 的创建屏与确认路径：意图问题/回答/假设是临时 planner 输入（该元素），正式确认写入 Goal、UserProfile 与 PlanBundle（由 ED-01/ED-02/ED-05 与相应元素承载）。"
+    }
+  ]
+}

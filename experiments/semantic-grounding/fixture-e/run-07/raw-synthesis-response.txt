@@ -1,0 +1,308 @@
+<<<FRAMEWORK_MAP>>>
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "doc-f13-f16-runbook",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current",
+    "scope": {
+      "text": "F13–F16 售后链路的运行验证与部署手册：本地前置与构建、CloudBase 部署与配置、沙箱模式运行验证、证据留存规范、独立审查 Checklist、沙箱→真实环境切换，以及 §10 未发货仅退款库存释放时机决策项。",
+      "sectionRefs": ["§1"]
+    },
+    "nonGoalSummary": {
+      "text": "本文不改动支付域：F16 退款云函数自持 refundCommon/config.js、不复用 payOrder/payNotify 代码，WX_PAY_* 仅作缺省回退，真实切换独立配置 WECHAT_REFUND_*；也不推荐在 submitAfterSales 增加用户可选库存释放时机的字段。",
+      "sectionRefs": ["§9", "§10"]
+    }
+  },
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "售后申请与审批云函数组（F13/F14：submitAfterSales、cancelAfterSales、processAfterSales、queryAdminAfterSales）",
+      "type": "artifact",
+      "role": "producer",
+      "topics": ["T-03", "T-04", "T-06"],
+      "sectionRefs": ["§1", "§3.1", "§4.2", "§4.4", "§6.1", "§6.2"]
+    },
+    {
+      "id": "E-02",
+      "label": "退款云函数组（F16：refundOrder、refundNotify、refundQueryCron，自持 refundCommon/config，独立于支付域）",
+      "type": "artifact",
+      "role": "producer",
+      "topics": ["T-03", "T-04", "T-06", "T-09"],
+      "sectionRefs": ["§1", "§3.1", "§3.3", "§6.4", "§8", "§9"]
+    },
+    {
+      "id": "E-03",
+      "label": "资产补偿与重试链（F15：runCompensation、retryAfterSalesCompensation、forceRestockAndAssets）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-03", "T-04", "T-06", "T-08"],
+      "sectionRefs": ["§1", "§4.7", "§4.8", "§5.3", "§6.3"]
+    },
+    {
+      "id": "E-04",
+      "label": "售后单与关联资产记录（afterSalesStatus、refundStatus、stockRestored / couponRestored / pointsRestored、refundCompensationError / refundCompensationRetryCount）",
+      "type": "artifact",
+      "role": "instance",
+      "topics": ["T-04", "T-06", "T-10"],
+      "sectionRefs": ["§4.2", "§4.3", "§4.7", "§6.3"]
+    },
+    {
+      "id": "E-05",
+      "label": "afterSalesStatus 状态推进（REQUESTED → APPROVED → WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED，或 CANCELLED）",
+      "type": "state",
+      "role": "target",
+      "topics": ["T-04", "T-06"],
+      "sectionRefs": ["§4.2", "§4.3", "§4.4", "§6.2"]
+    },
+    {
+      "id": "E-06",
+      "label": "部署流水线（node --check → npm run build:h5 / build:mp-weixin → 按 1–11 顺序部署云函数）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-02", "T-03"],
+      "sectionRefs": ["§2.1", "§2.2", "§2.3", "§3.1"]
+    },
+    {
+      "id": "E-07",
+      "label": "运行配置面（定时触发器 */10 与 */5、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量与沙箱/真实模式）",
+      "type": "artifact",
+      "role": "boundary",
+      "topics": ["T-03", "T-07", "T-09"],
+      "sectionRefs": ["§3.2", "§3.3", "§3.4", "§7.1", "§8"]
+    },
+    {
+      "id": "E-08",
+      "label": "沙箱运行验证（预置数据 + 用例 1–3 + mock 通知 + cron 查单 + 失败重试 + 强制补偿）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-04", "T-05"],
+      "sectionRefs": ["§4.1", "§4.2", "§4.3", "§4.4", "§4.5", "§4.6", "§4.7", "§4.8"]
+    },
+    {
+      "id": "E-09",
+      "label": "验收证据与独立审查清单（§5 截图/重试日志/audit_logs 留存 + §6 F13–F16 验收勾选项）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-05", "T-06"],
+      "sectionRefs": ["§4.2", "§5", "§5.1", "§5.2", "§5.3", "§5.4", "§5.5", "§6"]
+    },
+    {
+      "id": "E-10",
+      "label": "沙箱 → 真实环境切换（沙箱 passing 后配置 real 模式必备变量、移除 __mock 入口、0.01 元真实退款前置验证、切换后回归）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-07"],
+      "sectionRefs": ["§7", "§7.1", "§7.2", "§7.3"]
+    },
+    {
+      "id": "C-01",
+      "label": "未发货仅退款库存释放时机决策（A = REFUND_SUCCESS 释放，F15 现状；B = APPROVE 提前释放，F06 老路径）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-06", "T-10"],
+      "sectionRefs": ["§4.2", "§6.3", "§10", "§现状对照表", "§两种实现的风险", "§Reviewer 决策项（必看）", "§默认推荐"]
+    },
+    {
+      "id": "C-02",
+      "label": "访问与权限边界（cancelAfterSales 仅订单所有者；processAfterSales 仅管理员且仅 REQUESTED；forceRestockAndAssets 仅管理员且只补资产）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-04", "T-06"],
+      "sectionRefs": ["§4.4", "§4.8", "§6.1", "§6.2"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "ED-01",
+      "from": "E-06",
+      "to": "E-01",
+      "type": "produces",
+      "label": "按 1–11 顺序部署 F13/F14 云函数（node --check 与 h5 / 小程序构建通过后）",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-02",
+      "from": "E-06",
+      "to": "E-02",
+      "type": "produces",
+      "label": "部署 refundOrder / refundNotify / refundQueryCron；refundCommon 作为 lib 随包引用、不单独部署",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-03",
+      "from": "E-06",
+      "to": "E-07",
+      "type": "produces",
+      "label": "部署过程中建立定时触发器与 /refundNotify 网关路由、写入 WECHAT_REFUND_* 环境变量",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-04",
+      "from": "E-07",
+      "to": "E-03",
+      "type": "controls",
+      "label": "*/10 * * * * 定时触发器驱动 retryAfterSalesCompensation",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-05",
+      "from": "E-07",
+      "to": "E-02",
+      "type": "controls",
+      "label": "*/5 * * * * 定时触发器驱动 refundQueryCron；/refundNotify 路由指向 refundNotify",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-06",
+      "from": "E-01",
+      "to": "E-04",
+      "type": "produces",
+      "label": "submitAfterSales / cancelAfterSales / processAfterSales 创建并更新售后单记录",
+      "qualifiers": { "cardinality": { "from": "one", "to": "many" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-07",
+      "from": "E-03",
+      "to": "E-04",
+      "type": "transforms-to",
+      "label": "补偿按订单商品数量回补库存并恢复优惠券/积分，写入 stockRestored / couponRestored / pointsRestored",
+      "qualifiers": { "cardinality": { "from": "one", "to": "many" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-08",
+      "from": "E-02",
+      "to": "E-01",
+      "type": "depends-on",
+      "label": "refundNotify 回调推进 afterSalesStatus=REFUNDED 时调用 processAfterSales",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-09",
+      "from": "E-08",
+      "to": "E-01",
+      "type": "consumes",
+      "label": "沙箱用例 1–3 调用 submitAfterSales、processAfterSales、cancelAfterSales、queryAdminAfterSales",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-10",
+      "from": "E-08",
+      "to": "E-02",
+      "type": "consumes",
+      "label": "用例调用 refundOrder、以 X-Mock-Source: sandbox 触发 refundNotify、手动触发 refundQueryCron",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-11",
+      "from": "E-08",
+      "to": "E-04",
+      "type": "validates",
+      "label": "核对 afterSalesStatus / refundStatus 与资产回补标志是否符合用例期望",
+      "qualifiers": { "cardinality": { "from": "one", "to": "many" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-12",
+      "from": "E-08",
+      "to": "E-09",
+      "type": "produces",
+      "label": "每个用例留存截图、重试日志与 audit_logs 记录",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-13",
+      "from": "E-10",
+      "to": "E-07",
+      "type": "transforms-to",
+      "label": "把 WECHAT_REFUND_MODE 由 sandbox 切为 real，并补齐真实模式变量、移除 __mock 入口",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-14",
+      "from": "E-08",
+      "to": "E-10",
+      "type": "controls",
+      "label": "沙箱验证通过后才执行真实环境切换",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "ED-15",
+      "from": "E-02",
+      "to": "E-04",
+      "type": "transforms-to",
+      "label": "refundOrder 写入 outRefundNo 与 refundStatus=PROCESSING，refundNotify 写入 refundStatus=SUCCESS 与 refundedAt",
+      "qualifiers": { "cardinality": { "from": "one", "to": "many" }, "ownership": "owned" }
+    },
+    {
+      "id": "ED-16",
+      "from": "E-03",
+      "to": "E-01",
+      "type": "depends-on",
+      "label": "F15 补偿链以 F13/F14 产生的售后单与状态为前提",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "reference" }
+    }
+  ],
+  "attachments": [
+    { "elementId": "E-05", "attachedTo": ["E-04"] },
+    { "elementId": "C-01", "attachedTo": ["E-03", "E-04"] },
+    { "elementId": "C-02", "attachedTo": ["E-01", "E-03"] }
+  ],
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "F13–F16 依赖顺序与 F12 替代关系",
+      "proposition": "F13→F14→F15→F16 为严格依赖顺序；这四个 Feature 替代 F12，Round 19 中全部 passing 后 F12 解除阻塞并切为 passing。",
+      "sectionRefs": ["§1"]
+    },
+    {
+      "id": "T-02",
+      "title": "本地前置与构建",
+      "proposition": "部署前必须对全部相关云函数 node --check、完成 h5 与 mp-weixin 构建、确认 .gitignore 覆盖敏感文件。",
+      "sectionRefs": ["§2", "§2.1", "§2.2", "§2.3"]
+    },
+    {
+      "id": "T-03",
+      "title": "CloudBase 部署与配置",
+      "proposition": "云函数按 1–11 顺序部署（refundCommon 不单独部署），并配置 */10 与 */5 定时触发器、/refundNotify 网关路由和沙箱模式环境变量。",
+      "sectionRefs": ["§3", "§3.1", "§3.2", "§3.3", "§3.4"]
+    },
+    {
+      "id": "T-04",
+      "title": "沙箱模式运行验证",
+      "proposition": "用预置用户/管理员/商品数据按用例 1–3 走通未发货仅退款、已发货退货退款、撤销与越权，并验证 mock 通知、cron 查单、失败重试与强制补偿。",
+      "sectionRefs": ["§4"]
+    },
+    {
+      "id": "T-05",
+      "title": "证据留存规范与安全审计",
+      "proposition": "每个 Feature passing 前必须留存指定截图或日志，并完成 git grep 与函数日志关键字的安全审计。",
+      "sectionRefs": ["§5"]
+    },
+    {
+      "id": "T-06",
+      "title": "独立审查 Checklist 与验收口径",
+      "proposition": "F13–F16 各有独立验收 checklist（§6.1–§6.4），F12 已在 Round 19 完成重新验收。",
+      "sectionRefs": ["§6"]
+    },
+    {
+      "id": "T-07",
+      "title": "沙箱 → 真实环境切换",
+      "proposition": "仅在沙箱 passing 后执行：补齐真实模式必备变量、删除 __mock 入口、以 0.01 元真实退款做前置验证，并重跑 §4.2–§4.8 回归。",
+      "sectionRefs": ["§7"]
+    },
+    {
+      "id": "T-08",
+      "title": "故障排查速查",
+      "proposition": "六类典型故障的症状 → 可能原因 → 排查动作对照：mode 缺失、回调 400、stillProcessing 递增、retry failed 递增、状态转移被拒、列表 Tab 不展示。",
+      "sectionRefs": ["§8"]
+    },
+    {
+      "id": "T-09",
+      "title": "与 F01 支付域的边界",
+      "proposition": "F16 自持 refundCommon/config.js 不复用支付域代码，WX_PAY_* 仅作缺省回退，真实切换独立配置 WECHAT_REFUND_* 且不修改支付核心文件。",
+      "sectionRefs": ["§9"]
+    },
+    {
+      "id": "T

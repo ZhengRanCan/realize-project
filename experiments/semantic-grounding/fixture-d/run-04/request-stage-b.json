@@ -1,0 +1,24 @@
+{
+  "stage": "B",
+  "fixture": "d",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens_stage_a": 65536,
+    "max_tokens_stage_b": 131072,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "docPath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+  "docSha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236",
+  "promptPath": "ai/framework-map-synthesis.prompt.md",
+  "promptSha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540",
+  "userMessageSha256": "03451cb4d00e2b499bfd991fde7b1357fa7b37af2cc86cc528ce22d1e6a8c584",
+  "userMessageChars": 59491,
+  "inventoryPath": "experiments/semantic-grounding/fixture-d/run-04/semantic-inventory.json",
+  "inventorySha256": "44005e3d41bdd053a60b03b0f756d7f328574fdb78d26fa7b6cfc80626c1c500",
+  "startedAt": "2026-09-26T15:11:02.185Z"
+}

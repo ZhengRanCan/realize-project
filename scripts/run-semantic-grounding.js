@@ -75,10 +75,11 @@ const DEFAULTS = {
   // 其中 reasoning 占 14634（89%）→ 真正写出的 JSON 只有 ~1.7k tokens 就被砍断。
   // 该模型的 max_tokens 同时覆盖 reasoning 与 content，所以必须给足（F07 已验证 65536 可用）。
   maxTokensA: 65536,
-  // Stage B **同样不能压**。实测（e/run-04）：max_tokens_b=12288 时
-  // finish_reason=length、completion=12288、**reasoning 也是 12288** → content 长度 0，
-  // 模型把整份预算花在思考上，一个字都没输出。
-  maxTokensB: 65536,
+  // Stage B 需要更大的天花板：实测（e/run-07）reasoning 单独就到 61261，
+  // 65536 时 finish_reason=length、map 没写完、第二个产物永远不出现。
+  // 模型 max_output_tokens = 393216，131072 远未触及 —— 这只是解除一个**已被证实会 bind** 的上限，
+  // 不是新的行为变量（reasoning_effort 仍保持 provider 默认 high）。
+  maxTokensB: 131072,
   temperature: 1,
   timeoutMs: 900000,
   maxAttempts: 1,

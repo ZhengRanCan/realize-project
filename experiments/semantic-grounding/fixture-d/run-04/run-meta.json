@@ -1,0 +1,166 @@
+{
+  "feature": "F10-semantic-grounding",
+  "fixture": "d",
+  "fixtureLabel": "D · ER-heavy / multi-entity network",
+  "runDir": "experiments/semantic-grounding/fixture-d/run-04",
+  "stage": "both",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens_stage_a": 65536,
+    "max_tokens_stage_b": 131072,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "documentPath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+  "documentSha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236",
+  "promptA": {
+    "path": "ai/semantic-inventory.prompt.md",
+    "sha256": "f94e6c00da1e61b4bc129e632d2e170a6726676c3864d9c55d6133f516483272",
+    "fingerprint": "f94e6c00da1e61b4"
+  },
+  "promptB": {
+    "path": "ai/framework-map-synthesis.prompt.md",
+    "sha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540",
+    "fingerprint": "8c3f0be2f6768912"
+  },
+  "frozen": {
+    "model": "deepseek-flash",
+    "generationParams": {
+      "temperature": 1,
+      "max_tokens_stage_a": 65536,
+      "max_tokens_stage_b": 131072,
+      "timeout_ms": 900000,
+      "max_attempts": 1
+    },
+    "document": {
+      "path": "测试文档/fixture-d-goal-plan-task-state-model.md",
+      "sha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236"
+    },
+    "promptA": {
+      "path": "ai/semantic-inventory.prompt.md",
+      "sha256": "f94e6c00da1e61b4bc129e632d2e170a6726676c3864d9c55d6133f516483272"
+    },
+    "promptB": {
+      "path": "ai/framework-map-synthesis.prompt.md",
+      "sha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540"
+    },
+    "schemas": {
+      "semanticInventory": {
+        "path": "schema/semantic-inventory.schema.json",
+        "sha256": "f277419d25424c2da9721db1ad765af033881dba6e27f8124be5a0dd27f65eff"
+      },
+      "frameworkMap": {
+        "path": "schema/framework-map.schema.json",
+        "sha256": "56e66faabcd8ca7ea15dcb8925dc559368a8695a6bb9ca60b0a826ef9dcd8c22"
+      },
+      "mapSelection": {
+        "path": "schema/map-selection.schema.json",
+        "sha256": "eaa6a58f0f935b63faf236e91244d17d270b2389e713a83f8f0efad371ed84c8"
+      }
+    },
+    "contract": {
+      "path": "docs/framework-map-contract.md",
+      "sha256": "a70443517c1a0cb37a185f3d949710c00f9a104f8efc758da16516c40f6716da"
+    },
+    "validator": {
+      "path": "scripts/check-map.js",
+      "sha256": "1c1dbe45281d373ae6e86edff1785b4241d94d0512d46005e4e22e4dee565c7f"
+    }
+  },
+  "startedAt": "2026-09-26T15:09:56.622Z",
+  "finishedAt": "2026-09-26T15:16:15.809Z",
+  "status": "success",
+  "error": null,
+  "stages": {
+    "a": {
+      "status": "success",
+      "attempts": 1,
+      "latencyMs": 65552,
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 10211,
+        "completion_tokens": 21493,
+        "total_tokens": 31704,
+        "prompt_tokens_details": {
+          "cached_tokens": 1536
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 10655
+        },
+        "prompt_cache_hit_tokens": 1536,
+        "prompt_cache_miss_tokens": 8675
+      },
+      "protocol": {
+        "rawResponseSaved": true,
+        "jsonExtracted": true,
+        "tempWrite": true,
+        "readBackVerified": true,
+        "atomicRename": true
+      }
+    },
+    "b": {
+      "status": "success",
+      "attempts": 1,
+      "latencyMs": 313610,
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 20431,
+        "completion_tokens": 82932,
+        "total_tokens": 103363,
+        "prompt_tokens_details": {
+          "cached_tokens": 3712
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 66594
+        },
+        "prompt_cache_hit_tokens": 3712,
+        "prompt_cache_miss_tokens": 16719
+      },
+      "protocol": {
+        "rawResponseSaved": true,
+        "jsonExtracted": true,
+        "tempWrite": true,
+        "readBackVerified": true,
+        "atomicRename": true,
+        "checkMapExecuted": true
+      }
+    }
+  },
+  "repair": "none",
+  "artifactSha256": {
+    "semantic-inventory.json": "44005e3d41bdd053a60b03b0f756d7f328574fdb78d26fa7b6cfc80626c1c500",
+    "framework-map.json": "d3c1c1a8608258b1b41d426df331c29dcd232bfc7954eadd82edf50539e789b5",
+    "map-selection.json": "ab2ce29c5b49aec34bf218311295eeb9ffa43b5e0e209668c73180a12ce467b5"
+  },
+  "integrity": {
+    "inventory": {
+      "blocking": [],
+      "advisory": [],
+      "problems": [],
+      "itemCount": 136
+    },
+    "selection": {
+      "problems": [],
+      "softNotes": [],
+      "stats": {
+        "inventoryItems": 136,
+        "dispositions": 136,
+        "represented": 125,
+        "topic-only": 9,
+        "omitted": 2,
+        "missing": 0
+      }
+    }
+  },
+  "validator": {
+    "exitCode": 0,
+    "hard": 0,
+    "warn": 3,
+    "info": 25,
+    "status": "PASS"
+  }
+}
