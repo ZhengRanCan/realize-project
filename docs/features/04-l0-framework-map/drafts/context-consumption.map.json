@@ -1,0 +1,179 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+
+  "document": {
+    "id": "DESIGN-CONTEXT-CONSUMPTION",
+    "title": "Pre-class Fusion Context Consumption 语义模型",
+    "sourcePath": "测试文档/18-context-consumption-semantic-model.md",
+    "role": "target",
+    "scope": {
+      "text": "本文只讨论 Context Consumption 的产品语义层级，不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。",
+      "sourceUnitIds": ["SU-001"]
+    },
+    "nonGoalSummary": {
+      "text": "不采用 Context Influence 作为第四级；不承诺输出变化严格由 DeepTutor 上下文导致。",
+      "sourceUnitIds": ["SU-007", "SU-034", "SU-083"]
+    }
+  },
+
+  "thesis": "上下文消费只发生在 Outline Generation Attempt —— Frozen Context 经服务端投影成为 outline 生成的真实输入，Scene 继承的是 context-shaped outline；Receipt / Availability / Consumption 是三个可以同时为真、但不能互相替代的语义层级。",
+
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "Frozen Context",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-02"],
+      "sourceUnitIds": ["SU-014", "SU-020", "SU-058", "SU-065"]
+    },
+    {
+      "id": "E-02",
+      "label": "Generation-facing Projection",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-02"],
+      "sourceUnitIds": ["SU-046", "SU-047", "SU-048", "SU-059", "SU-080"]
+    },
+    {
+      "id": "E-03",
+      "label": "Outline Generation Attempt",
+      "type": "process",
+      "role": "instance",
+      "topics": ["T-02", "T-03"],
+      "sourceUnitIds": ["SU-044", "SU-046", "SU-050", "SU-076"]
+    },
+    {
+      "id": "E-04",
+      "label": "Context-shaped Outline Revision",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-02", "T-04"],
+      "sourceUnitIds": ["SU-054", "SU-056", "SU-062", "SU-079"]
+    },
+    {
+      "id": "E-05",
+      "label": "Scene Generation",
+      "type": "process",
+      "role": "consumer",
+      "topics": ["T-02", "T-04"],
+      "sourceUnitIds": ["SU-051", "SU-055", "SU-075", "SU-076"]
+    },
+    {
+      "id": "E-06",
+      "label": "Context Receipt",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": ["T-01"],
+      "sourceUnitIds": ["SU-004", "SU-012", "SU-014", "SU-057"]
+    },
+    {
+      "id": "E-07",
+      "label": "Context Availability",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": ["T-01"],
+      "sourceUnitIds": ["SU-004", "SU-017", "SU-018", "SU-058"]
+    },
+    {
+      "id": "E-08",
+      "label": "Context Consumption",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": ["T-01", "T-03"],
+      "sourceUnitIds": ["SU-004", "SU-022", "SU-023", "SU-024", "SU-085"]
+    },
+    {
+      "id": "E-09",
+      "label": "Output Alignment",
+      "type": "concept",
+      "role": "output",
+      "topics": ["T-04"],
+      "sourceUnitIds": ["SU-010", "SU-039", "SU-078", "SU-080"]
+    },
+    {
+      "id": "E-10",
+      "label": "Consumption ≠ Output Alignment",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-04"],
+      "sourceUnitIds": ["SU-002", "SU-008", "SU-040", "SU-079"]
+    },
+    {
+      "id": "E-11",
+      "label": "Context Influence 不得作为第四级",
+      "type": "constraint",
+      "role": "excluded",
+      "topics": ["T-05"],
+      "sourceUnitIds": ["SU-007", "SU-032", "SU-034", "SU-084"]
+    },
+    {
+      "id": "E-12",
+      "label": "Receipt / Availability / Consumption 不能互相替代",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-01"],
+      "sourceUnitIds": ["SU-005", "SU-019", "SU-025", "SU-064"]
+    }
+  ],
+
+  "edges": [
+    { "from": "E-02", "to": "E-01", "type": "depends-on" },
+    { "from": "E-03", "to": "E-02", "type": "consumes" },
+    { "from": "E-03", "to": "E-04", "type": "produces" },
+    { "from": "E-05", "to": "E-04", "type": "consumes" }
+  ],
+
+  "attachments": [
+    { "elementId": "E-06", "attachedTo": ["E-01"] },
+    { "elementId": "E-07", "attachedTo": ["E-02"] },
+    { "elementId": "E-08", "attachedTo": ["E-03"] },
+    { "elementId": "E-09", "attachedTo": ["E-04", "E-05"] },
+    { "elementId": "E-10", "attachedTo": ["E-08", "E-09"] },
+    { "elementId": "E-11", "attachedTo": ["E-08"] },
+    { "elementId": "E-12", "attachedTo": ["E-06", "E-07", "E-08"] }
+  ],
+
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "三级递进语义",
+      "proposition": "Receipt、Availability、Consumption 是三个可以同时为真、但不能互相替代的语义层级 —— 上下文到了不等于可用，可用不等于被消费；被消费的是教学语义，不是实现控制对象。",
+      "blockIds": ["O-02", "O-07", "O-08", "O-09"]
+    },
+    {
+      "id": "T-02",
+      "title": "生成链路与消费点",
+      "proposition": "消费点是 outline generation：Frozen Context 派生出的 projection 必须成为 outline 生成的真实输入，而不是被附加在 Prompt 里；scene 继承的是 context-shaped outline。",
+      "blockIds": ["O-04", "O-04b", "O-04c"]
+    },
+    {
+      "id": "T-03",
+      "title": "消费的证据与判定",
+      "proposition": "判定消费的最低证据是「某一次 Outline Generation Attempt 实际使用了 generation-facing projection」；函数调用、Prompt 字符串、成功返回都不能升级为 Consumption。",
+      "blockIds": ["O-10", "O-10b", "O-16", "O-14"]
+    },
+    {
+      "id": "T-04",
+      "title": "两条链的边界与状态组合",
+      "proposition": "Consumption 管「这次生成用了什么」，Output Alignment 管「生成出来体现了什么」；两链在 outline revision 处衔接，五种状态组合各有产品解释。",
+      "blockIds": ["O-05", "O-06", "O-11b", "O-13"]
+    },
+    {
+      "id": "T-05",
+      "title": "语义边界与非主张",
+      "proposition": "消费不要求盲目服从，也不要求输出明显不同；本篇不采用第四级 Context Influence，也不承诺某个输出变化严格由上下文导致。",
+      "blockIds": ["O-03", "O-10c", "O-11", "O-12", "O-15"]
+    }
+  ],
+
+  "meta": {
+    "elementCount": 12,
+    "topicCount": 5,
+    "edgeCount": 4,
+    "attachmentCount": 7,
+    "documentEntrySourceUnitIds": ["SU-001", "SU-007", "SU-034", "SU-083"],
+    "note": "手工产物，未使用 AI，未复用旧 21 个 block 的切法。topic 的 blockIds 按语义内聚重新推导，不是为了补 orphan block 而机械增加。"
+  }
+}

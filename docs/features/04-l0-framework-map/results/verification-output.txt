@@ -1,0 +1,72 @@
+Feature 04 · L0 framework-map 自查（三层 coverage 分开检查）
+map  docs\features\04-l0-framework-map\drafts\context-consumption.map.json
+plan fixtures\context-consumption.overview-plan.json
+
+═══ A. Framework Map invariant（L0 图是否成立）═══
+
+[F1] 每个 L0 element 必须有 provenance
+  PASS  E-01 Frozen Context ← SU-014,SU-020,SU-058,SU-065
+  PASS  E-02 Generation-facing Projection ← SU-046,SU-047,SU-048,SU-059,SU-080
+  PASS  E-03 Outline Generation Attempt ← SU-044,SU-046,SU-050,SU-076
+  PASS  E-04 Context-shaped Outline Revision ← SU-054,SU-056,SU-062,SU-079
+  PASS  E-05 Scene Generation ← SU-051,SU-055,SU-075,SU-076
+  PASS  E-06 Context Receipt ← SU-004,SU-012,SU-014,SU-057
+  PASS  E-07 Context Availability ← SU-004,SU-017,SU-018,SU-058
+  PASS  E-08 Context Consumption ← SU-004,SU-022,SU-023,SU-024,SU-085
+  PASS  E-09 Output Alignment ← SU-010,SU-039,SU-078,SU-080
+  PASS  E-10 Consumption ≠ Output Alignment ← SU-002,SU-008,SU-040,SU-079
+  PASS  E-11 Context Influence 不得作为第四级 ← SU-007,SU-032,SU-034,SU-084
+  PASS  E-12 Receipt / Availability / Consumption 不能互相替代 ← SU-005,SU-019,SU-025,SU-064
+
+[F2] L0 element 总数受容量限制（≤ 12）
+  PASS  元素总数 12 ≤ 12
+  WARN  元素总数 12 已接近上限 12
+
+[F3] 不要求每个 Topic 都在 Framework Map 上有 element
+  PASS  每个 element 都有 topic 归属（与 F3 不冲突：F3 只禁止"反过来强制"）
+  PASS  有 element 的 Topic: 5/5（本篇恰好每个 Topic 都有 element）
+
+[受控词表] type / role / edge 类型
+  PASS  type 分布: {"artifact":3,"process":2,"concept":4,"constraint":3}
+  PASS  六类是 allowed vocabulary，不是"必须凑齐的 checklist"：本篇 component=0，允许
+  PASS  edges 词表封闭（用到: depends-on, consumes, produces）
+  PASS  未使用兜底词 relates-to
+
+[主轴] 只有 process / artifact
+  PASS  主轴元素类型: artifact, process
+
+[判据 B] 至少参与一条重要 edge 或 attachment 关系
+  PASS  12/12 元素都参与至少一条 edge 或 attachment
+
+[判据 F] 同一概念只有一个节点（label 唯一）
+  PASS  12 个元素 label 唯一
+
+[attachments 完整性]
+  PASS  侧挂元素全部有 attachment（7 条）
+
+═══ B. Navigation invariant（读者能不能走到内容）═══
+
+[N1] 每个 Topic 至少关联一个 L0 element 或一个 L2 block
+  PASS  T-01 三级递进语义: elements=4 · blocks=4
+  PASS  T-02 生成链路与消费点: elements=5 · blocks=3
+  PASS  T-03 消费的证据与判定: elements=2 · blocks=4
+  PASS  T-04 两条链的边界与状态组合: elements=4 · blocks=4
+  PASS  T-05 语义边界与非主张: elements=1 · blocks=5
+
+[N2] 每个需要保留的 L2 block 必须至少能从一个 Topic 进入（文档级入口除外）
+  PASS  21/21 个 block 都有入口（Topic 20 个 + 文档级 1 个）
+  PASS  文档级入口 block: O-01《这是什么文档》 ← 由 document.scope 承担，不需要 Topic
+
+[N3] 每个 Semantic Unit 必须存在至少一条 Document → Topic/L0 → L2 的可达路径
+    document metadata 入口: 4 条 · L0 element: 42 条 · Topic→L2: 86 条
+  PASS  87/87 条语义都有可达路径（完全无路径 = 0）
+  PASS  document metadata 的 sourceUnitIds 全部真实存在
+
+═══ C. Semantic Coverage（不在本脚本范围）═══
+  NOTE  L2 的"每条语义至少被表达一次"由 check-overview 负责，本脚本不重复判定。
+  NOTE  三种 coverage 必须分开：Framework Coverage ≠ Navigation Coverage ≠ Semantic Coverage。
+
+════════════════════════════════
+结果: Hard Error 0 · Warning 1
+Framework Map invariant + Navigation invariant 全部通过
+════════════════════════════════

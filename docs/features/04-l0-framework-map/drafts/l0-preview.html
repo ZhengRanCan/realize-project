@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>L0 Framework Map · Pre-class Fusion Context Consumption 语义模型</title>
+<style>
+  :root { --ink:#111; --line:#d8d8d8; --mut:#6b6b6b; --bg:#fff;
+    --artifact:#eef4ff; --process:#eefbf1; --state:#fff8e8; --concept:#f6eefe; --constraint:#fdeeee; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font: 14px/1.6 -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; }
+  header { padding:20px 28px 14px; border-bottom:1px solid var(--line); }
+  h1 { margin:0 0 6px; font-size:20px; }
+  .thesis { margin:0; color:#222; max-width:900px; }
+  .scope { margin:5px 0 0; color:#333; font-size:13px; max-width:900px; }
+  .scope i { color:var(--mut); font-style:normal; }
+  .stats { margin-top:8px; color:var(--mut); font-size:12px; }
+  .layout { display:grid; grid-template-columns: 1fr 320px; gap:0; }
+  main { padding:22px 28px 60px; }
+  .band-title { font-size:12px; letter-spacing:.08em; color:var(--mut); text-transform:uppercase; margin:0 0 10px; }
+  .row { display:grid; grid-template-columns: 190px 1fr 190px; align-items:start; gap:10px; }
+  .col-mid { display:flex; flex-direction:column; align-items:center; }
+  .slot { min-height:1px; }
+  .card { display:flex; flex-direction:column; gap:3px; width:100%; text-align:left;
+    background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 11px;
+    font:inherit; color:inherit; cursor:pointer; }
+  .card:hover { border-color:#111; }
+  .card .label { font-weight:600; }
+  .card.t-artifact { background:var(--artifact); }
+  .card.t-process { background:var(--process); }
+  .card.t-state { background:var(--state); }
+  .card.t-concept { background:var(--concept); }
+  .card.t-constraint { background:var(--constraint); border-style:dashed; }
+  .badges { display:flex; gap:6px; flex-wrap:wrap; }
+  .badges i { font-style:normal; font-size:11px; padding:1px 6px; border-radius:999px; border:1px solid var(--line); background:#fff; }
+  .badges i.type { font-weight:600; }
+  .topics { display:flex; gap:6px; flex-wrap:wrap; }
+  .tp { font-style:normal; font-size:11px; color:var(--mut); }
+  .attach { font-size:11.5px; color:#444; }
+  .col-mid .card { max-width:420px; }
+  .arrow { display:flex; flex-direction:column; align-items:center; height:46px; color:var(--mut); }
+  .arrow .line { width:2px; flex:1; background:#bbb; }
+  .arrow.up .line { background:repeating-linear-gradient(#bbb 0 4px, transparent 4px 8px); }
+  .arrow .elabel { font-size:11px; padding:2px 0; color:#555; }
+  .constraints { margin-top:34px; }
+  .cons-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:10px; }
+  aside { border-left:1px solid var(--line); padding:22px 20px 60px; background:#fcfcfc; }
+  .topic { border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:10px; background:#fff; }
+  .tt { font-weight:600; }
+  .tp-body { color:#333; margin:4px 0 7px; font-size:13px; }
+  .tchips { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+  .tchips i { font-style:normal; font-size:11px; border:1px solid var(--line); border-radius:999px;
+    padding:1px 6px; cursor:pointer; background:#fff; }
+  .tchips i:hover { border-color:#111; }
+  .tcount { font-size:11px; color:var(--mut); margin-left:2px; }
+  .tblocks { margin-top:6px; font-size:11.5px; color:var(--mut); }
+  .tblocks a { color:#1a4fd6; text-decoration:none; }
+  .tblocks a:hover { text-decoration:underline; }
+  a.blk { display:block; padding:4px 0; color:#1a4fd6; text-decoration:none; font-size:13px; }
+  a.blk i { color:var(--mut); font-style:normal; font-size:11px; }
+  .legend { margin-top:16px; font-size:12px; color:var(--mut); }
+  .legend div { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+  .sw { width:12px; height:12px; border:1px solid var(--line); border-radius:3px; }
+  #detail { position:fixed; right:16px; bottom:16px; width:min(560px, 92vw); max-height:70vh; overflow:auto;
+    background:#fff; border:1px solid #111; border-radius:12px; padding:16px 18px; display:none;
+    box-shadow:0 12px 40px rgba(0,0,0,.18); }
+  #detail h3 { margin:0 0 2px; font-size:16px; }
+  #detail .meta { color:var(--mut); font-size:12px; margin-bottom:8px; }
+  #detail ul { margin:6px 0 12px; padding-left:18px; }
+  #detail .unit { border-top:1px solid var(--line); padding:8px 0; font-size:13px; }
+  #detail .unit b { font-weight:600; }
+  #detail .close { position:absolute; right:12px; top:10px; border:none; background:none; font-size:18px; cursor:pointer; }
+  .hint { color:var(--mut); font-size:12px; margin-top:10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pre-class Fusion Context Consumption 语义模型</h1>
+  <p class="thesis">上下文消费只发生在 Outline Generation Attempt —— Frozen Context 经服务端投影成为 outline 生成的真实输入，Scene 继承的是 context-shaped outline；Receipt / Availability / Consumption 是三个可以同时为真、但不能互相替代的语义层级。</p>
+  <p class="scope"><b>范围</b>：本文只讨论 Context Consumption 的产品语义层级，不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。 <i>（document.scope · SU-001）</i></p>
+  <p class="scope"><b>非目标</b>：不采用 Context Influence 作为第四级；不承诺输出变化严格由 DeepTutor 上下文导致。 <i>（document.nonGoalSummary · SU-007,SU-034,SU-083）</i></p>
+  <div class="stats">测试文档/18-context-consumption-semantic-model.md · role=target ·
+    12 elements · 4 edges · 5 topics ·
+    静态验证页（Feature 04 一次性产物，非产品代码）</div>
+</header>
+
+<div class="layout">
+  <main>
+    <p class="band-title">Framework Map · 主轴</p>
+    <div class="row">
+    <div class="col-left"><button class="card t-concept side" data-el="E-06">
+  <span class="label">Context Receipt</span>
+  <span class="badges"><i class="type t-concept">concept</i><i class="role">semantic-level</i></span>
+  <span class="attach">挂到：Frozen Context</span>
+  <span class="topics"><i class="tp">T-01</i></span>
+</button></div>
+    <div class="col-mid"><button class="card t-artifact " data-el="E-01">
+  <span class="label">Frozen Context</span>
+  <span class="badges"><i class="type t-artifact">artifact</i><i class="role">input</i></span>
+  
+  <span class="topics"><i class="tp">T-02</i></span>
+</button><div class="arrow up"><span class="line"></span><span class="elabel">depends-on</span></div></div>
+    <div class="col-right"><div class="slot"></div></div>
+  </div>
+<div class="row">
+    <div class="col-left"><button class="card t-concept side" data-el="E-07">
+  <span class="label">Context Availability</span>
+  <span class="badges"><i class="type t-concept">concept</i><i class="role">semantic-level</i></span>
+  <span class="attach">挂到：Generation-facing Projection</span>
+  <span class="topics"><i class="tp">T-01</i></span>
+</button></div>
+    <div class="col-mid"><button class="card t-artifact " data-el="E-02">
+  <span class="label">Generation-facing Projection</span>
+  <span class="badges"><i class="type t-artifact">artifact</i><i class="role">intermediate</i></span>
+  
+  <span class="topics"><i class="tp">T-02</i></span>
+</button><div class="arrow up"><span class="line"></span><span class="elabel">consumes</span></div></div>
+    <div class="col-right"><div class="slot"></div></div>
+  </div>
+<div class="row">
+    <div class="col-left"><button class="card t-concept side" data-el="E-08">
+  <span class="label">Context Consumption</span>
+  <span class="badges"><i class="type t-concept">concept</i><i class="role">semantic-level</i></span>
+  <span class="attach">挂到：Outline Generation Attempt</span>
+  <span class="topics"><i class="tp">T-01</i><i class="tp">T-03</i></span>
+</button></div>
+    <div class="col-mid"><button class="card t-process " data-el="E-03">
+  <span class="label">Outline Generation Attempt</span>
+  <span class="badges"><i class="type t-process">process</i><i class="role">instance</i></span>
+  
+  <span class="topics"><i class="tp">T-02</i><i class="tp">T-03</i></span>
+</button><div class="arrow down"><span class="line"></span><span class="elabel">produces</span></div></div>
+    <div class="col-right"><div class="slot"></div></div>
+  </div>
+<div class="row">
+    <div class="col-left"><div class="slot"></div></div>
+    <div class="col-mid"><button class="card t-artifact " data-el="E-04">
+  <span class="label">Context-shaped Outline Revision</span>
+  <span class="badges"><i class="type t-artifact">artifact</i><i class="role">intermediate</i></span>
+  
+  <span class="topics"><i class="tp">T-02</i><i class="tp">T-04</i></span>
+</button><div class="arrow up"><span class="line"></span><span class="elabel">consumes</span></div></div>
+    <div class="col-right"><div class="slot"></div></div>
+  </div>
+<div class="row">
+    <div class="col-left"><div class="slot"></div></div>
+    <div class="col-mid"><button class="card t-process " data-el="E-05">
+  <span class="label">Scene Generation</span>
+  <span class="badges"><i class="type t-process">process</i><i class="role">consumer</i></span>
+  
+  <span class="topics"><i class="tp">T-02</i><i class="tp">T-04</i></span>
+</button></div>
+    <div class="col-right"><button class="card t-concept side" data-el="E-09">
+  <span class="label">Output Alignment</span>
+  <span class="badges"><i class="type t-concept">concept</i><i class="role">output</i></span>
+  <span class="attach">挂到：Context-shaped Outline Revision · Scene Generation</span>
+  <span class="topics"><i class="tp">T-04</i></span>
+</button></div>
+  </div>
+    <div class="constraints">
+      <p class="band-title">边界与排除（侧挂）</p>
+      <div class="cons-grid">
+        <button class="card t-constraint cons" data-el="E-10">
+    <span class="label">⚠ Consumption ≠ Output Alignment</span>
+    <span class="badges"><i class="type t-constraint">constraint</i><i class="role">boundary</i></span>
+    <span class="attach">挂到：Context Consumption · Output Alignment</span>
+  </button>
+<button class="card t-constraint cons" data-el="E-11">
+    <span class="label">⚠ Context Influence 不得作为第四级</span>
+    <span class="badges"><i class="type t-constraint">constraint</i><i class="role">excluded</i></span>
+    <span class="attach">挂到：Context Consumption</span>
+  </button>
+<button class="card t-constraint cons" data-el="E-12">
+    <span class="label">⚠ Receipt / Availability / Consumption 不能互相替代</span>
+    <span class="badges"><i class="type t-constraint">constraint</i><i class="role">boundary</i></span>
+    <span class="attach">挂到：Context Receipt · Context Availability · Context Consumption</span>
+  </button>
+      </div>
+    </div>
+    <p class="hint">点任意元素查看 L3 详情（原文定义 + 参与的关系）。</p>
+  </main>
+
+  <aside>
+    <p class="band-title">Topics</p>
+    <div class="topic">
+    <div class="tt">三级递进语义</div>
+    <div class="tp-body">Receipt、Availability、Consumption 是三个可以同时为真、但不能互相替代的语义层级 —— 上下文到了不等于可用，可用不等于被消费；被消费的是教学语义，不是实现控制对象。</div>
+    <div class="tchips"><i data-jump="E-06">E-06</i><i data-jump="E-07">E-07</i><i data-jump="E-08">E-08</i><i data-jump="E-12">E-12</i><span class="tcount">4 elements</span></div>
+    <div class="tblocks">下钻 L2（4）：<a href="../../../experiments/stage2-full/overview-preview.html#block-O-02" target="_blank" title="核心主张：保留三级递进">O-02</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-07" target="_blank" title="三个层级分别能说明什么、不能说明什么">O-07</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-08" target="_blank" title="消费的对象是什么、不是什么">O-08</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-09" target="_blank" title="Consumption 的定义与递进关系">O-09</a></div>
+  </div>
+<div class="topic">
+    <div class="tt">生成链路与消费点</div>
+    <div class="tp-body">消费点是 outline generation：Frozen Context 派生出的 projection 必须成为 outline 生成的真实输入，而不是被附加在 Prompt 里；scene 继承的是 context-shaped outline。</div>
+    <div class="tchips"><i data-jump="E-01">E-01</i><i data-jump="E-02">E-02</i><i data-jump="E-03">E-03</i><i data-jump="E-04">E-04</i><i data-jump="E-05">E-05</i><span class="tcount">5 elements</span></div>
+    <div class="tblocks">下钻 L2（3）：<a href="../../../experiments/stage2-full/overview-preview.html#block-O-04" target="_blank" title="系统骨架：消费点放在哪一层">O-04</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-04b" target="_blank" title="为什么不把消费点放在 scene">O-04b</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-04c" target="_blank" title="三个产品层级 → 现有生产职责映射">O-04c</a></div>
+  </div>
+<div class="topic">
+    <div class="tt">消费的证据与判定</div>
+    <div class="tp-body">判定消费的最低证据是「某一次 Outline Generation Attempt 实际使用了 generation-facing projection」；函数调用、Prompt 字符串、成功返回都不能升级为 Consumption。</div>
+    <div class="tchips"><i data-jump="E-03">E-03</i><i data-jump="E-08">E-08</i><span class="tcount">2 elements</span></div>
+    <div class="tblocks">下钻 L2（4）：<a href="../../../experiments/stage2-full/overview-preview.html#block-O-10" target="_blank" title="HOW DO WE KNOW：怎样证明某个状态真的发生了">O-10</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-10b" target="_blank" title="这些都不能单独证明 Consumption">O-10b</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-16" target="_blank" title="Consumption Subject：以哪一次 Attempt 为准">O-16</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-14" target="_blank" title="代码侧的边界与反模式">O-14</a></div>
+  </div>
+<div class="topic">
+    <div class="tt">两条链的边界与状态组合</div>
+    <div class="tp-body">Consumption 管「这次生成用了什么」，Output Alignment 管「生成出来体现了什么」；两链在 outline revision 处衔接，五种状态组合各有产品解释。</div>
+    <div class="tchips"><i data-jump="E-04">E-04</i><i data-jump="E-05">E-05</i><i data-jump="E-09">E-09</i><i data-jump="E-10">E-10</i><span class="tcount">4 elements</span></div>
+    <div class="tblocks">下钻 L2（4）：<a href="../../../experiments/stage2-full/overview-preview.html#block-O-05" target="_blank" title="两条链：Context-side 与 Output-side">O-05</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-06" target="_blank" title="两条链各自回答什么（职责边界）">O-06</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-11b" target="_blank" title="Possible mismatch states：Consumption 与 Alignment 不一致的两种情况">O-11b</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-13" target="_blank" title="5 种状态组合的产品解释">O-13</a></div>
+  </div>
+<div class="topic">
+    <div class="tt">语义边界与非主张</div>
+    <div class="tp-body">消费不要求盲目服从，也不要求输出明显不同；本篇不采用第四级 Context Influence，也不承诺某个输出变化严格由上下文导致。</div>
+    <div class="tchips"><i data-jump="E-11">E-11</i><span class="tcount">1 elements</span></div>
+    <div class="tblocks">下钻 L2（5）：<a href="../../../experiments/stage2-full/overview-preview.html#block-O-03" target="_blank" title="明确不采用：把 Context Influence 作为第四级">O-03</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-10c" target="_blank" title="两个反直觉判断">O-10c</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-11" target="_blank" title="Consumption 不要求什么 / 可能出现的不一致状态">O-11</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-12" target="_blank" title="为什么不做第四级：worked-example-first 反例">O-12</a> <a href="../../../experiments/stage2-full/overview-preview.html#block-O-15" target="_blank" title="明确不决定的 8 项 / 明确不承诺的 5 项">O-15</a></div>
+  </div>
+    <div class="legend">
+      <div><span class="sw" style="background:#eef4ff"></span>artifact × 3</div>
+      <div><span class="sw" style="background:#eefbf1"></span>process × 2</div>
+      <div><span class="sw" style="background:#f6eefe"></span>concept × 4</div>
+      
+      <div><span class="sw" style="background:#fdeeee"></span>constraint × 3</div>
+      <div style="margin-top:8px;color:#6b6b6b">六类是 allowed vocabulary，不是必须凑齐的 checklist（本篇 component = 0）。</div>
+      <div style="margin-top:6px;color:#6b6b6b">文档级入口：标题 / thesis / 范围 / 非目标 不占用 Topic，也不占用 L0 element。</div>
+    </div>
+  </aside>
+</div>
+
+<div id="detail">
+  <button class="close" onclick="document.getElementById('detail').style.display='none'">×</button>
+  <h3 id="d-label"></h3>
+  <div class="meta" id="d-meta"></div>
+  <div><b>参与的关系</b><ul id="d-rel"></ul></div>
+  <div><b>提到它的 blocks（L2，跳转到现有阅读视图）</b><div id="d-blocks"></div></div>
+  <div><b>溯源（原文 sourceUnits）</b><div id="d-units"></div></div>
+</div>
+
+<script>
+const DATA = [{"id":"E-01","label":"Frozen Context","type":"artifact","role":"input","topics":["T-02"],"rel":["Generation-facing Projection —depends-on→","被 Context Receipt 侧挂"],"blocks":[{"id":"O-04c","title":"三个产品层级 → 现有生产职责映射","shape":"matrix"},{"id":"O-07","title":"三个层级分别能说明什么、不能说明什么","shape":"capability-matrix"},{"id":"O-10b","title":"这些都不能单独证明 Consumption","shape":"checklist"}],"units":[{"id":"SU-014","section":"§3","kind":"boundary","statement":"Receipt 不能说明：上下文已经通过合法性校验、属于当前生成请求、已经冻结、当前生成一定可以使用它、生成器实际读过或使用了其中的教学语义、最终 outline 或 scene 已经对齐。"},{"id":"SU-020","section":"§4","kind":"negative-case","statement":"一个上下文可以有 Receipt 但没有 Availability：digest 与当前请求不一致、包含越权知识引用、Frozen Context 尚未成功创建、context 属于旧 revision、浏览器提交了看似完整但未经服务器授权的上下文、生成请求已经切换到另一个 lesson session。"},{"id":"SU-058","section":"§10","kind":"responsibility","statement":"Availability 对应\"在当前 outline attempt 中恢复合法、冻结、版本一致 context\"，概念入口是 resolveFormalFusion()、contextFrom()、正式 Fusion session recovery，成功边界是当前生成可安全读取同一 Frozen Context。"},{"id":"SU-065","section":"§12","kind":"negative-case","statement":"freezeFormalFusionForOutline() 成功保存 frozenLessonGenerationContext，但 outline generation 没有读取其投影。"}]},{"id":"E-02","label":"Generation-facing Projection","type":"artifact","role":"intermediate","topics":["T-02"],"rel":["—depends-on→ Frozen Context","Outline Generation Attempt —consumes→","被 Context Availability 侧挂"],"blocks":[{"id":"O-04","title":"系统骨架：消费点放在哪一层","shape":"current-target-flow"},{"id":"O-04c","title":"三个产品层级 → 现有生产职责映射","shape":"matrix"},{"id":"O-16","title":"Consumption Subject：以哪一次 Attempt 为准","shape":"flow"},{"id":"O-10","title":"HOW DO WE KNOW：怎样证明某个状态真的发生了","shape":"ladder"},{"id":"O-14","title":"代码侧的边界与反模式","shape":"checklist"}],"units":[{"id":"SU-046","section":"§9","kind":"target-state","statement":"Context Consumption 的 primary production responsibility 位于这条链路，而不是 scene runtime：freeze/resolve → outline generation route → server-derived generation projection → outline prompt 或等价 planner input → outline stream / Outline Generation Attempt → outline 持久化。"},{"id":"SU-047","section":"§9","kind":"current-state","statement":"lib/fusion/generation-session.ts 已存在一个很小的 FormalGenerationContextProjection，并由 appendFormalTeachingPrompt() 渲染为 Frozen lesson guidance。"},{"id":"SU-048","section":"§9","kind":"current-state","statement":"当前投影主要包含 topic、mapping lineage、knowledge reference IDs、guidance revision 和 recommended approaches；后续仍需决定哪些冻结教学语义必须进入 outline generation，以及怎样区分\"投影已注入\"与\"生成过程实际消费\"。"},{"id":"SU-059","section":"§10","kind":"responsibility","statement":"Consumption 对应\"将冻结语义投影到 outline generation 并作为课程设计输入\"，概念入口是 projectFormalGenerationContext()、appendFormalTeachingPrompt()、outline route / generator orchestration，成功边界是当前 Outline Generation Attempt 实际使用 generation-facing teaching semantics。"},{"id":"SU-080","section":"§14","kind":"evidence-requirement","statement":"Context Consumption 的最低证据应以 generation-level 为主：一次 Outline Generation Attempt 使用了哪个 Frozen Context 和哪个 generation-facing projection；Output Alignment 则需要在后续阶段形成局部 Judgment 与可定位 Evidence。"}]},{"id":"E-03","label":"Outline Generation Attempt","type":"process","role":"instance","topics":["T-02","T-03"],"rel":["—consumes→ Generation-facing Projection","—produces→ Context-shaped Outline Revision","被 Context Consumption 侧挂"],"blocks":[{"id":"O-04","title":"系统骨架：消费点放在哪一层","shape":"current-target-flow"},{"id":"O-04b","title":"为什么不把消费点放在 scene","shape":"checklist"},{"id":"O-14","title":"代码侧的边界与反模式","shape":"checklist"}],"units":[{"id":"SU-044","section":"§9","kind":"current-state","statement":"当前课前 outline 入口是 app/api/generate/scene-outlines-stream/route.ts。"},{"id":"SU-046","section":"§9","kind":"target-state","statement":"Context Consumption 的 primary production responsibility 位于这条链路，而不是 scene runtime：freeze/resolve → outline generation route → server-derived generation projection → outline prompt 或等价 planner input → outline stream / Outline Generation Attempt → outline 持久化。"},{"id":"SU-050","section":"§9","kind":"negative-case","statement":"未来 Context Consumption 的成功不应依赖自动生成 checkpoint/remediation；其目标是让普通 outline 生成消费冻结教学语义。"},{"id":"SU-076","section":"§13","kind":"target-state","statement":"OpenMAIC 后续应以 outline generation 作为 Primary Consumption Point；scene generation 主要继承 context-shaped outline，并只使用必要 lineage 或由 outline 派生的局部约束。"}]},{"id":"E-04","label":"Context-shaped Outline Revision","type":"artifact","role":"intermediate","topics":["T-02","T-04"],"rel":["Outline Generation Attempt —produces→","Scene Generation —consumes→","被 Output Alignment 侧挂"],"blocks":[{"id":"O-04","title":"系统骨架：消费点放在哪一层","shape":"current-target-flow"},{"id":"O-10c","title":"两个反直觉判断","shape":"checklist"},{"id":"O-14","title":"代码侧的边界与反模式","shape":"checklist"}],"units":[{"id":"SU-054","section":"§9","kind":"target-state","statement":"后续应把这条现有路径理解为需要收敛的边界：FrozenLessonGenerationContext → outline generation projection → context-shaped Outline Revision → scene generation from authoritative outline。"},{"id":"SU-056","section":"§9","kind":"target-state","statement":"Scene generation 的主要消费对象应是 context-shaped outline，而不是完整 Frozen Context。"},{"id":"SU-062","section":"§11","kind":"definition","statement":"需要区分三种粒度：Outline Generation Request（一次服务端请求）、Outline Generation Attempt（请求中的一次实际生成尝试，可能有重试）、Outline Revision（生成成功并被接受后形成的课纲版本）。"},{"id":"SU-079","section":"§14","kind":"boundary","statement":"两者在 outline revision 和 context lineage 处衔接，但不能用一个替代另一个。"}]},{"id":"E-05","label":"Scene Generation","type":"process","role":"consumer","topics":["T-02","T-04"],"rel":["—consumes→ Context-shaped Outline Revision","被 Output Alignment 侧挂"],"blocks":[{"id":"O-04","title":"系统骨架：消费点放在哪一层","shape":"current-target-flow"},{"id":"O-04b","title":"为什么不把消费点放在 scene","shape":"checklist"},{"id":"O-14","title":"代码侧的边界与反模式","shape":"checklist"}],"units":[{"id":"SU-051","section":"§9","kind":"current-state","statement":"Scene content 的当前入口是 app/api/generate/scene-content/route.ts，底层生成在 lib/generation/scene-generator.ts，完整组装在 lib/generation/scene-builder.ts；这些路径主要接收一个 SceneOutline。"},{"id":"SU-055","section":"§9","kind":"invariant","statement":"Scene generation 可以继承必要的 context lineage、outline revision 和由 outline 派生的局部设计约束，但不应重新读取完整 raw Proposal、learner projection、DeepTutor 内部响应或另一个 context revision。"},{"id":"SU-075","section":"§13","kind":"consequence","statement":"若让每个 scene generator 都独立直接消费完整 Frozen Context，会造成：每个 scene 重新解释同一份 guidance、scene 之间可能使用不同 context revision、scene 层决定覆盖 outline 层的整体课程设计、learner/context 数据重复进入多个 Prompt、token 成本增加、后续 realized alignment 难以判断偏差来自 outline 还是 scene。"},{"id":"SU-076","section":"§13","kind":"target-state","statement":"OpenMAIC 后续应以 outline generation 作为 Primary Consumption Point；scene generation 主要继承 context-shaped outline，并只使用必要 lineage 或由 outline 派生的局部约束。"}]},{"id":"E-06","label":"Context Receipt","type":"concept","role":"semantic-level","topics":["T-01"],"rel":["侧挂 → Frozen Context","被 Receipt / Availability / Consumption 不能互相替代 侧挂"],"blocks":[{"id":"O-02","title":"核心主张：保留三级递进","shape":"ladder"},{"id":"O-04c","title":"三个产品层级 → 现有生产职责映射","shape":"matrix"},{"id":"O-05","title":"两条链：Context-side 与 Output-side","shape":"flow"},{"id":"O-07","title":"三个层级分别能说明什么、不能说明什么","shape":"capability-matrix"},{"id":"O-10","title":"HOW DO WE KNOW：怎样证明某个状态真的发生了","shape":"ladder"}],"units":[{"id":"SU-004","section":"§1","kind":"definition","statement":"Receipt 表示上下文到达了系统；Availability 表示合法、冻结、版本一致的上下文已可被本次生成使用；Consumption 表示本次生成任务实际把其中的教学语义作为课程设计输入。"},{"id":"SU-012","section":"§3","kind":"definition","statement":"Context Receipt 表示 OpenMAIC 或其服务端 Fusion 层收到了一份来自课前语义交换链的上下文结果，至少可以识别它属于某个请求或 session lineage。"},{"id":"SU-014","section":"§3","kind":"boundary","statement":"Receipt 不能说明：上下文已经通过合法性校验、属于当前生成请求、已经冻结、当前生成一定可以使用它、生成器实际读过或使用了其中的教学语义、最终 outline 或 scene 已经对齐。"},{"id":"SU-057","section":"§10","kind":"responsibility","statement":"Receipt 对应\"接收和记录课前 context lineage\"，概念入口是 freezeFormalFusionForOutline() / resolveFormalFusion() 及 session store，成功边界是服务端收到并能关联 context/request/session。"}]},{"id":"E-07","label":"Context Availability","type":"concept","role":"semantic-level","topics":["T-01"],"rel":["侧挂 → Generation-facing Projection","被 Receipt / Availability / Consumption 不能互相替代 侧挂"],"blocks":[{"id":"O-02","title":"核心主张：保留三级递进","shape":"ladder"},{"id":"O-04c","title":"三个产品层级 → 现有生产职责映射","shape":"matrix"},{"id":"O-05","title":"两条链：Context-side 与 Output-side","shape":"flow"},{"id":"O-07","title":"三个层级分别能说明什么、不能说明什么","shape":"capability-matrix"},{"id":"O-10","title":"HOW DO WE KNOW：怎样证明某个状态真的发生了","shape":"ladder"}],"units":[{"id":"SU-004","section":"§1","kind":"definition","statement":"Receipt 表示上下文到达了系统；Availability 表示合法、冻结、版本一致的上下文已可被本次生成使用；Consumption 表示本次生成任务实际把其中的教学语义作为课程设计输入。"},{"id":"SU-017","section":"§4","kind":"definition","statement":"Context Availability 表示合法、冻结、版本一致的课前语义上下文已经准备好，并且在本次 outline generation 的授权边界内可被使用。"},{"id":"SU-018","section":"§4","kind":"invariant","statement":"Availability 至少意味着：来自受信任的服务端路径、请求/session/Frozen Context lineage 一致、schema 与 revision 与 digest 与引用范围和授权关系通过检查、使用的是同一个冻结上下文、仍在有效生命周期内、生成阶段具有访问该合法上下文的服务端能力。"},{"id":"SU-058","section":"§10","kind":"responsibility","statement":"Availability 对应\"在当前 outline attempt 中恢复合法、冻结、版本一致 context\"，概念入口是 resolveFormalFusion()、contextFrom()、正式 Fusion session recovery，成功边界是当前生成可安全读取同一 Frozen Context。"}]},{"id":"E-08","label":"Context Consumption","type":"concept","role":"semantic-level","topics":["T-01","T-03"],"rel":["侧挂 → Outline Generation Attempt","被 Consumption ≠ Output Alignment 侧挂","被 Context Influence 不得作为第四级 侧挂","被 Receipt / Availability / Consumption 不能互相替代 侧挂"],"blocks":[{"id":"O-02","title":"核心主张：保留三级递进","shape":"ladder"},{"id":"O-05","title":"两条链：Context-side 与 Output-side","shape":"flow"},{"id":"O-07","title":"三个层级分别能说明什么、不能说明什么","shape":"capability-matrix"},{"id":"O-08","title":"消费的对象是什么、不是什么","shape":"two-column-comparison"}],"units":[{"id":"SU-004","section":"§1","kind":"definition","statement":"Receipt 表示上下文到达了系统；Availability 表示合法、冻结、版本一致的上下文已可被本次生成使用；Consumption 表示本次生成任务实际把其中的教学语义作为课程设计输入。"},{"id":"SU-022","section":"§5","kind":"definition","statement":"Context Consumption 表示本次 outline generation 实际使用了冻结上下文中的教学语义，并将其作为课程设计输入，而不是仅仅收到、保存或附加了上下文。"},{"id":"SU-023","section":"§5","kind":"definition","statement":"被消费的对象是经过验证和冻结的教学语义：学习目标、授权且相关的知识范围、必要前置关系、learner projection、Required design constraints、Recommended approaches、Evaluation Focus、生成约束与范围建议与明确排除项。"},{"id":"SU-024","section":"§5","kind":"non-claim","statement":"Consumption 不要求把 raw Proposal、DeepTutor 内部响应、工具轨迹或模型推理直接交给生成器。"},{"id":"SU-085","section":"§5","kind":"non-claim","statement":"Consumption 的对象是语义要求和教学取向，不是 sceneId、route、React 组件、播放器命令、checkpoint/remediation 创建命令、RuntimeState 修改、浏览器操作指令等实现控制对象。"}]},{"id":"E-09","label":"Output Alignment","type":"concept","role":"output","topics":["T-04"],"rel":["侧挂 → Context-shaped Outline Revision / Scene Generation","被 Consumption ≠ Output Alignment 侧挂"],"blocks":[{"id":"O-05","title":"两条链：Context-side 与 Output-side","shape":"flow"},{"id":"O-06","title":"两条链各自回答什么（职责边界）","shape":"capability-matrix"},{"id":"O-16","title":"Consumption Subject：以哪一次 Attempt 为准","shape":"flow"},{"id":"O-10","title":"HOW DO WE KNOW：怎样证明某个状态真的发生了","shape":"ladder"},{"id":"O-14","title":"代码侧的边界与反模式","shape":"checklist"}],"units":[{"id":"SU-010","section":"§2","kind":"definition","statement":"Output-side chain 回答：最终生成的 outline 和 scene 是否在可观察意义上体现了相关目标、知识范围和教学设计要求。"},{"id":"SU-039","section":"§8","kind":"boundary","statement":"Context Consumption 关注冻结教学语义是否到达并实际参与生成；Output Alignment 关注最终 outline / scene 是否体现相关教学要求。"},{"id":"SU-078","section":"§14","kind":"responsibility","statement":"Output Alignment 主要新增或改造：outline preflight assessment、scene realization assessment、objective 与 knowledge-scope 与 guidance judgments、evidence 与 limitations 与 aggregation、derived outlineCoverage。"},{"id":"SU-080","section":"§14","kind":"evidence-requirement","statement":"Context Consumption 的最低证据应以 generation-level 为主：一次 Outline Generation Attempt 使用了哪个 Frozen Context 和哪个 generation-facing projection；Output Alignment 则需要在后续阶段形成局部 Judgment 与可定位 Evidence。"}]},{"id":"E-10","label":"Consumption ≠ Output Alignment","type":"constraint","role":"boundary","topics":["T-04"],"rel":["侧挂 → Context Consumption / Output Alignment"],"blocks":[{"id":"O-05","title":"两条链：Context-side 与 Output-side","shape":"flow"},{"id":"O-11b","title":"Possible mismatch states：Consumption 与 Alignment 不一致的两种情况","shape":"combo"},{"id":"O-14","title":"代码侧的边界与反模式","shape":"checklist"}],"units":[{"id":"SU-002","section":"§0","kind":"boundary","statement":"Context-side chain 与 Output-side chain 保持分离，二者共同支持 context-grounded generation 的产品叙事，但不承诺严格反事实因果。"},{"id":"SU-008","section":"§2","kind":"definition","statement":"产品语义上保留两条相互关联但不互相吞并的链：Context-side chain 与 Output-side chain。"},{"id":"SU-040","section":"§8","kind":"invariant","statement":"Consumption ≠ Output Alignment，Output Alignment ≠ Consumption。"},{"id":"SU-079","section":"§14","kind":"boundary","statement":"两者在 outline revision 和 context lineage 处衔接，但不能用一个替代另一个。"}]},{"id":"E-11","label":"Context Influence 不得作为第四级","type":"constraint","role":"excluded","topics":["T-05"],"rel":["侧挂 → Context Consumption"],"blocks":[{"id":"O-03","title":"明确不采用：把 Context Influence 作为第四级","shape":"diff"},{"id":"O-12","title":"为什么不做第四级：worked-example-first 反例","shape":"walkthrough"},{"id":"O-15","title":"明确不决定的 8 项 / 明确不承诺的 5 项","shape":"checklist"}],"units":[{"id":"SU-007","section":"§1","kind":"target-state","statement":"明确不采用 Receipt → Availability → Consumption → Influence 的四级结构。"},{"id":"SU-032","section":"§6","kind":"counterexample","statement":"worked-example-first 反例：Receipt/Availability/Consumption 全为 yes 且课程确实使用了 worked example，但不能确定这个 worked example 是因为 DeepTutor 才出现的，因为默认生成模板本来可能也会生成它。"},{"id":"SU-034","section":"§6","kind":"target-state","statement":"Context Influence 不作为 Context Consumption 的第四级，也不作为本协议的必要产品状态；它可以在未来研究或实验评估中作为独立问题讨论。"},{"id":"SU-084","section":"§15","kind":"target-state","statement":"后续可以在本语义模型基础上再单独讨论概念性 JSON，但该 JSON 应表达 Receipt / Availability / Consumption 的语义差异，不应重新加入 Context Influence 作为第四级。"}]},{"id":"E-12","label":"Receipt / Availability / Consumption 不能互相替代","type":"constraint","role":"boundary","topics":["T-01"],"rel":["侧挂 → Context Receipt / Context Availability / Context Consumption"],"blocks":[{"id":"O-02","title":"核心主张：保留三级递进","shape":"ladder"},{"id":"O-06","title":"两条链各自回答什么（职责边界）","shape":"capability-matrix"},{"id":"O-09","title":"Consumption 的定义与递进关系","shape":"ladder"},{"id":"O-10c","title":"两个反直觉判断","shape":"checklist"}],"units":[{"id":"SU-005","section":"§1","kind":"invariant","statement":"三个层级不能互相替代：Receipt ≠ Availability，Availability ≠ Consumption。"},{"id":"SU-019","section":"§4","kind":"boundary","statement":"Availability 仍然不能说明生成器已经真正使用了上下文；它只说明\"如果生成器需要，它现在可以合法、稳定地使用这份上下文\"。"},{"id":"SU-025","section":"§5","kind":"invariant","statement":"Receipt 是\"我们收到了上下文\"；Availability 是\"我们确认它合法、冻结、版本一致，并且本次生成可以使用\"；Consumption 是\"本次生成任务确实把其中的教学语义纳入了课程设计\"。"},{"id":"SU-064","section":"§11","kind":"boundary","statement":"反之，outline 成功返回也不能自动证明 Consumption：如果 projection 没有成为真实生成输入，只能算 Receipt 或 Availability。"}]}];
+document.addEventListener('click', (ev) => {
+  const jump = ev.target.closest('[data-jump]');
+  if (jump) { const c = document.querySelector('[data-el="' + jump.dataset.jump + '"]');
+    if (c) c.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+  const btn = ev.target.closest('[data-el]');
+  if (!btn) return;
+  const d = DATA.find((x) => x.id === btn.dataset.el);
+  if (!d) return;
+  document.getElementById('d-label').textContent = d.id + ' · ' + d.label;
+  document.getElementById('d-meta').textContent =
+    d.type + ' / ' + d.role + ' · topics: ' + d.topics.join(', ');
+  document.getElementById('d-rel').innerHTML = d.rel.map((r) => '<li>' + r + '</li>').join('');
+  document.getElementById('d-blocks').innerHTML = d.blocks.length
+    ? d.blocks.map((b) => '<a class="blk" href="../../../experiments/stage2-full/overview-preview.html#block-' + b.id + '" target="_blank"><b>' + b.id + '</b> ' + b.title + ' <i>' + b.shape + '</i></a>').join('')
+    : '<span style="color:#6b6b6b">（无）</span>';
+  document.getElementById('d-units').innerHTML = d.units.map((u) =>
+    '<div class="unit"><b>' + u.id + '</b> <span style="color:#6b6b6b">' + u.section + ' · ' + u.kind + '</span><br>' + u.statement + '</div>').join('');
+  document.getElementById('detail').style.display = 'block';
+});
+</script>
+</body>
+</html>

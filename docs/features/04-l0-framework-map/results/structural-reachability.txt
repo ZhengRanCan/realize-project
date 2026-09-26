@@ -1,0 +1,30 @@
+===== Structural Reachability Test =====
+documents : 测试文档/18-context-consumption-semantic-model.md
+entries   : document metadata 4 条 · L0 element 42 条 · Topic→L2 86 条
+
+题号 | 答案所在 unit | 最优跳数 | 问题
+Q1 | SU-080 | 1 跳 | Consumption 的最低证据是什么？
+Q2 | SU-026,SU-072,SU-015 | 2 跳 | 哪些情况不能单独证明 Consumption？
+Q3 | SU-002,SU-008,SU-040,SU-039 | 1 跳 | Context-side 与 Output-side 的边界是什么？
+Q4 | SU-074,SU-075,SU-076 | 1 跳 | 为什么消费点放在 Outline 而不是 Scene？
+Q5 | SU-004,SU-021,SU-025 | 1 跳 | Receipt 与 Availability 的区别是什么？
+Q6 | SU-006,SU-007,SU-034 | 0 跳 | 为什么不做第四级 Context Influence？
+Q7 | SU-061,SU-062 | 1 跳 | Consumption 的 Subject 是什么？
+Q8 | SU-030,SU-031 | 2 跳 | Consumption 是否要求最终输出明显不同？
+Q9 | SU-065,SU-066,SU-067,SU-068 | 1 跳 | 哪些代码路径只能算 Receipt / Availability？
+Q10 | SU-035,SU-011 | 2 跳 | 两条链共同支持的产品叙事是什么？
+
+分布: {"1 跳":6,"2 跳":3,"0 跳":1}
+
+--- 完全无路径检查（目标 = 0）---
+PASS  87/87 条语义都有可达路径 —— 完全无路径 = 0
+
+--- 各 Topic 的入口规模 ---
+T-01 三级递进语义: elements=4 · blocks=4
+T-02 生成链路与消费点: elements=5 · blocks=3
+T-03 消费的证据与判定: elements=2 · blocks=4
+T-04 两条链的边界与状态组合: elements=4 · blocks=4
+T-05 语义边界与非主张: elements=1 · blocks=5
+
+注：本测量只回答"有没有路 / 要几层"，不是认知体验的胜负指标。
+===== END =====
