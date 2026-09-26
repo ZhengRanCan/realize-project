@@ -70,9 +70,15 @@ const DEFAULTS = {
   schemaB: path.join('schema', 'framework-map.schema.json'),
   selectionSchema: path.join('schema', 'map-selection.schema.json'),
   model: 'deepseek-flash',
-  // 分阶段输出预算（用户裁决：给太大空间会让 Stage A 越写越散）
-  maxTokensA: 16384,
-  maxTokensB: 12288,
+  // Stage A 的输出预算：**不能压**。
+  // 实测（e/run-03）：16384 预算下 finish_reason=length，16386/16384 顶格，
+  // 其中 reasoning 占 14634（89%）→ 真正写出的 JSON 只有 ~1.7k tokens 就被砍断。
+  // 该模型的 max_tokens 同时覆盖 reasoning 与 content，所以必须给足（F07 已验证 65536 可用）。
+  maxTokensA: 65536,
+  // Stage B **同样不能压**。实测（e/run-04）：max_tokens_b=12288 时
+  // finish_reason=length、completion=12288、**reasoning 也是 12288** → content 长度 0，
+  // 模型把整份预算花在思考上，一个字都没输出。
+  maxTokensB: 65536,
   temperature: 1,
   timeoutMs: 900000,
   maxAttempts: 1,

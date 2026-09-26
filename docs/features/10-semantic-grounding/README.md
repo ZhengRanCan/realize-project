@@ -133,6 +133,23 @@ Framework Map Encoding
 | **E2 · Selection Miss** | Inventory 有，**Stage B 丢掉**（`disposition = omitted`，或没有合法 representation） | AI 看到了，但**压缩时丢了** |
 | **E3 · Encoding Distortion** | Inventory 有、Selection 也说 selected，但最终 **type 错 / relation direction 错 / constraint 挂错宿主 / contains↔reference 混淆** | 看到了、也决定保留，但**表达错了** |
 | **E4 · Escape-hatch Misuse** | Inventory 有、Stage B 也**声称**表达了，但实际塞进 `edge.label` / topic proposition / `meta.note` / 伪 relationGap | **绕过 Contract 的表达** —— 没有真正进入 semantic-bearing structure |
+| **E5 · Over-representation** | Inventory 里**大量低层、重复或从属语义被一一提升为** Framework Map 承载对象，导致 L0 **丧失认知压缩职责** | 不是"丢了"，而是"全都要" —— 清单被当成待办列表 |
+
+**E5 的典型信号**（**不是**单纯 `elements > 12`）：
+
+```text
+· Inventory → represented ratio 极高（接近 100%）
+· 大量 target 只承载 1 条 semantic item（1:1 传导）
+· L0 element 数明显接近 Inventory 的条目粒度
+```
+
+> **实测样本（D/run-01）**：`154 / 154 represented` · `81 elements` · `27 个 target 只承载 1 条` —— 标准 E5。
+> 详见 `results/selection-analysis.md`。
+
+**E5 的根因是结构性的，不是模型偷懒**：当时的 Stage B 只加压力、不加筛选
+（每一条都要有 disposition + 五类不许 omitted + budget 12 只是 Warning + 没有任何"先选 ≤12"的要求）
+→ 面对 154 条，最不会违规的解法就是全部 represented。
+**修法是让 Selection 发生在 Encoding 之前**（见 `ai/framework-map-synthesis.prompt.md` §八）。
 
 判定路径（以 E 的 `10 次 → REFUND_FAILED` 为例）：
 
@@ -174,13 +191,20 @@ Provenance quality  出处是否精确（§key 合法、行号对得上、quote 
 `semantic-inventory` / `map-selection` 的完整性**不含**"id 连续"。
 
 ```text
-✅ 真正要查的（integrity FAIL）
-   duplicate id                     同一 id 出现两次
-   unknown referenced id            引用了不存在的 id（inventory 里没有的 semanticId、不存在的 §key）
-   selection missing inventory id   inventory 有、selection 里没有
-   selection references nonexistent map target   target 指向不存在的 element / topic / edge / attachment
-   same inventory item twice        selection 对同一条重复记录
-   target.kind 与真实 type 不符      声称 constraint 但 target 是 artifact 之类
+🚫 blocking（**不允许进入 Stage B**）—— 内容级 / 身份级
+   duplicate id                       同一 id 出现两次（无法唯一识别 semantic item）
+   dangling semantic reference        引用了不存在的 semanticId / §key
+   malformed inventory structure      顶层或 items 结构不成立
+   无法唯一识别 semantic item          缺 id、缺 statement、缺 sources
+   selection missing inventory id     inventory 有、selection 里没有
+   selection references nonexistent map target   target 指向不存在的 element/topic/edge/attachment
+   same inventory item twice          selection 对同一条重复记录
+   target.kind 与真实 type 不符        声称 constraint 但 target 是 artifact 之类
+
+⚠️ advisory（**记录为 integrity FAIL，但继续 Stage B**）—— 纯编号格式
+   例：`S-152b` 这种编号格式不符合规范
+   前提：ID 唯一 + 引用闭合 + selection 能正确引用 + 语义内容合法
+   理由（用户裁决）：一个编号格式问题**不能**把 E2/E3/E4 的归因全部遮掉。
 
 ❌ 不查的
    "id 必须连续"  —— S-001 / S-002 / S-004 只要没有引用 S-003，就不是语义错误。

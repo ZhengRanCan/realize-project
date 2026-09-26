@@ -103,19 +103,41 @@ budget         element 数量的 preferred budget = 12。超过是 Warning（不
 · 这些内容属于 `constraint` 元素（或其 label），不属于边的 label。
 ```
 
+**你的目标规模（这是生成阶段的作业要求，不是修改契约）：**
+
+```text
+Target **8–12 core L0 elements.**
+
+Exceed 12 only when preserving an indispensable structural semantic cannot be achieved
+through edge, attachment, qualifier, or Topic navigation. If you exceed 12, explain why.
+```
+
+> Contract 里 `>12` 仍然只是 Warning —— 这一句**不是**把 Warning 偷偷变成 Hard Error，
+> 而是明确告诉你：**你的工作包含"压缩"这件事**。做过压缩的图才叫 Framework Map。
+
 **什么可以不上 L0（取舍判据）：**
 
 ```text
 可以不上：同一概念的另一种说法 · 只在一处提到且不与任何元素发生关系的细节参数 ·
-         纯叙述性过渡 / 背景铺垫 · 属于更细层级（L2 视觉块）的实现细节
-
-不可以砍（若清单里有，必须在图上有承载；见 §七 的 topic-only 限制）：
-         失败 / 异常路径 · 人工介入与权限边界 · 阈值 / 上限 / 有界重试 ·
-         不变量与一致性要求 · 明确写出的"不做什么"（非目标 / 边界）
+         纯叙述性过渡 / 背景铺垫 · 属于更细层级（L2 视觉块）的实现细节 ·
+         低层、重复或从属语义（它们应由某个核心结构一并承载，而不是各自成为一个节点）
 ```
 
-**判断方法：** 先问"这条语义如果不在图上，读者会不会漏掉一个机制？"
-会 → 它必须进图（element / constraint / attachment），**不要靠对同类内容做粒度聚合把它并掉**。
+**「不得静默丢失」的五类 —— 注意：不是"必须成为 element"：**
+
+```text
+失败 / 异常路径 · 人工介入与权限边界 · 阈值 / 上限 / 有界重试 ·
+业务不变量与一致性要求 · 明确写出的 non-goal（不做什么）
+```
+
+这五类**不得静默丢失**，但**不要求独立成为 element**。它们的优先归宿是：
+
+```text
+① 挂到**已有** element 上：attachment / constraint / edge / qualifier
+② 只有确实是**核心设计对象**（有自己的组成、生命周期、边界）时，才新增 element
+③ topic-only 可以作为弱归宿，但必须解释：为什么它属于**导航语义**
+   而不是 Framework Map 的**结构语义**
+```
 
 ---
 
@@ -211,33 +233,60 @@ null                                  → 仅当 disposition = "omitted"
 
 ```text
 ① 清单里每一条都必须出现且**只出现一次**（漏一条 / 重复一条都是失败）。
-② §四 的"不可以砍"五类（失败路径 / 权限边界 / 阈值上限 / 不变量 / 非目标）
-   **不允许 disposition = "omitted"**。
-③ 但"不允许 omitted" ≠ "必须成为 element"：这三条归宿都合法 ——
-      · 成为 element（或 type=constraint 的元素）
-      · 作为 attachment 侧挂到宿主
-      · 被一条 edge 正经表达（type + qualifiers）
-   `topic-only` 是弱归宿：只有确实不适合进图时才用，且必须在 reason 里说明。
-④ reason 必须写具体（引用原文机制），不要写"已涵盖"这类空话。
-⑤ 同一个 target 可以承载多条语义；但不要为了好交代把多条语义塞进同一个 element 而丢掉区别。
+② §四 的「不得静默丢失」五类（失败路径 / 权限边界 / 阈值上限 / 不变量 / non-goal）
+   **不允许 disposition = "omitted"**；但它们的优先归宿是
+   **挂到已有 element 上**（attachment / constraint / edge / qualifier），
+   **只有确实是核心设计对象时才新增 element**。
+③ 其余（普通叙述性、从属、重复）语义**允许 omitted** —— 写一行 reason 即可。
+   这是"选择"的一部分，不是偷懒。
+④ topic-only 是弱归宿：用了就必须解释为什么它属于导航语义而不是结构语义。
+⑤ reason 必须写具体（引用该语义本身），不要写"已涵盖"这类空话。
+⑥ ⚠️ **反 E5（Over-representation）自查**：
+   如果出现下列任一信号，说明你把清单当成了待办列表 —— 回 §八 重新聚类、重新选择：
+     · represented 比例接近 100%
+     · 大量 target 只承载 1 条语义
+     · L0 element 数明显接近 Inventory 的条目粒度
+   正常形态应该是：**多个语义自然汇聚到同一个核心结构**（一条 element / constraint
+   同时承载 3–5 条语义是常见的）。
 ```
 
 ---
 
-### 八、生成过程
+### 八、生成过程（**Selection 必须发生在 Encoding 之前**）
+
+⚠️ 最容易犯的错：拿清单**逐条**去找地方放 —— 那会得到一张"每条语义一个节点"的图（100+ 元素），
+那不是 Framework Map，是清单的镜像。**必须先选择，再表达。**
 
 ```text
-1. 读原文 + Inventory
-2. 找出核心设计对象（有结构 / 有生命周期 / 有关系 / 有边界的东西）→ 候选 element
-3. 用 §三 的规则给它们定 type（**不要**按名字定）
-4. 按 §四 的取舍判据决定哪些上 L0、哪些侧挂、哪些下放
-5. 用 type + qualifiers 表达主要关系；表达不了的进 relationGap（按 §五 的分流规则）
-6. 挂 attachments（注意宿主方向）
-7. 分 Topic，并保证每个顶层小节都有入口
-8. 逐条写 selection trace，并回头自查：有没有为了省事把机制塞进 label / 命题
+Semantic Inventory
+   ↓
+① 聚类：哪些语义其实在描述**同一个** L0 对象或机制？
+        （同一机制的不同侧面 / 阈值 + 它约束的对象 / 权限 + 它保护的操作）
+   ↓
+② 选择：对"读懂这篇文档"而言，**不可缺少的核心结构**是什么？
+        → Target 8–12 个 core L0 elements（见 §四）
+   ↓
+③ 构造 L0 核心元素（此时才做 type 判定，按 §三 的规则）
+   ↓
+④ 其余语义再分流（**这一步才允许逐条过清单**）：
+        ├─ attachment（挂到已有元素）
+        ├─ edge / qualifier（由一条关系表达）
+        ├─ topic-only（弱归宿，需解释）
+        └─ omitted + reason（允许；五类机制除外 —— 见 §四）
 ```
 
-**element 准入判据（三条都过才算）：** 文档明确写了它；它有独立语义（不是别的元素的同义改写）；它在图上能连上至少一条边或侧挂。
+**自查（写 selection 之前先回答自己）：**
+
+```text
+· 我的 L0 element 是"从全文抽象出来的核心结构"，还是"清单条目的搬运"？
+· 有没有两条 element 其实在描述同一个东西的两种说法？
+· 一条 element 能不能同时承载清单里 3–5 条语义？（应该经常发生）
+· 如果我把 element 数从 X 压到 12，会不会丢掉"不可缺少的结构"？
+  会 → 保留并解释；不会 → 说明压得还不够。
+```
+
+**element 准入判据（三条都过才算）：** 文档明确写了它；它有**独立结构语义**
+（有自己的组成 / 生命周期 / 边界，不是别的元素的同义改写或从属细节）；它在图上能连上至少一条边或侧挂。
 
 ---
 
