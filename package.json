@@ -14,7 +14,18 @@
     "source": "node scripts/extract-source-sections.js",
     "simulate": "node scripts/simulate-review.js",
     "ai:plan": "node scripts/ai-plan.js",
-    "compare-plan": "node scripts/compare-plan.js"
+    "compare-plan": "node scripts/compare-plan.js",
+    "check-block": "node scripts/check-block.js",
+    "ai:block": "node scripts/ai-block.js",
+    "compare-stage2": "node scripts/compare-stage2.js",
+    "test:block": "node scripts/test-check-block.js",
+    "test:all": "node scripts/test-check-plan.js && node scripts/test-check-block.js",
+    "assemble": "node scripts/assemble-overview.js",
+    "check-overview": "node scripts/check-overview.js",
+    "build-preview": "node scripts/build-preview.js",
+    "report:full": "node scripts/full-run-report.js",
+    "verify-preview": "electron . --verify-preview experiments/stage2-full/overview-preview.html",
+    "manifest:full": "node scripts/write-full-manifest.js"
   },
   "devDependencies": {
     "electron": "^31.7.7"

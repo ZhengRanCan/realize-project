@@ -1,0 +1,148 @@
+{
+  "id": "O-14",
+  "title": "代码侧的边界与反模式",
+  "stage": "boundary",
+  "shape": "checklist",
+  "covers": [
+    "SU-048",
+    "SU-049",
+    "SU-050",
+    "SU-051",
+    "SU-052",
+    "SU-073",
+    "SU-077",
+    "SU-078",
+    "SU-079"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§9",
+      "role": "current-state"
+    },
+    {
+      "section": "§12",
+      "role": "boundary"
+    },
+    {
+      "section": "§13",
+      "role": "current-state"
+    },
+    {
+      "section": "§14",
+      "role": "responsibility"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-008",
+    "DEC-010",
+    "GAP-001",
+    "GAP-004"
+  ],
+  "defaultExpanded": false,
+  "content": {
+    "type": "checklist",
+    "panels": [
+      {
+        "title": "既有代码路径不等于 Context Consumption 证明",
+        "variant": "warn",
+        "sourceUnitIds": [
+          "SU-049",
+          "SU-050"
+        ],
+        "items": [
+          {
+            "text": "当前 generation projection 主要包含 topic、mapping lineage、knowledge reference IDs、guidance revision 和 recommended approaches。",
+            "note": "后续仍需决定哪些冻结教学语义必须进入 outline generation，并区分“投影已注入”与“生成过程实际消费”。",
+            "variant": "current",
+            "sourceUnitIds": [
+              "SU-048"
+            ]
+          },
+          {
+            "text": "completeFormalLessonOutlines() 追加 checkpoint/remediation pair 属于既有 F60 边界修正对象。",
+            "note": "该行为不应被当作 Context Consumption 的证明。",
+            "variant": "bad",
+            "sourceUnitIds": [
+              "SU-049"
+            ]
+          },
+          {
+            "text": "未来 Context Consumption 的成功不应依赖自动生成 checkpoint/remediation。",
+            "note": "目标是让普通 outline 生成消费冻结教学语义。",
+            "variant": "target",
+            "sourceUnitIds": [
+              "SU-050"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Scene pipeline 的消费边界",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-052",
+          "SU-073"
+        ],
+        "items": [
+          {
+            "text": "Scene content 当前由 scene-content route 进入，经 scene-generator 生成，并由 scene-builder 完整组装。",
+            "note": "这些路径主要接收一个 SceneOutline。",
+            "variant": "current",
+            "sourceUnitIds": [
+              "SU-051"
+            ]
+          },
+          {
+            "text": "SceneGenerationContext 是跨页 speech coherence context。",
+            "note": "它不是 DeepTutor 的 Frozen Context。",
+            "variant": "warn",
+            "sourceUnitIds": [
+              "SU-052"
+            ]
+          },
+          {
+            "text": "当前 scene pipeline 从 SceneOutline 经 scene-content route / generateSceneContent() 和 scene actions，形成 complete Scene。",
+            "note": "该链路主要实现已经产生的 outline。",
+            "variant": "current",
+            "sourceUnitIds": [
+              "SU-073"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Context Consumption 与 Output Alignment 不能互相替代",
+        "variant": "warn",
+        "sourceUnitIds": [
+          "SU-079"
+        ],
+        "items": [
+          {
+            "text": "Context Consumption 主要改造 generation-session / context projection、scene-outlines-stream route 和 outline generation orchestration。",
+            "note": "还包括 outline attempt 与 revision lineage。",
+            "variant": "target",
+            "sourceUnitIds": [
+              "SU-077"
+            ]
+          },
+          {
+            "text": "Output Alignment 主要新增或改造 outline preflight assessment、scene realization assessment，以及 objective、knowledge-scope 和 guidance judgments。",
+            "note": "还包括 evidence、limitations、aggregation 与 derived outlineCoverage。",
+            "variant": "target",
+            "sourceUnitIds": [
+              "SU-078"
+            ]
+          },
+          {
+            "text": "两者在 outline revision 和 context lineage 处衔接。",
+            "note": "但不能用一个替代另一个。",
+            "variant": "warn",
+            "sourceUnitIds": [
+              "SU-079"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

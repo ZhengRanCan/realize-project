@@ -1,0 +1,46 @@
+{
+  "stage": 2,
+  "blockId": "O-05",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "flow",
+  "covers": [
+    "SU-002",
+    "SU-003",
+    "SU-004",
+    "SU-008",
+    "SU-009",
+    "SU-010",
+    "SU-011",
+    "SU-036"
+  ],
+  "expectedContentType": "flow",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "31c421cbc5825ded",
+  "userMessageSha256": "91a502a43d71ff74",
+  "planSha256": "ff5e166c56a46782",
+  "sourceUnitsSha256": "9850be559243f090",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-26T06:58:25.081Z",
+  "userMessageChars": 15847,
+  "finishedAt": "2026-09-26T07:00:25.499Z",
+  "usage": {
+    "completion_tokens": 1942,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1536
+    },
+    "prompt_tokens": 14322,
+    "prompt_tokens_details": {
+      "cache_write_tokens": 322,
+      "cached_tokens": 13583
+    },
+    "total_tokens": 16264
+  },
+  "latencyMs": 120417,
+  "finishReason": "stop",
+  "attempt": 1,
+  "aiReturnedShape": "flow",
+  "aiWarnings": null
+}

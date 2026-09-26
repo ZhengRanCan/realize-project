@@ -1,0 +1,73 @@
+{
+  "id": "O-03",
+  "title": "明确不采用：把 Context Influence 作为第四级",
+  "stage": "what",
+  "shape": "diff",
+  "covers": [
+    "SU-007",
+    "SU-006"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§1",
+      "role": "target-state"
+    },
+    {
+      "section": "§6",
+      "role": "rationale"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-002"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "diff",
+    "sides": [
+      {
+        "label": "曾设想的结构",
+        "variant": "warn",
+        "lines": [
+          {
+            "mark": "gone",
+            "text": "Receipt → Availability → Consumption → Influence",
+            "note": "明确不采用这一四级结构。",
+            "sourceUnitIds": [
+              "SU-007"
+            ]
+          },
+          {
+            "mark": "gone",
+            "text": "Influence：生成结果出现可归因于 DeepTutor 上下文的变化或取舍",
+            "note": "“可归因于”包含反事实与因果意味。",
+            "sourceUnitIds": [
+              "SU-006"
+            ]
+          }
+        ]
+      },
+      {
+        "label": "采用的结构",
+        "variant": "target",
+        "lines": [
+          {
+            "mark": "keep",
+            "text": "Receipt → Availability → Consumption",
+            "note": "Context Consumption 保留三个递进层级。",
+            "sourceUnitIds": [
+              "SU-007"
+            ]
+          },
+          {
+            "mark": "add",
+            "text": "Context Influence 不作为第四级",
+            "note": "该定义已经进入 Output Alignment，甚至比它更强。",
+            "sourceUnitIds": [
+              "SU-006"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

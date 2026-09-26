@@ -1,0 +1,37 @@
+{
+  "stage": 2,
+  "blockId": "O-13",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "combo",
+  "covers": [
+    "SU-037",
+    "SU-038",
+    "SU-036"
+  ],
+  "expectedContentType": "combo",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "980bb05fc6af7938",
+  "userMessageSha256": "cbc5f57134c3c8cd",
+  "planSha256": "bcd89b84682e4634",
+  "sourceUnitsSha256": "6a91579b10d65363",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-25T14:37:22.373Z",
+  "userMessageChars": 13759,
+  "finishedAt": "2026-09-25T14:37:40.367Z",
+  "usage": {
+    "completion_tokens": 1537,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1034
+    },
+    "prompt_tokens": 9513,
+    "total_tokens": 11050
+  },
+  "latencyMs": 17992,
+  "finishReason": "stop",
+  "attempt": 1,
+  "aiReturnedShape": "combo",
+  "aiWarnings": null
+}

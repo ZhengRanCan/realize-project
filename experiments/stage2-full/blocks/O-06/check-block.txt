@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-06｜shape=capability-matrix｜stage=how
+title    两条链各自回答什么（职责边界）
+content  type=matrix｜主要元素 6 个
+coverage 4 / 4（100%）
+
+
+结果：PASS

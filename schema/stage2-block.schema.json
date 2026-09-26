@@ -1,0 +1,399 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://local.design-review/stage2-block.schema.json",
+  "title": "stage2-block.schema.json",
+  "description": "Stage 2 产物的结构契约。content 的结构**完全复用现有 renderer 的 content 格式**（不建立平行格式），只额外允许每个主要元素带 sourceUnitIds 做 provenance。",
+  "type": "object",
+  "required": ["shape", "content"],
+  "additionalProperties": false,
+  "properties": {
+    "shape": {
+      "description": "必须与 plan 里该 block 的 shape 完全一致（程序会比对）。",
+      "enum": [
+        "prose",
+        "flow",
+        "current-target-flow",
+        "matrix",
+        "capability-matrix",
+        "diff",
+        "ladder",
+        "walkthrough",
+        "combo",
+        "checklist",
+        "two-column-comparison"
+      ]
+    },
+    "content": { "type": "object", "required": ["type"] }
+  },
+  "definitions": {
+    "sourceUnitIds": {
+      "description": "该元素承载的 sourceUnit id。用于 Block Semantic Coverage 与 Source 回查；不参与 UI 展示。",
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^SU-[0-9]{3}$" }
+    },
+    "variant": {
+      "enum": ["plain", "current", "target", "ok", "warn", "bad", "info", "muted"]
+    },
+    "cell": {
+      "type": "object",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "variant": { "$ref": "#/definitions/variant" },
+        "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+      }
+    },
+    "checklistItem": {
+      "type": "object",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "note": { "type": "string" },
+        "variant": { "enum": ["ok", "bad", "muted", "plain", "warn", "info"] },
+        "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+      }
+    },
+    "checklistPanel": {
+      "type": "object",
+      "required": ["items"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string" },
+        "variant": { "enum": ["plain", "ok", "bad", "warn", "info"] },
+        "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" },
+        "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/checklistItem" } }
+      }
+    },
+    "flowNode": {
+      "type": "object",
+      "required": ["title"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "detail": { "type": "string" },
+        "state": { "enum": ["current", "changed", "target"] },
+        "tier": { "enum": ["primary", "secondary"] },
+        "code": { "type": "string" },
+        "badges": { "type": "array", "items": { "type": "string" } },
+        "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+      }
+    },
+    "flowEdge": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["plain", "changed", "problem"] },
+        "note": { "type": "string" },
+        "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+      }
+    },
+    "flowLane": {
+      "type": "object",
+      "required": ["label", "nodes"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "variant": { "enum": ["plain", "current", "target"] },
+        "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["node"],
+            "additionalProperties": false,
+            "properties": {
+              "node": { "$ref": "#/definitions/flowNode" },
+              "edge": { "$ref": "#/definitions/flowEdge" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "description": "shape = prose → content.type = prose",
+      "properties": {
+        "shape": { "const": "prose" },
+        "content": {
+          "type": "object",
+          "required": ["type", "parts"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "prose" },
+            "parts": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["text"],
+                "additionalProperties": false,
+                "properties": {
+                  "text": { "type": "string", "minLength": 1 },
+                  "variant": { "enum": ["lead", "secondary", "quiet"] },
+                  "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = flow → content.type = flow（单条链路；1 个 lane 或并列 lane，节点 state 均为 current）",
+      "properties": {
+        "shape": { "const": "flow" },
+        "content": {
+          "type": "object",
+          "required": ["type", "lanes"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "flow" },
+            "caption": { "type": "string" },
+            "note": { "type": "string" },
+            "lanes": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/flowLane" } }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = current-target-flow → content.type = flow（恰好 2 个 lane，variant = current / target）",
+      "properties": {
+        "shape": { "const": "current-target-flow" },
+        "content": {
+          "type": "object",
+          "required": ["type", "lanes"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "flow" },
+            "caption": { "type": "string" },
+            "note": { "type": "string" },
+            "lanes": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": { "$ref": "#/definitions/flowLane" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = matrix / capability-matrix → content.type = matrix（capability-matrix 的 columns 固定为 主语 / 能说明 / 不能说明）",
+      "properties": {
+        "shape": { "enum": ["matrix", "capability-matrix"] },
+        "content": {
+          "type": "object",
+          "required": ["type", "columns", "rows"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "matrix" },
+            "columns": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+            "note": { "type": "string" },
+            "rows": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "items": { "$ref": "#/definitions/cell" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = diff → content.type = diff（恰好 2 个 side）",
+      "properties": {
+        "shape": { "const": "diff" },
+        "content": {
+          "type": "object",
+          "required": ["type", "sides"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "diff" },
+            "note": { "type": "string" },
+            "sides": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["label", "lines"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string", "minLength": 1 },
+                  "variant": { "enum": ["current", "target"] },
+                  "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" },
+                  "lines": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": ["mark", "text"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "mark": { "enum": ["keep", "add", "gone"] },
+                        "text": { "type": "string", "minLength": 1 },
+                        "note": { "type": "string" },
+                        "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = ladder → content.type = ladder",
+      "properties": {
+        "shape": { "const": "ladder" },
+        "content": {
+          "type": "object",
+          "required": ["type", "tiers"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "ladder" },
+            "caption": { "type": "string" },
+            "note": { "type": "string" },
+            "tiers": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["label", "text"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string", "minLength": 1 },
+                  "text": { "type": "string", "minLength": 1 },
+                  "detail": { "type": "string" },
+                  "variant": { "$ref": "#/definitions/variant" },
+                  "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = walkthrough → content.type = steps",
+      "properties": {
+        "shape": { "const": "walkthrough" },
+        "content": {
+          "type": "object",
+          "required": ["type", "steps", "verdict"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "steps" },
+            "caption": { "type": "string" },
+            "note": { "type": "string" },
+            "steps": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["text"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string" },
+                  "text": { "type": "string", "minLength": 1 },
+                  "note": { "type": "string" },
+                  "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+                }
+              }
+            },
+            "verdict": {
+              "type": "object",
+              "required": ["text"],
+              "additionalProperties": false,
+              "properties": {
+                "text": { "type": "string", "minLength": 1 },
+                "variant": { "enum": ["ok", "warn", "bad", "info", "plain"] },
+                "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = combo → content.type = combo",
+      "properties": {
+        "shape": { "const": "combo" },
+        "content": {
+          "type": "object",
+          "required": ["type", "pairs"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "combo" },
+            "caption": { "type": "string" },
+            "note": { "type": "string" },
+            "pairs": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["key", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "key": { "type": "string", "minLength": 1 },
+                  "keyVariants": { "type": "array", "items": { "type": "string" } },
+                  "value": { "type": "string", "minLength": 1 },
+                  "variant": { "enum": ["plain", "ok", "warn", "bad", "info"] },
+                  "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = checklist → content.type = checklist（panels ≥ 1）",
+      "properties": {
+        "shape": { "const": "checklist" },
+        "content": {
+          "type": "object",
+          "required": ["type", "panels"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "checklist" },
+            "note": { "type": "string" },
+            "panels": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/checklistPanel" } }
+          }
+        }
+      }
+    },
+    {
+      "description": "shape = two-column-comparison → content.type = checklist（恰好 2 个 panel）",
+      "properties": {
+        "shape": { "const": "two-column-comparison" },
+        "content": {
+          "type": "object",
+          "required": ["type", "panels"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "checklist" },
+            "note": { "type": "string" },
+            "panels": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": { "$ref": "#/definitions/checklistPanel" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

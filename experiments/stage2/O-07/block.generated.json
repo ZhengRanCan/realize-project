@@ -1,0 +1,111 @@
+{
+  "id": "O-07",
+  "title": "三个层级分别能说明什么、不能说明什么",
+  "stage": "how",
+  "shape": "capability-matrix",
+  "covers": [
+    "SU-013",
+    "SU-014",
+    "SU-018",
+    "SU-022"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§3",
+      "role": "boundary"
+    },
+    {
+      "section": "§4",
+      "role": "boundary"
+    },
+    {
+      "section": "§5",
+      "role": "definition"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-004"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "matrix",
+    "columns": [
+      "主语",
+      "能说明",
+      "不能说明"
+    ],
+    "rows": [
+      [
+        {
+          "text": "Receipt",
+          "variant": "current",
+          "sourceUnitIds": [
+            "SU-013",
+            "SU-014"
+          ]
+        },
+        {
+          "text": "系统收到了某个 Proposal、冻结上下文或相关传输结果；传输层或接收层记录了到达事实；后续系统有机会继续进行授权、版本和语义关联检查。",
+          "variant": "info",
+          "sourceUnitIds": [
+            "SU-013"
+          ]
+        },
+        {
+          "text": "不能说明上下文已通过合法性校验、属于当前生成请求、已经冻结或当前生成一定可以使用；也不能说明生成器实际读过或使用了教学语义，以及最终 outline 或 scene 已经对齐。",
+          "variant": "warn",
+          "sourceUnitIds": [
+            "SU-014"
+          ]
+        }
+      ],
+      [
+        {
+          "text": "Availability",
+          "variant": "current",
+          "sourceUnitIds": [
+            "SU-018"
+          ]
+        },
+        {
+          "text": "上下文来自受信任的服务端路径；请求、session 与 Frozen Context lineage 一致；schema、revision、digest、引用范围和授权关系通过检查；使用同一个冻结上下文且仍在有效生命周期内；生成阶段具备访问该合法上下文的服务端能力。",
+          "variant": "ok",
+          "sourceUnitIds": [
+            "SU-018"
+          ]
+        },
+        {
+          "text": "仍然不能说明生成器已经真正使用了上下文；只说明生成器需要时，可以合法、稳定地使用这份上下文。",
+          "variant": "warn",
+          "sourceUnitIds": [
+            "SU-018"
+          ]
+        }
+      ],
+      [
+        {
+          "text": "Context Consumption",
+          "variant": "target",
+          "sourceUnitIds": [
+            "SU-022"
+          ]
+        },
+        {
+          "text": "本次 outline generation 实际使用了冻结上下文中的教学语义，并将其作为课程设计输入，而不是仅仅收到、保存或附加上下文。",
+          "variant": "ok",
+          "sourceUnitIds": [
+            "SU-022"
+          ]
+        },
+        {
+          "text": "不意味着必须机械执行每一项建议，也不要求最终输出必须产生肉眼可见的差异。",
+          "variant": "muted",
+          "sourceUnitIds": [
+            "SU-022"
+          ]
+        }
+      ]
+    ],
+    "note": "Receipt 表示上下文到了；Availability 表示合法、冻结且版本一致的上下文已经准备好并可用；Consumption 表示教学语义实际参与了本次课程设计。"
+  }
+}

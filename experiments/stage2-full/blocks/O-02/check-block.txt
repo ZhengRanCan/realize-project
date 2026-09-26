@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-02｜shape=ladder｜stage=what
+title    核心主张：保留三级递进
+content  type=ladder｜主要元素 3 个
+coverage 3 / 3（100%）
+
+
+结果：PASS

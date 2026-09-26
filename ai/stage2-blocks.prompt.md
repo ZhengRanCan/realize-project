@@ -64,6 +64,21 @@ semantic coverage —— 这个块承载哪些语义，已经定好
 
 **特别警惕**：原文里的否定式表述最容易在改写时丢掉否定词。逐条检查 `不能`、`不等于`、`不要求`、`不承诺`、`不决定`、`不是`。
 
+### 相邻层级之间不得串层（实测最常见的语义失真）
+
+当一个 block 同时承载**相邻层级**的语义时（例如 Receipt → Availability → Consumption 三级），
+每个元素的文本必须**严格限定在它自己 `sourceUnitIds` 指的那一条**语义内。
+
+- 节点 A 的 `sourceUnitIds` 是 Receipt 的定义 → detail 只能写"到达 / 能关联请求或 session lineage / 接收事实被记录"；
+  **不许**写"合法、冻结、版本一致、可用、准备好"（那是 Availability 的判据）。
+- 节点 B 的 `sourceUnitIds` 是 Availability → 才能写"合法、冻结、版本一致、可被本次生成使用"。
+- 节点 C 的 `sourceUnitIds` 是 Consumption → 才能写"实际参与生成 / 作为课程设计输入"。
+
+**自检方法**：写完后把每个元素的文本与它 `sourceUnitIds` 对应的 statement 逐条对照。
+如果文本里出现了**它自己的 statement 里没有、而相邻 sourceUnit 的 statement 里才有**的措辞，那就是串层。
+
+同样不要为了"看起来完整"而把下一层的判据提前写进上一层 —— 上一层的克制是设计意图，不是遗漏。
+
 ---
 
 ## 铁律二：只填 Shape 需要的字段
@@ -73,7 +88,7 @@ semantic coverage —— 这个块承载哪些语义，已经定好
 | shape | 字段 |
 |---|---|
 | `prose` | `parts[]`（text / variant: lead\|secondary\|quiet） |
-| `flow` | `caption?` / `lanes[]`（label / variant / nodes[]：node{title,detail,state,code,badges} + edge{kind,note}） / `note?` |
+| `flow` | `caption?` / `lanes[]`（label / variant / **sourceUnitIds** / nodes[]：每项是 `{ "node": {…}, "edge": {…} }`） / `note?` |
 | `current-target-flow` | 同 `flow`，但恰好 2 个 lane（variant: current / target），节点 `state` 用 `current\|changed\|target` |
 | `matrix` | `columns[]` / `rows[][]`（cell: text + variant） / `note?` |
 | `capability-matrix` | `columns` 固定 `[主语, 能说明, 不能说明]` / `rows[][]` / `note?`；**每行的"不能说明"不得为空** |
@@ -85,6 +100,34 @@ semantic coverage —— 这个块承载哪些语义，已经定好
 | `two-column-comparison` | `panels`（恰好 2 组） / `note?` |
 
 `variant` 取值只能从：`plain` / `current` / `target` / `ok` / `warn` / `bad` / `info` / `muted`。
+
+### `flow` 的准确写法（最容易被写成扁平形式）
+
+```json
+{
+  "type": "flow",
+  "lanes": [
+    {
+      "label": "现状",
+      "variant": "current",
+      "sourceUnitIds": ["SU-044"],
+      "nodes": [
+        {
+          "node": { "title": "outline route", "detail": "…", "state": "current", "sourceUnitIds": ["SU-044"] },
+          "edge": { "kind": "changed", "note": "…", "sourceUnitIds": ["SU-053"] }
+        }
+      ]
+    }
+  ]
+}
+```
+
+要点：
+
+1. `nodes` 的每一项是 `{ "node": {…}, "edge": {…} }`。**不要把 `title` / `detail` 直接放在 `nodes[]` 的元素上**，
+   那是扁平写法，现有 renderer 无法直接消费。
+2. `node` 内放 `title` / `detail` / `state` / `code` / `badges` / `sourceUnitIds`。
+3. **`lanes[]` 与 `edge` 也要带 `sourceUnitIds`** —— 它们同样是"主要内容元素"，漏了会让 provenance 覆盖率下降。
 
 **容量**：参考 shape catalog 的推荐容量。如果 `<BLOCK_PLAN>` 提供了 `capacityNote`，说明上游已确认这个块需要超出常规容量，你按语义如实填满即可。
 
@@ -128,6 +171,49 @@ semantic coverage —— 这个块承载哪些语义，已经定好
 `role` 只有在 `<BLOCK_PLAN>` 明确写了 `role: "ambient"` 时才填 `ambient`，否则填 `normal`。
 
 ---
+
+### provenance 的覆盖要求（机器会逐一核对）
+
+除了每个内容元素要带 `sourceUnitIds`，还要保证：
+
+1. `<BLOCK_PLAN>.covers` 里的**每一条** sourceUnit 都至少被一个元素引用 —— 少一条就判为语义丢失；
+2. **结构元素也要带 provenance**：`flow` 的 `lanes[]` 与 `edge`、`checklist` 的 `panels[]`。
+   只给"内容元素"（节点 / 单元格 / 条目）标注是不够的；
+3. 不要把一大批 sourceUnit 全塞给同一个元素 —— 单个元素挂超过 4 条会被判为"垃圾桶元素"；
+4. 同一个 sourceUnit 不要在多个元素里反复出现（超过 2 次会被判为冗余）。
+
+### 哪些结构元素需要 provenance（判据：**删掉它会不会损失原文语义**）
+
+| 类别 | 例子 | 是否必须带 sourceUnitIds |
+|---|---|---|
+| **承载语义的结构元素** | `checklist.panels[].title`（如"这些都不是充分证据"）、`flow.lanes[].label`（如"现状：scene 直接附加 formal context"）、`matrix.rows[][0]` 的自定义行首（如"Context Receipt"）、`diff.sides[].label`（当它表达 Current / Target 之外的语义时）、`walkthrough.steps[].label` | **必须**。漏标会被判为 **Hard Error** |
+| **纯展示标签** | `CURRENT`、`TARGET`、`能说明`、`不能说明`、`主语`、`Step 1`、以及任何 renderer 固定文案 | 不要求 |
+
+判据只有一条：**如果把这段文字删掉，原文的语义会不会损失？**
+
+- 会 → 它是 semantic-bearing，必须带 `sourceUnitIds`；
+- 不会（只是给读者一个位置提示）→ 它是纯展示标签，不必带。
+
+注意 `matrix` 的**列标题**里，"能说明 / 不能说明"是纯展示标签；但**行首的自定义语义标签**
+（某个层级名、某个概念名）是 semantic-bearing，必须带 provenance。
+
+`diff` 的两侧标题要特别小心 —— 它是这个规则最常见的踩坑点：
+
+```json
+// ✗ 容易写成：描述性标题，承载了语义，却没带 provenance → Hard Error
+{ "sides": [ { "label": "被考虑的结构", "variant": "current" }, { "label": "采用的结构", "variant": "target" } ] }
+
+// ✓ 两种合格写法之一：
+//   (a) 用固定展示标签，不带 provenance
+{ "sides": [ { "label": "CURRENT", "variant": "current" }, { "label": "TARGET", "variant": "target" } ] }
+
+//   (b) 保留描述性标题，但必须带 provenance
+{ "sides": [
+    { "label": "被考虑的结构", "variant": "current", "sourceUnitIds": ["SU-007"] },
+    { "label": "采用的结构",   "variant": "target",  "sourceUnitIds": ["SU-007"] } ] }
+```
+
+同一原则适用于所有结构元素：**要么用固定展示标签，要么带 provenance —— 不能既写描述性文字又不标来源。**
 
 ## 自检清单（输出前逐条核对）
 

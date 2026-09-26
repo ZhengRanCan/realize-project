@@ -1,0 +1,89 @@
+{
+  "id": "O-03",
+  "title": "明确不采用：把 Context Influence 作为第四级",
+  "stage": "what",
+  "shape": "diff",
+  "covers": [
+    "SU-007",
+    "SU-006"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§1",
+      "role": "target-state"
+    },
+    {
+      "section": "§6",
+      "role": "rationale"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-002"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "diff",
+    "sides": [
+      {
+        "label": "被考虑的第四级",
+        "variant": "current",
+        "sourceUnitIds": [
+          "SU-006"
+        ],
+        "lines": [
+          {
+            "mark": "add",
+            "text": "Receipt → Availability → Consumption → Influence",
+            "note": "曾经可以设想的四级结构。",
+            "sourceUnitIds": [
+              "SU-006",
+              "SU-007"
+            ]
+          },
+          {
+            "mark": "keep",
+            "text": "Context Influence：生成结果出现可归因于 DeepTutor 上下文的变化或取舍。",
+            "note": "该定义包含反事实与因果意味。",
+            "sourceUnitIds": [
+              "SU-006"
+            ]
+          },
+          {
+            "mark": "keep",
+            "text": "它已经进入 Output Alignment，甚至比 Output Alignment 更强。",
+            "note": "因此超出了 Consumption 的产品责任。",
+            "sourceUnitIds": [
+              "SU-006"
+            ]
+          }
+        ]
+      },
+      {
+        "label": "明确不采用",
+        "variant": "target",
+        "sourceUnitIds": [
+          "SU-007"
+        ],
+        "lines": [
+          {
+            "mark": "gone",
+            "text": "不采用 Receipt → Availability → Consumption → Influence 的四级结构。",
+            "note": "Context Consumption 保留三个递进层级。",
+            "sourceUnitIds": [
+              "SU-007"
+            ]
+          },
+          {
+            "mark": "gone",
+            "text": "Context Influence 不作为 Context Consumption 的第四级。",
+            "note": "不将其设为本协议的必要产品状态。",
+            "sourceUnitIds": [
+              "SU-006",
+              "SU-007"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

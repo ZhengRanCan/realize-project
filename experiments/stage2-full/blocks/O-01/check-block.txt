@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-01｜shape=prose｜stage=what
+title    这是什么文档
+content  type=prose｜主要元素 2 个
+coverage 1 / 1（100%）
+
+
+结果：PASS

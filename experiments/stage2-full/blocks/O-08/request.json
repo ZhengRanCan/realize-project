@@ -1,0 +1,41 @@
+{
+  "stage": 2,
+  "blockId": "O-08",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "two-column-comparison",
+  "covers": [
+    "SU-023",
+    "SU-024",
+    "SU-085"
+  ],
+  "expectedContentType": "checklist",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "31c421cbc5825ded",
+  "userMessageSha256": "ccf0f318e0667027",
+  "planSha256": "5bfcab31f8ea16e1",
+  "sourceUnitsSha256": "9850be559243f090",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-26T06:48:04.919Z",
+  "userMessageChars": 15206,
+  "finishedAt": "2026-09-26T06:50:37.567Z",
+  "usage": {
+    "completion_tokens": 2139,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1891
+    },
+    "prompt_tokens": 14101,
+    "prompt_tokens_details": {
+      "cache_write_tokens": 454,
+      "cached_tokens": 13647
+    },
+    "total_tokens": 16240
+  },
+  "latencyMs": 152647,
+  "finishReason": "stop",
+  "attempt": 1,
+  "aiReturnedShape": "two-column-comparison",
+  "aiWarnings": null
+}

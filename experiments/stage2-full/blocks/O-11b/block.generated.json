@@ -1,0 +1,62 @@
+{
+  "id": "O-11b",
+  "title": "Possible mismatch states：Consumption 与 Alignment 不一致的两种情况",
+  "stage": "prove",
+  "shape": "combo",
+  "covers": [
+    "SU-040",
+    "SU-041",
+    "SU-042"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§8",
+      "role": "example"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-003"
+  ],
+  "defaultExpanded": false,
+  "content": {
+    "type": "combo",
+    "pairs": [
+      {
+        "key": "Consumption ≠ Output Alignment；Output Alignment ≠ Consumption",
+        "keyVariants": [
+          "info",
+          "info"
+        ],
+        "value": "Consumption 与 Output Alignment 不能相互等同。",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-040"
+        ]
+      },
+      {
+        "key": "Consumption = yes；Output Alignment = no",
+        "keyVariants": [
+          "ok",
+          "bad"
+        ],
+        "value": "上下文确实参与了生成，但结果没有满足相关 Required，或没有充分体现目标、范围与教学设计。",
+        "variant": "warn",
+        "sourceUnitIds": [
+          "SU-041"
+        ]
+      },
+      {
+        "key": "Consumption = no；Output Alignment = apparently yes",
+        "keyVariants": [
+          "bad",
+          "warn"
+        ],
+        "value": "结果可能来自默认模板、通用教学模式或偶然相似，不能把它归因于 DeepTutor。",
+        "variant": "warn",
+        "sourceUnitIds": [
+          "SU-042"
+        ]
+      }
+    ]
+  }
+}

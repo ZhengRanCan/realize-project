@@ -22,8 +22,13 @@ const { evaluateGate, buildHumanReviewSkeleton } = semantics;
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const SELF_TEST = process.argv.includes('--selftest');
-if (SELF_TEST) {
-  // 无人值守自检不需要 GPU；关掉可避免退出时的 command_buffer 相关 stderr 噪音。
+/** `--verify-preview <file>`：加载生成的 preview HTML 并断言 DOM（实验性验证，不改 UI）。 */
+const VERIFY_PREVIEW = (() => {
+  const i = process.argv.indexOf('--verify-preview');
+  return i >= 0 && process.argv[i + 1] ? path.resolve(process.argv[i + 1]) : null;
+})();
+if (SELF_TEST || VERIFY_PREVIEW) {
+  // 无人值守运行不需要 GPU；关掉可避免退出时的 command_buffer 相关 stderr 噪音。
   app.disableHardwareAcceleration();
 }
 const SCHEMA_PATH = path.join(PROJECT_ROOT, 'schema', 'design-review.schema.json');
@@ -501,7 +506,10 @@ async function runSelfTest() {
     ].filter(([, present]) => present).map(([name]) => name);
     if (domShapes.length === 5) ok(`默认展开的区块已实际渲染：${domShapes.join(', ')}（折叠的 ${expectedShapes.length - domShapes.length} 种展开后才渲染）`);
     else fail(`展开区块渲染异常，只有: ${domShapes.join(', ')}`);
-    const expectedLanes = allBlocksData.filter((b) => b.content.type === 'flow').reduce((n, b) => n + b.content.lanes.length, 0);
+    // 折叠的区块不渲染内容，因此期望值只统计"默认展开"的块
+    const expectedLanes = allBlocksData
+      .filter((b) => b.content.type === 'flow' && b.defaultExpanded)
+      .reduce((n, b) => n + b.content.lanes.length, 0);
     const expectedMatrices = allBlocksData
       .filter((b) => b.content.type === 'matrix' && b.defaultExpanded)
       .reduce((n) => n + 1, 0);
@@ -874,13 +882,119 @@ async function runSelfTest() {
   }
 }
 
+/**
+ * Preview 渲染验证（`npm run verify-preview -- <file>`）。
+ *
+ * 目的：确认 build-preview.js 生成的静态 HTML **真的被现有 renderer 渲染出来了**
+ * （而不是只生成了一个"看起来像"的文件）。
+ * 它加载该文件并断言 DOM 内容；不修改任何 UI。
+ */
+async function runVerifyPreview(filePath) {
+  const report = [];
+  const ok = (m) => report.push(`✓ ${m}`);
+  const fail = (m) => report.push(`✗ ${m}`);
+  const emit = () => {
+    process.stdout.write(`\n===== VERIFY PREVIEW =====\n${report.join('\n')}\n===== END =====\n`);
+  };
+
+  try {
+    const win = mainWindow;
+    // 捕获渲染器控制台错误，便于定位 preview 为什么没渲染出来
+    const consoleErrors = [];
+    win.webContents.on('console-message', (_event, level, message, line, sourceId) => {
+      if (level >= 2) consoleErrors.push(`${message} @${String(sourceId).split('/').pop()}:${line}`);
+    });
+    await new Promise((resolve) => {
+      if (!win.webContents.isLoading()) return resolve();
+      win.webContents.once('did-finish-load', resolve);
+    });
+    await win.loadFile(filePath);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (consoleErrors.length > 0) {
+      report.push(`! 渲染器控制台错误 ${consoleErrors.length} 条：`);
+      consoleErrors.slice(0, 8).forEach((e) => report.push(`    ${e.slice(0, 160)}`));
+    }
+
+    const dom = await win.webContents.executeJavaScript(
+      `(() => ({
+         title: document.getElementById('design-title')?.textContent || null,
+         blocks: document.querySelectorAll('.block').length,
+         tocItems: document.querySelectorAll('.toc-item').length,
+         tocGroups: document.querySelectorAll('.toc-group').length,
+         stageHeads: document.querySelectorAll('.stage-head').length,
+         srcChips: document.querySelectorAll('.src-chip').length,
+         expanded: document.querySelectorAll('.block:not(.collapsed)').length,
+         contentTypes: [...new Set([...document.querySelectorAll('.block-body > *')].map((n) => n.className.split(' ')[0]))],
+         emptyBodies: [...document.querySelectorAll('.block-body')].filter((n) => n.children.length === 0).length,
+         // 折叠区块本来就不渲染内容；只有"应当展开却没有内容"才是问题
+         collapsedWithBody: [...document.querySelectorAll('.block.collapsed')].filter((n) => {
+           const body = n.querySelector('.block-body');
+           return body && body.children.length > 0;
+         }).length,
+         expandedWithoutBody: [...document.querySelectorAll('.block:not(.collapsed):not(.ambient)')].filter((n) => {
+           const body = n.querySelector('.block-body');
+           return !body || body.children.length === 0;
+         }).length,
+         bannerComplete: document.getElementById('preview-meta')?.textContent.includes('complete=true') || false,
+       }))()`
+    );
+
+    if (dom.title) ok(`renderer 已渲染标题：${dom.title}`);
+    else fail('renderer 没有渲染标题 —— preview 未成功加载');
+    if (dom.blocks === 21) ok(`21 个 block 全部渲染（${dom.expanded} 个展开）`);
+    else fail(`block 数量异常：${dom.blocks}，期望 21`);
+    if (dom.expandedWithoutBody === 0) ok('所有应当展开的区块都渲染出了内容');
+    else fail(`有 ${dom.expandedWithoutBody} 个展开的 block 内容为空`);
+    if (dom.collapsedWithBody === 0) ok('折叠区块确实没有渲染内容（结构性折叠生效）');
+    else fail(`有 ${dom.collapsedWithBody} 个折叠区块仍带内容`);
+    if (dom.tocItems === 21 && dom.tocGroups === 4) ok(`左侧目录：4 段 / ${dom.tocItems} 条目`);
+    else fail(`目录异常：groups=${dom.tocGroups} items=${dom.tocItems}`);
+    if (dom.stageHeads === 4) ok('四段阅读流的分段标题已渲染');
+    else fail(`分段标题数量异常：${dom.stageHeads}`);
+    if (dom.srcChips > 0) ok(`Source 回查入口存在（${dom.srcChips} 个标签）`);
+    else fail('没有 Source 标签');
+    if (dom.contentTypes.length >= 5) ok(`多种承载形式已渲染：${dom.contentTypes.join(', ')}`);
+    else fail(`承载形式过少：${dom.contentTypes.join(', ')}`);
+    if (dom.bannerComplete) ok('preview 横幅显示 complete=true');
+
+    // 原文回查面板（与 Electron 同源逻辑）
+    const sourceFlow = await win.webContents.executeJavaScript(
+      `(async () => {
+         document.querySelector('.src-chip')?.click();
+         const deadline = Date.now() + 2500;
+         while (Date.now() < deadline) {
+           if (!document.getElementById('source-panel').classList.contains('hidden')) break;
+           await new Promise((r) => setTimeout(r, 60));
+         }
+         const t = document.getElementById('source-body')?.textContent || '';
+         return { open: !document.getElementById('source-panel').classList.contains('hidden'), len: t.length };
+       })()`
+    );
+    if (sourceFlow.open && sourceFlow.len > 80) ok(`点 Source 能打开原文面板（${sourceFlow.len} 字）`);
+    else fail(`原文面板异常：${JSON.stringify(sourceFlow)}`);
+
+    emit();
+    const failed = report.filter((l) => l.startsWith('✗')).length;
+    process.stdout.write(`VERIFY PREVIEW ${failed === 0 ? 'PASSED' : `FAILED (${failed})`}\n`);
+    app.exit(failed === 0 ? 0 : 1);
+  } catch (error) {
+    fail(`验证异常：${error && error.stack ? error.stack : error}`);
+    emit();
+    app.exit(1);
+  }
+}
+
 app.whenReady().then(() => {
   registerIpc();
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-  if (SELF_TEST) {
+  if (VERIFY_PREVIEW) {
+    setTimeout(() => {
+      runVerifyPreview(VERIFY_PREVIEW);
+    }, 400);
+  } else if (SELF_TEST) {
     setTimeout(() => {
       runSelfTest();
     }, 400);

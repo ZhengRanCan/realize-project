@@ -1,0 +1,61 @@
+{
+  "id": "O-08",
+  "title": "消费的对象是什么、不是什么",
+  "stage": "how",
+  "shape": "two-column-comparison",
+  "covers": [
+    "SU-023",
+    "SU-024",
+    "SU-085"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§5",
+      "role": "definition"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-007",
+    "DEC-006"
+  ],
+  "defaultExpanded": false,
+  "content": {
+    "type": "checklist",
+    "panels": [
+      {
+        "title": "被消费的教学语义",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-023"
+        ],
+        "items": [
+          {
+            "text": "经过验证和冻结的教学语义：学习目标、授权且相关的知识范围、必要前置关系、learner projection、Required design constraints、Recommended approaches、Evaluation Focus、生成约束、范围建议与明确排除项。",
+            "variant": "ok",
+            "sourceUnitIds": [
+              "SU-023"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "不直接交给生成器，也不是实现控制对象",
+        "variant": "muted",
+        "sourceUnitIds": [
+          "SU-024",
+          "SU-085"
+        ],
+        "items": [
+          {
+            "text": "Consumption 不要求把 raw Proposal、DeepTutor 内部响应、工具轨迹或模型推理直接交给生成器；其对象是语义要求和教学取向，不是 sceneId、route、React 组件、播放器命令、checkpoint/remediation 创建命令、RuntimeState 修改或浏览器操作指令等实现控制对象。",
+            "variant": "muted",
+            "sourceUnitIds": [
+              "SU-024",
+              "SU-085"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

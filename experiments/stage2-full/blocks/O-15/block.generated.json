@@ -1,0 +1,171 @@
+{
+  "id": "O-15",
+  "title": "明确不决定的 9 项 / 明确不承诺的 5 项",
+  "stage": "boundary",
+  "shape": "checklist",
+  "covers": [
+    "SU-081",
+    "SU-082",
+    "SU-083",
+    "SU-084"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§15",
+      "role": "non-claim"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-012",
+    "Q-001",
+    "Q-003",
+    "Q-006",
+    "Q-007"
+  ],
+  "defaultExpanded": false,
+  "content": {
+    "type": "checklist",
+    "panels": [
+      {
+        "title": "明确不决定",
+        "variant": "warn",
+        "sourceUnitIds": [
+          "SU-081",
+          "SU-082"
+        ],
+        "items": [
+          {
+            "text": "最终 JSON 字段",
+            "note": "不决定 Receipt、Availability、Consumption 的最终 JSON 字段。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-081"
+            ]
+          },
+          {
+            "text": "Consumption evidence 的具体结构",
+            "note": "本文不决定 Context Consumption evidence 的具体结构。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-081"
+            ]
+          },
+          {
+            "text": "生成器如何消费上下文",
+            "note": "本文不决定生成器消费上下文的具体方式。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-081"
+            ]
+          },
+          {
+            "text": "生成方式",
+            "note": "不决定采用 Prompt、结构化 planner、模板或混合生成方式。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-081"
+            ]
+          },
+          {
+            "text": "是否记录生成设计决策",
+            "note": "本文不决定是否需要记录生成设计决策。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-081"
+            ]
+          },
+          {
+            "text": "Consumption 的判断边界",
+            "note": "不决定由 OpenMAIC 内部判断，还是产生受控跨边界结果。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-082"
+            ]
+          },
+          {
+            "text": "未消费或不可用时的处理",
+            "note": "不决定是阻止生成、回退普通课堂，还是允许草稿。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-082"
+            ]
+          },
+          {
+            "text": "与未来实验性因果分析的关系",
+            "note": "本文不决定 Context Consumption 与未来实验性因果分析的关系。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-082"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "明确不承诺",
+        "variant": "bad",
+        "sourceUnitIds": [
+          "SU-083"
+        ],
+        "items": [
+          {
+            "text": "DeepTutor 的语义一定正确",
+            "note": "本文不承诺 DeepTutor 的语义一定正确。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-083"
+            ]
+          },
+          {
+            "text": "模型内部推理被理解或被验证",
+            "note": "本文不承诺模型内部推理已被理解或验证。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-083"
+            ]
+          },
+          {
+            "text": "Prompt 包含上下文就一定发生 Consumption",
+            "note": "上下文出现在 Prompt 中，不等于一定发生 Consumption。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-083"
+            ]
+          },
+          {
+            "text": "最终输出一定由 DeepTutor 引起变化",
+            "note": "本文不承诺最终输出一定发生了由 DeepTutor 引起的变化。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-083"
+            ]
+          },
+          {
+            "text": "Output Alignment 可由 Consumption 单独证明",
+            "note": "Consumption 不能单独证明 Output Alignment。",
+            "variant": "plain",
+            "sourceUnitIds": [
+              "SU-083"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "后续概念性 JSON 的边界",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-084"
+        ],
+        "items": [
+          {
+            "text": "可以另行讨论概念性 JSON",
+            "note": "该 JSON 应表达 Receipt、Availability、Consumption 的语义差异，不应重新加入 Context Influence 作为第四级。",
+            "variant": "target",
+            "sourceUnitIds": [
+              "SU-084"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

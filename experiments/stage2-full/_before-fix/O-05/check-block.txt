@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-05｜shape=flow｜stage=how
+title    两条链：Context-side 与 Output-side
+content  type=flow｜主要元素 12 个
+coverage 7 / 7（100%）
+
+
+结果：PASS

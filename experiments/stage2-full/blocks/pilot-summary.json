@@ -1,0 +1,17 @@
+{
+  "model": "gpt-5.6-sol",
+  "planSha256": "4c39047328e56a3f",
+  "sourceUnitsSha256": "ad0acf25db1d28e7",
+  "promptSha256": "31c421cbc5825ded",
+  "selectedBy": "explicit",
+  "results": [
+    {
+      "blockId": "O-16",
+      "shape": null,
+      "failed": true,
+      "reason": "HTTP 503：{\"error\":{\"code\":\"model_not_found\",\"message\":\"上游服务暂时不可用，请稍后重试 (request id: 202609260718573256700668268d9d68NDtSwz3)\",\"type\":\"new_api_error\"}}",
+      "checkBlock": null,
+      "coverage": null
+    }
+  ]
+}

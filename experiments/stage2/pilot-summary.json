@@ -1,0 +1,17 @@
+{
+  "model": "gpt-5.6-sol",
+  "planSha256": "bcd89b84682e4634",
+  "sourceUnitsSha256": "6a91579b10d65363",
+  "promptSha256": "980bb05fc6af7938",
+  "selectedBy": "explicit",
+  "results": [
+    {
+      "blockId": "O-03",
+      "shape": "diff",
+      "failed": false,
+      "reason": null,
+      "checkBlock": "PASS",
+      "coverage": "coverage 2 / 2（100%）"
+    }
+  ]
+}

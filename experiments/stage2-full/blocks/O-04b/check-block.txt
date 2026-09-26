@@ -1,0 +1,11 @@
+=== Stage 2 block 验收 ===
+block    O-04b｜shape=checklist｜stage=what
+title    为什么不把消费点放在 scene
+content  type=checklist｜主要元素 7 个
+coverage 3 / 3（100%）
+
+
+WARNINGS (1)
+  ! [重复] SU-075 在 3 个元素里重复出现，可能内容冗余
+
+结果：PASS WITH WARNINGS —— 结构可用，但请人工确认上面的 warning。

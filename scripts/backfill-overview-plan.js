@@ -80,7 +80,7 @@ const RAW_UNITS = [
   ['§6', 'target-state', 'core', 'Context Influence 不作为 Context Consumption 的第四级，也不作为本协议的必要产品状态；它可以在未来研究或实验评估中作为独立问题讨论。', 'SU-034'],
 
   // ---------- §7 产品叙事与状态组合 ----------
-  ['§7', 'definition', 'core', '完整叙事是：本次生成收到并准备了合法、冻结、版本一致的课前教学语义；该语义实际参与了 outline generation；最终生成的 outline 和 scene 又在可观察意义上体现了相关目标、知识范围和教学设计要求。', 'SU-035'],
+  ['§7', 'definition', 'supporting', '完整叙事是：本次生成收到并准备了合法、冻结、版本一致的课前教学语义；该语义实际参与了 outline generation；最终生成的 outline 和 scene 又在可观察意义上体现了相关目标、知识范围和教学设计要求。', 'SU-035'],
   ['§7', 'boundary', 'supporting', '这条叙事可以分别报告两条链的状态，不需要压缩成一个不可解释的"个性化成功"布尔值。', 'SU-036'],
   ['§7', 'example', 'core', '5 种状态组合各有产品解释：从"上下文没有到达"到"上下文可用但未实际参与生成"，再到"形成了完整的 context-grounded generation 证据"。', 'SU-037'],
   ['§7', 'non-claim', 'core', '即使是最后一种状态仍然不证明：DeepTutor 判断一定正确、课程一定有效、学生一定学会、某个输出变化严格由 DeepTutor 导致。', 'SU-038'],
@@ -146,6 +146,13 @@ const RAW_UNITS = [
   ['§15', 'open-question', 'core', '本文也不决定：Consumption 是否由 OpenMAIC 内部判断还是产生受控跨边界结果、未消费或不可用时是阻止生成还是回退普通课堂还是允许草稿、与未来实验性因果分析的关系。', 'SU-082'],
   ['§15', 'non-claim', 'core', '本文不承诺：DeepTutor 的语义一定正确、模型内部推理被理解或被验证、Prompt 中包含上下文就一定发生 Consumption、最终输出一定发生了由 DeepTutor 引起的变化、Output Alignment 可以由 Consumption 单独证明。', 'SU-083'],
   ['§15', 'target-state', 'supporting', '后续可以在本语义模型基础上再单独讨论概念性 JSON，但该 JSON 应表达 Receipt / Availability / Consumption 的语义差异，不应重新加入 Context Influence 作为第四级。', 'SU-084'],
+
+  // ---------- Feature 01 / Fix 2.1：回推时发现 §5 漏掉的边界 ----------
+  // 原 SU-023/SU-024 只覆盖了"被消费的对象"与"不要求直接交给生成器的内容"，
+  // 但原文 §5 还明确排除了另一组对象：runtime / UI / route / sceneId 等实现控制对象。
+  ['§5', 'non-claim', 'core', 'Consumption 的对象是语义要求和教学取向，不是 sceneId、route、React 组件、播放器命令、checkpoint/remediation 创建命令、RuntimeState 修改、浏览器操作指令等实现控制对象。', 'SU-085'],
+  ['§5', 'negative-case', 'supporting', 'Prompt 长度增加不能作为 Consumption 的证据。', 'SU-086'],
+  ['§5', 'boundary', 'supporting', '某项 Recommended 被纳入设计考虑后最终未采用时，会在 Output Alignment 中记录为 Not adopted，但不能伪称为已经采用。', 'SU-087'],
 ];
 
 /* ------------------------------------------------------------------ *
@@ -236,7 +243,7 @@ const BLOCKS = [
     title: '两条链：Context-side 与 Output-side',
     stage: 'how',
     shape: 'flow',
-    covers: ['SU-002', 'SU-008', 'SU-009', 'SU-010', 'SU-011', 'SU-035', 'SU-036'],
+    covers: ['SU-002', 'SU-003', 'SU-004', 'SU-008', 'SU-009', 'SU-010', 'SU-011', 'SU-036'],
     sourceRefs: [
       { section: '§2', role: 'definition' },
       { section: '§7', role: 'definition' },
@@ -278,7 +285,7 @@ const BLOCKS = [
     title: '消费的对象是什么、不是什么',
     stage: 'how',
     shape: 'two-column-comparison',
-    covers: ['SU-023', 'SU-024'],
+    covers: ['SU-023', 'SU-024', 'SU-085'],
     sourceRefs: [{ section: '§5', role: 'definition' }],
     reviewObjects: ['DEC-007', 'DEC-006'],
     defaultExpanded: false,
@@ -319,6 +326,7 @@ const BLOCKS = [
       'SU-016',
       'SU-020',
       'SU-026',
+      'SU-086',
       'SU-065',
       'SU-066',
       'SU-067',
@@ -354,7 +362,7 @@ const BLOCKS = [
     title: 'Consumption 不要求什么',
     stage: 'prove',
     shape: 'two-column-comparison',
-    covers: ['SU-028', 'SU-029', 'SU-030', 'SU-031'],
+    covers: ['SU-028', 'SU-087', 'SU-029', 'SU-030', 'SU-031'],
     sourceRefs: [{ section: '§5', role: 'invariant' }],
     reviewObjects: ['DEC-005', 'DEC-006'],
     defaultExpanded: false,
@@ -437,6 +445,26 @@ const BLOCKS = [
 
 const DUPLICATES = [
   {
+    sourceUnits: ['SU-004', 'SU-035'],
+    keptInBlock: 'O-02',
+    reason: 'Fix 2.2：SU-035（§7 的完整叙事，含"收到并准备了合法、冻结、版本一致的课前教学语义"）与 SU-004（§1 的三级定义）表达同一组三级语义。三级定义以 O-02 为准，SU-035 登记为合并；O-05 不再把它当作三级定义的来源，改为直接覆盖 SU-003 / SU-004。',
+  },
+  {
+    sourceUnits: ['SU-024', 'SU-085'],
+    keptInBlock: 'O-08',
+    reason: 'Fix 2.1：原 SU-024 只表达了"不要求直接交给生成器"的对象；原文 §5 还明确排除了 runtime / UI / route / sceneId 这一组实现控制对象。两者是同一句"Consumption 的对象是语义要求和教学取向，不是……"的两组边界，合并进 O-08 的同一个 checklist。',
+  },
+  {
+    sourceUnits: ['SU-026', 'SU-086'],
+    keptInBlock: 'O-10b',
+    reason: 'SU-086（Prompt 长度增加不是证据）原本混在 SU-026 的否定清单里，拆出来单独登记后仍由 O-10b 的同一组反例清单承载。',
+  },
+  {
+    sourceUnits: ['SU-028', 'SU-087'],
+    keptInBlock: 'O-11',
+    reason: 'SU-087（未采用记录为 Not adopted，不得伪称已采用）原本混在 SU-028（不要求盲目服从）里，拆出来单独登记后仍由 O-11 的同一组承载。',
+  },
+  {
     sourceUnits: ['SU-005', 'SU-025', 'SU-040'],
     keptInBlock: 'O-02',
     reason: '§1、§5、§8 三处从不同角度重述"层级/维度不能互相替代"，语义同一，合并为一次边界表达。',
@@ -502,6 +530,62 @@ const plan = {
   duplicatesMerged: DUPLICATES,
 };
 
+/* ------------------------------------------------------------------ *
+ * 展示层同步：title / stage / defaultExpanded / 顺序 以 design fixture 的 overview 为准
+ *
+ * 这些是"展示决策"，权威来源是 backfill-overview-blocks.js 产出的
+ * fixtures/context-consumption.json；plan 只负责语义覆盖，但两处的展示字段必须一致，
+ * 否则 Stage 2 的输入（plan）与人工 Overview（fixture）会对不上。
+ * O-16 不在 fixture 的 overview 中（它是回推发现的缺口），因此单独处理。
+ * ------------------------------------------------------------------ */
+
+const designForSync = JSON.parse(fs.readFileSync(path.join(ROOT, plan.designRef.path), 'utf8'));
+const fixtureBlocks = new Map(
+  designForSync.overview.sections.flatMap((sec) => sec.blocks.map((b) => [b.id, { ...b, stage: sec.id }]))
+);
+const fixtureOrder = designForSync.overview.sections.flatMap((sec) => sec.blocks.map((b) => b.id));
+
+// O-16 的 stage 由本 feature 显式指定（Fix 1.3：移入 prove）
+const STAGE_OVERRIDES = { 'O-16': 'prove' };
+// O-16 在 prove 段中的位置：紧跟 O-09（先了解 Subject，再了解证据方式）
+const PROVE_ORDER = ['O-09', 'O-16', 'O-10', 'O-10b', 'O-10c', 'O-11', 'O-11b'];
+
+plan.blocks.forEach((b) => {
+  const authoritative = fixtureBlocks.get(b.id);
+  if (authoritative) {
+    if (authoritative.title) b.title = authoritative.title;
+    b.stage = authoritative.stage;
+    b.defaultExpanded = authoritative.defaultExpanded;
+  }
+  if (STAGE_OVERRIDES[b.id]) b.stage = STAGE_OVERRIDES[b.id];
+});
+
+// 重排：按 fixture 的 section 顺序，但 O-16 插到 prove 段中的指定位置
+const orderIndex = new Map();
+fixtureOrder.forEach((id, i) => orderIndex.set(id, i));
+const targetOrder = [];
+designForSync.overview.sections.forEach((sec) => {
+  if (sec.id === 'prove') {
+    sec.blocks.forEach((b) => {
+      if (b.id === 'O-09') {
+        targetOrder.push('O-09');
+        targetOrder.push('O-16');
+      } else {
+        targetOrder.push(b.id);
+      }
+    });
+    return;
+  }
+  sec.blocks.forEach((b) => targetOrder.push(b.id));
+});
+// 保证没有遗漏（O-16 已单独插入）
+const missingInOrder = plan.blocks.map((b) => b.id).filter((id) => !targetOrder.includes(id));
+if (missingInOrder.length > 0) targetOrder.push(...missingInOrder);
+plan.blocks.sort((a, b) => targetOrder.indexOf(a.id) - targetOrder.indexOf(b.id));
+
+if (targetOrder.indexOf('O-16') < 0) throw new Error('O-16 未进入排序结果');
+if (plan.blocks.filter((b) => b.id === 'O-16').length !== 1) throw new Error('O-16 数量异常');
+
 // 自检 1：id 连续且唯一
 const ids = plan.sourceUnits.map((u) => u.id);
 const expected = ids.map((_, i) => `SU-${String(i + 1).padStart(3, '0')}`);
@@ -510,9 +594,12 @@ if (ids.join(',') !== expected.join(',')) {
   throw new Error(`SU id 不连续：第 ${mismatch + 1} 个是 ${ids[mismatch]}，期望 ${expected[mismatch]}`);
 }
 
-// 自检 2：每个 sourceUnit 都被至少一个 block covers（否则 gold fixture 自己就不合格）
+// 自检 2：每个 sourceUnit 都被 covers 覆盖，或在 duplicatesMerged 里登记为合并
+// （与 scripts/check-plan.js 的规则保持一致，否则会把"已合并"的单元误判为未覆盖）
 const covered = new Set(plan.blocks.flatMap((b) => b.covers));
-const uncovered = plan.sourceUnits.filter((u) => !covered.has(u.id));
+const mergedBy = new Map();
+plan.duplicatesMerged.forEach((m) => m.sourceUnits.forEach((id) => mergedBy.set(id, m.keptInBlock)));
+const uncovered = plan.sourceUnits.filter((u) => !covered.has(u.id) && !mergedBy.has(u.id));
 if (uncovered.length > 0) {
   console.error('✗ 以下 sourceUnit 没有被任何 block 覆盖：');
   uncovered.forEach((u) => console.error(`   ${u.id} [${u.importance}] ${u.statement.slice(0, 40)}…`));
@@ -555,7 +642,7 @@ fs.writeFileSync(OUT, `${JSON.stringify(plan, null, 2)}\n`, 'utf8');
 const core = plan.sourceUnits.filter((u) => u.importance === 'core').length;
 console.log(`已写出 ${path.relative(ROOT, OUT)}`);
 console.log(`  sourceUnits ${plan.sourceUnits.length}（core ${core} / supporting ${plan.sourceUnits.length - core}）`);
-console.log(`  blocks      ${plan.blocks.length}，覆盖 ${covered.size} 个单元，无遗漏`);
+console.log(`  blocks      ${plan.blocks.length}，covers 覆盖 ${covered.size} 个单元，另 ${mergedBy.size} 个登记为合并，无遗漏`);
 console.log(`  duplicatesMerged ${plan.duplicatesMerged.length} 组`);
 const kindCount = {};
 plan.sourceUnits.forEach((u) => { kindCount[u.kind] = (kindCount[u.kind] || 0) + 1; });

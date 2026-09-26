@@ -1,0 +1,54 @@
+{
+  "id": "O-16",
+  "title": "Consumption Subject：以哪一次 Attempt 为准",
+  "stage": "boundary",
+  "shape": "flow",
+  "covers": [
+    "SU-061",
+    "SU-080"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§11",
+      "role": "definition"
+    },
+    {
+      "section": "§14",
+      "role": "evidence"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-009"
+  ],
+  "defaultExpanded": false,
+  "content": {
+    "type": "flow",
+    "lanes": [
+      {
+        "label": "Context Consumption 的 Subject",
+        "variant": "plain",
+        "sourceUnitIds": [
+          "SU-061"
+        ],
+        "nodes": [
+          {
+            "node": {
+              "title": "Frozen Context × Outline Generation Attempt",
+              "detail": "Subject 不是抽象的 Frozen Context，也不是最终 scene，而是一次 Frozen Context 与一次 Outline Generation Attempt 的组合。",
+              "sourceUnitIds": [
+                "SU-061"
+              ]
+            },
+            "edge": {
+              "kind": "plain",
+              "note": "最低证据以 generation-level 为主：记录该 Attempt 使用的 Frozen Context 与 generation-facing projection；Output Alignment 则在后续阶段形成局部 Judgment 与可定位 Evidence。",
+              "sourceUnitIds": [
+                "SU-080"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

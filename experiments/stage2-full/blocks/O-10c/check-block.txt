@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-10c｜shape=checklist｜stage=prove
+title    两个反直觉判断
+content  type=checklist｜主要元素 6 个
+coverage 3 / 3（100%）
+
+
+结果：PASS

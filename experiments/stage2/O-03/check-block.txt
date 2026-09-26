@@ -1,0 +1,13 @@
+=== Stage 2 block 验收 ===
+block    O-03｜shape=diff｜stage=what
+title    明确不采用：把 Context Influence 作为第四级
+content  type=diff｜主要元素 6 个
+coverage 2 / 2（100%）
+
+provenance 缺失的元素：2 / 6
+
+WARNINGS (2)
+  ! [provenance] sides[0]（一栏）没有 sourceUnitIds（已识别为纯展示标签，不要求 provenance）
+  ! [provenance] sides[1]（一栏）没有 sourceUnitIds（已识别为纯展示标签，不要求 provenance）
+
+结果：PASS WITH WARNINGS —— 结构可用，但请人工确认上面的 warning。

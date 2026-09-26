@@ -1,0 +1,36 @@
+{
+  "stage": 2,
+  "blockId": "O-03",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "diff",
+  "covers": [
+    "SU-007",
+    "SU-006"
+  ],
+  "expectedContentType": "diff",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "980bb05fc6af7938",
+  "userMessageSha256": "af15b1171ec32d6b",
+  "planSha256": "bcd89b84682e4634",
+  "sourceUnitsSha256": "6a91579b10d65363",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-25T12:57:40.723Z",
+  "userMessageChars": 14061,
+  "finishedAt": "2026-09-25T12:57:51.494Z",
+  "usage": {
+    "completion_tokens": 863,
+    "completion_tokens_details": {
+      "reasoning_tokens": 618
+    },
+    "prompt_tokens": 9551,
+    "total_tokens": 10414
+  },
+  "latencyMs": 10768,
+  "finishReason": "stop",
+  "attempt": 1,
+  "aiReturnedShape": "diff",
+  "aiWarnings": null
+}

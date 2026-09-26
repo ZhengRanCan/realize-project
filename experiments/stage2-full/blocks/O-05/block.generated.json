@@ -1,0 +1,136 @@
+{
+  "id": "O-05",
+  "title": "两条链：Context-side 与 Output-side",
+  "stage": "how",
+  "shape": "flow",
+  "covers": [
+    "SU-002",
+    "SU-003",
+    "SU-004",
+    "SU-008",
+    "SU-009",
+    "SU-010",
+    "SU-011",
+    "SU-036"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§2",
+      "role": "definition"
+    },
+    {
+      "section": "§7",
+      "role": "definition"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-003"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "flow",
+    "lanes": [
+      {
+        "label": "Context-side chain",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-008"
+        ],
+        "nodes": [
+          {
+            "node": {
+              "title": "Context Receipt",
+              "detail": "上下文到达了系统。",
+              "sourceUnitIds": [
+                "SU-003",
+                "SU-004"
+              ]
+            },
+            "edge": {
+              "kind": "plain",
+              "note": "进入 Context Availability。",
+              "sourceUnitIds": [
+                "SU-003"
+              ]
+            }
+          },
+          {
+            "node": {
+              "title": "Context Availability",
+              "detail": "合法、冻结、版本一致的上下文已可被本次生成使用。",
+              "sourceUnitIds": [
+                "SU-004"
+              ]
+            },
+            "edge": {
+              "kind": "plain",
+              "note": "进入 Context Consumption。",
+              "sourceUnitIds": [
+                "SU-003"
+              ]
+            }
+          },
+          {
+            "node": {
+              "title": "Context Consumption",
+              "detail": "本次生成任务实际把其中的教学语义作为课程设计输入。",
+              "sourceUnitIds": [
+                "SU-004",
+                "SU-009"
+              ]
+            },
+            "edge": {
+              "kind": "changed",
+              "note": "两条链共同支持 context-grounded generation narrative；不需要额外承诺某个具体输出变化严格由 DeepTutor 导致。",
+              "sourceUnitIds": [
+                "SU-002",
+                "SU-011"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "label": "Output-side chain",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-008"
+        ],
+        "nodes": [
+          {
+            "node": {
+              "title": "Generated Lesson",
+              "detail": "生成的 outline 和 scene。",
+              "sourceUnitIds": [
+                "SU-010"
+              ]
+            },
+            "edge": {
+              "kind": "plain",
+              "note": "进入 Output Alignment。",
+              "sourceUnitIds": [
+                "SU-010"
+              ]
+            }
+          },
+          {
+            "node": {
+              "title": "Output Alignment",
+              "detail": "最终生成的 outline 和 scene 在可观察意义上体现相关目标、知识范围和教学设计要求。",
+              "sourceUnitIds": [
+                "SU-010"
+              ]
+            },
+            "edge": {
+              "kind": "changed",
+              "note": "两条链的状态可以分别报告，不需要压缩成一个不可解释的“个性化成功”布尔值。",
+              "sourceUnitIds": [
+                "SU-036"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

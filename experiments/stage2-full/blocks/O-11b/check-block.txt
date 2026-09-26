@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-11b｜shape=combo｜stage=prove
+title    Possible mismatch states：Consumption 与 Alignment 不一致的两种情况
+content  type=combo｜主要元素 3 个
+coverage 3 / 3（100%）
+
+
+结果：PASS

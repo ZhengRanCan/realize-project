@@ -1,0 +1,37 @@
+{
+  "stage": 2,
+  "blockId": "O-07",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "capability-matrix",
+  "covers": [
+    "SU-013",
+    "SU-014",
+    "SU-018",
+    "SU-022"
+  ],
+  "expectedContentType": "matrix",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "bf1751a905b53f7b",
+  "userMessageSha256": "2788fca4fde912e0",
+  "planSha256": "bcd89b84682e4634",
+  "sourceUnitsSha256": "6a91579b10d65363",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-25T12:43:05.584Z",
+  "userMessageChars": 13982,
+  "parseError": "Expected ',' or '}' after property value in JSON at position 433 (line 1 column 434)",
+  "usage": {
+    "completion_tokens": 1554,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1128
+    },
+    "prompt_tokens": 12107,
+    "prompt_tokens_details": {
+      "cache_write_tokens": 281,
+      "cached_tokens": 11555
+    },
+    "total_tokens": 13661
+  }
+}

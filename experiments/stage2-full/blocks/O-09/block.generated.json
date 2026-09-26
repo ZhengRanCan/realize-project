@@ -1,0 +1,44 @@
+{
+  "id": "O-09",
+  "title": "Consumption 的定义与递进关系",
+  "stage": "prove",
+  "shape": "ladder",
+  "covers": [
+    "SU-025",
+    "SU-027"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§5",
+      "role": "definition"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-005"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "ladder",
+    "tiers": [
+      {
+        "label": "Receipt → Availability",
+        "text": "从“收到上下文”递进到“确认本次生成可以使用”",
+        "detail": "Receipt 表示我们收到了上下文；Availability 表示我们确认它合法、冻结、版本一致，并且本次生成可以使用。",
+        "variant": "muted",
+        "sourceUnitIds": [
+          "SU-025"
+        ]
+      },
+      {
+        "label": "Consumption",
+        "text": "本次生成任务确实把教学语义纳入课程设计",
+        "detail": "Prompt 可以承载 Consumption，但不是产品定义，也不是充分条件；产品要求教学语义成为 outline-design task 的真实输入。",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-025",
+          "SU-027"
+        ]
+      }
+    ]
+  }
+}

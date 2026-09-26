@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-12｜shape=walkthrough｜stage=boundary
+title    为什么不做第四级：worked-example-first 反例
+content  type=steps｜主要元素 4 个
+coverage 3 / 3（100%）
+
+
+结果：PASS

@@ -1,0 +1,1 @@
+{"shape":"prose","content":{"type":"prose","parts":[{"text":"本文只讨论 Context Consumption 的产品语义层级。","variant":"lead","sourceUnitIds":["SU-001"]},{"text":"本文不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。","variant":"secondary","sourceUnitIds":["SU-001"]}]}}

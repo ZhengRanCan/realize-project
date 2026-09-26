@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-16｜shape=flow｜stage=boundary
+title    Consumption Subject：以哪一次 Attempt 为准
+content  type=flow｜主要元素 3 个
+coverage 2 / 2（100%）
+
+
+结果：PASS

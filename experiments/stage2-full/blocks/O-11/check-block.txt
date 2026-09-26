@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-11｜shape=two-column-comparison｜stage=prove
+title    Consumption 不要求什么 / 可能出现的不一致状态
+content  type=checklist｜主要元素 7 个
+coverage 5 / 5（100%）
+
+
+结果：PASS

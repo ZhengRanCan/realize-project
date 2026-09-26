@@ -1,0 +1,30 @@
+{
+  "stage": 2,
+  "blockId": "O-16",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "flow",
+  "covers": [
+    "SU-061",
+    "SU-080"
+  ],
+  "expectedContentType": "flow",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "31c421cbc5825ded",
+  "userMessageSha256": "87b3d288619f47b6",
+  "planSha256": "4c39047328e56a3f",
+  "sourceUnitsSha256": "ad0acf25db1d28e7",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-26T07:18:41.045Z",
+  "userMessageChars": 15208,
+  "error": "HTTP 503：{\"error\":{\"code\":\"model_not_found\",\"message\":\"上游服务暂时不可用，请稍后重试 (request id: 202609260718573256700668268d9d68NDtSwz3)\",\"type\":\"new_api_error\"}}",
+  "artifactStatus": "content-from-earlier-run",
+  "artifactNote": "本文件记录的是 2026-09-26T07:18 一次**失败**的重新生成尝试（上游 HTTP 503）。同一目录下的 block.generated.json / raw.md / check-block.txt 是 2026-09-25T22:38 那次**成功**运行留下的产物，未被覆盖。两者对应的 plan 快照不同：成功那次 O-16 的 stage 还是 boundary，Feature 01 之后 plan 已把它移到 prove。overview.generated.json 的 stage 由 assembler 从 plan 注入，因此不受影响；但由于上游不稳定，本轮未能把 O-16 重跑一次以取得一致的日志与内容快照。",
+  "successfulRun": {
+    "finishedAt": "2026-09-25T22:38:22Z",
+    "planStageAtThatTime": "boundary",
+    "note": "该次运行的 request.json 已被本次失败尝试覆盖，无法恢复。"
+  }
+}

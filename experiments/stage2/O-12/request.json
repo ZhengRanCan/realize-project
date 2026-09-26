@@ -1,0 +1,41 @@
+{
+  "stage": 2,
+  "blockId": "O-12",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "walkthrough",
+  "covers": [
+    "SU-032",
+    "SU-033",
+    "SU-034"
+  ],
+  "expectedContentType": "steps",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "bf1751a905b53f7b",
+  "userMessageSha256": "8cd4962ea98fc394",
+  "planSha256": "bcd89b84682e4634",
+  "sourceUnitsSha256": "6a91579b10d65363",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-25T12:44:38.453Z",
+  "userMessageChars": 11313,
+  "finishedAt": "2026-09-25T12:45:07.390Z",
+  "usage": {
+    "completion_tokens": 1397,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1014
+    },
+    "prompt_tokens": 10895,
+    "prompt_tokens_details": {
+      "cache_write_tokens": 52,
+      "cached_tokens": 10341
+    },
+    "total_tokens": 12292
+  },
+  "latencyMs": 28936,
+  "finishReason": "stop",
+  "attempt": 1,
+  "aiReturnedShape": "walkthrough",
+  "aiWarnings": null
+}

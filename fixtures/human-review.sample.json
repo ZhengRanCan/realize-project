@@ -2,7 +2,7 @@
   "reviewVersion": 1,
   "designId": "DESIGN-CONTEXT-CONSUMPTION",
   "designReviewPath": "fixtures\\context-consumption.json",
-  "updatedAt": "2026-09-25T07:25:35.061Z",
+  "updatedAt": "2026-09-26T07:12:21.496Z",
   "decisions": {
     "DEC-001": {
       "status": "approved",

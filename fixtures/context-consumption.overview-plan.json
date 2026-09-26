@@ -249,7 +249,7 @@
       "section": "§7",
       "kind": "definition",
       "statement": "完整叙事是：本次生成收到并准备了合法、冻结、版本一致的课前教学语义；该语义实际参与了 outline generation；最终生成的 outline 和 scene 又在可观察意义上体现了相关目标、知识范围和教学设计要求。",
-      "importance": "core"
+      "importance": "supporting"
     },
     {
       "id": "SU-036",
@@ -593,6 +593,27 @@
       "kind": "target-state",
       "statement": "后续可以在本语义模型基础上再单独讨论概念性 JSON，但该 JSON 应表达 Receipt / Availability / Consumption 的语义差异，不应重新加入 Context Influence 作为第四级。",
       "importance": "supporting"
+    },
+    {
+      "id": "SU-085",
+      "section": "§5",
+      "kind": "non-claim",
+      "statement": "Consumption 的对象是语义要求和教学取向，不是 sceneId、route、React 组件、播放器命令、checkpoint/remediation 创建命令、RuntimeState 修改、浏览器操作指令等实现控制对象。",
+      "importance": "core"
+    },
+    {
+      "id": "SU-086",
+      "section": "§5",
+      "kind": "negative-case",
+      "statement": "Prompt 长度增加不能作为 Consumption 的证据。",
+      "importance": "supporting"
+    },
+    {
+      "id": "SU-087",
+      "section": "§5",
+      "kind": "boundary",
+      "statement": "某项 Recommended 被纳入设计考虑后最终未采用时，会在 Output Alignment 中记录为 Not adopted，但不能伪称为已经采用。",
+      "importance": "supporting"
     }
   ],
   "blocks": [
@@ -769,11 +790,12 @@
       "shape": "flow",
       "covers": [
         "SU-002",
+        "SU-003",
+        "SU-004",
         "SU-008",
         "SU-009",
         "SU-010",
         "SU-011",
-        "SU-035",
         "SU-036"
       ],
       "sourceRefs": [
@@ -859,7 +881,8 @@
       "shape": "two-column-comparison",
       "covers": [
         "SU-023",
-        "SU-024"
+        "SU-024",
+        "SU-085"
       ],
       "sourceRefs": [
         {
@@ -892,6 +915,31 @@
         "DEC-005"
       ],
       "defaultExpanded": true
+    },
+    {
+      "id": "O-16",
+      "title": "Consumption Subject：以哪一次 Attempt 为准",
+      "stage": "prove",
+      "shape": "flow",
+      "covers": [
+        "SU-061",
+        "SU-080"
+      ],
+      "sourceRefs": [
+        {
+          "section": "§11",
+          "role": "definition"
+        },
+        {
+          "section": "§14",
+          "role": "evidence"
+        }
+      ],
+      "reviewObjects": [
+        "DEC-009"
+      ],
+      "defaultExpanded": false,
+      "capacityNote": "回推检查发现的缺口：§11 的 Subject 定义与 §14 的 generation-level 证据要求原先没有任何区块承载，补此块。"
     },
     {
       "id": "O-10",
@@ -942,6 +990,7 @@
         "SU-016",
         "SU-020",
         "SU-026",
+        "SU-086",
         "SU-065",
         "SU-066",
         "SU-067",
@@ -966,7 +1015,7 @@
         "GAP-004",
         "GAP-005"
       ],
-      "defaultExpanded": true,
+      "defaultExpanded": false,
       "capacityNote": "§12 的七类情况必须成组出现才有说服力，拆开会让读者以为只是孤立反例。"
     },
     {
@@ -996,11 +1045,12 @@
     },
     {
       "id": "O-11",
-      "title": "Consumption 不要求什么",
+      "title": "Consumption 不要求什么 / 可能出现的不一致状态",
       "stage": "prove",
       "shape": "two-column-comparison",
       "covers": [
         "SU-028",
+        "SU-087",
         "SU-029",
         "SU-030",
         "SU-031"
@@ -1125,7 +1175,7 @@
     },
     {
       "id": "O-15",
-      "title": "明确不决定的 9 项 / 明确不承诺的 5 项",
+      "title": "明确不决定的 8 项 / 明确不承诺的 5 项",
       "stage": "boundary",
       "shape": "checklist",
       "covers": [
@@ -1148,34 +1198,41 @@
         "Q-007"
       ],
       "defaultExpanded": false
-    },
-    {
-      "id": "O-16",
-      "title": "Consumption Subject：以哪一次 Attempt 为准",
-      "stage": "boundary",
-      "shape": "flow",
-      "covers": [
-        "SU-061",
-        "SU-080"
-      ],
-      "sourceRefs": [
-        {
-          "section": "§11",
-          "role": "definition"
-        },
-        {
-          "section": "§14",
-          "role": "evidence"
-        }
-      ],
-      "reviewObjects": [
-        "DEC-009"
-      ],
-      "defaultExpanded": false,
-      "capacityNote": "回推检查发现的缺口：§11 的 Subject 定义与 §14 的 generation-level 证据要求原先没有任何区块承载，补此块。"
     }
   ],
   "duplicatesMerged": [
+    {
+      "sourceUnits": [
+        "SU-004",
+        "SU-035"
+      ],
+      "keptInBlock": "O-02",
+      "reason": "Fix 2.2：SU-035（§7 的完整叙事，含\"收到并准备了合法、冻结、版本一致的课前教学语义\"）与 SU-004（§1 的三级定义）表达同一组三级语义。三级定义以 O-02 为准，SU-035 登记为合并；O-05 不再把它当作三级定义的来源，改为直接覆盖 SU-003 / SU-004。"
+    },
+    {
+      "sourceUnits": [
+        "SU-024",
+        "SU-085"
+      ],
+      "keptInBlock": "O-08",
+      "reason": "Fix 2.1：原 SU-024 只表达了\"不要求直接交给生成器\"的对象；原文 §5 还明确排除了 runtime / UI / route / sceneId 这一组实现控制对象。两者是同一句\"Consumption 的对象是语义要求和教学取向，不是……\"的两组边界，合并进 O-08 的同一个 checklist。"
+    },
+    {
+      "sourceUnits": [
+        "SU-026",
+        "SU-086"
+      ],
+      "keptInBlock": "O-10b",
+      "reason": "SU-086（Prompt 长度增加不是证据）原本混在 SU-026 的否定清单里，拆出来单独登记后仍由 O-10b 的同一组反例清单承载。"
+    },
+    {
+      "sourceUnits": [
+        "SU-028",
+        "SU-087"
+      ],
+      "keptInBlock": "O-11",
+      "reason": "SU-087（未采用记录为 Not adopted，不得伪称已采用）原本混在 SU-028（不要求盲目服从）里，拆出来单独登记后仍由 O-11 的同一组承载。"
+    },
     {
       "sourceUnits": [
         "SU-005",

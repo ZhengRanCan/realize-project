@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-09｜shape=ladder｜stage=prove
+title    Consumption 的定义与递进关系
+content  type=ladder｜主要元素 2 个
+coverage 2 / 2（100%）
+
+
+结果：PASS

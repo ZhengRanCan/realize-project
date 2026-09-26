@@ -1,0 +1,40 @@
+{
+  "stage": 2,
+  "blockId": "O-04",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "current-target-flow",
+  "covers": [
+    "SU-044",
+    "SU-045",
+    "SU-046",
+    "SU-047",
+    "SU-053",
+    "SU-054",
+    "SU-055",
+    "SU-056"
+  ],
+  "expectedContentType": "flow",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "bf1751a905b53f7b",
+  "userMessageSha256": "5573c55e0ea9248c",
+  "planSha256": "bcd89b84682e4634",
+  "sourceUnitsSha256": "6a91579b10d65363",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-25T12:41:44.379Z",
+  "userMessageChars": 17169,
+  "parseError": "Expected ',' or ']' after array element in JSON at position 1543 (line 1 column 1544)",
+  "usage": {
+    "completion_tokens": 3011,
+    "completion_tokens_details": {
+      "reasoning_tokens": 2070
+    },
+    "prompt_tokens": 12589,
+    "prompt_tokens_details": {
+      "cache_write_tokens": 11330
+    },
+    "total_tokens": 15600
+  }
+}

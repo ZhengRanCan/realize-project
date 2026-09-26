@@ -1,0 +1,118 @@
+{
+  "id": "O-07",
+  "title": "三个层级分别能说明什么、不能说明什么",
+  "stage": "how",
+  "shape": "capability-matrix",
+  "covers": [
+    "SU-013",
+    "SU-014",
+    "SU-018",
+    "SU-022"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§3",
+      "role": "boundary"
+    },
+    {
+      "section": "§4",
+      "role": "boundary"
+    },
+    {
+      "section": "§5",
+      "role": "definition"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-004"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "matrix",
+    "columns": [
+      {
+        "text": "主语",
+        "variant": "plain"
+      },
+      {
+        "text": "能说明",
+        "variant": "ok"
+      },
+      {
+        "text": "不能说明",
+        "variant": "warn"
+      }
+    ],
+    "rows": [
+      [
+        {
+          "text": "Context Receipt",
+          "variant": "plain",
+          "sourceUnitIds": [
+            "SU-013"
+          ]
+        },
+        {
+          "text": "系统收到了某个 Proposal、冻结上下文或相关传输结果；传输层或接收层记录了到达事实；后续系统有机会继续进行授权、版本和语义关联检查。",
+          "variant": "info",
+          "sourceUnitIds": [
+            "SU-013"
+          ]
+        },
+        {
+          "text": "不能说明上下文已通过合法性校验、属于当前生成请求或已经冻结；不能说明当前生成一定可以使用它、生成器实际读过或使用了教学语义，也不能说明最终 outline 或 scene 已经对齐。",
+          "variant": "warn",
+          "sourceUnitIds": [
+            "SU-014"
+          ]
+        }
+      ],
+      [
+        {
+          "text": "Context Availability",
+          "variant": "plain",
+          "sourceUnitIds": [
+            "SU-018"
+          ]
+        },
+        {
+          "text": "上下文来自受信任的服务端路径；请求、session 与 Frozen Context lineage 一致；schema、revision、digest、引用范围和授权关系通过检查；使用同一个冻结上下文且仍在有效生命周期内；生成阶段具有访问该合法上下文的服务端能力。",
+          "variant": "ok",
+          "sourceUnitIds": [
+            "SU-018"
+          ]
+        },
+        {
+          "text": "不能说明生成器已经真正使用了上下文；只说明生成器需要时，可以合法、稳定地使用这份上下文。",
+          "variant": "warn",
+          "sourceUnitIds": [
+            "SU-018"
+          ]
+        }
+      ],
+      [
+        {
+          "text": "Context Consumption",
+          "variant": "plain",
+          "sourceUnitIds": [
+            "SU-022"
+          ]
+        },
+        {
+          "text": "本次 outline generation 实际使用了冻结上下文中的教学语义，并将其作为课程设计输入。",
+          "variant": "ok",
+          "sourceUnitIds": [
+            "SU-022"
+          ]
+        },
+        {
+          "text": "不等于仅仅收到、保存或附加上下文；Proposal 被接收、Frozen Context 被保存、context 出现在参数或 Prompt 中、Prompt 变长、接口返回 outline 或输出偶然出现关键词，都不能单独证明 Consumption。",
+          "variant": "warn",
+          "sourceUnitIds": [
+            "SU-022"
+          ]
+        }
+      ]
+    ]
+  }
+}

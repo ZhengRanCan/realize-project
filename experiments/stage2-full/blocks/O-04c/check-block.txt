@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-04c｜shape=matrix｜stage=what
+title    三个产品层级 → 现有生产职责映射
+content  type=matrix｜主要元素 8 个
+coverage 4 / 4（100%）
+
+
+结果：PASS

@@ -429,45 +429,49 @@ const O08 = {
   defaultExpanded: false,
   reviewObjects: ['DEC-007', 'DEC-006'],
   content: {
-    type: 'matrix',
-    columns: ['被消费的对象（语义与教学取向）', '不被消费的对象（实现细节与运行时指令）'],
-    rows: [
-      [
-        { text: '当前课程学习目标', variant: 'ok' },
-        { text: 'sceneId', variant: 'bad' },
-      ],
-      [
-        { text: '授权且相关的知识范围', variant: 'ok' },
-        { text: 'route', variant: 'bad' },
-      ],
-      [
-        { text: '必要前置关系', variant: 'ok' },
-        { text: 'React 组件', variant: 'bad' },
-      ],
-      [
-        { text: '与本课程相关的 learner projection', variant: 'ok' },
-        { text: '播放器命令', variant: 'bad' },
-      ],
-      [
-        { text: 'Required design constraints', variant: 'ok' },
-        { text: 'checkpoint / remediation 创建命令', variant: 'bad' },
-      ],
-      [
-        { text: 'Recommended approaches', variant: 'ok' },
-        { text: 'RuntimeState 修改', variant: 'bad' },
-      ],
-      [
-        { text: 'Evaluation Focus', variant: 'ok' },
-        { text: '浏览器操作指令', variant: 'bad' },
-      ],
+    type: 'checklist',
+    panels: [
+      {
+        title: '被消费的对象（语义与教学取向）',
+        variant: 'ok',
+        items: [
+          { text: '当前课程学习目标', variant: 'ok' },
+          { text: '授权且相关的知识范围', variant: 'ok' },
+          { text: '必要前置关系', variant: 'ok' },
+          { text: '与本课程相关的 learner projection', variant: 'ok' },
+          { text: 'Required design constraints', variant: 'ok' },
+          { text: 'Recommended approaches', variant: 'ok' },
+          { text: 'Evaluation Focus', variant: 'ok' },
+          { text: '生成约束、范围建议与明确排除项', variant: 'ok' },
+        ],
+      },
+      {
+        title: '不要求直接交给生成器的内容',
+        variant: 'bad',
+        items: [
+          { text: 'raw Proposal', variant: 'bad' },
+          { text: 'DeepTutor 内部响应', variant: 'bad' },
+          { text: '工具轨迹', variant: 'bad' },
+          { text: '模型推理', variant: 'bad' },
+        ],
+      },
+      {
+        title: '不是消费对象的实现控制对象',
+        variant: 'bad',
+        items: [
+          { text: 'sceneId', variant: 'bad' },
+          { text: 'route', variant: 'bad' },
+          { text: 'React 组件', variant: 'bad' },
+          { text: '播放器命令', variant: 'bad' },
+          { text: 'checkpoint / remediation 创建命令', variant: 'bad' },
+          { text: 'RuntimeState 修改', variant: 'bad' },
+          { text: '浏览器操作指令', variant: 'bad' },
+        ],
+      },
     ],
-    note: 'Consumption 不要求把 raw Proposal、DeepTutor 内部响应、工具轨迹或模型推理直接交给生成器。',
+    note: '被消费的是语义要求和教学取向；raw 输入与实现控制对象都不是消费对象。',
   },
 };
-
-/* ------------------------------------------------------------------ *
- * 丙 · 怎么算发生了
- * ------------------------------------------------------------------ */
 
 const O09 = {
   id: 'O-09',
@@ -530,7 +534,7 @@ const O10b = {
   title: '这些都不能单独证明 Consumption',
   stage: 'prove',
   sources: ['§5', '§12'],
-  defaultExpanded: true,
+  defaultExpanded: false,
   reviewObjects: ['DEC-010', 'GAP-004', 'GAP-005'],
   content: {
     type: 'checklist',
@@ -830,7 +834,7 @@ const O14 = {
 
 const O15 = {
   id: 'O-15',
-  title: '明确不决定的 9 项 / 明确不承诺的 5 项',
+  title: '明确不决定的 8 项 / 明确不承诺的 5 项',
   stage: 'boundary',
   sources: ['§15'],
   defaultExpanded: false,
@@ -844,7 +848,8 @@ const O15 = {
         items: [
           { text: '最终 Receipt、Availability、Consumption 的 JSON 字段', variant: 'bad' },
           { text: 'Context Consumption evidence 的具体结构', variant: 'bad' },
-          { text: '生成器如何消费上下文（Prompt、结构化 planner、模板或混合生成方式）', variant: 'bad' },
+          { text: '生成器如何消费上下文', variant: 'bad' },
+          { text: 'Prompt、结构化 planner、模板或混合生成方式', variant: 'bad' },
           { text: '是否需要记录生成设计决策', variant: 'bad' },
           { text: 'Consumption 是否由 OpenMAIC 内部判断，还是产生受控跨边界结果', variant: 'bad' },
           { text: '未消费或不可用时，是阻止生成、回退普通课堂还是允许草稿', variant: 'bad' },
@@ -871,6 +876,43 @@ const O15 = {
  * 组装
  * ------------------------------------------------------------------ */
 
+const O16 = {
+  id: 'O-16',
+  title: 'Consumption Subject：以哪一次 Attempt 为准',
+  stage: 'prove',
+  role: 'normal',
+  sources: ['§11', '§14'],
+  defaultExpanded: false,
+  reviewObjects: ['DEC-009'],
+  content: {
+    type: 'flow',
+    lanes: [
+      {
+        label: 'Consumption Subject',
+        variant: 'current',
+        nodes: [
+          {
+            node: {
+              title: 'Consumption Subject',
+              detail: 'Consumption 的主体是 Frozen Context × Outline Generation Attempt，而不是抽象的 Frozen Context，也不是最终 scene。',
+              state: 'current',
+            },
+          },
+          {
+            node: {
+              title: 'Outline Generation Attempt',
+              detail:
+                '一次 Outline Generation Request 中可能包含多次实际生成尝试（重试）；证据必须以 Attempt 为单位，说明哪次 Attempt 使用了哪个 Frozen Context 与哪个 projection。',
+              state: 'current',
+            },
+          },
+        ],
+      },
+    ],
+    note: '因此 Consumption 可以在最终生成失败时仍然成立，只要某次实际 Attempt 合法使用了 generation-facing projection。',
+  },
+};
+
 const OVERVIEW = {
   sections: [
     {
@@ -889,7 +931,7 @@ const OVERVIEW = {
       id: 'prove',
       title: '丙 · 怎么算发生了',
       purpose: '每级状态如何判定、需要什么证据、哪些东西不足以作为证据。',
-      blocks: [O09, O10, O10b, O10c, O11, O11b],
+      blocks: [O09, O16, O10, O10b, O10c, O11, O11b],
     },
     {
       id: 'boundary',

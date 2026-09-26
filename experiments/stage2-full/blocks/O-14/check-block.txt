@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-14｜shape=checklist｜stage=boundary
+title    代码侧的边界与反模式
+content  type=checklist｜主要元素 12 个
+coverage 9 / 9（100%）
+
+
+结果：PASS

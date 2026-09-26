@@ -1,0 +1,41 @@
+{
+  "stage": 2,
+  "blockId": "O-10",
+  "model": "gpt-5.6-sol",
+  "endpoint": "https://fast.sbbbbbbbbb.xyz/v1",
+  "temperature": 1,
+  "maxTokens": 16000,
+  "shape": "ladder",
+  "covers": [
+    "SU-080",
+    "SU-012",
+    "SU-017"
+  ],
+  "expectedContentType": "ladder",
+  "promptPath": "ai/stage2-blocks.prompt.md",
+  "promptSha256": "bf1751a905b53f7b",
+  "userMessageSha256": "393c33f15cbd3dd5",
+  "planSha256": "bcd89b84682e4634",
+  "sourceUnitsSha256": "6a91579b10d65363",
+  "designRef": "DESIGN-CONTEXT-CONSUMPTION",
+  "startedAt": "2026-09-25T12:44:04.807Z",
+  "userMessageChars": 15540,
+  "finishedAt": "2026-09-25T12:44:38.399Z",
+  "usage": {
+    "completion_tokens": 1359,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1020
+    },
+    "prompt_tokens": 12539,
+    "prompt_tokens_details": {
+      "cache_write_tokens": 308,
+      "cached_tokens": 11903
+    },
+    "total_tokens": 13898
+  },
+  "latencyMs": 33590,
+  "finishReason": "stop",
+  "attempt": 1,
+  "aiReturnedShape": "ladder",
+  "aiWarnings": null
+}

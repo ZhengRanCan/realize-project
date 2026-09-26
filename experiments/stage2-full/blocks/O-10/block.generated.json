@@ -1,0 +1,73 @@
+{
+  "id": "O-10",
+  "title": "HOW DO WE KNOW：怎样证明某个状态真的发生了",
+  "stage": "prove",
+  "shape": "ladder",
+  "covers": [
+    "SU-080",
+    "SU-012",
+    "SU-017"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§3",
+      "role": "evidence"
+    },
+    {
+      "section": "§4",
+      "role": "evidence"
+    },
+    {
+      "section": "§5",
+      "role": "evidence"
+    },
+    {
+      "section": "§11",
+      "role": "evidence"
+    },
+    {
+      "section": "§12",
+      "role": "evidence"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-005",
+    "DEC-010",
+    "Q-002"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "ladder",
+    "caption": "证据逐级增强：从收到上下文、确认可用，到证明生成实际使用",
+    "tiers": [
+      {
+        "label": "Context Receipt",
+        "text": "上下文已到达系统",
+        "detail": "OpenMAIC 或服务端 Fusion 层收到课前语义交换链的上下文结果，并且至少能够识别其所属请求或 session lineage。",
+        "variant": "muted",
+        "sourceUnitIds": [
+          "SU-012"
+        ]
+      },
+      {
+        "label": "Context Availability",
+        "text": "合法上下文已准备好并可用",
+        "detail": "课前语义上下文合法、冻结且版本一致，并处于本次 outline generation 的授权边界内；这仍然不能说明生成器已经真正使用了上下文。",
+        "variant": "info",
+        "sourceUnitIds": [
+          "SU-017"
+        ]
+      },
+      {
+        "label": "Context Consumption",
+        "text": "以 generation-level 证据证明实际使用",
+        "detail": "最低证据应以一次 Outline Generation Attempt 为主，说明其使用了哪个 Frozen Context 和哪个 generation-facing projection；Output Alignment 需要在后续阶段形成局部 Judgment 与可定位 Evidence。",
+        "variant": "target",
+        "sourceUnitIds": [
+          "SU-080"
+        ]
+      }
+    ],
+    "note": "Receipt 与 Availability 不能自动升级为 Consumption；Consumption 的最低证据应落在实际 Outline Generation Attempt。"
+  }
+}

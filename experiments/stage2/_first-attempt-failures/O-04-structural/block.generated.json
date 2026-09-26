@@ -1,0 +1,225 @@
+{
+  "id": "O-04",
+  "title": "系统骨架：消费点放在哪一层",
+  "stage": "what",
+  "shape": "current-target-flow",
+  "covers": [
+    "SU-044",
+    "SU-045",
+    "SU-046",
+    "SU-047",
+    "SU-053",
+    "SU-054",
+    "SU-055",
+    "SU-056"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§9",
+      "role": "current-flow"
+    },
+    {
+      "section": "§9",
+      "role": "target-flow"
+    },
+    {
+      "section": "§13",
+      "role": "rationale"
+    },
+    {
+      "section": "§10",
+      "role": "responsibility"
+    },
+    {
+      "section": "§14",
+      "role": "responsibility"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-007",
+    "DEC-008",
+    "DEC-011",
+    "FACT-001",
+    "FACT-002",
+    "FACT-003",
+    "FACT-005"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "flow",
+    "caption": "现状仍保留 scene prompt 直接附加 formal context 的路径；目标将 Primary Consumption Point 收敛到 outline generation。",
+    "lanes": [
+      {
+        "label": "现状",
+        "variant": "current",
+        "nodes": [
+          {
+            "title": "课前 outline 入口",
+            "detail": "app/api/generate/scene-outlines-stream/route.ts",
+            "state": "current",
+            "code": "scene-outlines-stream/route.ts",
+            "badges": [
+              "outline 入口"
+            ],
+            "sourceUnitIds": [
+              "SU-044"
+            ],
+            "edge": {
+              "kind": "plain",
+              "note": "解析课程生成请求"
+            }
+          },
+          {
+            "title": "冻结或恢复正式 Context",
+            "detail": "调用 freezeFormalFusionForOutline()，或恢复已冻结的正式 Fusion context。",
+            "state": "current",
+            "code": "freezeFormalFusionForOutline()",
+            "badges": [
+              "freeze / resolve"
+            ],
+            "sourceUnitIds": [
+              "SU-045"
+            ],
+            "edge": {
+              "kind": "plain",
+              "note": "生成服务器侧 projection"
+            }
+          },
+          {
+            "title": "追加现有 Generation Projection",
+            "detail": "lib/fusion/generation-session.ts 中已有较小的 FormalGenerationContextProjection，并由 appendFormalTeachingPrompt() 渲染为 Frozen lesson guidance，追加到 outline generation 输入。",
+            "state": "current",
+            "code": "appendFormalTeachingPrompt()",
+            "badges": [
+              "现有起点"
+            ],
+            "sourceUnitIds": [
+              "SU-045",
+              "SU-047"
+            ],
+            "edge": {
+              "kind": "plain",
+              "note": "进入 outline LLM stream"
+            }
+          },
+          {
+            "title": "生成并持久化 Outline",
+            "detail": "调用 outline LLM stream，并解析、规范化和持久化 outline。",
+            "state": "current",
+            "code": "outline stream → persistence",
+            "badges": [
+              "outline"
+            ],
+            "sourceUnitIds": [
+              "SU-045"
+            ],
+            "edge": {
+              "kind": "problem",
+              "note": "当前代码仍存在另一条直接附加 formal context 的路径"
+            }
+          },
+          {
+            "title": "Scene Prompt 直接附加 Formal Context",
+            "detail": "正式 Fusion scene-content route 会恢复服务器存储的 outline，并调用 appendFormalTeachingPrompt()；该边界后续需要收敛。",
+            "state": "changed",
+            "code": "scene-content/route.ts",
+            "badges": [
+              "待收敛边界"
+            ],
+            "sourceUnitIds": [
+              "SU-053",
+              "SU-054"
+            ]
+          }
+        ]
+      },
+      {
+        "label": "目标",
+        "variant": "target",
+        "nodes": [
+          {
+            "title": "Freeze / Resolve Frozen Context",
+            "detail": "恢复合法、冻结且版本一致的正式 Fusion context，作为 outline generation 链路的起点。",
+            "state": "target",
+            "code": "freeze / resolve",
+            "badges": [
+              "Frozen Context"
+            ],
+            "sourceUnitIds": [
+              "SU-046"
+            ],
+            "edge": {
+              "kind": "plain",
+              "note": "进入 Primary Consumption Point"
+            }
+          },
+          {
+            "title": "Outline Generation Route",
+            "detail": "Context Consumption 的 primary production responsibility 位于 outline generation 链路，而不是 scene runtime。",
+            "state": "changed",
+            "code": "outline generation route",
+            "badges": [
+              "Primary Consumption Point"
+            ],
+            "sourceUnitIds": [
+              "SU-046"
+            ],
+            "edge": {
+              "kind": "changed",
+              "note": "由服务器生成 generation-facing projection"
+            }
+          },
+          {
+            "title": "Server-derived Generation Projection",
+            "detail": "将 Frozen Context 投影为 generation-facing teaching semantics。",
+            "state": "target",
+            "code": "generation projection",
+            "badges": [
+              "server-derived"
+            ],
+            "sourceUnitIds": [
+              "SU-046",
+              "SU-054"
+            ],
+            "edge": {
+              "kind": "plain",
+              "note": "进入 outline prompt 或等价 planner input"
+            }
+          },
+          {
+            "title": "Outline Attempt 与 Context-shaped Revision",
+            "detail": "projection 进入 outline prompt 或等价 planner input，经 outline stream / Outline Generation Attempt 形成并持久化 context-shaped Outline Revision。",
+            "state": "target",
+            "code": "prompt → attempt → revision",
+            "badges": [
+              "authoritative outline"
+            ],
+            "sourceUnitIds": [
+              "SU-046",
+              "SU-054"
+            ],
+            "edge": {
+              "kind": "changed",
+              "note": "Scene generation 从权威 outline 继续生成"
+            }
+          },
+          {
+            "title": "Scene 从权威 Outline 生成",
+            "detail": "Scene generation 的主要消费对象应是 context-shaped outline，而不是完整 Frozen Context。它可以继承必要的 context lineage、outline revision 和由 outline 派生的局部设计约束，但不应重新读取完整 raw Proposal、learner projection、DeepTutor 内部响应或另一个 context revision。",
+            "state": "target",
+            "code": "scene generation from authoritative outline",
+            "badges": [
+              "不重新解释完整 Context"
+            ],
+            "sourceUnitIds": [
+              "SU-054",
+              "SU-055",
+              "SU-056"
+            ]
+          }
+        ]
+      }
+    ],
+    "note": "目标链路为：freeze/resolve → outline generation route → server-derived generation projection → outline prompt 或等价 planner input → outline stream / Outline Generation Attempt → outline 持久化；scene generation 主要继承 context-shaped outline。"
+  }
+}

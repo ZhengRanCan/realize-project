@@ -1,0 +1,13 @@
+=== Stage 2 block 验收 ===
+block    O-05｜shape=flow｜stage=how
+title    两条链：Context-side 与 Output-side
+content  type=flow｜主要元素 12 个
+coverage 8 / 8（100%）
+
+
+WARNINGS (3)
+  ! [重复] SU-003 在 3 个元素里重复出现，可能内容冗余
+  ! [重复] SU-004 在 3 个元素里重复出现，可能内容冗余
+  ! [重复] SU-010 在 3 个元素里重复出现，可能内容冗余
+
+结果：PASS WITH WARNINGS —— 结构可用，但请人工确认上面的 warning。

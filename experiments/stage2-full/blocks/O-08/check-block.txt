@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-08｜shape=two-column-comparison｜stage=how
+title    消费的对象是什么、不是什么
+content  type=checklist｜主要元素 4 个
+coverage 3 / 3（100%）
+
+
+结果：PASS

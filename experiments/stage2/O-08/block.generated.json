@@ -1,0 +1,60 @@
+{
+  "id": "O-08",
+  "title": "消费的对象是什么、不是什么",
+  "stage": "how",
+  "shape": "two-column-comparison",
+  "covers": [
+    "SU-023",
+    "SU-024"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§5",
+      "role": "definition"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-007",
+    "DEC-006"
+  ],
+  "defaultExpanded": false,
+  "content": {
+    "type": "checklist",
+    "panels": [
+      {
+        "title": "被消费的对象",
+        "variant": "ok",
+        "sourceUnitIds": [
+          "SU-023"
+        ],
+        "items": [
+          {
+            "text": "经过验证和冻结的教学语义：学习目标、授权且相关的知识范围、必要前置关系、learner projection、Required design constraints、Recommended approaches、Evaluation Focus，以及生成约束、范围建议和明确排除项。",
+            "note": "这些语义作为课程设计输入被消费。",
+            "variant": "ok",
+            "sourceUnitIds": [
+              "SU-023"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "不要求直接交给生成器的对象",
+        "variant": "warn",
+        "sourceUnitIds": [
+          "SU-024"
+        ],
+        "items": [
+          {
+            "text": "raw Proposal、DeepTutor 内部响应、工具轨迹或模型推理。",
+            "note": "Consumption 不要求将这些对象直接交给生成器。",
+            "variant": "warn",
+            "sourceUnitIds": [
+              "SU-024"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

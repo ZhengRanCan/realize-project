@@ -1,0 +1,87 @@
+{
+  "id": "O-06",
+  "title": "两条链各自回答什么（职责边界）",
+  "stage": "how",
+  "shape": "capability-matrix",
+  "covers": [
+    "SU-039",
+    "SU-021",
+    "SU-019",
+    "SU-043"
+  ],
+  "sourceRefs": [
+    {
+      "section": "§2",
+      "role": "definition"
+    },
+    {
+      "section": "§8",
+      "role": "boundary"
+    },
+    {
+      "section": "§14",
+      "role": "boundary"
+    }
+  ],
+  "reviewObjects": [
+    "DEC-003"
+  ],
+  "defaultExpanded": true,
+  "content": {
+    "type": "matrix",
+    "columns": [
+      "主语",
+      "能说明",
+      "不能说明"
+    ],
+    "rows": [
+      [
+        {
+          "text": "Context Receipt / Context Availability",
+          "variant": "plain",
+          "sourceUnitIds": [
+            "SU-021"
+          ]
+        },
+        {
+          "text": "Receipt 说明上下文到了；Availability 说明合法上下文已经准备好并可用。",
+          "variant": "info",
+          "sourceUnitIds": [
+            "SU-021"
+          ]
+        },
+        {
+          "text": "Availability 仍不能说明生成器已经真正使用了上下文；它只说明生成器需要时可以合法、稳定地使用这份上下文。",
+          "variant": "warn",
+          "sourceUnitIds": [
+            "SU-019"
+          ]
+        }
+      ],
+      [
+        {
+          "text": "Context Consumption / Output Alignment",
+          "variant": "plain",
+          "sourceUnitIds": [
+            "SU-039"
+          ]
+        },
+        {
+          "text": "Context Consumption 说明冻结教学语义到达并实际参与生成；Output Alignment 说明最终 outline / scene 体现相关教学要求。两者共同成立，才能支持本次课程在可追踪意义上消费并体现了课前教学语义。",
+          "variant": "ok",
+          "sourceUnitIds": [
+            "SU-039",
+            "SU-043"
+          ]
+        },
+        {
+          "text": "任一目标单独成立，都不能替代另一目标，也不能单独支持“消费并体现课前教学语义”的结论。",
+          "variant": "warn",
+          "sourceUnitIds": [
+            "SU-043"
+          ]
+        }
+      ]
+    ]
+  }
+}

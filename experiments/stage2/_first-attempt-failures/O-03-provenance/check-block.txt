@@ -1,0 +1,13 @@
+=== Stage 2 block 验收 ===
+block    O-03｜shape=diff｜stage=what
+title    明确不采用：把 Context Influence 作为第四级
+content  type=diff｜主要元素 6 个
+coverage 2 / 2（100%）
+
+provenance 缺失的元素：2 / 6
+
+HARD ERRORS (2)
+  ✗ [provenance] sides[0]（一栏）含实际生成语义文本，但没有 sourceUnitIds：「曾设想的结构」 —— 承载语义的结构元素必须可回溯；若它只是 renderer 固定文案，请改成固定标签
+  ✗ [provenance] sides[1]（一栏）含实际生成语义文本，但没有 sourceUnitIds：「采用的结构」 —— 承载语义的结构元素必须可回溯；若它只是 renderer 固定文案，请改成固定标签
+
+结果：FAIL —— 这个块不能进入 Overview。

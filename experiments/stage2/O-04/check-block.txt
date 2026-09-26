@@ -1,0 +1,8 @@
+=== Stage 2 block 验收 ===
+block    O-04｜shape=current-target-flow｜stage=what
+title    系统骨架：消费点放在哪一层
+content  type=flow｜主要元素 14 个
+coverage 8 / 8（100%）
+
+
+结果：PASS
