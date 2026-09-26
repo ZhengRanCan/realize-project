@@ -42,69 +42,143 @@
 
 ---
 
-## 3. Fixture D / E 选择标准（**先冻结，再去挑**）
+## 3. Fixture D / E 选择标准
 
-### 3.1 Fixture D —— 真正的 ER-heavy
+> **本节保留 v1（已冻结并执行）与 v2（现行）两个版本，不覆盖历史。**
+> 修订理由见 §3.3。
 
-**必须至少具有：**
-
-- [ ] 多个**核心实体**（不是"一个对象一堆字段"）
-- [ ] 实体间 **1:1 / 1:N / N:M** 三种关系至少各出现一次
-- [ ] 字段 / 属性较多
-- [ ] **ownership / reference** 语义
-- [ ] 至少一种 **lifecycle**
-- [ ] **schema evolution / migration**
-- [ ] 至少一个**跨实体的 invariant**
-
-**排除条件（重要）：**
-
-- ❌ **不要**再选一篇"数据变换流水线"（Fixture B 已经是，那是本次最大的选型局限）
-- ✅ 最好**没有天然的单一处理主轴**
-
-**它要攻击：**
+### 3.0 两个 Fixture 的攻击目标（所有 qualification 条件都必须服务这两句话）
 
 ```text
-framework-map 会不会被错误地逼成 flow？
-artifact / component / concept 是否够用？
-relation vocabulary 对实体关系（1:N、N:M、ownership、reference）是否够用？
-12 个元素是否太少？
+Fixture D  攻击「Framework Map 是否能表达没有天然主轴的多实体关系网络」
+Fixture E  攻击「Framework Map 是否能表达带正常、异常、人工介入及有界失败策略的操作过程」
 ```
 
-### 3.2 Fixture E —— 纯 Operational Runbook
-
-**尽量接近"操作手册"本身，而不是"系统设计里附带 retry"：**
-
-- [ ] incident / operation **trigger**
-- [ ] **preconditions**
-- [ ] step-by-step **actions**
-- [ ] **branching**
-- [ ] **retry**
-- [ ] **timeout**
-- [ ] **rollback**
-- [ ] **escalation**
-- [ ] **observability**
-- [ ] **completion criteria**
-- [ ] operator **decision points**
-
-**最好同时包含：**
-
-- [ ] 正常路径
-- [ ] 异常路径
-- [ ] 人工介入路径
-
-**它要攻击：**
+写这两句是为了防止**代理指标篡夺测试目标** ——
 
 ```text
-process / state / constraint 的边界
-分叉 topology
-attachment（runbook 里大量步骤该不该上图？）
-Topic Navigation 是否仍然必要
+为了测 ER      → 最后变成测「文档里有没有 N:M」        ❌
+为了测 Runbook → 最后变成测「文档里有没有 timeout」    ❌
 ```
 
-### 3.3 挑选纪律
+### 3.1 Selection Criteria v1（**已冻结并执行；保留为历史**）
 
-- 两篇**都必须由用户提供**，执行方不得自行编写
-- 选定后先把**选择依据逐条对照 §3.1 / §3.2 打勾**，再开始建模
+| Fixture | v1 标准 |
+|---|---|
+| **D** | 多个核心实体 · **1:1 / 1:N / N:M 三种关系各至少出现一次** · 字段丰富 · ownership/reference · lifecycle · schema evolution · 跨实体 invariant · 最好没有天然单一处理主轴 |
+| **E** | 11 要素（trigger / preconditions / step-by-step / branching / retry / **timeout** / rollback / escalation / observability / completion criteria / operator decision points）· 最好含正常 / 异常 / 人工介入三条路径 |
+
+**v1 执行结果：**
+
+```text
+D  NO QUALIFIED FIXTURE      最好候选 6/7，缺 N:M
+   → results/fixture-selection-d.md
+E  NO QUALIFIED FIXTURE      最好候选 10/11，缺 timeout
+   → results/fixture-selection-e.md
+```
+
+### 3.2 Selection Criteria v2（**现行**）
+
+#### Fixture D — 真正的多实体关系网络
+
+**必须满足（全部）：**
+
+- [ ] **多个独立实体**（不是"一个对象一堆字段"）
+- [ ] **多条明确的跨实体关系**
+- [ ] **至少覆盖两种不同的 cardinality / ownership 模式**
+      （例如 功能性「at most one / exactly one / unique」+ 多重性「1:N / list」）
+- [ ] **至少一条不能简单解释为父子 containment 的跨实体关系**
+      （例如 reference / summarize / 聚合约束 / 跨实体不变量）
+- [ ] **文档整体不得主要由单一数据处理 pipeline 组织**
+- [ ] 字段 / 属性丰富
+- [ ] ownership / reference
+- [ ] 至少一种 lifecycle
+- [ ] schema evolution / migration
+- [ ] 至少一个跨实体 invariant
+
+**不再要求**：文档里出现 `N:M` / `多对多` 之类的记号。
+**N:M 仍是很好的加分信号，但不再是资格 Gate。**
+
+> 这样真正攻击的是：**entity network + cross-entity semantics + lifecycle + evolution + invariants + no natural processing axis**，
+> 而不是"文档里有没有 N:M"。
+
+#### Fixture E — 操作过程（含**有界失败策略**）
+
+11 要素中的 `timeout` **升级为 `bounded waiting / bounded failure`**：
+
+- [ ] 至少出现**一种**有界等待 / 有界失败规则：
+      `timeout` · `deadline` · `TTL / lease expiry` · `max retry count` ·
+      `max polling count` · `circuit-break condition` · `explicit abort threshold` ·
+      或其它**有明确边界**的等待 / 失败规则
+- [ ] **该规则必须有明确边界**
+
+```text
+「失败后重试」                              ❌ 不够（无边界）
+「最多重试 5 次，之后进入人工处置」          ✅ 够（有界 + 有后续）
+「lease 到期未续则视为失败并由他人接管」     ✅ 够
+```
+
+其余 10 要素（trigger / preconditions / step-by-step / branching / retry / rollback /
+escalation / observability / completion criteria / operator decision points）**保持不变**；
+正常 / 异常 / 人工介入三条路径仍是"最好包含"。
+
+> 这样仍然攻击 **process / state / constraint / branch / failure handling**，
+> 而不拘泥于"必须出现时间型 timeout"。
+
+### 3.3 修订理由（revision rationale）
+
+```text
+v1 使用了过于具体的代理现象（proxy phenomena）。
+全语料资格审查显示：这些代理条件本身阻碍了对底层 contract 属性的测试。
+```
+
+**不是**"看完候选后降低难度"，而是**把测试条件从具体实现现象提升回真正要攻击的能力**：
+
+```text
+D 缺的是一种特定 cardinality          → v2 改为"多实体关系网络 + 非 containment 关系"
+E 缺的是一种特定 bounded-failure 表达 → v2 改为"有界等待 / 有界失败策略"
+```
+
+支撑证据（v1 执行结果）：
+
+```text
+D：1262 篇中，含 N:M 类记号的文档 = 0
+E：3666 篇中，同时满足 11 要素的文档 = 0
+两个 near-miss 各自只差一条，且都差在"代理指标"那一条上
+```
+
+**修订纪律**：v1 与其 `NO QUALIFIED FIXTURE` 结果 **原样保留**（§3.1），不做覆盖式改写；
+v2 是**新增**，并标注修订理由。
+
+### 3.4 ⚠️ 本轮候选池已被观察过（必须声明）
+
+Phase 2b v2 **在同一批候选池上重跑**。因此：
+
+> **v2 是 engineering validation，不再宣称具有完全独立的 fixture selection。**
+
+正确流程仍然是（**不允许跳过任何一步**）：
+
+```text
+冻结 §3 v2
+   ↓
+重新扫描同一候选池
+   ↓
+重新逐项判定（每条落到原文小节）
+   ↓
+重新排序候选
+   ↓
+选择 D / E
+   ↓
+才开始 candidate map
+```
+
+**不能**直接宣布"tempo = D、F13-F16 = E"，**即使我们猜得到它们很可能是强候选**。
+以后若需要更强的证据，再加一个**外部 holdout fixture**。
+
+### 3.5 挑选纪律（不变）
+
+- 两篇**都必须由用户提供**，执行方不得自行编写（本轮为本地材料筛选中选，需用户确认）
+- 选定后先把**选择依据逐条对照 §3.2 打勾**，再开始建模
 - 若某条硬要求找不到文档满足，**记录缺口**，不要降低标准去凑
 
 ---
@@ -224,32 +298,43 @@ BLOCKED      没有可用的 Fixture（**当前状态**，见 results/fixture-se
 - **前置**：F06 完成（schema + check-map + 21 个单元测试可用）
 - **配套文档**：`execution-prompt.md` · `validation-checklist.md`
 
-### Task 1（资格审查）：已完成 —— **两篇均为 NO QUALIFIED FIXTURE**
+### Task 1（资格审查）
+
+**v1（§3.1 冻结标准）执行结果 —— 原样保留：**
 
 ```text
-D  6/7   缺 N:M        → results/fixture-selection-d.md
-         近失候选保留为 Fixture D-near-miss / ER-lite candidate（tempo 那份），不替代 D
-E  10/11 缺 timeout    → results/fixture-selection-e.md
-         近失候选 F13-F16-runbook.md（10/11 + 3/3 路径）
+D  NO QUALIFIED FIXTURE      最好候选 6/7，缺 N:M        → results/fixture-selection-d.md
+E  NO QUALIFIED FIXTURE      最好候选 10/11，缺 timeout  → results/fixture-selection-e.md
 ```
 
-判定一律按**冻结标准**：全部强制条件 PASS 才入选。**没有为了让实验跑起来而降标准。**
+**标准修订 → §3.2 v2**（理由见 §3.3）：把测试条件从**具体实现现象**提升回**真正要攻击的能力**。
 
-**当前 Gate：`BLOCKED — no qualified fixture`**
-（不是 `PARTIAL PASS` —— 那要求 Fixture E 完成。）
+**v2 完整重跑结果（同一候选池，重新扫描 / 重新判定 / 重新排序）：**
 
-### 继续的两条路径
+```text
+D  QUALIFIED   uni-app/tempo/docs/architecture/goal-plan-task-state-model.md
+E  QUALIFIED   uni-app/YUSHI/docs/harness/features/individual_feature/F13-F16-runbook.md
+                → results/fixture-selection-v2.md
+```
 
-1. 由用户**外部提供** D / E 文档（按 §3 标准挑，逐条打勾）
-2. 由用户明确授权**修订 §3.1 / §3.2 的某条标准**
-   → 按"**记录为标准修订 + 在同一批候选上重跑完整流程**"处理，**不沿用本次结论**
+- D：v2 硬门槛通过 14 篇，**第 1 名分数 153 是第 2 名（74）的两倍以上**；挑战者逐一回原文判定，全是决策记录 / 数据流型设计笔记
+- E：`bounded failure` 证据充分 —— 「**重试超过 5 次** → `refundCompensationFailed = true`」（F15 `verification.md` L27）+ 实现层 `MAX_RETRY_COUNT` + runbook §4.8「**仅管理员**可调用」的强制补偿
 
-### 留到下一轮（Phase 2c / Feature 09 v2）再讨论的标准问题
+> ⚠️ **声明**：候选池在 v1 阶段已被观察过 → v2 是 **engineering validation**，
+> **不宣称具有完全独立的 fixture selection**（§3.4）。将来若需更强证据，另加**外部 holdout fixture**。
 
-前者是**结论**，不是"本次改标准的理由"。
+### 当前 Gate
 
-- **N:M 到底是不是要点？** 真正想攻击的可能是「**多平级实体 + 多方向关系 + ownership/reference + 生命周期 + 跨实体 invariant + 没有天然 processing pipeline**」——即"**Framework Map 会不会又被错误地画成一条链？**"
-- **`timeout` 是否应作为 E 的强制项？** 若 E 的使命是打 `process / state / constraint` 的边界与**升级路径**，真正必要的是"**有界等待 → 升级**"这条链，而不是孤立的 timeout 字段。
+```text
+待用户确认 D / E → 进入 Task 2（生成 candidate map）
+```
+
+（`BLOCKED` 已解除；但**尚未**开始建模 —— 按 §3.5，选定后需先由用户确认并登记 SHA256。）
+
+### 留到下一轮（Phase 2c / Feature 09 v2）再讨论的问题
+
+- 本轮已把"代理指标"与"测试目标"分开（§3.0 的两句话）。下一轮可继续追问：
+  多实体关系网络的**难度分级**（几种 cardinality 才算够难？），以及 runbook 的**有界失败形态**是否需要更细的分类（retry-bound vs lease-expiry vs circuit-break）。
 
 ### 本轮方法学案例（建议长期保留）
 
@@ -257,4 +342,8 @@ E  10/11 缺 timeout    → results/fixture-selection-e.md
 > This is not evidence that the criterion is wrong,
 > and it is not permission to relax the criterion post hoc.
 
-两次独立实例：`D` 在 1262 篇中含 N:M 类记号的文档 = 0；`E` 在 3666 篇中同时满足 11 要素的文档 = 0。
+以及它的**正确收尾方式**：
+
+> 当全语料证据显示标准掺入了**过于具体的代理现象**时，应当
+> **显式升级标准版本（保留旧版与旧结果 + 写明修订理由）并完整重跑**，
+> 而**不是**在看过候选之后悄悄放宽。
