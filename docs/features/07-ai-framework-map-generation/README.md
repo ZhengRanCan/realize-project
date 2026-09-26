@@ -1,6 +1,8 @@
 # Feature 07: AI Framework Map Generation
 
-> **状态**：🟢 **Ready → Phase 1 进行中**（Gateway Safety 已完成并通过，见 `results/gateway-safety.md`）
+> **状态**：🟡 **Phase 1–4 已执行完毕 · `Gate = PARTIAL PASS`**（2026-09-26）
+> 结论：**工程链与 Contract 合法性完美（15/15 `HARD 0`），语义忠实度 0/15 完整通过**
+> → `results/final-gate.md`
 > **前置**：Feature 09 `Gate = PASS`（Contract v1 定稿）；Feature 06 的 `schema` + `check-map` 可用
 > **位置**：生成链路。本轮**不设计** Framework Map，只验证 AI 能否稳定、忠实地生成它。
 
@@ -380,16 +382,18 @@ docs/features/07-ai-framework-map-generation/
 ├── execution-prompt.md
 ├── validation-checklist.md
 └── results/
-    ├── gateway-safety.md      ✅ 已完成
-    ├── run-matrix.md          （Phase 3 填）
-    ├── semantic-review.md     （Phase 3 填）
-    ├── stability-analysis.md  （Phase 3 填）
-    └── final-gate.md          （Phase 3 填）
+    ├── gateway-safety.md      ✅ 33/33（+ gateway-safety-output.txt）
+    ├── phase2-smoke-test.md   ✅ 工程链 PASS + 三个 harness 缺陷
+    ├── run-matrix.md          ✅ 16 个 run 的工程/结构数据
+    ├── semantic-review.md     ✅ 5 篇逐 run 语义判读
+    ├── stability-analysis.md  ✅ 锚点稳定性 + 结构稳定性
+    ├── final-gate.md          ✅ Gate = PARTIAL PASS + 逐 run 三维分级 + 最终四问
+    └── phase3-artifact-check.txt  ✅ 产物完整性（sha / 参数 / 无覆盖）
 
 ai/framework-map-generation.prompt.md
 scripts/generate-framework-map.js
 scripts/test-generate-framework-map.js
-experiments/framework-map-generation/fixture-{a..e}/run-NN/
+experiments/framework-map-generation/fixture-{a..e}/run-NN/   16 个 run（15 正式 + 1 参数偏差样本）
 ```
 
 ---
