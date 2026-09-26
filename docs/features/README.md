@@ -59,7 +59,7 @@ XX-feature-name/
 | 01 | human-review-repair | Completed | DSH agent | 用户 | 2026-09-26 |
 | 03 | hierarchical-architecture | Completed（架构规格） | DSH agent | 用户 | 2026-09-26 |
 | 04 | l0-framework-map | Technical Pass / UX Validation Pending | DSH agent | 用户 | - |
-| 05 | l0-generalization-gate | Ready（可立即开始） | TBD | TBD | - |
+| 05 | l0-generalization-gate | Ready（可立即开始） | DSH agent | 用户 | - |
 | 06 | contract-and-validators | Blocked（等 05 的 Gate） | TBD | TBD | - |
 | 07 | generation-pipeline | Blocked（等 Gate + 06） | TBD | TBD | - |
 | 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |

@@ -96,34 +96,65 @@ N3  每条 Semantic Unit 至少一条 Document → Topic/L0 → L2 的可达路�
 
 **Topic 必须按语义内聚推导，不是为了补 orphan 而机械新建**（03 §10.1）。
 
-### Task 2.3 回答三个疑问
+### Task 2.3 回答三个最关心的问题
 
 ```text
-疑问 1：Data-heavy 文档画得出机制链吗？
-        → 画得出就给实际主轴；画不出就说明为什么、以及它实际是什么形态
+Q1  Data-heavy 文档是否被迫画成一条不存在的"机制链"？
+    → 画不出就说明 R8（framework-map 表达模型）在数据型文档上有前提问题
+    → 要给实际形态：它是实体关系图？归属图？还是别的
 
-疑问 2：Process-heavy 文档的机制链与 topic 划分重合度如何？
-        → 给出重合度的具体判断（哪些元素/边与 topic 边界重合）
-        → 若几乎重合，说明 L0 相对普通流程图还有没有增量价值
+Q2  Process-heavy 文档的 L0 是否退化成普通流程图？
+    Topic 与图本身是否失去层级差异？
+    → 给出重合度的具体判断（哪些元素/边与 topic 边界重合）
+    → 若几乎重合，说明 L0 相对一张普通流程图还有没有增量价值
+    → 明确回答：Framework Map 是否必须存在单一主轴？
 
-疑问 3：不同类型技术文档的 L0 topology 是否可能完全不同？
-        → 如实记录三类文档各自形成的拓扑：
-          Fixture A（概念型） → ?
-          Fixture B（数据型） → ?
-          Fixture C（流程型） → ?
-        → 必须明确回答：Framework Map 是否必须存在单一主轴？
+Q3  遇到不适配内容时，是哪一类 gap？（见 Task 2.4）
 ```
 
 回答必须包含**具体元素/边的例子**，不能是泛泛而谈。
 
-### Task 2.4 过拟合检查
+### Task 2.4 Gap 分类（**本任务最重要的一步**）
+
+对每一个"装不进去"或"别扭"的内容，**先分类，不要直接加类型**：
+
+```text
+Semantic gap    六类 ontology 真表达不了（role 也救不了）   → 只有这一类才值得考虑扩 ontology
+Layout gap      类型对了，只是画法不适合                     → 调布局，不改规格
+Relation gap    节点没问题，边表达不了（8 词不够）           → 记录，交 Phase 3
+Navigation gap  图不该承载，但 Topic 必须有入口              → 加 Topic / blockIds
+```
+
+**产出 `results/gap-classification.md`**，每项一行：
+
+| 内容（元素 / 关系） | 类型 | 归入哪类 gap | 理由 | 是否建议改规格 |
+|---|---|---|---|---|
+
+**铁律：不要一看到有东西装不进去，就立刻新增第 7 类元素。** 分类之后仍然认为需要扩 ontology 的，必须单独列出并说明"为什么 role / layout / relation 三条路都救不了"。
+
+### Task 2.5 逐条填规则矩阵（R1~R8）
+
+对 03 §3~§6 出来的 8 条通用规则，逐条给三类文档上的结论：
+
+```text
+R1 六类 element vocabulary        R5 ≤12 容量原则
+R2 type + role 两层机制           R6 Topic synthesis
+R3 edge / attachment 区分          R7 Framework vs Navigation coverage
+R4 relation vocabulary（8 词）     R8 framework-map 表达模型本身
+```
+
+每条结论只能是：**成立 / 有条件成立 / 不成立**，且必须附证据（哪个元素、哪条边、在哪个 Fixture 上）。
+
+**产出 `results/rule-matrix.md`** —— 这是本 feature 的主要交付物。
+
+### Task 2.6 过拟合检查
 
 - [ ] 三类文档是否产生了**各自不同**的结构？
 - [ ] B / C 上是否出现了 Fixture A 的结构（例如 `Consumption Evidence` / `Product Boundary` 这类命名与切法）？
 - [ ] 若出现 → 判定为 **overfitting**，Gate **不通过**
 - [ ] 同时检查第二类过拟合：是否把"主轴 + 侧挂"当成了 L0 的必要形态（§3.3 / §11.5）
 
-### Task 2.5（可选）第三类探针
+### Task 2.7（可选）第三类探针
 
 若要追加探针，用 `deepseek-harness-master/.agents/notes/implemented/architecture/` 下的**决策记录**格式文档（Problem / Decision / Alternatives / Consequences）。
 
@@ -136,10 +167,13 @@ N3  每条 Semantic Unit 至少一条 Document → Topic/L0 → L2 的可达路�
 ```text
 [ ] B / C 的 SHA256 与 测试文档/README.md 记录一致（未被改动）
 [ ] B / C 两篇来源已确认，不是自造
-[ ] 两张图各自通过 Feature 04 的全部结构检查
+[ ] 两张图各自通过 Feature 04 的全部结构检查（Framework + Navigation invariant）
 [ ] 两张图的元素数各自 ≤ 12
 [ ] B / C 使用 provenance 小节锚点；A 使用 sourceUnitIds
-[ ] 三个疑问都有明确回答，含"是否存在单一主轴"
+[ ] **N3 明确标注为 provisional validation granularity**，没有与 A 的 sourceUnit 粒度混算
+[ ] Q1 / Q2 / Q3 都有明确回答，含"是否存在单一主轴"
+[ ] **每个不适配项都归入了 4 类 gap 之一**，且没有未经分类就新增类型
+[ ] **R1~R8 逐条有结论和证据**（rule-matrix.md 无空行、无"大致成立"这类含糊表述）
 [ ] 过拟合检查有结论（含第二类过拟合）
 [ ] Gate 结论为 PASS 或 FAIL，且理由可复核
 ```
@@ -152,9 +186,11 @@ docs/features/05-l0-generalization-gate/
 │   ├── fixture-b.map.json
 │   └── fixture-c.map.json
 └── results/
-    ├── phase2-generalization.md      三个疑问的答复 + 三类拓扑结论
-    ├── overfitting-check.md          两类过拟合检查
-    └── verification-output.txt       不变量自查输出
+    ├── rule-matrix.md               ★ R1~R8 × 三类文档的结论矩阵
+    ├── gap-classification.md        ★ 每个不适配项的 4 类 gap 归类
+    ├── phase2-generalization.md     Q1~Q3 的答复
+    ├── overfitting-check.md         两类过拟合检查
+    └── verification-output.txt      不变量自查输出
 ```
 
 **不要**产出：新的 schema、校验器脚本、renderer 改动、生成 prompt。**Gate FAIL 时尤其不得产出**。
@@ -162,11 +198,14 @@ docs/features/05-l0-generalization-gate/
 ## 报告格式
 
 ```text
-Fixture B  Data-heavy：元素数 / 拓扑形态 / 有没有主轴 / 结论
-Fixture C  Process-heavy：元素数 / 拓扑形态 / 与 topic 的重合度 / 结论
-Fixture A  概念型（基线）：拓扑形态
-三问回答    逐条
+Fixture B  Data-heavy：元素数 / 拓扑形态 / 有没有主轴 / 元素类型分布
+Fixture C  Process-heavy：元素数 / 拓扑形态 / 与 topic 的重合度
+Fixture A  概念型（基线）：拓扑形态（复用 Feature 04 的图）
+Q1/Q2/Q3   逐条
+规则矩阵    R1~R8 逐条结论（成立 / 有条件成立 / 不成立）+ 一句话证据
+Gap 汇总    各类 gap 条数；其中建议扩 ontology 的项（若有）
+粒度        明确写出 B / C 是 provisional（小节粒度）
 过拟合      第一类（Fixture A 锚定）/ 第二类（主轴当成必要形态）
-Gate        PASS 或 FAIL（FAIL 时必须写明是哪条疑问导致的、需要改 §3~§6 的哪一部分）
+Gate        PASS 或 FAIL（FAIL 时写明哪条规则不成立、需要改 §3~§6 的哪一部分）
 遗留        需要先解决才能进入 Feature 06 的问题
 ```
