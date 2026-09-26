@@ -73,25 +73,87 @@ label 只到"类别"这一层。
 
 ---
 
-## 3. 结论：D **没有变啰嗦**，但出现了**结构性分辨率损失**
+## 3. 裁决（用户裁定）：**Compression regression** —— 必须区分两类压缩
+
+用户给"接受取舍"加了**明确边界**：
+
+> 接受"L0 不展开全部不变量" **≠** 接受"核心基础关系从图上消失"。
+
+### ✅ 可接受的压缩（不构成失败）
 
 ```text
-✅ entity recall 保持 · ✅ 不变啰嗦 · ✅ 无编造关系
-⚠️ Task 依赖的基础关系消失（只剩 constraint 里的不变量）
-⚠️ 单条 constraint 吸收 39 条语义（label 只到类别级）
+C-PlanStructureAndState ← 39 条 invariant
+
+L0 的职责**不是**把 39 条 invariant 全部铺开；只要它能告诉用户"这里存在一组重要约束"，
+细节继续由 L1/L2 或 selection trace 承载 —— 这是合理的 progressive disclosure。
+E 侧 C-01 / C-02 / C-03 各吸收十几条语义同理。
+→ 它证明的是**当前 constraint 表达面比较粗**，不是 F10 的 Selection repair 失败。
 ```
 
-**"压缩甜点区"的实证形状：**
+### ❌ 不可接受的压缩：**基础关系层被删**
 
 ```text
-过度展开                过压？
-81 elements   ←————————→   13 elements
-(E5 失败)                  (D×1 / E×1)
-                           ↑ 压缩成功，但约束层出现"聚合黑洞"
+Task --depends-on--> Task      ← 基础关系层（第 1 层）  ❌ 消失
+acyclic / done 才算满足          ← constraint 层（第 3 层） ✅ 保留
 ```
 
-E 侧同样是这个形状（`C-02 ← 14 条` · `C-01 ← 12 条` · `C-03 ← 12 条`），
-说明**这不是 D 特有的**，而是当前 Contract 表达面下的**系统性压缩姿势**。
+**这违反 F09 已冻结的三层原则自身**：第 3 层不该替代第 1 层。
+
+```text
+判定：D×1 = **Compression regression**
+  · 核心实体全部保留（12/12）
+  · 但至少一条核心基础关系发生 **E3 · Encoding Distortion**
+归因：**不是 E1**（inventory 明确抽到了"Task 之间存在依赖"：S-56 / S-63 / S-64）
+      **也不是"L0 不需要细节"** —— 而是**基础关系被错误降级成了约束**。
+```
+
+**处置（用户裁决）：**
+
+```text
+❌ 现在**不改 prompt**（不要用 prompt 打补丁）
+✅ 必须作为 **F10 未关闭项**保留：
+   `D core relation resolution / Task --depends-on--> Task` = **未关闭**
+```
+
+### 4.1 相关的 representation gap（升级登记）
+
+**Constraint Composition / Compression Gap**（原 F09 Structured Constraint Gap 的升级命名）：
+
+```text
+F09 只能说：constraint 里的复杂规则机器不容易结构化。
+F10 证明另一层影响：**一旦施加真正的 L0 压缩压力，constraint 会自然成为"语义聚合黑洞"**
+  —— 保住 coverage，却降低自描述性与局部可读性。
+
+下一阶段值得研究一种组成表达面，例如：
+  constraint
+  ├── summary
+  └── statements[] { statement, sourceRef, … }
+
+⚠️ 现在**只登记，不设计**；不要顺手做 uniqueBy / predicate / threshold DSL；
+⚠️ 它与 Structured Constraint Gap 相连，但**不要**被误解成"缺一个 relation word"。
+```
+
+### 4.2 不用 prompt 强拆（用户裁决 C 暂缓）
+
+```text
+"单个 constraint 最多承载 N 条 semantic items" 这类 prompt 限制：
+  → 模型很可能只是把 1 个黑洞机械变成 5 个小黑洞，节点数重新向 E5 漂移，
+    却没有真正提高语义结构质量。
+  → **Schema / representation 缺表达面，不能长期靠 prompt 数量限制修。**
+```
+
+---
+
+## 4. "压缩甜点区"的实证形状（保留）
+
+```text
+过度展开                    过压？
+81 elements  ←——————————————→  13 elements
+(E5 失败)                      (D×1 / E×1)
+                                ↑ 压缩成功，但约束层出现"聚合黑洞"
+```
+
+E 侧同形（`C-02 ← 14` · `C-01 ← 12` · `C-03 ← 12`）→ 说明这是当前 Contract 表达面下的**系统性压缩姿势**。
 
 ---
 

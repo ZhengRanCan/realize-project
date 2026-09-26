@@ -1,0 +1,139 @@
+{
+  "feature": "F10-semantic-grounding",
+  "fixture": "e",
+  "fixtureLabel": "E · Operational Runbook",
+  "runDir": "experiments/semantic-grounding/fixture-e/run-09",
+  "stage": "a",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens_stage_a": 65536,
+    "max_tokens_stage_b": 131072,
+    "reasoning_effort_stage_a": "low",
+    "reasoning_effort_stage_b": "(provider default)",
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "documentPath": "测试文档/fixture-e-f13-f16-runbook.md",
+  "documentSha256": "c55f2f55f851ddc79194af9a90023d78a38376553aba1e567228ddaf0ed67d97",
+  "promptA": {
+    "path": "ai/semantic-inventory.prompt.md",
+    "sha256": "f94e6c00da1e61b4bc129e632d2e170a6726676c3864d9c55d6133f516483272",
+    "fingerprint": "f94e6c00da1e61b4"
+  },
+  "promptB": {
+    "path": "ai/framework-map-synthesis.prompt.md",
+    "sha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540",
+    "fingerprint": "8c3f0be2f6768912"
+  },
+  "frozen": {
+    "model": "deepseek-flash",
+    "generationParams": {
+      "temperature": 1,
+      "max_tokens_stage_a": 65536,
+      "max_tokens_stage_b": 131072,
+      "reasoning_effort_stage_a": "low",
+      "reasoning_effort_stage_b": "(provider default)",
+      "timeout_ms": 900000,
+      "max_attempts": 1
+    },
+    "document": {
+      "path": "测试文档/fixture-e-f13-f16-runbook.md",
+      "sha256": "c55f2f55f851ddc79194af9a90023d78a38376553aba1e567228ddaf0ed67d97"
+    },
+    "promptA": {
+      "path": "ai/semantic-inventory.prompt.md",
+      "sha256": "f94e6c00da1e61b4bc129e632d2e170a6726676c3864d9c55d6133f516483272"
+    },
+    "promptB": {
+      "path": "ai/framework-map-synthesis.prompt.md",
+      "sha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540"
+    },
+    "schemas": {
+      "semanticInventory": {
+        "path": "schema/semantic-inventory.schema.json",
+        "sha256": "f277419d25424c2da9721db1ad765af033881dba6e27f8124be5a0dd27f65eff"
+      },
+      "frameworkMap": {
+        "path": "schema/framework-map.schema.json",
+        "sha256": "56e66faabcd8ca7ea15dcb8925dc559368a8695a6bb9ca60b0a826ef9dcd8c22"
+      },
+      "mapSelection": {
+        "path": "schema/map-selection.schema.json",
+        "sha256": "eaa6a58f0f935b63faf236e91244d17d270b2389e713a83f8f0efad371ed84c8"
+      }
+    },
+    "contract": {
+      "path": "docs/framework-map-contract.md",
+      "sha256": "a70443517c1a0cb37a185f3d949710c00f9a104f8efc758da16516c40f6716da"
+    },
+    "validator": {
+      "path": "scripts/check-map.js",
+      "sha256": "1c1dbe45281d373ae6e86edff1785b4241d94d0512d46005e4e22e4dee565c7f"
+    }
+  },
+  "startedAt": "2026-09-26T15:34:06.721Z",
+  "finishedAt": "2026-09-26T15:34:25.530Z",
+  "status": "stage-a-only",
+  "error": null,
+  "stages": {
+    "a": {
+      "status": "success",
+      "attempts": 1,
+      "latencyMs": 18800,
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 11108,
+        "completion_tokens": 6027,
+        "total_tokens": 17135,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1508
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 11108
+      },
+      "protocol": {
+        "rawResponseSaved": true,
+        "jsonExtracted": true,
+        "tempWrite": true,
+        "readBackVerified": true,
+        "atomicRename": true
+      }
+    },
+    "b": {
+      "status": null,
+      "attempts": 0,
+      "latencyMs": null,
+      "finishReason": null,
+      "usage": null,
+      "protocol": {
+        "rawResponseSaved": false,
+        "jsonExtracted": false,
+        "tempWrite": false,
+        "readBackVerified": false,
+        "atomicRename": false,
+        "checkMapExecuted": false
+      }
+    }
+  },
+  "repair": "none",
+  "artifactSha256": {
+    "semantic-inventory.json": "36f99102b7d525bb662c5afe78e6fac1c190063998bbe339fd94447604d0fabb"
+  },
+  "integrity": {
+    "inventory": {
+      "blocking": [],
+      "advisory": [],
+      "problems": [],
+      "itemCount": 51
+    },
+    "selection": null
+  },
+  "validator": null
+}

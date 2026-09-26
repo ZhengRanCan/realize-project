@@ -411,6 +411,30 @@ FAIL          四类失败无法归因（说明中间表示没起到作用），
 BLOCKED       仅限 Gateway / IO 导致实验无法执行
 ```
 
+### 11.1 当前状态（截至 E×1 / E 复现 / D×1 / 成本实验）
+
+| 维度 | 状态 |
+|---|---|
+| Semantic extraction | ✅ 初步成立（Stage A 在 E 上 95 条、D 上 136 条，结构合法） |
+| Selection compression | ✅ 初步稳定（E：13 / 13 elements；D：13；对照 E5 失败样本 81） |
+| **E5 over-representation** | ✅ **已被压住**（1:1 占比 42% → 13–32%；element 数 81 → 12–13） |
+| Runbook anchors（E 侧） | ✅ 稳定改善（F07 的 0–1/3 → 4/4 有承载；manual intervention 在 run-06 显式为「仅管理员强制补偿」） |
+| **Regression：D core relation resolution** | ⚠️ **未关闭** —— `Task --depends-on--> Task` 被降级成只剩 constraint 层（判定 E3 Encoding Distortion，见 `results/d1-regression.md` §3） |
+| **Known representation gap** | 📌 **已升级登记**：**Constraint Composition / Compression Gap**（原 Structured Constraint Gap；见 `results/d1-regression.md` §4.1） |
+| Cost efficiency | ✅ 已测：`reasoning_effort=low` 省 Stage A 80% / Stage B 61%，5/5 anchor 保留；⚠️ 但本次丢了 `state` 元素 → 记为**候选优化，暂不设为默认**（`results/cost-experiment.md`） |
+
+**Gate 倾向**：`PARTIAL PASS`（E 侧成立、D 侧有一条基础关系未关闭）。
+最终判定需在 Phase 3 人工审计（`results/inventory-review.md` 等）完成后给出。
+
+### 11.2 明确未关闭 / 已登记的事项
+
+```text
+未关闭 ①  D 的 Task --depends-on--> Task（基础关系层）—— 不用 prompt 打补丁，留给下一阶段
+已登记 ②  Constraint Composition / Compression Gap（constraint 缺组成语句表达面）
+已登记 ③  low effort 下的类型保真度（state 元素消失）—— 需 1–2 次补样才决定是否采用 low
+待审计 ④  run-08 的 S-40 被 omitted 但疑似属于「不可以砍」五类
+```
+
 **收尾必须回答：**
 
 ```text

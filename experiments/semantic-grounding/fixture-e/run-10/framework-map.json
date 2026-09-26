@@ -1,0 +1,434 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "f13-f16-runbook",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current",
+    "scope": {
+      "text": "F13–F16 售后链路的运行验证与部署手册：Feature 依赖链、代码前置检查、CloudBase 部署、沙箱模式运行验证、证据留存、独立审查、沙箱→真实环境切换、故障排查与库存释放时机决策。",
+      "sectionRefs": [
+        "§1"
+      ]
+    },
+    "nonGoalSummary": {
+      "text": "F13–F15 不需要任何环境变量；切换到真实环境必须删除沙箱 __mock 调用入口；不推荐为 submitAfterSales 增加 preferredReleaseStock 字段。",
+      "sectionRefs": [
+        "§3.4",
+        "§7.2",
+        "§Reviewer 决策项（必看）"
+      ]
+    }
+  },
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "售后链路 Feature 依赖链（F13→F14→F15→F16）",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": [
+        "T-01",
+        "T-06"
+      ],
+      "sectionRefs": [
+        "§1"
+      ]
+    },
+    {
+      "id": "E-02",
+      "label": "CloudBase 部署（云函数顺序 + 定时触发器 + HTTP 网关路由）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": [
+        "T-03"
+      ],
+      "sectionRefs": [
+        "§3.1",
+        "§3.2",
+        "§3.3"
+      ]
+    },
+    {
+      "id": "E-03",
+      "label": "环境变量配置（沙箱 / 真实模式）",
+      "type": "artifact",
+      "role": "input",
+      "topics": [
+        "T-03",
+        "T-07",
+        "T-09"
+      ],
+      "sectionRefs": [
+        "§3.4",
+        "§7.1"
+      ]
+    },
+    {
+      "id": "E-04",
+      "label": "沙箱模式运行验证（数据准备 / 用例 1-3 / mock 通知 / cron 查单）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": [
+        "T-04"
+      ],
+      "sectionRefs": [
+        "§4.1",
+        "§4.2",
+        "§4.3",
+        "§4.4",
+        "§4.5",
+        "§4.6"
+      ]
+    },
+    {
+      "id": "E-05",
+      "label": "售后补偿与重试机制（retryAfterSalesCompensation / forceRestockAndAssets）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": [
+        "T-04"
+      ],
+      "sectionRefs": [
+        "§4.7",
+        "§4.8"
+      ]
+    },
+    {
+      "id": "E-06",
+      "label": "沙箱 → 真实环境切换",
+      "type": "process",
+      "role": "target",
+      "topics": [
+        "T-07"
+      ],
+      "sectionRefs": [
+        "§7.2",
+        "§7.3"
+      ]
+    },
+    {
+      "id": "E-07",
+      "label": "未发货仅退款库存释放时机决策",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": [
+        "T-10"
+      ],
+      "sectionRefs": [
+        "§现状对照表",
+        "§两种实现的风险",
+        "§Reviewer 决策项（必看）",
+        "§默认推荐",
+        "§已知业务侧 UX 副作用（无论选 A 还是 B 都存在）"
+      ]
+    },
+    {
+      "id": "E-08",
+      "label": "密钥与安全审计边界（.gitignore / 日志 / 控制台变量）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-02",
+        "T-05",
+        "T-07"
+      ],
+      "sectionRefs": [
+        "§2.3",
+        "§5.5",
+        "§7.1"
+      ]
+    },
+    {
+      "id": "E-09",
+      "label": "证据留存规范（F13–F16 逐项 + 安全审计）",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "T-05"
+      ],
+      "sectionRefs": [
+        "§5.1",
+        "§5.2",
+        "§5.3",
+        "§5.4"
+      ]
+    },
+    {
+      "id": "E-10",
+      "label": "独立审查 Checklist（F13–F16 + F12 重新验收 + 决策记录）",
+      "type": "process",
+      "role": "authority",
+      "topics": [
+        "T-06"
+      ],
+      "sectionRefs": [
+        "§6.1",
+        "§6.2",
+        "§6.3",
+        "§6.4",
+        "§决策记录（reviewer 在 F15 passing 前填写）"
+      ]
+    },
+    {
+      "id": "E-11",
+      "label": "售后不变量与阈值（越权拒绝 / 撤销不回补 / 补偿幂等 / 10 次失败上限 / 仅管理员强制补偿）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-04",
+        "T-06"
+      ],
+      "sectionRefs": [
+        "§4.4",
+        "§4.7",
+        "§4.8",
+        "§6.1",
+        "§6.2",
+        "§6.3",
+        "§6.4"
+      ]
+    },
+    {
+      "id": "E-12",
+      "label": "与 F01 支付域边界（独立 refundCommon/config.js，WX_PAY_* 仅缺省回退）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-09"
+      ],
+      "sectionRefs": [
+        "§9"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "E-02",
+      "to": "E-03",
+      "type": "consumes",
+      "label": "部署时消费沙箱 / 真实环境变量配置",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        },
+        "ownership": "reference"
+      }
+    },
+    {
+      "id": "e2",
+      "from": "E-04",
+      "to": "E-02",
+      "type": "depends-on",
+      "label": "沙箱验证在部署完成后进行",
+      "qualifiers": {
+        "cardinality": {
+          "from": "many",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e3",
+      "from": "E-04",
+      "to": "E-05",
+      "type": "validates",
+      "label": "沙箱验证覆盖补偿与重试机制",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e4",
+      "from": "E-04",
+      "to": "E-09",
+      "type": "produces",
+      "label": "验证产出证据留存",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "many"
+        },
+        "ownership": "owned"
+      }
+    },
+    {
+      "id": "e5",
+      "from": "E-10",
+      "to": "E-09",
+      "type": "consumes",
+      "label": "独立审查消费验证证据",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "many"
+        },
+        "ownership": "reference"
+      }
+    },
+    {
+      "id": "e6",
+      "from": "E-06",
+      "to": "E-04",
+      "type": "depends-on",
+      "label": "真实环境切换依赖沙箱验证",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e7",
+      "from": "E-06",
+      "to": "E-03",
+      "type": "consumes",
+      "label": "切换消费真实模式环境变量配置",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        },
+        "ownership": "reference"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "E-01",
+      "attachedTo": [
+        "E-04"
+      ]
+    },
+    {
+      "elementId": "E-07",
+      "attachedTo": [
+        "E-04"
+      ]
+    },
+    {
+      "elementId": "E-08",
+      "attachedTo": [
+        "E-03",
+        "E-09"
+      ]
+    },
+    {
+      "elementId": "E-11",
+      "attachedTo": [
+        "E-04",
+        "E-05"
+      ]
+    },
+    {
+      "elementId": "E-12",
+      "attachedTo": [
+        "E-02",
+        "E-03"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "依赖与总览",
+      "proposition": "F13→F14→F15→F16 构成单向依赖链，F12 已被其替代且不再推进。",
+      "sectionRefs": [
+        "§1"
+      ]
+    },
+    {
+      "id": "T-02",
+      "title": "前置：本地代码与构建",
+      "proposition": "部署前必须通过 node --check、npm 构建与 .gitignore 隐私检查。",
+      "sectionRefs": [
+        "§2"
+      ]
+    },
+    {
+      "id": "T-03",
+      "title": "CloudBase 部署",
+      "proposition": "按固定顺序部署云函数、配置定时触发器与环境变量、为 /refundNotify 建立 HTTP 路由。",
+      "sectionRefs": [
+        "§3"
+      ]
+    },
+    {
+      "id": "T-04",
+      "title": "沙箱模式运行验证",
+      "proposition": "预置数据后跑用例 1-3，并用 mock 通知与 cron 查单验证补偿与重试机制。",
+      "sectionRefs": [
+        "§4"
+      ]
+    },
+    {
+      "id": "T-05",
+      "title": "证据留存规范",
+      "proposition": "F13–F16 各自留存指定证据，并做密钥 / 日志安全审计。",
+      "sectionRefs": [
+        "§5"
+      ]
+    },
+    {
+      "id": "T-06",
+      "title": "独立审查 Checklist",
+      "proposition": "对 F13–F16 及 F12 重新验收逐项勾选校验点，并填写决策记录。",
+      "sectionRefs": [
+        "§6"
+      ]
+    },
+    {
+      "id": "T-07",
+      "title": "沙箱 → 真实环境切换",
+      "proposition": "配置真实变量、删除 mock 入口、跑 0.01 元真实退款并回归全部用例。",
+      "sectionRefs": [
+        "§7"
+      ]
+    },
+    {
+      "id": "T-08",
+      "title": "故障排查速查",
+      "proposition": "汇总常见故障现象与处置方式。",
+      "sectionRefs": [
+        "§8"
+      ]
+    },
+    {
+      "id": "T-09",
+      "title": "与 F01 支付域边界",
+      "proposition": "退款云函数独立使用 refundCommon/config.js，仅缺省回退 WX_PAY_*。",
+      "sectionRefs": [
+        "§9"
+      ]
+    },
+    {
+      "id": "T-10",
+      "title": "库存释放时机决策项",
+      "proposition": "对比 F06 老路径与 F13/F14 新路径的库存释放时机，给出默认推荐与 UX 副作用。",
+      "sectionRefs": [
+        "§10"
+      ]
+    },
+    {
+      "id": "T-11",
+      "title": "修订记录",
+      "proposition": "记录版本修订，含 v0.3 新增 REVIEWER-GUIDE.md。",
+      "sectionRefs": [
+        "§11"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 12,
+    "topicCount": 11,
+    "edgeCount": 7,
+    "attachmentCount": 5
+  }
+}

@@ -401,15 +401,19 @@ function runValidator(map, mapRelPath) {
  * 传输层
  * ------------------------------------------------------------------ */
 
-async function callModel(creds, system, user, maxTokens) {
+async function callModel(creds, system, user, maxTokens, effort) {
   const params = {
     temperature: Number(args.temperature),
     max_tokens: Number(maxTokens),
+    reasoning_effort: effort || null, // null = 不发送该字段（provider 默认 high）
     timeout_ms: Number(args.timeoutMs) || DEFAULTS.timeoutMs,
     max_attempts: Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts),
   };
   const body = JSON.stringify({
-    model: creds.model, temperature: params.temperature, max_tokens: params.max_tokens,
+    model: creds.model,
+    temperature: params.temperature,
+    max_tokens: params.max_tokens,
+    ...(params.reasoning_effort ? { reasoning_effort: params.reasoning_effort } : {}),
     messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
   });
   const started = Date.now();
@@ -503,12 +507,18 @@ async function main() {
   fs.mkdirSync(runDir, { recursive: true });
 
   const maxTokensA = Number(args.maxTokensA || args.maxTokens || DEFAULTS.maxTokensA);
+  // reasoning_effort：**默认不发送**（= provider 默认 high）。发送时逐 run 记录，供成本实验对比。
+  const effortA = args.effortA || args.effort || null;
+  const effortB = args.effortB || args.effort || null;
   const maxTokensB = Number(args.maxTokensB || args.maxTokens || DEFAULTS.maxTokensB);
 
   const generationParams = {
     temperature: Number(args.temperature),
     max_tokens_stage_a: maxTokensA,
     max_tokens_stage_b: maxTokensB,
+    // 默认 '(provider default)'；成本实验里会显式写成 low / high，供逐 run 对比
+    reasoning_effort_stage_a: effortA || '(provider default)',
+    reasoning_effort_stage_b: effortB || '(provider default)',
     timeout_ms: Number(args.timeoutMs) || DEFAULTS.timeoutMs,
     max_attempts: Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts),
   };
@@ -593,7 +603,7 @@ async function main() {
     console.log('\nStage A（semantic inventory）…');
     let resA;
     try {
-      resA = stubA ? stubCall('a') : await callModel(creds, promptA.system, userMessage, maxTokensA);
+      resA = stubA ? stubCall('a') : await callModel(creds, promptA.system, userMessage, maxTokensA, effortA);
       if (resA.error) throw resA.error;
     } catch (error) {
       meta.stages.a.status = 'transport-failed'; meta.stages.a.error = error.message;
@@ -698,7 +708,7 @@ async function main() {
   console.log('\nStage B（framework map synthesis）…');
   let resB;
   try {
-    resB = stubB ? stubCall('b') : await callModel(creds, promptB.system, userMessageB, maxTokensB);
+    resB = stubB ? stubCall('b') : await callModel(creds, promptB.system, userMessageB, maxTokensB, effortB);
     if (resB.error) throw resB.error;
   } catch (error) {
     meta.stages.b.status = 'transport-failed'; meta.stages.b.error = error.message;

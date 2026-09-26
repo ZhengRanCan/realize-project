@@ -1,0 +1,403 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "f13-f16-runbook",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current",
+    "scope": {
+      "text": "本手册给出 F13–F16 售后链路的部署、沙箱运行验证、证据留存与沙箱→真实环境切换的可执行步骤。",
+      "sectionRefs": [
+        "§1"
+      ]
+    },
+    "nonGoalSummary": {
+      "text": "不新增让用户选择库存释放时机的 preferredReleaseStock 字段（§10 决策 3 明确不推荐）；不改动 payOrder / payNotify 等支付核心文件，退款域只以 WX_PAY_* 作缺省回退。",
+      "sectionRefs": [
+        "§9",
+        "§10"
+      ]
+    }
+  },
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "T-02"
+      ],
+      "sectionRefs": [
+        "§2",
+        "§2.1",
+        "§2.2",
+        "§3",
+        "§3.1"
+      ]
+    },
+    {
+      "id": "E-02",
+      "label": "F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "T-01",
+        "T-02",
+        "T-07"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§3.1",
+        "§9"
+      ]
+    },
+    {
+      "id": "E-03",
+      "label": "云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": [
+        "T-02",
+        "T-05",
+        "T-06"
+      ],
+      "sectionRefs": [
+        "§3.2",
+        "§3.3",
+        "§3.4",
+        "§7.1"
+      ]
+    },
+    {
+      "id": "E-04",
+      "label": "沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron",
+      "type": "process",
+      "role": "consumer",
+      "topics": [
+        "T-03"
+      ],
+      "sectionRefs": [
+        "§4.1",
+        "§4.2",
+        "§4.3",
+        "§4.4",
+        "§4.5",
+        "§4.6"
+      ]
+    },
+    {
+      "id": "E-05",
+      "label": "资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分",
+      "type": "process",
+      "role": "intermediate",
+      "topics": [
+        "T-03",
+        "T-06",
+        "T-08"
+      ],
+      "sectionRefs": [
+        "§3.2",
+        "§4.7",
+        "§4.8",
+        "§6.3"
+      ]
+    },
+    {
+      "id": "E-06",
+      "label": "售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED",
+      "type": "state",
+      "role": "intermediate",
+      "topics": [
+        "T-03",
+        "T-04",
+        "T-06"
+      ],
+      "sectionRefs": [
+        "§4.2",
+        "§4.3",
+        "§4.4",
+        "§6.2"
+      ]
+    },
+    {
+      "id": "E-07",
+      "label": "证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "T-04"
+      ],
+      "sectionRefs": [
+        "§5",
+        "§5.3",
+        "§6"
+      ]
+    },
+    {
+      "id": "E-08",
+      "label": "沙箱 → 真实环境切换与切换后回归",
+      "type": "process",
+      "role": "intermediate",
+      "topics": [
+        "T-05"
+      ],
+      "sectionRefs": [
+        "§7",
+        "§7.1",
+        "§7.2",
+        "§7.3"
+      ]
+    },
+    {
+      "id": "E-09",
+      "label": "未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）",
+      "type": "concept",
+      "role": "target",
+      "topics": [
+        "T-08"
+      ],
+      "sectionRefs": [
+        "§10",
+        "§现状对照表",
+        "§两种实现的风险",
+        "§Reviewer 决策项（必看）",
+        "§默认推荐"
+      ]
+    },
+    {
+      "id": "C-01",
+      "label": "权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝",
+      "type": "constraint",
+      "role": "authority",
+      "topics": [
+        "T-03",
+        "T-04"
+      ],
+      "sectionRefs": [
+        "§4.4",
+        "§4.8",
+        "§6.1",
+        "§6.2"
+      ]
+    },
+    {
+      "id": "C-02",
+      "label": "补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-03",
+        "T-04",
+        "T-06"
+      ],
+      "sectionRefs": [
+        "§4.7",
+        "§5.3",
+        "§6.3",
+        "§6.4",
+        "§默认推荐"
+      ]
+    },
+    {
+      "id": "C-03",
+      "label": "环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-02",
+        "T-05",
+        "T-07"
+      ],
+      "sectionRefs": [
+        "§2.2",
+        "§2.3",
+        "§5.5",
+        "§7.1",
+        "§9"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "ED-01",
+      "from": "E-01",
+      "to": "E-02",
+      "type": "produces",
+      "label": "node --check 与 npm 构建通过后，按 1–11 顺序部署云函数（refundCommon 作为 lib 不单独部署）"
+    },
+    {
+      "id": "ED-02",
+      "from": "E-01",
+      "to": "E-03",
+      "type": "produces",
+      "label": "部署阶段建立定时触发器、HTTP 网关路由与环境变量"
+    },
+    {
+      "id": "ED-03",
+      "from": "E-04",
+      "to": "E-02",
+      "type": "consumes",
+      "label": "用例 1–3 通过云函数调用驱动售后链路"
+    },
+    {
+      "id": "ED-04",
+      "from": "E-04",
+      "to": "E-07",
+      "type": "produces",
+      "label": "验证运行产生截图 / 日志与 audit_logs 证据"
+    },
+    {
+      "id": "ED-05",
+      "from": "E-05",
+      "to": "E-02",
+      "type": "depends-on",
+      "label": "补偿在退款成功回调之后执行，依赖已部署的退款与售后云函数"
+    },
+    {
+      "id": "ED-06",
+      "from": "E-08",
+      "to": "E-04",
+      "type": "depends-on",
+      "label": "沙箱 passing 之后才执行真实环境切换"
+    },
+    {
+      "id": "ED-07",
+      "from": "E-08",
+      "to": "E-03",
+      "type": "depends-on",
+      "label": "切换依赖控制台设置的真实模式变量与退款通知路由"
+    },
+    {
+      "id": "ED-08",
+      "from": "E-08",
+      "to": "E-07",
+      "type": "produces",
+      "label": "切换后用真实小额退款与回归记录留存证据"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "E-06",
+      "attachedTo": [
+        "E-02"
+      ]
+    },
+    {
+      "elementId": "E-09",
+      "attachedTo": [
+        "E-05"
+      ]
+    },
+    {
+      "elementId": "C-01",
+      "attachedTo": [
+        "E-02",
+        "E-05"
+      ]
+    },
+    {
+      "elementId": "C-02",
+      "attachedTo": [
+        "E-05"
+      ]
+    },
+    {
+      "elementId": "C-03",
+      "attachedTo": [
+        "E-01",
+        "E-03"
+      ]
+    }
+  ],
+  "relationGap": [],
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "F13–F16 售后链路的构成与依赖顺序",
+      "proposition": "F13→F14→F15→F16 是本次验证的串联主线，每个 Feature 对应一组云函数；F12 已被这四个 Feature 替代并在 Round 19 重新验收为 passing。",
+      "sectionRefs": [
+        "§1",
+        "§6.5"
+      ]
+    },
+    {
+      "id": "T-02",
+      "title": "部署前置与云函数发布",
+      "proposition": "上线前先过 node --check 与两套 npm 构建，再按 1–11 顺序部署云函数，并建立触发器、网关路由与环境变量。",
+      "sectionRefs": [
+        "§2",
+        "§3"
+      ]
+    },
+    {
+      "id": "T-03",
+      "title": "沙箱模式端到端验证",
+      "proposition": "沙箱下用三条用例、mock 通知、查单 cron 与失败重试，验证售后链路的状态推进与补偿行为。",
+      "sectionRefs": [
+        "§4"
+      ]
+    },
+    {
+      "id": "T-04",
+      "title": "证据留存与独立审查",
+      "proposition": "每个 Feature passing 前必须留存指定证据，并通过 §6 的独立审查 checklist。",
+      "sectionRefs": [
+        "§5",
+        "§6"
+      ]
+    },
+    {
+      "id": "T-05",
+      "title": "沙箱到真实环境的切换",
+      "proposition": "沙箱 passing 之后才切到真实模式，切换后必须回归全部沙箱用例并完成真实小额退款验证。",
+      "sectionRefs": [
+        "§7"
+      ]
+    },
+    {
+      "id": "T-06",
+      "title": "故障排查速查",
+      "proposition": "针对 mode 缺失、签名校验失败、stillProcessing 递增、补偿 failed 递增、状态转移被拒、列表不显示等常见症状给出原因与处置。",
+      "sectionRefs": [
+        "§8"
+      ]
+    },
+    {
+      "id": "T-07",
+      "title": "与 F01 支付域的边界",
+      "proposition": "退款域独立使用 refundCommon，仅以 WX_PAY_* 作缺省回退，不修改支付核心文件。",
+      "sectionRefs": [
+        "§9"
+      ]
+    },
+    {
+      "id": "T-08",
+      "title": "未发货仅退款库存释放时机决策",
+      "proposition": "reviewer 需在 F15 passing 前决定库存释放时机（A 保守 / B 激进），默认推荐保持 A，并记录决策结论。",
+      "sectionRefs": [
+        "§10",
+        "§现状对照表",
+        "§Reviewer 决策项（必看）",
+        "§已知业务侧 UX 副作用（无论选 A 还是 B 都存在）"
+      ]
+    },
+    {
+      "id": "T-09",
+      "title": "修订记录",
+      "proposition": "文档修订记录：v0.3 起新增 docs/harness/REVIEWER-GUIDE.md 作为 reviewer 入门指南。",
+      "sectionRefs": [
+        "§11"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 12,
+    "topicCount": 9,
+    "edgeCount": 8,
+    "attachmentCount": 5,
+    "note": "12 个 element 恰好在 preferred budget 之内：主轴 7 个 process/artifact（部署 → 云函数集/配置 → 沙箱验证 → 补偿重试 → 证据 → 切换），另 1 个 state（状态机）、1 个 concept（§10 决策）、3 个 constraint（权限边界 / 幂等与上限 / 环境与凭据）。五类不可砍语义（失败路径、权限边界、阈值上限、业务不变量、non-goal）全部落在 C-01/C-02/C-03、E-05、E-06、E-09 上，未额外增加元素；§8 排查速查以 Topic 承载，其失败机理分别挂到 E-01/E-04/E-05/E-06/C-02/C-03。"
+  }
+}

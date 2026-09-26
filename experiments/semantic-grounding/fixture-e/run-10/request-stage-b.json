@@ -1,0 +1,26 @@
+{
+  "stage": "B",
+  "fixture": "e",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens_stage_a": 65536,
+    "max_tokens_stage_b": 131072,
+    "reasoning_effort_stage_a": "(provider default)",
+    "reasoning_effort_stage_b": "low",
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "docPath": "测试文档/fixture-e-f13-f16-runbook.md",
+  "docSha256": "c55f2f55f851ddc79194af9a90023d78a38376553aba1e567228ddaf0ed67d97",
+  "promptPath": "ai/framework-map-synthesis.prompt.md",
+  "promptSha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540",
+  "userMessageSha256": "f3fabbb7d76b801482b40f561e5a9b921ef5580263087901e6c27793dfe95ec7",
+  "userMessageChars": 38067,
+  "inventoryPath": "experiments/semantic-grounding/fixture-e/run-09/semantic-inventory.json",
+  "inventorySha256": "36f99102b7d525bb662c5afe78e6fac1c190063998bbe339fd94447604d0fabb",
+  "startedAt": "2026-09-26T15:34:25.625Z"
+}

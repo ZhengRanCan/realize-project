@@ -1,0 +1,847 @@
+<<<FRAMEWORK_MAP>>>
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "f13-f16-runbook",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current",
+    "scope": {
+      "text": "本手册给出 F13–F16 售后链路的部署、沙箱运行验证、证据留存与沙箱→真实环境切换的可执行步骤。",
+      "sectionRefs": ["§1"]
+    },
+    "nonGoalSummary": {
+      "text": "不新增让用户选择库存释放时机的 preferredReleaseStock 字段（§10 决策 3 明确不推荐）；不改动 payOrder / payNotify 等支付核心文件，退款域只以 WX_PAY_* 作缺省回退。",
+      "sectionRefs": ["§9", "§10"]
+    }
+  },
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-02"],
+      "sectionRefs": ["§2", "§2.1", "§2.2", "§3", "§3.1"]
+    },
+    {
+      "id": "E-02",
+      "label": "F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-01", "T-02", "T-07"],
+      "sectionRefs": ["§1", "§3.1", "§9"]
+    },
+    {
+      "id": "E-03",
+      "label": "云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-02", "T-05", "T-06"],
+      "sectionRefs": ["§3.2", "§3.3", "§3.4", "§7.1"]
+    },
+    {
+      "id": "E-04",
+      "label": "沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron",
+      "type": "process",
+      "role": "consumer",
+      "topics": ["T-03"],
+      "sectionRefs": ["§4.1", "§4.2", "§4.3", "§4.4", "§4.5", "§4.6"]
+    },
+    {
+      "id": "E-05",
+      "label": "资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-03", "T-06", "T-08"],
+      "sectionRefs": ["§3.2", "§4.7", "§4.8", "§6.3"]
+    },
+    {
+      "id": "E-06",
+      "label": "售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED",
+      "type": "state",
+      "role": "intermediate",
+      "topics": ["T-03", "T-04", "T-06"],
+      "sectionRefs": ["§4.2", "§4.3", "§4.4", "§6.2"]
+    },
+    {
+      "id": "E-07",
+      "label": "证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-04"],
+      "sectionRefs": ["§5", "§5.3", "§6"]
+    },
+    {
+      "id": "E-08",
+      "label": "沙箱 → 真实环境切换与切换后回归",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-05"],
+      "sectionRefs": ["§7", "§7.1", "§7.2", "§7.3"]
+    },
+    {
+      "id": "E-09",
+      "label": "未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）",
+      "type": "concept",
+      "role": "target",
+      "topics": ["T-08"],
+      "sectionRefs": ["§10", "§现状对照表", "§两种实现的风险", "§Reviewer 决策项（必看）", "§默认推荐"]
+    },
+    {
+      "id": "C-01",
+      "label": "权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝",
+      "type": "constraint",
+      "role": "authority",
+      "topics": ["T-03", "T-04"],
+      "sectionRefs": ["§4.4", "§4.8", "§6.1", "§6.2"]
+    },
+    {
+      "id": "C-02",
+      "label": "补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-03", "T-04", "T-06"],
+      "sectionRefs": ["§4.7", "§5.3", "§6.3", "§6.4", "§默认推荐"]
+    },
+    {
+      "id": "C-03",
+      "label": "环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-02", "T-05", "T-07"],
+      "sectionRefs": ["§2.2", "§2.3", "§5.5", "§7.1", "§9"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "ED-01",
+      "from": "E-01",
+      "to": "E-02",
+      "type": "produces",
+      "label": "node --check 与 npm 构建通过后，按 1–11 顺序部署云函数（refundCommon 作为 lib 不单独部署）"
+    },
+    {
+      "id": "ED-02",
+      "from": "E-01",
+      "to": "E-03",
+      "type": "produces",
+      "label": "部署阶段建立定时触发器、HTTP 网关路由与环境变量"
+    },
+    {
+      "id": "ED-03",
+      "from": "E-04",
+      "to": "E-02",
+      "type": "consumes",
+      "label": "用例 1–3 通过云函数调用驱动售后链路"
+    },
+    {
+      "id": "ED-04",
+      "from": "E-04",
+      "to": "E-07",
+      "type": "produces",
+      "label": "验证运行产生截图 / 日志与 audit_logs 证据"
+    },
+    {
+      "id": "ED-05",
+      "from": "E-05",
+      "to": "E-02",
+      "type": "depends-on",
+      "label": "补偿在退款成功回调之后执行，依赖已部署的退款与售后云函数"
+    },
+    {
+      "id": "ED-06",
+      "from": "E-08",
+      "to": "E-04",
+      "type": "depends-on",
+      "label": "沙箱 passing 之后才执行真实环境切换"
+    },
+    {
+      "id": "ED-07",
+      "from": "E-08",
+      "to": "E-03",
+      "type": "depends-on",
+      "label": "切换依赖控制台设置的真实模式变量与退款通知路由"
+    },
+    {
+      "id": "ED-08",
+      "from": "E-08",
+      "to": "E-07",
+      "type": "produces",
+      "label": "切换后用真实小额退款与回归记录留存证据"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "E-06",
+      "attachedTo": ["E-02"]
+    },
+    {
+      "elementId": "E-09",
+      "attachedTo": ["E-05"]
+    },
+    {
+      "elementId": "C-01",
+      "attachedTo": ["E-02", "E-05"]
+    },
+    {
+      "elementId": "C-02",
+      "attachedTo": ["E-05"]
+    },
+    {
+      "elementId": "C-03",
+      "attachedTo": ["E-01", "E-03"]
+    }
+  ],
+  "relationGap": [],
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "F13–F16 售后链路的构成与依赖顺序",
+      "proposition": "F13→F14→F15→F16 是本次验证的串联主线，每个 Feature 对应一组云函数；F12 已被这四个 Feature 替代并在 Round 19 重新验收为 passing。",
+      "sectionRefs": ["§1", "§6.5"]
+    },
+    {
+      "id": "T-02",
+      "title": "部署前置与云函数发布",
+      "proposition": "上线前先过 node --check 与两套 npm 构建，再按 1–11 顺序部署云函数，并建立触发器、网关路由与环境变量。",
+      "sectionRefs": ["§2", "§3"]
+    },
+    {
+      "id": "T-03",
+      "title": "沙箱模式端到端验证",
+      "proposition": "沙箱下用三条用例、mock 通知、查单 cron 与失败重试，验证售后链路的状态推进与补偿行为。",
+      "sectionRefs": ["§4"]
+    },
+    {
+      "id": "T-04",
+      "title": "证据留存与独立审查",
+      "proposition": "每个 Feature passing 前必须留存指定证据，并通过 §6 的独立审查 checklist。",
+      "sectionRefs": ["§5", "§6"]
+    },
+    {
+      "id": "T-05",
+      "title": "沙箱到真实环境的切换",
+      "proposition": "沙箱 passing 之后才切到真实模式，切换后必须回归全部沙箱用例并完成真实小额退款验证。",
+      "sectionRefs": ["§7"]
+    },
+    {
+      "id": "T-06",
+      "title": "故障排查速查",
+      "proposition": "针对 mode 缺失、签名校验失败、stillProcessing 递增、补偿 failed 递增、状态转移被拒、列表不显示等常见症状给出原因与处置。",
+      "sectionRefs": ["§8"]
+    },
+    {
+      "id": "T-07",
+      "title": "与 F01 支付域的边界",
+      "proposition": "退款域独立使用 refundCommon，仅以 WX_PAY_* 作缺省回退，不修改支付核心文件。",
+      "sectionRefs": ["§9"]
+    },
+    {
+      "id": "T-08",
+      "title": "未发货仅退款库存释放时机决策",
+      "proposition": "reviewer 需在 F15 passing 前决定库存释放时机（A 保守 / B 激进），默认推荐保持 A，并记录决策结论。",
+      "sectionRefs": ["§10", "§现状对照表", "§Reviewer 决策项（必看）", "§已知业务侧 UX 副作用（无论选 A 还是 B 都存在）"]
+    },
+    {
+      "id": "T-09",
+      "title": "修订记录",
+      "proposition": "文档修订记录：v0.3 起新增 docs/harness/REVIEWER-GUIDE.md 作为 reviewer 入门指南。",
+      "sectionRefs": ["§11"]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 12,
+    "topicCount": 9,
+    "edgeCount": 8,
+    "attachmentCount": 5,
+    "note": "12 个 element 恰好在 preferred budget 之内：主轴 7 个 process/artifact（部署 → 云函数集/配置 → 沙箱验证 → 补偿重试 → 证据 → 切换），另 1 个 state（状态机）、1 个 concept（§10 决策）、3 个 constraint（权限边界 / 幂等与上限 / 环境与凭据）。五类不可砍语义（失败路径、权限边界、阈值上限、业务不变量、non-goal）全部落在 C-01/C-02/C-03、E-05、E-06、E-09 上，未额外增加元素；§8 排查速查以 Topic 承载，其失败机理分别挂到 E-01/E-04/E-05/E-06/C-02/C-03。"
+  }
+}
+<<<MAP_SELECTION>>>
+{
+  "selectionVersion": 1,
+  "document": {
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md"
+  },
+  "inventoryRef": {
+    "path": "测试文档/fixture-e-f13-f16-runbook.semantic-inventory.json",
+    "sha256": "unavailable-in-stage-b-input",
+    "itemCount": 95
+  },
+  "dispositions": [
+    {
+      "semanticId": "S-01",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-01" },
+      "reason": "F13→F14→F15→F16 是手册组织 Feature 的串联顺序（读文档的导航主线），不是图上机制之间的依赖；L0 的机制依赖由 ED-01 / ED-03 / ED-06 表达。"
+    },
+    {
+      "semanticId": "S-02",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-01" },
+      "reason": "「F12 已被 F13–F16 替代、Round 19 转 passing」是项目状态流转记录，没有对应机制对象，作为 §1 的导航命题出现。"
+    },
+    {
+      "semanticId": "S-03",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-02" },
+      "reason": "Feature 与云函数的映射就是 E-02 的组成：E-02 的 label 按 F13 / F14 / F15 / F16 分组列出 submitAfterSales…refundCommon。"
+    },
+    {
+      "semanticId": "S-04",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-01" },
+      "reason": "对全部相关云函数执行 node --check 并期望 exit 0，是 E-01 部署流程的第一道前置闸口。"
+    },
+    {
+      "semanticId": "S-05",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-01" },
+      "reason": "npm run build:h5 / build:mp-weixin 及其 dist 产物是 E-01 的构建步骤，产物是 ED-01 的部署输入。"
+    },
+    {
+      "semanticId": "S-06",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "受限 PowerShell 下 npx uni build 触发 spawn EPERM、需换终端复测，属于构建终端的环境约束，挂在 C-03 上。"
+    },
+    {
+      "semanticId": "S-07",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": ".gitignore 必须包含 .env / *.pem / secrets/ 等条目且 git status 不出现敏感文件，是「凭据不入库」这一硬约束的内容。"
+    },
+    {
+      "semanticId": "S-08",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-01" },
+      "reason": "1 到 11 的部署顺序（refundCommon 作为 lib 被 require、不单独部署）就是 E-01 的流程定义。"
+    },
+    {
+      "semanticId": "S-09",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-03" },
+      "reason": "retryAfterSalesCompensation 的 */10 定时触发器是 E-03（云函数运行时配置）的内容。"
+    },
+    {
+      "semanticId": "S-10",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-03" },
+      "reason": "refundQueryCron 的 */5 定时触发器同样是 E-03 的配置内容。"
+    },
+    {
+      "semanticId": "S-11",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-03" },
+      "reason": "创建 /refundNotify 网关路由并保持与 payNotify 的 /payNotify 独立，属于 E-03 的网关配置内容（配置项的存在与归属）。"
+    },
+    {
+      "semanticId": "S-12",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-03" },
+      "reason": "把网关 HTTPS URL 配置到 WECHAT_REFUND_NOTIFY_URL 是 E-03 环境变量配置项之一。"
+    },
+    {
+      "semanticId": "S-13",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "「F13–F15 不需要环境变量；F16 沙箱只需 MODE=sandbox 与 APPID/MCHID/SERIAL_NO，其余不强制」是对环境变量配置的硬要求，归 C-03。"
+    },
+    {
+      "semanticId": "S-14",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-04" },
+      "reason": "预置 users（test_user_a points=1000、test_admin）与 admin_whitelist 是 E-04「预置数据」步骤的输入条件。"
+    },
+    {
+      "semanticId": "S-15",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "products（prod_1 stock=10）与 coupons 的具体预置条目属 §4.1 一次性测试数据细节，与 S-14 同类；L0 上由 E-04 的输入条件一并承载，不再单列结构。"
+    },
+    {
+      "semanticId": "S-16",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "submitAfterSales 之后 REQUESTED / REFUND_ONLY 是售后单状态机的起始取值与迁移。"
+    },
+    {
+      "semanticId": "S-17",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "APPROVE_REFUND_ONLY → APPROVED（cancellationStatus=APPROVED）是状态机沿仅退款支线的一条迁移。"
+    },
+    {
+      "semanticId": "S-18",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-02" },
+      "reason": "refundOrder 的沙箱返回（code=0、mode=sandbox、refundStatus=PROCESSING、outRefundNo 前缀 R）是 F16 退款云函数的行为输出，归 E-02；其中的幂等要求另见 S-59/C-02。"
+    },
+    {
+      "semanticId": "S-19",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "mock 回调后 afterSalesStatus=REFUNDED 且 refundedAt 写入，是状态机的终态迁移。"
+    },
+    {
+      "semanticId": "S-20",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "§4.2 里 audit_logs 六条记录的具体枚举是用例断言细节，且与 §5/§6 的审计留痕要求重复；证据要求已由 E-07 承载。"
+    },
+    {
+      "semanticId": "S-21",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-05" },
+      "reason": "未发货链路库存只在 final compensation 时 +1，是 E-05 补偿机制的行为；其释放时机本身由 E-09 决策约束。"
+    },
+    {
+      "semanticId": "S-22",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "F12 §5.2 要求 APPROVED 释放、而 F15 在 REFUND_SUCCESS 才补偿的待确认点，正是 §10 决策项要求 reviewer 拍板的内容。"
+    },
+    {
+      "semanticId": "S-23",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "凭证图片 + QUALITY_ISSUE 提交后进入 RETURN_REFUND，是状态机切换到退货退款支线的迁移。"
+    },
+    {
+      "semanticId": "S-24",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "APPROVE_RETURN_REFUND → WAIT_RETURN 是状态机迁移。"
+    },
+    {
+      "semanticId": "S-25",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "submitReturnLogistics 提交退货单号 → RETURN_SHIPPED 是状态机迁移。"
+    },
+    {
+      "semanticId": "S-26",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "INSPECT_RECEIVED → WAIT_INSPECTION 是状态机迁移。"
+    },
+    {
+      "semanticId": "S-27",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "INSPECT_PASS → REFUND_PENDING 是状态机迁移（进入退款等待）。"
+    },
+    {
+      "semanticId": "S-28",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-05" },
+      "reason": "退货退款链路在退款成功后回补 prod_1 库存，是 E-05 补偿的结果（状态侧 REFUNDED 由 E-06 承载）。"
+    },
+    {
+      "semanticId": "S-29",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "cancelAfterSales → CANCELLED（含 cancelledBy / cancelledAt）是状态机的撤销迁移。"
+    },
+    {
+      "semanticId": "S-30",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "撤销后 stockRestored / couponRestored / pointsRestored 均为 false，是「撤销不回补资产」这一业务不变量，归 C-02。"
+    },
+    {
+      "semanticId": "S-31",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-01" },
+      "reason": "非订单所有者调用 cancelAfterSales 被服务端拒绝（code=-1、无权操作该订单）是权限边界。"
+    },
+    {
+      "semanticId": "S-32",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-04" },
+      "reason": "方式 A（POST /refundNotify + X-Mock-Source: sandbox + __mock.source）是 E-04 验证流程驱动退款回调的 mock 通知入口。"
+    },
+    {
+      "semanticId": "S-33",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-04" },
+      "reason": "方式 B（直接 cloud.callFunction 调 refundNotify，headers 带 X-Mock-Source、body 为 JSON 字符串）是 E-04 的另一条 mock 通知路径。"
+    },
+    {
+      "semanticId": "S-34",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-04" },
+      "reason": "手动 tcb fn invoke 触发 refundQueryCron 并核对 scanned / success / stillProcessing / failed / mode 的返回值，是 E-04 的查单 cron 验证步骤。"
+    },
+    {
+      "semanticId": "S-35",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "删掉 prod_1 后补偿失败必须表现为 code=-1、compensationFailed=true、refundCompensationError 非空且 retryCount=0，是补偿失败不变量。"
+    },
+    {
+      "semanticId": "S-36",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-05" },
+      "reason": "恢复 prod_1 后手动触发 retryAfterSalesCompensation 使 stockRestored=true，是 E-05 的重试成功路径。"
+    },
+    {
+      "semanticId": "S-37",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-01" },
+      "reason": "forceRestockAndAssets 仅管理员可调用、只补资产不改 afterSalesStatus，属权限边界（行为限制部分由 C-01 一并承载）。"
+    },
+    {
+      "semanticId": "S-38",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-07" },
+      "reason": "「每个 Feature passing 前必须留存截图或日志证据」是 E-07（证据与审查留痕）的总要求。"
+    },
+    {
+      "semanticId": "S-39",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "F13 的具体截图 / 交互清单（两种提示条、状态卡、列表 Tab、撤销弹窗）是 UI 级取证明细；L0 由 E-07 承载「必须留证」的要求，不逐条建结构。"
+    },
+    {
+      "semanticId": "S-40",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "F14 的截图与操作前后清单同属 UI 级取证明细，其中的 audit_logs 追溯要求已由 S-52 在 E-07 上表达。"
+    },
+    {
+      "semanticId": "S-41",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-07" },
+      "reason": "F15 重试日志证据必须覆盖成功 / 失败 / 超过上限三种情形，是 E-07 的证据覆盖要求（上限本身由 C-02 承载）。"
+    },
+    {
+      "semanticId": "S-42",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "git grep 无敏感凭据输出、函数日志检索 KEY / PRIVATE 无命中，是 C-03 的凭据不入库 / 不落日志约束。"
+    },
+    {
+      "semanticId": "S-43",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "「待发货 / 待收货 / 已完成订单各打开哪种申请表单」是用户端表单交互的验收细节，图上没有表单对象；F13 验收整体由 E-07 的 checklist 承载。"
+    },
+    {
+      "semanticId": "S-44",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-01" },
+      "reason": "金额超实付、空原因、越权订单被服务端拒绝，属于 C-01 的入参校验与权限边界。"
+    },
+    {
+      "semanticId": "S-45",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "REQUESTED 可撤销并恢复原订单状态是状态机的回退迁移；「不回补库存」的部分由 C-02 兜底。"
+    },
+    {
+      "semanticId": "S-46",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "重复提交或撤销不生成重复售后记录是幂等不变量，归 C-02。"
+    },
+    {
+      "semanticId": "S-47",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-07" },
+      "reason": "「F14 / F15 / F16 范围内无越界改动」是 §6.1 审查 checklist 的范围条目，由 E-07 承载。"
+    },
+    {
+      "semanticId": "S-48",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-07" },
+      "reason": "「待审 Tab 仅返回 REQUESTED」是 §6.2 的验收条目，属 E-07 的独立审查 checklist。"
+    },
+    {
+      "semanticId": "S-49",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "同意未发货进 APPROVED、同意已发货进 WAIT_RETURN 是状态机的分支迁移。"
+    },
+    {
+      "semanticId": "S-50",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-01" },
+      "reason": "拒绝无原因的审批被拦截属于审批入参校验边界。"
+    },
+    {
+      "semanticId": "S-51",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-01" },
+      "reason": "非管理员、非 REQUESTED、重复审批全部被拒且无副作用，是权限边界（重复审批的幂等面与 C-02 呼应）。"
+    },
+    {
+      "semanticId": "S-52",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-07" },
+      "reason": "审计日志可追溯是 E-07 留痕要求的具体表现。"
+    },
+    {
+      "semanticId": "S-53",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-05" },
+      "reason": "已发货链路验货通过且确认退款成功后每个 SKU 库存 +qty，是 E-05 的补偿行为。"
+    },
+    {
+      "semanticId": "S-54",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "F15 验收里的未发货库存释放时机确认项直接指向 §10 决策项 E-09。"
+    },
+    {
+      "semanticId": "S-55",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "并发或重复触发只补偿一次是幂等不变量。"
+    },
+    {
+      "semanticId": "S-56",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-05" },
+      "reason": "有效券恢复为可用、过期券保持过期并有记录，是 E-05 的优惠券补偿行为。"
+    },
+    {
+      "semanticId": "S-57",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-05" },
+      "reason": "使用积分的订单只退回一次、积分账户不存在时记录错误，是 E-05 的积分补偿行为（含失败记录）。"
+    },
+    {
+      "semanticId": "S-58",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "补偿失败必须把 refundCompensationError 落库且订单不标记成功，是失败不变量。"
+    },
+    {
+      "semanticId": "S-59",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "沙箱返回 PROCESSING、outRefundNo 唯一且可复用幂等，是退款请求的幂等约束。"
+    },
+    {
+      "semanticId": "S-60",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "refundNotify 经 X-Mock-Source: sandbox 触发后推进 afterSalesStatus=REFUNDED 并回调 processAfterSales，主体是状态机的终态迁移。"
+    },
+    {
+      "semanticId": "S-61",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-04" },
+      "reason": "沙箱查单在 80% 命中率下成功推进，是 E-04 中 cron 验证的 mock 行为预期。"
+    },
+    {
+      "semanticId": "S-62",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "连续 10 次查单失败置 REFUND_FAILED 是一条有界重试上限，归 C-02。"
+    },
+    {
+      "semanticId": "S-63",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-01" },
+      "reason": "F12 重新验收已完成、status 由 blocked 改 passing 是 Feature 状态流转记录，属流程导航，不构成机制结构。"
+    },
+    {
+      "semanticId": "S-64",
+      "disposition": "represented",
+      "target": { "kind": "edge", "id": "ED-06" },
+      "reason": "「仅在沙箱 passing 之后才切换到真实环境」正是 ED-06（E-08 depends-on E-04）所声明的前置关系。"
+    },
+    {
+      "semanticId": "S-65",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "真实模式必备变量清单（MODE / APPID / MCHID / SERIAL_NO / 私钥 / 平台公钥 / API_V3_KEY / NOTIFY_URL，API_BASE_URL 有默认值）是对配置的硬要求。"
+    },
+    {
+      "semanticId": "S-66",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "WECHAT_REFUND_* 只从 CloudBase 控制台设置、仓库任何位置不得包含其值，是凭据约束。"
+    },
+    {
+      "semanticId": "S-67",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-08" },
+      "reason": "把变量写入 refundOrder / refundNotify / refundQueryCron 共享、删除沙箱 __mock 入口、确认不走 mockRefundApply，是切换流程的步骤定义。"
+    },
+    {
+      "semanticId": "S-68",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-08" },
+      "reason": "用 0.01 元真实退款（商户平台记录 + 真实钱包到账）做切换前置验证，是 E-08 的验证步骤。"
+    },
+    {
+      "semanticId": "S-69",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "验证通过后把 MODE=real 固化为正式值并移除所有 *_MOCK 前缀变量，是对最终配置态的约束。"
+    },
+    {
+      "semanticId": "S-70",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-08" },
+      "reason": "切换后重跑 §4.2–§4.8 并增加真实环境小金额对账用例，是 E-08 的回归定义。"
+    },
+    {
+      "semanticId": "S-71",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-01" },
+      "reason": "mode 字段缺失指向旧版本云函数、处置是重新部署 refundOrder，锚定在部署流程 E-01 上。"
+    },
+    {
+      "semanticId": "S-72",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "真实模式下签名校验失败源于未配置 PLATFORM_PUBLIC_KEY，属 C-03 的真实模式变量约束。"
+    },
+    {
+      "semanticId": "S-73",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-04" },
+      "reason": "查单长期 stillProcessing 是沙箱 mock 命中 20% CLOSED 分支，属 E-04 的沙箱 mock 行为。"
+    },
+    {
+      "semanticId": "S-74",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-05" },
+      "reason": "retry failed 递增源于 refundCompensationError 持续非空，是 E-05 重试机制的失败表现。"
+    },
+    {
+      "semanticId": "S-75",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "REFUND_SUCCESS 转移被拒是因为订单状态不在 APPROVED / REFUND_PENDING，是状态机的守卫条件。"
+    },
+    {
+      "semanticId": "S-76",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-06" },
+      "reason": "列表页售后 Tab 不显示源于 afterSalesStatus 仍为空，是状态机取值缺失的表现。"
+    },
+    {
+      "semanticId": "S-77",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-02" },
+      "reason": "refundCommon/config.js 只被 F16 三个退款函数使用、不复用 payOrder / payNotify 代码，是 E-02 的组成边界。"
+    },
+    {
+      "semanticId": "S-78",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "共享 WX_PAY_* 只作缺省回退（WECHAT_REFUND_APPID 缺省时回退 WX_PAY_APPID）是对配置来源的约束。"
+    },
+    {
+      "semanticId": "S-79",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-03" },
+      "reason": "独立配置 WECHAT_REFUND_* 以免污染支付域，属 C-03 的域隔离约束。"
+    },
+    {
+      "semanticId": "S-80",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "F12 design §5.2 的库存回补规则（REFUNDED，或未发货 REFUND_ONLY 的 APPROVED / CLOSED）正是 §10 决策要落地的规则本身，两个候选释放时机都在 E-09 上。"
+    },
+    {
+      "semanticId": "S-81",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "F12 允许两个释放节点、F15 只在 REFUND_SUCCESS 释放、与 F06 老路径立即释放不一致——即 E-09 决策的分歧点。"
+    },
+    {
+      "semanticId": "S-82",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "现状对照表给出 F06 老路径与 F13/F14 新路径的入口、链路与释放时机差异，就是 E-09 的两个候选方案。"
+    },
+    {
+      "semanticId": "S-83",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "风险 A（保守）的利弊是 E-09 候选 A 的论证内容。"
+    },
+    {
+      "semanticId": "S-84",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "风险 B（激进）的利弊是 E-09 候选 B 的论证内容。"
+    },
+    {
+      "semanticId": "S-85",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "决策 1（选 A 不调整 / 选 B 需在 APPROVE_REFUND_ONLY 增加提前释放前置步骤）就是 E-09 的决策内容。"
+    },
+    {
+      "semanticId": "S-86",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "决策 2（若选 B 是否同步释放优惠券与积分、是否扩展为 releaseAllAssets）是 E-09 的从属选项。"
+    },
+    {
+      "semanticId": "S-87",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "决策 3 明确不推荐 preferredReleaseStock（与 F13 §5.1 撤销不回补互斥）是非目标，随 E-09 记录并在 document.nonGoalSummary 重申。"
+    },
+    {
+      "semanticId": "S-88",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "默认推荐保持 F15 当前实现（保守路径）是 E-09 的推荐取值。"
+    },
+    {
+      "semanticId": "S-89",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "F12 acceptance 要求重复回调下 APPROVED / REFUNDED 不重复回补，且 F06 老路径直接写 stockRestored=true 会让 F15 跳过——是幂等闸门不变量。"
+    },
+    {
+      "semanticId": "S-90",
+      "disposition": "represented",
+      "target": { "kind": "constraint", "id": "C-02" },
+      "reason": "F06 processCancellation 与 F13 processAfterSales 互不感知、同一订单可能重复释放库存，只靠 if (order.stockRestored === true) 闸门兜底，归 C-02 的幂等不变量。"
+    },
+    {
+      "semanticId": "S-91",
+      "disposition": "omitted",
+      "target": null,
+      "reason": "默认推荐的对账 / 资金论证属叙述性理由（决策取值已由 E-09 承载，audit_logs 与 refundedAt 的对账留痕已由 E-07 承载），不另立结构。"
+    },
+    {
+      "semanticId": "S-92",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "「无论选 A 还是 B 都存在」的商家两次操作与工作台确认按钮，是 E-09 决策的已知业务侧副作用。"
+    },
+    {
+      "semanticId": "S-93",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-08" },
+      "reason": "cancelOrder 与 submitAfterSales 两个用户入口的区分，是理解 §10 决策背景的导航信息，不改变图上的机制结构。"
+    },
+    {
+      "semanticId": "S-94",
+      "disposition": "represented",
+      "target": { "kind": "element", "id": "E-09" },
+      "reason": "决策记录须同步到 F15 verification.md §9 勾选项，是 E-09 决策项的收口要求。"
+    },
+    {
+      "semanticId": "S-95",
+      "disposition": "topic-only",
+      "target": { "kind": "topic", "id": "T-09" },
+      "reason": "v0.3 新增 REVIEWER-GUIDE.md 是文档修订记录，只在 T-09 的导航命题中出现，不进入结构语义。"
+    }
+  ]
+}
