@@ -1,0 +1,28 @@
+{
+  "fixture": "c",
+  "fixtureLabel": "C · Process heavy",
+  "runDir": "experiments/framework-map-generation/fixture-c/run-01",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens": 65536,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "docPath": "测试文档/fixture-c-candidate-inbox-driven-profile-pipeline.md",
+  "docSha256": "f66dbd412bb90bd73dd9cfd9ffad18b2495bb9b141c2f5b0dc70cf79542afcaa",
+  "documentSha256": "f66dbd412bb90bd73dd9cfd9ffad18b2495bb9b141c2f5b0dc70cf79542afcaa",
+  "promptPath": "ai/framework-map-generation.prompt.md",
+  "promptFingerprint": "295e9c9923b330f3",
+  "promptSha256": "295e9c9923b330f3a16bc80c8151da8fd1a31aa59fdd0a022e96918c263be2dc",
+  "userMessageSha256": "b67119f8ab9bf4e9a97789b0c5fae8b6a89961c79069839dcc62fc93dea38549",
+  "systemPromptChars": 5,
+  "userMessageChars": 30277,
+  "startedAt": "2026-09-26T13:55:44.383Z",
+  "finishedAt": "2026-09-26T13:57:22.830Z",
+  "status": "success",
+  "error": null
+}

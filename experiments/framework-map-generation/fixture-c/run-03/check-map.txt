@@ -1,0 +1,31 @@
+===== check-map: experiments/framework-map-generation/fixture-c/run-03/framework-map.json =====
+document      DeepTutor 自动画像与学习状态流水线
+granularity   section (provisional)   ⚠️ provisional — 不得与 sourceUnit 粒度混算
+stats         elements 16 · edges 16 · attachments 2 · topics 12 · relationGap 1 · gapDensity 0.06
+coverage      19/19 有路径（本粒度内）
+
+HARD ERROR (0)
+  （无）
+
+WARNING (3)
+  ! W1 element 总数 16 > preferred budget 12（认知容量 heuristic，非 semantic validity）；内容都有 L1/L2 入口 → 只需检查 Navigation invariant
+  ! W3 Topic 数 12 > 10
+  ! W5 relationGap[0] fusion-learning-fact ⇢ fusion-learning-fact：「同一 Candidate/Observation 在相同映射版本下只能有一个逻辑事实；重映射时创建新 revision 或明确 supersede 旧事实，而不是静默改写历史。」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）
+
+INFORMATIONAL (7)
+  i I1 component = 0（正常形态差异，不是缺陷）
+  i I2 state = 0（正常形态差异，不是缺陷）
+  i I4 非单链拓扑：收敛节点 lesson-binding, candidate-projection, processing-outcome, profile-fact-proposal, memory-consolidation（按 consumes 归一化后的多入边）—— 形态差异，不是异常
+  i I5 pipeline-overview 没有 L0 element（Topic 与 element 已解耦，合法）
+  i I5 reliability 没有 L0 element（Topic 与 element 已解耦，合法）
+  i I5 implementation 没有 L0 element（Topic 与 element 已解耦，合法）
+  i I6 reliability 只挂了一个 block / section（单点 Topic，形态差异）
+
+SKIPPED (0)
+  （无 —— 本次全部检查都已执行）
+
+════════════════════════════════
+结果: HARD 0 · WARN 3 · INFO 7
+状态: PASS
+注: element budget / 单点 Topic / 某类元素为 0 / 无主轴 / DAG 是 Warning 或 Informational，不是语义缺陷。relationGap 少而散时逐条列 W5，多而密时聚合成一条 W8 + detail 段。
+════════════════════════════════

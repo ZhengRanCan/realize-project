@@ -1,0 +1,60 @@
+{
+  "fixture": "d",
+  "fixtureLabel": "D · ER-heavy / multi-entity network",
+  "runDir": "experiments/framework-map-generation/fixture-d/run-02",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens": 65536,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "documentPath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+  "documentSha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236",
+  "promptPath": "ai/framework-map-generation.prompt.md",
+  "promptFingerprint": "295e9c9923b330f3",
+  "promptSha256": "295e9c9923b330f3a16bc80c8151da8fd1a31aa59fdd0a022e96918c263be2dc",
+  "userMessageSha256": "571b57c2aaea2e26993e71db0aa9dbfee834689132e7660b2a73a4f84266268d",
+  "startedAt": "2026-09-26T14:02:10.850Z",
+  "finishedAt": "2026-09-26T14:03:44.954Z",
+  "status": "success",
+  "error": null,
+  "attempts": 1,
+  "latencyMs": 94095,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 12658,
+    "completion_tokens": 26343,
+    "total_tokens": 39001,
+    "prompt_tokens_details": {
+      "cached_tokens": 12416
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 20527
+    },
+    "prompt_cache_hit_tokens": 12416,
+    "prompt_cache_miss_tokens": 242
+  },
+  "protocol": {
+    "rawResponseSaved": true,
+    "jsonExtracted": true,
+    "tempWrite": true,
+    "readBackVerified": true,
+    "atomicRename": true,
+    "checkMapExecuted": true
+  },
+  "repair": "none",
+  "artifactSha256": {
+    "framework-map.json": "4fd1508c4151d25391d6e66d081360933ded5f97972cdf25c9841a2fcdf1cdf7"
+  },
+  "validator": {
+    "exitCode": 0,
+    "hard": 0,
+    "warn": 3,
+    "info": 23,
+    "status": "PASS"
+  }
+}

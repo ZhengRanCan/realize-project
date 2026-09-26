@@ -1,0 +1,919 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "fixture-d-goal-plan-task-state-model",
+    "title": "Goal / Plan / Stage / Task target model contract",
+    "sourcePath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+    "role": "target",
+    "scope": {
+      "text": "Target data model contract for the planning domain: core persistent aggregate PlanBundle (Plan, Stage[], Task[]), transient planner inputs, execution history, computed views, legacy DailyPlan[] boundary, and migration direction.",
+      "sectionRefs": [
+        "§Purpose",
+        "§F40 conclusion",
+        "§Model layers"
+      ]
+    },
+    "nonGoalSummary": {
+      "text": "F40 does not delete DailyPlan[], change storage keys, change compatibility reads, or implement AI/planner rewrites; these are later features.",
+      "sectionRefs": [
+        "§Purpose",
+        "§F40 conclusion",
+        "§DailyPlan legacy boundary"
+      ]
+    }
+  },
+  "thesis": "PlanBundle is the core persistent planning aggregate; planner inputs are transient; execution history remains separate and immutable; legacy DailyPlan[] is only a compatibility boundary until a later breaking migration.",
+  "elements": [
+    {
+      "id": "goal",
+      "label": "Goal",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "purpose-and-scope",
+        "goal-model"
+      ],
+      "sectionRefs": [
+        "§Goal",
+        "§F40 conclusion",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "userProfile",
+      "label": "UserProfile",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "purpose-and-scope",
+        "user-profile-model"
+      ],
+      "sectionRefs": [
+        "§UserProfile",
+        "§F40 conclusion",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "planBundle",
+      "label": "PlanBundle",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "purpose-and-scope",
+        "plan-bundle-and-parts",
+        "initial-planning-flow",
+        "replanning-flow"
+      ],
+      "sectionRefs": [
+        "§PlanBundle",
+        "§F40 conclusion",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "plan",
+      "label": "Plan",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "plan-bundle-and-parts",
+        "plan-change-summary"
+      ],
+      "sectionRefs": [
+        "§Plan",
+        "§PlanBundle"
+      ]
+    },
+    {
+      "id": "stage",
+      "label": "Stage",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "plan-bundle-and-parts",
+        "replanning-flow"
+      ],
+      "sectionRefs": [
+        "§Stage",
+        "§PlanBundle"
+      ]
+    },
+    {
+      "id": "task",
+      "label": "Task",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "plan-bundle-and-parts",
+        "task-card-computed-contract",
+        "today-task-selection",
+        "execution-history"
+      ],
+      "sectionRefs": [
+        "§Task",
+        "§PlanBundle"
+      ]
+    },
+    {
+      "id": "initialPlanContext",
+      "label": "InitialPlanContext",
+      "type": "artifact",
+      "role": "input",
+      "topics": [
+        "purpose-and-scope",
+        "initial-planning-flow"
+      ],
+      "sectionRefs": [
+        "§Initial planning flow",
+        "§F40 conclusion",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "replanContext",
+      "label": "ReplanContext",
+      "type": "artifact",
+      "role": "input",
+      "topics": [
+        "purpose-and-scope",
+        "replanning-flow"
+      ],
+      "sectionRefs": [
+        "§Replanning flow",
+        "§F40 conclusion",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "dailyReview",
+      "label": "DailyReview",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "purpose-and-scope",
+        "execution-history"
+      ],
+      "sectionRefs": [
+        "§DailyReview",
+        "§FocusSession, TaskResult and DailyReview",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "taskResult",
+      "label": "TaskResult",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "execution-history"
+      ],
+      "sectionRefs": [
+        "§FocusSession, TaskResult and DailyReview",
+        "§DailyReview"
+      ]
+    },
+    {
+      "id": "focusSession",
+      "label": "FocusSession",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "execution-history"
+      ],
+      "sectionRefs": [
+        "§FocusSession, TaskResult and DailyReview"
+      ]
+    },
+    {
+      "id": "todayTaskSelection",
+      "label": "TodayTaskSelection",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "purpose-and-scope",
+        "today-task-selection"
+      ],
+      "sectionRefs": [
+        "§TodayTaskSelection",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "dailyReviewPromptDismissal",
+      "label": "DailyReviewPromptDismissal",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "purpose-and-scope",
+        "daily-review-prompt-dismissal"
+      ],
+      "sectionRefs": [
+        "§DailyReviewPromptDismissal",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "planChangeSummary",
+      "label": "PlanChangeSummary",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "purpose-and-scope",
+        "plan-change-summary"
+      ],
+      "sectionRefs": [
+        "§PlanChangeSummary",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "dailyPlanLegacy",
+      "label": "DailyPlan[] legacy",
+      "type": "artifact",
+      "role": "boundary",
+      "topics": [
+        "purpose-and-scope",
+        "daily-plan-legacy-boundary"
+      ],
+      "sectionRefs": [
+        "§DailyPlan legacy boundary",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "taskCardView",
+      "label": "TaskCardView",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "task-card-computed-contract"
+      ],
+      "sectionRefs": [
+        "§Task Card computed contract"
+      ]
+    },
+    {
+      "id": "initialPlanning",
+      "label": "Initial planning",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "initial-planning-flow"
+      ],
+      "sectionRefs": [
+        "§Initial planning flow"
+      ]
+    },
+    {
+      "id": "replanning",
+      "label": "Replanning",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "replanning-flow"
+      ],
+      "sectionRefs": [
+        "§Replanning flow"
+      ]
+    },
+    {
+      "id": "taskDependencyConstraint",
+      "label": "Task dependency validity constraint",
+      "type": "constraint",
+      "role": "constraint",
+      "topics": [
+        "plan-bundle-and-parts",
+        "task-card-computed-contract"
+      ],
+      "sectionRefs": [
+        "§Task",
+        "§Task Card computed contract"
+      ]
+    },
+    {
+      "id": "executionHistoryImmutabilityConstraint",
+      "label": "Execution history immutability",
+      "type": "constraint",
+      "role": "constraint",
+      "topics": [
+        "execution-history",
+        "replanning-flow"
+      ],
+      "sectionRefs": [
+        "§FocusSession, TaskResult and DailyReview",
+        "§DailyReview",
+        "§Replanning flow"
+      ]
+    },
+    {
+      "id": "planningCapacityConstraint",
+      "label": "Daily capacity and stage minutes constraint",
+      "type": "constraint",
+      "role": "constraint",
+      "topics": [
+        "goal-model",
+        "plan-bundle-and-parts"
+      ],
+      "sectionRefs": [
+        "§Goal",
+        "§Plan",
+        "§Task"
+      ]
+    },
+    {
+      "id": "planStateUniquenessConstraint",
+      "label": "One active/selection/dismissal/summary constraint",
+      "type": "constraint",
+      "role": "constraint",
+      "topics": [
+        "goal-model",
+        "today-task-selection",
+        "daily-review-prompt-dismissal",
+        "plan-change-summary"
+      ],
+      "sectionRefs": [
+        "§Goal",
+        "§TodayTaskSelection",
+        "§DailyReviewPromptDismissal",
+        "§PlanChangeSummary"
+      ]
+    },
+    {
+      "id": "planStructureConstraint",
+      "label": "Plan structure and detailedThrough constraint",
+      "type": "constraint",
+      "role": "constraint",
+      "topics": [
+        "plan-bundle-and-parts",
+        "task-card-computed-contract"
+      ],
+      "sectionRefs": [
+        "§Plan",
+        "§Stage",
+        "§Task"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "planBundle",
+      "to": "plan",
+      "type": "contains",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        },
+        "ownership": "owned"
+      },
+      "note": "PlanBundle includes one Plan metadata record."
+    },
+    {
+      "id": "e2",
+      "from": "planBundle",
+      "to": "stage",
+      "type": "contains",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one-or-many"
+        },
+        "ownership": "owned"
+      },
+      "note": "PlanBundle contains Stage[]."
+    },
+    {
+      "id": "e3",
+      "from": "planBundle",
+      "to": "task",
+      "type": "contains",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one-or-many"
+        },
+        "ownership": "owned"
+      },
+      "note": "PlanBundle contains Task[]."
+    },
+    {
+      "id": "e4",
+      "from": "plan",
+      "to": "goal",
+      "type": "depends-on",
+      "qualifiers": {
+        "cardinality": {
+          "from": "zero-or-many",
+          "to": "one"
+        },
+        "ownership": "reference"
+      },
+      "note": "A Goal may have multiple historical Plan versions, but a Plan belongs to one Goal."
+    },
+    {
+      "id": "e5",
+      "from": "stage",
+      "to": "plan",
+      "type": "depends-on",
+      "qualifiers": {
+        "cardinality": {
+          "from": "zero-or-many",
+          "to": "one"
+        },
+        "ownership": "reference"
+      },
+      "note": "Stage date ranges must stay within the parent Plan date range."
+    },
+    {
+      "id": "e6",
+      "from": "task",
+      "to": "plan",
+      "type": "depends-on",
+      "qualifiers": {
+        "cardinality": {
+          "from": "zero-or-many",
+          "to": "one"
+        },
+        "ownership": "reference"
+      },
+      "note": "Target Task has planId and belongs to a PlanBundle's Plan."
+    },
+    {
+      "id": "e7",
+      "from": "task",
+      "to": "stage",
+      "type": "relates-to",
+      "qualifiers": {
+        "cardinality": {
+          "from": "zero-or-many",
+          "to": "zero-or-one"
+        },
+        "ownership": "reference"
+      },
+      "note": "Every initial Task belongs to one Stage; stageId is optional in the target shape."
+    },
+    {
+      "id": "e8",
+      "from": "initialPlanContext",
+      "to": "goal",
+      "type": "depends-on",
+      "note": "InitialPlanContext includes the Goal."
+    },
+    {
+      "id": "e9",
+      "from": "initialPlanContext",
+      "to": "userProfile",
+      "type": "depends-on",
+      "note": "InitialPlanContext may include UserProfile."
+    },
+    {
+      "id": "e10",
+      "from": "initialPlanning",
+      "to": "initialPlanContext",
+      "type": "consumes",
+      "note": "Initial planning consumes the assembled transient context."
+    },
+    {
+      "id": "e11",
+      "from": "initialPlanning",
+      "to": "planBundle",
+      "type": "produces",
+      "note": "Initial planning creates the first PlanBundle."
+    },
+    {
+      "id": "e12",
+      "from": "initialPlanning",
+      "to": "planBundle",
+      "type": "validates",
+      "note": "AI output must be validated before it becomes a PlanBundle."
+    },
+    {
+      "id": "e13",
+      "from": "replanContext",
+      "to": "goal",
+      "type": "depends-on",
+      "note": "ReplanContext includes the Goal."
+    },
+    {
+      "id": "e14",
+      "from": "replanContext",
+      "to": "userProfile",
+      "type": "depends-on",
+      "note": "ReplanContext may include UserProfile."
+    },
+    {
+      "id": "e15",
+      "from": "replanContext",
+      "to": "planBundle",
+      "type": "depends-on",
+      "note": "ReplanContext includes currentPlanBundle."
+    },
+    {
+      "id": "e16",
+      "from": "replanContext",
+      "to": "dailyReview",
+      "type": "depends-on",
+      "note": "ReplanContext may include DailyReview[]."
+    },
+    {
+      "id": "e17",
+      "from": "replanContext",
+      "to": "stage",
+      "type": "depends-on",
+      "note": "Stage progress and completedStageId enter replanning context."
+    },
+    {
+      "id": "e18",
+      "from": "replanning",
+      "to": "replanContext",
+      "type": "consumes",
+      "note": "Replanning consumes ReplanContext."
+    },
+    {
+      "id": "e19",
+      "from": "replanning",
+      "to": "planBundle",
+      "type": "consumes",
+      "note": "Replanning loads the current PlanBundle."
+    },
+    {
+      "id": "e20",
+      "from": "replanning",
+      "to": "dailyReview",
+      "type": "consumes",
+      "note": "Replanning may read DailyReview as execution history."
+    },
+    {
+      "id": "e21",
+      "from": "replanning",
+      "to": "taskResult",
+      "type": "consumes",
+      "note": "Replanning may read TaskResult execution facts while preserving committed history."
+    },
+    {
+      "id": "e22",
+      "from": "replanning",
+      "to": "planBundle",
+      "type": "produces",
+      "note": "Replanning produces a new PlanBundle or controlled change set."
+    },
+    {
+      "id": "e23",
+      "from": "replanning",
+      "to": "planChangeSummary",
+      "type": "produces",
+      "note": "Replanning produces PlanChangeSummary receipts for deterministic adjustments."
+    },
+    {
+      "id": "e24",
+      "from": "task",
+      "to": "task",
+      "type": "depends-on",
+      "qualifiers": {
+        "cardinality": {
+          "from": "zero-or-many",
+          "to": "zero-or-many"
+        },
+        "ownership": "reference"
+      },
+      "note": "Task.dependsOnTaskIds explicit dependencies; satisfied only when referenced Task status is done."
+    },
+    {
+      "id": "e25",
+      "from": "focusSession",
+      "to": "task",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "FocusSession belongs to exactly one Goal/Plan/Task."
+    },
+    {
+      "id": "e26",
+      "from": "taskResult",
+      "to": "task",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "TaskResult is execution result for one Task."
+    },
+    {
+      "id": "e27",
+      "from": "taskResult",
+      "to": "focusSession",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "TaskResult includes unique completed FocusSession references."
+    },
+    {
+      "id": "e28",
+      "from": "dailyReview",
+      "to": "taskResult",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "DailyReview may reference or summarize Task results for the date."
+    },
+    {
+      "id": "e29",
+      "from": "dailyReview",
+      "to": "plan",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "planId records the Plan context that produced the reviewed results."
+    },
+    {
+      "id": "e30",
+      "from": "todayTaskSelection",
+      "to": "task",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "Selection references a Task in the current active PlanBundle."
+    },
+    {
+      "id": "e31",
+      "from": "todayTaskSelection",
+      "to": "planBundle",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "Selection is bounded by the current active PlanBundle."
+    },
+    {
+      "id": "e32",
+      "from": "dailyReviewPromptDismissal",
+      "to": "goal",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "Dismissal is Goal-scoped."
+    },
+    {
+      "id": "e33",
+      "from": "dailyReviewPromptDismissal",
+      "to": "plan",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "Dismissal is Plan-scoped."
+    },
+    {
+      "id": "e34",
+      "from": "planChangeSummary",
+      "to": "planBundle",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "PlanChangeSummary is a receipt explaining one deterministic adjustment; it is not a second Plan truth source."
+    },
+    {
+      "id": "e35",
+      "from": "planChangeSummary",
+      "to": "plan",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "PlanChangeSummary references a planId."
+    },
+    {
+      "id": "e36",
+      "from": "planChangeSummary",
+      "to": "task",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "reference"
+      },
+      "note": "PlanChangeSummary references stable Task ids and dates, but never copies private TaskResult/DailyReview notes."
+    },
+    {
+      "id": "e37",
+      "from": "taskCardView",
+      "to": "planBundle",
+      "type": "depends-on",
+      "note": "TaskCardView is derived from a PlanBundle by a pure selector."
+    },
+    {
+      "id": "e38",
+      "from": "taskCardView",
+      "to": "task",
+      "type": "depends-on",
+      "note": "TaskCardView exposes availability and unmetDependencyTaskIds for Tasks."
+    },
+    {
+      "id": "e39",
+      "from": "dailyPlanLegacy",
+      "to": "planBundle",
+      "type": "relates-to",
+      "qualifiers": {
+        "ownership": "shared"
+      },
+      "note": "DailyPlan[] remains only a legacy storage/adapter compatibility surface while migration is incomplete."
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "taskDependencyConstraint",
+      "attachedTo": [
+        "task",
+        "taskCardView"
+      ]
+    },
+    {
+      "elementId": "executionHistoryImmutabilityConstraint",
+      "attachedTo": [
+        "dailyReview",
+        "taskResult",
+        "focusSession",
+        "replanning"
+      ]
+    },
+    {
+      "elementId": "planningCapacityConstraint",
+      "attachedTo": [
+        "goal",
+        "plan",
+        "stage",
+        "task"
+      ]
+    },
+    {
+      "elementId": "planStateUniquenessConstraint",
+      "attachedTo": [
+        "goal",
+        "plan",
+        "todayTaskSelection",
+        "dailyReviewPromptDismissal",
+        "planChangeSummary"
+      ]
+    },
+    {
+      "elementId": "planStructureConstraint",
+      "attachedTo": [
+        "plan",
+        "stage",
+        "task"
+      ]
+    }
+  ],
+  "relationGap": [
+    {
+      "from": "stage",
+      "to": "replanning",
+      "intendedMeaning": "Stage completion may trigger replanning for future stages/tasks.",
+      "reason": "Base relation vocabulary has no trigger/event relation; depends-on or controls would misstate the relationship.",
+      "fixture": "fixture-d-goal-plan-task-state-model"
+    }
+  ],
+  "topics": [
+    {
+      "id": "purpose-and-scope",
+      "title": "Purpose and F40 conclusion",
+      "proposition": "This is the F40 target data model contract for the planning domain; it sets migration direction without deleting legacy DailyPlan[] or changing storage/compatibility/AI/planner behavior.",
+      "sectionRefs": [
+        "§Purpose",
+        "§F40 conclusion",
+        "§Model layers"
+      ]
+    },
+    {
+      "id": "initial-planning-flow",
+      "title": "Initial planning flow",
+      "proposition": "Initial planning assembles InitialPlanContext from Goal and UserProfile and produces a validated PlanBundle without DailyReview.",
+      "sectionRefs": [
+        "§Initial planning flow"
+      ]
+    },
+    {
+      "id": "replanning-flow",
+      "title": "Replanning flow",
+      "proposition": "Replanning loads current PlanBundle and execution feedback into ReplanContext and produces a new PlanBundle or PlanChangeSet while preserving history.",
+      "sectionRefs": [
+        "§Replanning flow"
+      ]
+    },
+    {
+      "id": "goal-model",
+      "title": "Goal model",
+      "proposition": "Goal is the user's original intent and goal-scoped hard constraints with target fields for intent, success criteria, scope, starting point, and constraints.",
+      "sectionRefs": [
+        "§Goal"
+      ]
+    },
+    {
+      "id": "user-profile-model",
+      "title": "UserProfile model",
+      "proposition": "UserProfile is cross-goal reusable user context for scheduling and expression preferences, separate from daily execution energy.",
+      "sectionRefs": [
+        "§UserProfile"
+      ]
+    },
+    {
+      "id": "plan-bundle-and-parts",
+      "title": "PlanBundle, Plan, Stage, Task",
+      "proposition": "PlanBundle is the core persistent planning aggregate containing Plan, Stage[], and Task[]; Plan, Stage, and Task have target fields and lifecycle rules.",
+      "sectionRefs": [
+        "§PlanBundle",
+        "§Plan",
+        "§Stage",
+        "§Task"
+      ]
+    },
+    {
+      "id": "task-card-computed-contract",
+      "title": "Task Card computed contract",
+      "proposition": "A pure selector derives TaskCardView availability, recommendation, and unmet dependencies from a PlanBundle without storage, AI, or mutation.",
+      "sectionRefs": [
+        "§Task Card computed contract"
+      ]
+    },
+    {
+      "id": "execution-history",
+      "title": "FocusSession, TaskResult, DailyReview",
+      "proposition": "FocusSession, TaskResult, and DailyReview are separate execution concepts: a focus process, a task execution result, and day-scoped review history.",
+      "sectionRefs": [
+        "§FocusSession, TaskResult and DailyReview",
+        "§DailyReview"
+      ]
+    },
+    {
+      "id": "today-task-selection",
+      "title": "TodayTaskSelection",
+      "proposition": "TodayTaskSelection records which existing Task the user chose to execute on a concrete date, without rewriting scheduledDate.",
+      "sectionRefs": [
+        "§TodayTaskSelection"
+      ]
+    },
+    {
+      "id": "daily-review-prompt-dismissal",
+      "title": "DailyReviewPromptDismissal",
+      "proposition": "DailyReviewPromptDismissal is UI prompt history for one Goal/Plan/executionDate and is not execution or review truth.",
+      "sectionRefs": [
+        "§DailyReviewPromptDismissal"
+      ]
+    },
+    {
+      "id": "plan-change-summary",
+      "title": "PlanChangeSummary",
+      "proposition": "PlanChangeSummary is a persisted deterministic-adjustment receipt, not a second Plan truth source, with trigger fingerprint and acknowledgement.",
+      "sectionRefs": [
+        "§PlanChangeSummary"
+      ]
+    },
+    {
+      "id": "daily-plan-legacy-boundary",
+      "title": "DailyPlan legacy boundary",
+      "proposition": "DailyPlan[] does not belong to the future core domain model and is only a legacy compatibility surface until a separate breaking migration removes it.",
+      "sectionRefs": [
+        "§DailyPlan legacy boundary"
+      ]
+    },
+    {
+      "id": "computed-views",
+      "title": "Computed views",
+      "proposition": "Computed views are not persistent truth; services/selectors derive page-facing data from PlanBundle, DailyReview, and UserProfile.",
+      "sectionRefs": [
+        "§Computed views"
+      ]
+    },
+    {
+      "id": "migration-direction",
+      "title": "Migration direction",
+      "proposition": "Migration after F40 is split into later features: model fields, AI schemas, replanner schemas, deterministic fallback, view replacement, and removal of DailyPlan[].",
+      "sectionRefs": [
+        "§Migration direction"
+      ]
+    },
+    {
+      "id": "historical-notes",
+      "title": "Historical notes",
+      "proposition": "Historical notes record prior features F16, F39, F41, F56, and F58 and their additive model changes.",
+      "sectionRefs": [
+        "§Historical notes"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 23,
+    "topicCount": 15,
+    "edgeCount": 39,
+    "attachmentCount": 5,
+    "note": "Element count exceeds the preferred budget of 12 because the document defines several distinct target domain objects and cross-cutting constraints; no artificial grouping was applied."
+  }
+}

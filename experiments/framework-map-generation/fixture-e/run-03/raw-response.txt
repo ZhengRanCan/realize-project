@@ -1,0 +1,337 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "f13-f16-after-sales-runbook",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current",
+    "scope": {
+      "text": "把「F13–F16 全部 passing」所需的剩余工作拆成人工 reviewer 可逐步执行的操作：本地前置与构建、CloudBase 部署、沙箱模式运行验证、证据留存、独立审查 Checklist、沙箱→真实环境切换与故障排查。",
+      "sectionRefs": ["§1"]
+    },
+    "nonGoalSummary": {
+      "text": "非目标：不修改 F01 支付域（payOrder / payNotify）代码，F16 退款函数独立使用 refundCommon，仅以 WX_PAY_* 作缺省回退；不把任何 WECHAT_REFUND_* 密钥值写入仓库（仅从 CloudBase 控制台设置）；F12 的重新验收已在 Round 19 完成，不在本手册范围。",
+      "sectionRefs": ["§9"]
+    }
+  },
+  "thesis": "F13–F16 售后链路的 passing 需要按 本地前置 → CloudBase 部署 → 沙箱验证 → 证据留存 → 独立审查 → 真实切换 的顺序逐步执行，并且「未发货仅退款库存释放时机」的决策需由 reviewer 在 F15 passing 前确认。",
+  "elements": [
+    {
+      "id": "after-sales-chain",
+      "label": "F13–F16 售后链路",
+      "type": "concept",
+      "role": "current",
+      "topics": ["t-chain-overview"],
+      "sectionRefs": ["§1"]
+    },
+    {
+      "id": "after-sales-status",
+      "label": "售后状态机（REQUESTED / APPROVED / WAIT_RETURN / RETURN_SHIPPED / WAIT_INSPECTION / REFUND_PENDING / REFUNDED / CANCELLED …）",
+      "type": "state",
+      "role": "intermediate",
+      "topics": ["t-sandbox-verify"],
+      "sectionRefs": ["§4"]
+    },
+    {
+      "id": "local-build-prereq",
+      "label": "本地代码与构建前置检查（node --check / npm build / .gitignore）",
+      "type": "process",
+      "role": "input",
+      "topics": ["t-local-prereq"],
+      "sectionRefs": ["§2"]
+    },
+    {
+      "id": "cloudbase-deploy",
+      "label": "CloudBase 部署（云函数 / 触发器 / 网关 / 环境变量）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["t-cloudbase-deploy"],
+      "sectionRefs": ["§3"]
+    },
+    {
+      "id": "sandbox-verification",
+      "label": "沙箱模式运行验证",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["t-sandbox-verify"],
+      "sectionRefs": ["§4"]
+    },
+    {
+      "id": "independent-review",
+      "label": "独立审查",
+      "type": "process",
+      "role": "authority",
+      "topics": ["t-independent-review"],
+      "sectionRefs": ["§6"]
+    },
+    {
+      "id": "real-switch",
+      "label": "沙箱 → 真实环境切换",
+      "type": "process",
+      "role": "target",
+      "topics": ["t-real-switch"],
+      "sectionRefs": ["§7"]
+    },
+    {
+      "id": "cloud-functions",
+      "label": "售后链路云函数集（submitAfterSales / cancelAfterSales / processAfterSales / retryAfterSalesCompensation / refundOrder / refundNotify / refundQueryCron 等）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t-cloudbase-deploy"],
+      "sectionRefs": ["§3.1"]
+    },
+    {
+      "id": "cloudbase-endpoints",
+      "label": "CloudBase 触发器与 HTTP 网关路由（retryAfterSalesCompensation / refundQueryCron 定时触发器；/refundNotify 路由）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t-cloudbase-deploy"],
+      "sectionRefs": ["§3.2", "§3.3"]
+    },
+    {
+      "id": "refund-env-config",
+      "label": "WECHAT_REFUND_* 环境变量配置（沙箱 / 真实模式）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t-cloudbase-deploy", "t-real-switch"],
+      "sectionRefs": ["§3.4", "§7.1"]
+    },
+    {
+      "id": "sandbox-mock-notify",
+      "label": "沙箱 mock 退款通知（HTTP POST / 直接 cloud.callFunction）",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["t-sandbox-verify"],
+      "sectionRefs": ["§4.5"]
+    },
+    {
+      "id": "evidence-package",
+      "label": "证据留存包（截图 / 日志 / 审计记录）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t-evidence"],
+      "sectionRefs": ["§5"]
+    },
+    {
+      "id": "review-checklist",
+      "label": "独立审查 Checklist（F13 / F14 / F15 / F16 / F12）",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["t-independent-review"],
+      "sectionRefs": ["§6"]
+    },
+    {
+      "id": "feature-dependency-order",
+      "label": "F13 → F14 → F15 → F16 依赖顺序",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["t-chain-overview"],
+      "sectionRefs": ["§1"]
+    },
+    {
+      "id": "stock-release-decision",
+      "label": "未发货仅退款库存释放时机决策（APPROVED 释放 vs REFUND_SUCCESS 释放）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["t-stock-decision"],
+      "sectionRefs": ["§10"]
+    },
+    {
+      "id": "pay-domain-boundary",
+      "label": "F16 退款云函数与 F01 支付域的边界（独立 refundCommon，WX_PAY_* 仅缺省回退）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["t-pay-boundary"],
+      "sectionRefs": ["§9"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-deploy-depends-build",
+      "from": "cloudbase-deploy",
+      "to": "local-build-prereq",
+      "type": "depends-on",
+      "label": "§2 本地代码与构建是部署的前置",
+      "qualifiers": { "cardinality": { "from": "one-or-many", "to": "one" } }
+    },
+    {
+      "id": "e-deploy-produces-functions",
+      "from": "cloudbase-deploy",
+      "to": "cloud-functions",
+      "type": "produces",
+      "label": "按部署顺序部署各售后云函数"
+    },
+    {
+      "id": "e-deploy-produces-endpoints",
+      "from": "cloudbase-deploy",
+      "to": "cloudbase-endpoints",
+      "type": "produces",
+      "label": "配置定时触发器与 /refundNotify 网关路由"
+    },
+    {
+      "id": "e-deploy-produces-env",
+      "from": "cloudbase-deploy",
+      "to": "refund-env-config",
+      "type": "produces",
+      "label": "设置沙箱模式 WECHAT_REFUND_* 环境变量"
+    },
+    {
+      "id": "e-verify-consumes-functions",
+      "from": "sandbox-verification",
+      "to": "cloud-functions",
+      "type": "consumes",
+      "label": "调用云函数跑 §4.2–§4.8 用例",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e-verify-consumes-mock",
+      "from": "sandbox-verification",
+      "to": "sandbox-mock-notify",
+      "type": "consumes",
+      "label": "用沙箱 mock 通知模拟退款回调",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e-verify-produces-evidence",
+      "from": "sandbox-verification",
+      "to": "evidence-package",
+      "type": "produces",
+      "label": "产生截图 / 日志作为 passing 证据"
+    },
+    {
+      "id": "e-review-consumes-evidence",
+      "from": "independent-review",
+      "to": "evidence-package",
+      "type": "consumes",
+      "label": "审查留存证据",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e-review-consumes-checklist",
+      "from": "independent-review",
+      "to": "review-checklist",
+      "type": "consumes",
+      "label": "按 Checklist 逐项勾选",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e-review-validates-functions",
+      "from": "independent-review",
+      "to": "cloud-functions",
+      "type": "validates",
+      "label": "核验售后链路云函数行为与范围边界"
+    },
+    {
+      "id": "e-real-depends-sandbox",
+      "from": "real-switch",
+      "to": "sandbox-verification",
+      "type": "depends-on",
+      "label": "仅在沙箱 passing 之后执行",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" } }
+    },
+    {
+      "id": "e-real-transforms-env",
+      "from": "real-switch",
+      "to": "refund-env-config",
+      "type": "transforms-to",
+      "label": "把环境变量从沙箱模式切换为真实模式"
+    },
+    {
+      "id": "e-build-validates-functions",
+      "from": "local-build-prereq",
+      "to": "cloud-functions",
+      "type": "validates",
+      "label": "node --check 校验各云函数文件"
+    },
+    {
+      "id": "e-mock-depends-route",
+      "from": "sandbox-mock-notify",
+      "to": "cloudbase-endpoints",
+      "type": "depends-on",
+      "label": "方式 A 经 /refundNotify HTTP 网关路由 POST"
+    }
+  ],
+  "attachments": [
+    { "elementId": "after-sales-status", "attachedTo": ["after-sales-chain"] },
+    { "elementId": "feature-dependency-order", "attachedTo": ["after-sales-chain"] },
+    { "elementId": "stock-release-decision", "attachedTo": ["after-sales-status"] },
+    { "elementId": "pay-domain-boundary", "attachedTo": ["cloud-functions"] }
+  ],
+  "topics": [
+    {
+      "id": "t-chain-overview",
+      "title": "链路总览与依赖",
+      "proposition": "F13 → F14 → F15 → F16 构成售后链路，F12 已被这四个 Feature 替代且在 Round 19 完成 unblock 并切 passing。",
+      "sectionRefs": ["§1"]
+    },
+    {
+      "id": "t-local-prereq",
+      "title": "本地前置：代码与构建",
+      "proposition": "部署前需本地通过 node --check、npm 构建，并确认 .gitignore 屏蔽 .env / *.pem / *.key 等敏感文件。",
+      "sectionRefs": ["§2"]
+    },
+    {
+      "id": "t-cloudbase-deploy",
+      "title": "CloudBase 部署",
+      "proposition": "按顺序部署售后链路云函数，并配置定时触发器、/refundNotify HTTP 网关路由与沙箱模式环境变量。",
+      "sectionRefs": ["§3"]
+    },
+    {
+      "id": "t-sandbox-verify",
+      "title": "沙箱模式运行验证",
+      "proposition": "用三条用例（未发货仅退款、已发货退货退款、撤销+越权）配合 mock 通知、查单 cron、失败重试与强制补偿验证沙箱链路。",
+      "sectionRefs": ["§4"]
+    },
+    {
+      "id": "t-evidence",
+      "title": "证据留存规范",
+      "proposition": "每个 Feature passing 前需按 §5.1–§5.5 留存截图与日志，并执行密钥泄漏安全审计。",
+      "sectionRefs": ["§5"]
+    },
+    {
+      "id": "t-independent-review",
+      "title": "独立审查 Checklist",
+      "proposition": "按各 verification.md 与本手册 §6 的 checklist 逐项勾选，并含 F12 重新验收。",
+      "sectionRefs": ["§6"]
+    },
+    {
+      "id": "t-real-switch",
+      "title": "沙箱 → 真实环境切换",
+      "proposition": "仅在沙箱 passing 后，配置真实 WECHAT_REFUND_* 环境变量、移除 mock 入口，并做小金额真实退款验证与切换后回归。",
+      "sectionRefs": ["§7"]
+    },
+    {
+      "id": "t-troubleshoot",
+      "title": "故障排查速查",
+      "proposition": "针对常见现象（mode 字段缺失、验签失败、查单仍 processing、重试失败、状态转移被拒、售后 Tab 不显示）给出可能原因与排查方式。",
+      "sectionRefs": ["§8"]
+    },
+    {
+      "id": "t-pay-boundary",
+      "title": "与 F01 支付域的边界",
+      "proposition": "F16 退款云函数独立使用 refundCommon，不复用 payOrder / payNotify 代码，仅共享 WX_PAY_* 作为缺省回退且不修改支付核心文件。",
+      "sectionRefs": ["§9"]
+    },
+    {
+      "id": "t-stock-decision",
+      "title": "未发货仅退款库存释放时机决策",
+      "proposition": "库存释放存在 APPROVED 释放（F06 老路径）与 REFUND_SUCCESS 释放（F15 当前实现）两种方案，默认推荐保守路径，需 reviewer 在 F15 passing 前决策并签字。",
+      "sectionRefs": ["§10"]
+    },
+    {
+      "id": "t-revision",
+      "title": "修订记录",
+      "proposition": "记录手册 v0.1–v0.3 的修订内容，含新增 §10 决策项与 REVIEWER-GUIDE 指引。",
+      "sectionRefs": ["§11"]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 16,
+    "topicCount": 11,
+    "edgeCount": 14,
+    "attachmentCount": 4,
+    "note": "element 数 16，略超 preferred budget 12；未为压缩数量删减机制（本地前置、部署、部署配置工件、状态机与三条约束各自独立）。溯源为 section 粒度。"
+  }
+}

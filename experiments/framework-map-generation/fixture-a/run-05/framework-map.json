@@ -1,0 +1,447 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "pre-class-fusion-context-consumption",
+    "title": "Pre-class Fusion Context Consumption 语义模型",
+    "sourcePath": "测试文档/18-context-consumption-semantic-model.md",
+    "role": "target",
+    "scope": {
+      "text": "本文定义 Pre-class Fusion Context Consumption 的产品语义层级——Context Receipt / Context Availability / Context Consumption 三级递进，以及它与 Output Alignment（Output-side chain）之间的边界；文中给出的 OpenMAIC 代码映射只是现有边界说明，不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。",
+      "sectionRefs": [
+        "§Pre-class Fusion Context Consumption 语义模型",
+        "§一、核心决定"
+      ]
+    },
+    "nonGoalSummary": {
+      "text": "本文确定三级递进，但不决定三级状态的 JSON 字段、evidence 结构、生成器如何消费上下文（Prompt / 结构化 planner / 模板 / 混合）、是否记录生成设计决策、未消费或不可用时是否阻止生成或回退草稿；也不承诺 DeepTutor 语义一定正确、模型内部推理被验证、Prompt 含上下文即发生 Consumption、输出一定发生由 DeepTutor 引起的变化，或 Output Alignment 可由 Consumption 单独证明。",
+      "sectionRefs": [
+        "§十五、产品边界与非主张"
+      ]
+    }
+  },
+  "thesis": "Context Consumption 只保留 Context Receipt → Context Availability → Context Consumption 三级递进，明确不把 Context Influence 作为第四级；Context-side chain 与 Output-side chain 相互关联但不互相吞并，二者共同支持 context-grounded generation narrative，而不承诺严格反事实因果。",
+  "elements": [
+    {
+      "id": "context_receipt",
+      "label": "Context Receipt（上下文到达系统）",
+      "type": "state",
+      "role": "semantic-level",
+      "topics": [
+        "three_levels"
+      ],
+      "sectionRefs": [
+        "§三、Context Receipt：上下文到达系统"
+      ]
+    },
+    {
+      "id": "context_availability",
+      "label": "Context Availability（合法、冻结、版本一致的上下文可供本次生成使用）",
+      "type": "state",
+      "role": "semantic-level",
+      "topics": [
+        "three_levels"
+      ],
+      "sectionRefs": [
+        "§四、Context Availability：合法上下文可供本次生成使用"
+      ]
+    },
+    {
+      "id": "context_consumption",
+      "label": "Context Consumption（冻结教学语义实际参与生成）",
+      "type": "state",
+      "role": "semantic-level",
+      "topics": [
+        "three_levels",
+        "consumption_subject"
+      ],
+      "sectionRefs": [
+        "§五、Context Consumption：教学语义实际参与生成",
+        "§Receipt、Availability 与 Consumption 的递进关系"
+      ]
+    },
+    {
+      "id": "context_freeze_resolve",
+      "label": "Frozen Context 的冻结 / 恢复（freezeFormalFusionForOutline() / resolveFormalFusion() 及 session store）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "code_mapping"
+      ],
+      "sectionRefs": [
+        "§九、与 OpenMAIC 现有生成链的职责映射",
+        "§十、当前代码边界下的三个生产职责"
+      ]
+    },
+    {
+      "id": "frozen_context",
+      "label": "Frozen Context（合法、冻结、版本一致的课前教学语义）",
+      "type": "artifact",
+      "role": "input",
+      "topics": [
+        "three_levels",
+        "code_mapping"
+      ],
+      "sectionRefs": [
+        "§四、Context Availability：合法上下文可供本次生成使用",
+        "§九、与 OpenMAIC 现有生成链的职责映射"
+      ]
+    },
+    {
+      "id": "generation_projection",
+      "label": "Generation-facing projection（服务端派生的 generation projection / Frozen lesson guidance）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": [
+        "code_mapping",
+        "consumption_subject"
+      ],
+      "sectionRefs": [
+        "§九、与 OpenMAIC 现有生成链的职责映射",
+        "§十、当前代码边界下的三个生产职责"
+      ]
+    },
+    {
+      "id": "outline_generation",
+      "label": "Outline generation（scene-outlines-stream 入口与 outline 生成编排）",
+      "type": "process",
+      "role": "consumer",
+      "topics": [
+        "code_mapping",
+        "primary_point"
+      ],
+      "sectionRefs": [
+        "§九、与 OpenMAIC 现有生成链的职责映射",
+        "§十三、为什么 Primary Consumption Point 仍然是 outline generation"
+      ]
+    },
+    {
+      "id": "outline_attempt",
+      "label": "Outline Generation Attempt（请求中的一次实际 outline 生成尝试）",
+      "type": "process",
+      "role": "instance",
+      "topics": [
+        "consumption_subject"
+      ],
+      "sectionRefs": [
+        "§十一、Consumption Subject 与当前 OpenMAIC Attempt",
+        "§十二、当前代码中“只能算 Receipt / Availability”的典型情况"
+      ]
+    },
+    {
+      "id": "outline_revision",
+      "label": "Outline Revision（生成成功并被接受后形成的 context-shaped 课纲版本）",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "consumption_subject",
+        "alignment_boundary"
+      ],
+      "sectionRefs": [
+        "§十一、Consumption Subject 与当前 OpenMAIC Attempt",
+        "§十四、与 Output Alignment 的代码职责分离"
+      ]
+    },
+    {
+      "id": "scene_generation",
+      "label": "Scene generation（scene-content route / generateSceneContent() 与 scene 组装）",
+      "type": "process",
+      "role": "consumer",
+      "topics": [
+        "primary_point"
+      ],
+      "sectionRefs": [
+        "§九、与 OpenMAIC 现有生成链的职责映射",
+        "§十三、为什么 Primary Consumption Point 仍然是 outline generation"
+      ]
+    },
+    {
+      "id": "output_alignment",
+      "label": "Output Alignment（判断生成的 outline / scene 体现了什么教学要求）",
+      "type": "concept",
+      "role": "boundary",
+      "topics": [
+        "chains",
+        "alignment_boundary"
+      ],
+      "sectionRefs": [
+        "§二、Context-side chain 与 Output-side chain",
+        "§八、与 Output Alignment 的边界"
+      ]
+    },
+    {
+      "id": "context_grounded_narrative",
+      "label": "Context-grounded generation narrative",
+      "type": "concept",
+      "role": "target",
+      "topics": [
+        "chains"
+      ],
+      "sectionRefs": [
+        "§二、Context-side chain 与 Output-side chain",
+        "§七、两条链共同支持的产品叙事"
+      ]
+    },
+    {
+      "id": "context_influence",
+      "label": "Context Influence（被排除的第四级：生成结果出现可归因于 DeepTutor 上下文的变化或取舍）",
+      "type": "constraint",
+      "role": "excluded",
+      "topics": [
+        "influence_excluded"
+      ],
+      "sectionRefs": [
+        "§六、为什么不把 Context Influence 作为第四级"
+      ]
+    },
+    {
+      "id": "consumption_no_blind_obedience",
+      "label": "Consumption 不要求机械执行 DeepTutor 的每一项建议（消费的是语义要求与教学取向，不是 sceneId / 组件 / Runtime 指令）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "three_levels"
+      ],
+      "sectionRefs": [
+        "§Consumption 不要求盲目服从"
+      ]
+    },
+    {
+      "id": "consumption_no_visible_diff_required",
+      "label": "Consumption 不要求最终输出必须明显不同（可被考虑而未被采用仍可成立）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "three_levels"
+      ],
+      "sectionRefs": [
+        "§Consumption 不要求最终输出必须明显不同"
+      ]
+    },
+    {
+      "id": "consumption_alignment_separation",
+      "label": "Consumption ≠ Output Alignment，二者不可互相替代，只在 outline revision 与 context lineage 处衔接",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "alignment_boundary"
+      ],
+      "sectionRefs": [
+        "§八、与 Output Alignment 的边界",
+        "§十四、与 Output Alignment 的代码职责分离"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-freeze-produces-frozen",
+      "from": "context_freeze_resolve",
+      "to": "frozen_context",
+      "type": "produces",
+      "label": "冻结正式 Fusion context 或恢复已冻结的正式 Fusion context"
+    },
+    {
+      "id": "e-frozen-to-projection",
+      "from": "frozen_context",
+      "to": "generation_projection",
+      "type": "transforms-to",
+      "label": "服务端从 Frozen Context 派生 generation-facing projection（projectFormalGenerationContext() → appendFormalTeachingPrompt()）"
+    },
+    {
+      "id": "e-outline-consumes-frozen",
+      "from": "outline_generation",
+      "to": "frozen_context",
+      "type": "consumes",
+      "label": "outline 入口解析请求并冻结 / 恢复同一份正式 Fusion context"
+    },
+    {
+      "id": "e-outline-contains-attempt",
+      "from": "outline_generation",
+      "to": "outline_attempt",
+      "type": "contains",
+      "label": "一次 outline 请求内部包含一次或多次实际 outline LLM 尝试",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one-or-many"
+        },
+        "ownership": "owned"
+      }
+    },
+    {
+      "id": "e-attempt-consumes-projection",
+      "from": "outline_attempt",
+      "to": "generation_projection",
+      "type": "consumes",
+      "label": "generation-facing teaching semantics 成为该次 outline 生成的真实设计输入"
+    },
+    {
+      "id": "e-attempt-produces-revision",
+      "from": "outline_attempt",
+      "to": "outline_revision",
+      "type": "produces",
+      "label": "生成成功并被接受后形成新的 Outline Revision",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "zero-or-one"
+        }
+      }
+    },
+    {
+      "id": "e-scene-consumes-revision",
+      "from": "scene_generation",
+      "to": "outline_revision",
+      "type": "consumes",
+      "label": "scene generation 主要消费 context-shaped outline，只继承必要 lineage 与由 outline 派生的局部约束"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "context_receipt",
+      "attachedTo": [
+        "context_freeze_resolve"
+      ]
+    },
+    {
+      "elementId": "context_availability",
+      "attachedTo": [
+        "context_freeze_resolve",
+        "frozen_context"
+      ]
+    },
+    {
+      "elementId": "context_consumption",
+      "attachedTo": [
+        "outline_attempt",
+        "generation_projection"
+      ]
+    },
+    {
+      "elementId": "output_alignment",
+      "attachedTo": [
+        "outline_revision",
+        "scene_generation"
+      ]
+    },
+    {
+      "elementId": "context_grounded_narrative",
+      "attachedTo": [
+        "context_consumption",
+        "output_alignment"
+      ]
+    },
+    {
+      "elementId": "context_influence",
+      "attachedTo": [
+        "context_consumption"
+      ]
+    },
+    {
+      "elementId": "consumption_no_blind_obedience",
+      "attachedTo": [
+        "context_consumption"
+      ]
+    },
+    {
+      "elementId": "consumption_no_visible_diff_required",
+      "attachedTo": [
+        "context_consumption"
+      ]
+    },
+    {
+      "elementId": "consumption_alignment_separation",
+      "attachedTo": [
+        "context_consumption",
+        "output_alignment"
+      ]
+    }
+  ],
+  "relationGap": [
+    {
+      "from": "context_receipt",
+      "to": "context_availability",
+      "intendedMeaning": "Availability 以 Receipt 为前提但不反向蕴含：上下文可以有 Receipt 而没有 Availability（digest 不一致、越权引用、冻结失败、旧 revision、切换 lesson session、浏览器伪造上下文等），两层不可互相替代。",
+      "reason": "关系词表只覆盖 process / artifact 之间的基础关系，没有表达「递进层级 / 单向蕴含」的词；且按契约 state 元素不能作为 edge 端点，故如实登记为关系缺口。"
+    },
+    {
+      "from": "context_availability",
+      "to": "context_consumption",
+      "intendedMeaning": "Consumption 以 Availability 为前提但不反向蕴含：合法冻结上下文已可用并不说明生成器真正使用了其中的教学语义。",
+      "reason": "同上：无法用现有 9 个关系词在不失真的前提下表达两个语义层级之间的单向蕴含与递进关系。"
+    }
+  ],
+  "topics": [
+    {
+      "id": "three_levels",
+      "title": "三级递进：Receipt → Availability → Consumption",
+      "proposition": "Context Consumption 只有三个递进层级：Receipt 表示上下文到达系统；Availability 表示合法、冻结、版本一致的上下文已可在本次生成中使用；Consumption 表示本次生成的 outine 设计确实把其中的教学语义作为课程设计输入。三者不能互相替代，且 Consumption 既不要求盲目服从，也不要求最终输出明显不同。",
+      "sectionRefs": [
+        "§一、核心决定",
+        "§三、Context Receipt：上下文到达系统",
+        "§四、Context Availability：合法上下文可供本次生成使用",
+        "§五、Context Consumption：教学语义实际参与生成"
+      ]
+    },
+    {
+      "id": "chains",
+      "title": "Context-side chain 与 Output-side chain 共同支持的产品叙事",
+      "proposition": "Context-side chain（Receipt → Availability → Consumption）与 Output-side chain（Generated Lesson → Output Alignment）相互关联但不互相吞并，二者共同支持 context-grounded generation narrative，而不承诺“某个具体输出变化严格由 DeepTutor 导致”。",
+      "sectionRefs": [
+        "§二、Context-side chain 与 Output-side chain",
+        "§七、两条链共同支持的产品叙事"
+      ]
+    },
+    {
+      "id": "influence_excluded",
+      "title": "Context Influence 不作为第四级",
+      "proposition": "把 Context Influence 定义为“生成结果出现可归因于 DeepTutor 上下文的变化或取舍”需要反事实比较与控制变量，已进入 Output Alignment 甚至更强，因此它不作为 Context Consumption 的第四级，也不作为本协议的必要产品状态。",
+      "sectionRefs": [
+        "§六、为什么不把 Context Influence 作为第四级"
+      ]
+    },
+    {
+      "id": "alignment_boundary",
+      "title": "Consumption 与 Output Alignment 的边界",
+      "proposition": "Consumption 关注冻结教学语义是否到达并实际参与生成，Output Alignment 关注最终 outline / scene 是否体现相关教学要求；两者在 outline revision 与 context lineage 处衔接，但不能用一个替代另一个。",
+      "sectionRefs": [
+        "§八、与 Output Alignment 的边界",
+        "§十四、与 Output Alignment 的代码职责分离"
+      ]
+    },
+    {
+      "id": "code_mapping",
+      "title": "产品语义到当前 OpenMAIC 生成链的职责映射",
+      "proposition": "三个产品层级分别对应“接收并记录 context lineage”“在 outline attempt 中恢复合法冻结 context”“把冻结语义投影到 outline generation 作为设计输入”，主要生产责任位于 outline 生成链路，而不是 scene runtime、浏览器状态或课中 Runtime。",
+      "sectionRefs": [
+        "§九、与 OpenMAIC 现有生成链的职责映射",
+        "§十、当前代码边界下的三个生产职责"
+      ]
+    },
+    {
+      "id": "consumption_subject",
+      "title": "Consumption Subject 与 Request / Attempt / Revision 粒度",
+      "proposition": "Consumption 的 Subject 是 Frozen Context × Outline Generation Attempt；需区分 Outline Generation Request、Outline Generation Attempt 与 Outline Revision，并能解释“只有函数调用、Prompt 字符串或生成结果存在”为何只能算 Receipt / Availability。",
+      "sectionRefs": [
+        "§十一、Consumption Subject 与当前 OpenMAIC Attempt",
+        "§十二、当前代码中“只能算 Receipt / Availability”的典型情况"
+      ]
+    },
+    {
+      "id": "primary_point",
+      "title": "Primary Consumption Point 仍然是 outline generation",
+      "proposition": "scene pipeline 的职责是实现已产生的 outline 而非重新决定课程目标、范围与教学顺序，因此 outline generation 是主要消费点，scene generation 只继承 context-shaped outline 与必要 lineage 或局部约束，避免多份 revision、重复 Prompt 与难以归因的 realized alignment。",
+      "sectionRefs": [
+        "§十三、为什么 Primary Consumption Point 仍然是 outline generation"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 16,
+    "topicCount": 7,
+    "edgeCount": 7,
+    "attachmentCount": 9,
+    "note": "三段式递进（Receipt → Availability → Consumption）为 state 元素，按契约不能作为 edge 端点，其单向蕴含关系登记在 relationGap；产物侧只连 process / artifact。"
+  }
+}

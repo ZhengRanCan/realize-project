@@ -1,0 +1,35 @@
+===== check-map: experiments/framework-map-generation/fixture-b/run-02/framework-map.json =====
+document      Canonical Hash / Digest 与完整性规范
+granularity   section (provisional)   ⚠️ provisional — 不得与 sourceUnit 粒度混算
+stats         elements 14 · edges 18 · attachments 2 · topics 10 · relationGap 0 · gapDensity 0
+coverage      13/13 有路径（本粒度内）
+
+HARD ERROR (0)
+  （无）
+
+WARNING (1)
+  ! W1 element 总数 14 > preferred budget 12（认知容量 heuristic，非 semantic validity）；内容都有 L1/L2 入口 → 只需检查 Navigation invariant
+
+INFORMATIONAL (13)
+  i I1 component = 0（正常形态差异，不是缺陷）
+  i I2 state = 0（正常形态差异，不是缺陷）
+  i I4 非单链拓扑：收敛节点 semantic-normalization, canonical-json-bytes, semantic-request-digest, fact-set-digest, canonical-payload-hash（按 consumes 归一化后的多入边）—— 形态差异，不是异常
+  i I5 doc-position 没有 L0 element（Topic 与 element 已解耦，合法）
+  i I5 versioning-and-compat 没有 L0 element（Topic 与 element 已解耦，合法）
+  i I5 cross-language-impl 没有 L0 element（Topic 与 element 已解耦，合法）
+  i I5 pending-items 没有 L0 element（Topic 与 element 已解耦，合法）
+  i I6 versioning-and-compat 只挂了一个 block / section（单点 Topic，形态差异）
+  i I6 cross-language-impl 只挂了一个 block / section（单点 Topic，形态差异）
+  i I6 golden-fixtures-vectors 只挂了一个 block / section（单点 Topic，形态差异）
+  i I6 error-semantics 只挂了一个 block / section（单点 Topic，形态差异）
+  i I6 invariants-and-gates 只挂了一个 block / section（单点 Topic，形态差异）
+  i I6 pending-items 只挂了一个 block / section（单点 Topic，形态差异）
+
+SKIPPED (0)
+  （无 —— 本次全部检查都已执行）
+
+════════════════════════════════
+结果: HARD 0 · WARN 1 · INFO 13
+状态: PASS
+注: element budget / 单点 Topic / 某类元素为 0 / 无主轴 / DAG 是 Warning 或 Informational，不是语义缺陷。relationGap 少而散时逐条列 W5，多而密时聚合成一条 W8 + detail 段。
+════════════════════════════════

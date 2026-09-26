@@ -1,0 +1,28 @@
+{
+  "fixture": "d",
+  "fixtureLabel": "D · ER-heavy / multi-entity network",
+  "runDir": "experiments/framework-map-generation/fixture-d/run-01",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens": 65536,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "docPath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+  "docSha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236",
+  "documentSha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236",
+  "promptPath": "ai/framework-map-generation.prompt.md",
+  "promptFingerprint": "295e9c9923b330f3",
+  "promptSha256": "295e9c9923b330f3a16bc80c8151da8fd1a31aa59fdd0a022e96918c263be2dc",
+  "userMessageSha256": "571b57c2aaea2e26993e71db0aa9dbfee834689132e7660b2a73a4f84266268d",
+  "systemPromptChars": 5,
+  "userMessageChars": 46430,
+  "startedAt": "2026-09-26T14:00:27.322Z",
+  "finishedAt": "2026-09-26T14:02:10.790Z",
+  "status": "success",
+  "error": null
+}

@@ -1,0 +1,293 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "doc-f13-f16-runbook",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current"
+  },
+  "elements": [
+    {
+      "id": "f13_apply_cancel",
+      "label": "F13 用户售后申请/撤销链路",
+      "type": "process",
+      "role": "current",
+      "topics": ["t1", "t4", "t6"],
+      "sectionRefs": ["§1", "§4.2", "§4.4", "§6.1"]
+    },
+    {
+      "id": "f14_merchant_approval",
+      "label": "F14 商家审批链路",
+      "type": "process",
+      "role": "current",
+      "topics": ["t1", "t4", "t6"],
+      "sectionRefs": ["§1", "§4.3", "§6.2"]
+    },
+    {
+      "id": "f15_compensation_retry",
+      "label": "F15 补偿与失败重试链路",
+      "type": "process",
+      "role": "current",
+      "topics": ["t1", "t4", "t6"],
+      "sectionRefs": ["§1", "§4.7", "§4.8", "§6.3"]
+    },
+    {
+      "id": "f16_refund_api",
+      "label": "F16 微信退款 API 与回调链路",
+      "type": "process",
+      "role": "current",
+      "topics": ["t1", "t3", "t4", "t6"],
+      "sectionRefs": ["§1", "§3.3", "§4.5", "§4.6", "§6.4"]
+    },
+    {
+      "id": "cloudbase_build_deploy",
+      "label": "本地构建与 CloudBase 部署",
+      "type": "process",
+      "role": "current",
+      "topics": ["t2", "t3"],
+      "sectionRefs": ["§2", "§3"]
+    },
+    {
+      "id": "sandbox_verification",
+      "label": "沙箱模式运行验证",
+      "type": "process",
+      "role": "current",
+      "topics": ["t4"],
+      "sectionRefs": ["§4"]
+    },
+    {
+      "id": "real_env_switch",
+      "label": "沙箱→真实环境切换",
+      "type": "process",
+      "role": "target",
+      "topics": ["t7"],
+      "sectionRefs": ["§7"]
+    },
+    {
+      "id": "evidence_retention",
+      "label": "证据留存规范",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t5"],
+      "sectionRefs": ["§5"]
+    },
+    {
+      "id": "review_checklist",
+      "label": "独立审查 Checklist",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["t6"],
+      "sectionRefs": ["§6"]
+    },
+    {
+      "id": "troubleshooting",
+      "label": "故障排查速查",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t8"],
+      "sectionRefs": ["§8"]
+    },
+    {
+      "id": "payment_boundary",
+      "label": "与 F01 支付域的边界约束",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["t9"],
+      "sectionRefs": ["§9"]
+    },
+    {
+      "id": "stock_release_decision",
+      "label": "未发货仅退款库存释放时机决策",
+      "type": "constraint",
+      "role": "authority",
+      "topics": ["t10"],
+      "sectionRefs": [
+        "§10",
+        "§现状对照表",
+        "§两种实现的风险",
+        "§Reviewer 决策项（必看）",
+        "§默认推荐",
+        "§已知业务侧 UX 副作用（无论选 A 还是 B 都存在）",
+        "§决策记录（reviewer 在 F15 passing 前填写）"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_f13_dep_f14",
+      "from": "f13_apply_cancel",
+      "to": "f14_merchant_approval",
+      "type": "depends-on",
+      "label": "F13 → F14 依赖"
+    },
+    {
+      "id": "e_f14_dep_f15",
+      "from": "f14_merchant_approval",
+      "to": "f15_compensation_retry",
+      "type": "depends-on",
+      "label": "F14 → F15 依赖"
+    },
+    {
+      "id": "e_f15_dep_f16",
+      "from": "f15_compensation_retry",
+      "to": "f16_refund_api",
+      "type": "depends-on",
+      "label": "F15 → F16 依赖"
+    },
+    {
+      "id": "e_sandbox_dep_deploy",
+      "from": "sandbox_verification",
+      "to": "cloudbase_build_deploy",
+      "type": "depends-on",
+      "label": "沙箱验证依赖构建与部署"
+    },
+    {
+      "id": "e_real_dep_sandbox",
+      "from": "real_env_switch",
+      "to": "sandbox_verification",
+      "type": "depends-on",
+      "label": "真实环境切换依赖沙箱 passing"
+    },
+    {
+      "id": "e_sandbox_validates_f13",
+      "from": "sandbox_verification",
+      "to": "f13_apply_cancel",
+      "type": "validates",
+      "label": "沙箱用例验证 F13"
+    },
+    {
+      "id": "e_sandbox_validates_f14",
+      "from": "sandbox_verification",
+      "to": "f14_merchant_approval",
+      "type": "validates",
+      "label": "沙箱用例验证 F14"
+    },
+    {
+      "id": "e_sandbox_validates_f15",
+      "from": "sandbox_verification",
+      "to": "f15_compensation_retry",
+      "type": "validates",
+      "label": "沙箱用例验证 F15"
+    },
+    {
+      "id": "e_sandbox_validates_f16",
+      "from": "sandbox_verification",
+      "to": "f16_refund_api",
+      "type": "validates",
+      "label": "沙箱用例验证 F16"
+    },
+    {
+      "id": "e_sandbox_produces_evidence",
+      "from": "sandbox_verification",
+      "to": "evidence_retention",
+      "type": "produces",
+      "label": "沙箱验证产生证据留存"
+    },
+    {
+      "id": "e_review_consumes_evidence",
+      "from": "review_checklist",
+      "to": "evidence_retention",
+      "type": "consumes",
+      "label": "独立审查核对证据"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "troubleshooting",
+      "attachedTo": ["cloudbase_build_deploy", "sandbox_verification"]
+    },
+    {
+      "elementId": "payment_boundary",
+      "attachedTo": ["f16_refund_api"]
+    },
+    {
+      "elementId": "stock_release_decision",
+      "attachedTo": ["f15_compensation_retry", "f14_merchant_approval"]
+    }
+  ],
+  "relationGap": [
+    {
+      "from": "f16_refund_api",
+      "to": "f15_compensation_retry",
+      "intendedMeaning": "F16 退款成功后的回调触发 F15 的资产补偿",
+      "reason": "原文 §1 依赖图声称 F15 → F16，但 §4.2 步骤 4-5 与 §6.4 描述退款成功回调 refundNotify 后调用 processAfterSales 触发 F15 补偿，方向相反；受控关系词无法同时忠实表达两种并存的描述。"
+    }
+  ],
+  "topics": [
+    {
+      "id": "t1",
+      "title": "总览与依赖图",
+      "proposition": "F13→F14→F15→F16 的售后链路依赖及函数映射",
+      "sectionRefs": ["§1"]
+    },
+    {
+      "id": "t2",
+      "title": "本地代码与构建",
+      "proposition": "本地通过 node --check 与 npm 构建作为部署前置",
+      "sectionRefs": ["§2"]
+    },
+    {
+      "id": "t3",
+      "title": "CloudBase 部署",
+      "proposition": "云函数部署顺序、触发器、HTTP 网关与环境变量配置",
+      "sectionRefs": ["§3"]
+    },
+    {
+      "id": "t4",
+      "title": "沙箱模式运行验证",
+      "proposition": "通过数据准备和用例 1-3、mock 通知、cron、失败重试与强制补偿验证 F13-F16",
+      "sectionRefs": ["§4"]
+    },
+    {
+      "id": "t5",
+      "title": "证据留存规范",
+      "proposition": "每个 Feature passing 前需留存截图与日志证据",
+      "sectionRefs": ["§5"]
+    },
+    {
+      "id": "t6",
+      "title": "独立审查 Checklist",
+      "proposition": "按 F13/F14/F15/F16 verification 及全局复核逐项勾选",
+      "sectionRefs": ["§6"]
+    },
+    {
+      "id": "t7",
+      "title": "沙箱→真实环境切换",
+      "proposition": "仅在沙箱 passing 后配置真实环境变量并执行切换步骤",
+      "sectionRefs": ["§7"]
+    },
+    {
+      "id": "t8",
+      "title": "故障排查速查",
+      "proposition": "常见故障现象、原因与排查方式",
+      "sectionRefs": ["§8"]
+    },
+    {
+      "id": "t9",
+      "title": "与 F01 支付域的边界",
+      "proposition": "F16 独立使用 refundCommon/config，不污染支付域",
+      "sectionRefs": ["§9"]
+    },
+    {
+      "id": "t10",
+      "title": "未发货仅退款库存释放时机决策",
+      "proposition": "在保守路径（REFUND_SUCCESS 释放）与激进路径（APPROVE 释放）之间决策",
+      "sectionRefs": ["§10"]
+    },
+    {
+      "id": "t11",
+      "title": "修订记录",
+      "proposition": "文档版本与修订内容",
+      "sectionRefs": ["§11"]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 12,
+    "topicCount": 11,
+    "edgeCount": 11,
+    "attachmentCount": 3,
+    "note": "手册型 L0 框架图：以 F13–F16 链路、部署/验证/切换流程为主轴，证据、审查、故障排查、支付边界与库存释放决策作为侧挂。"
+  }
+}

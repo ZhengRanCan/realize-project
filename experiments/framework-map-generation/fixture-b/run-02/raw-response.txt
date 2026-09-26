@@ -1,0 +1,356 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "canonical-hash-digest-spec",
+    "title": "Canonical Hash / Digest 与完整性规范",
+    "sourcePath": "测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md",
+    "role": "target",
+    "scope": {
+      "text": "跨 OpenMAIC（TypeScript）与 DeepTutor（Python）的 canonical digest/hash 规范（fusion-c14n-v1），定义 semanticRequestDigest / factSetDigest / canonicalPayloadHash 三个值的规范化字节与摘要算法，是课前/课中/课后协议共同的跨阶段 SSOT。",
+      "sectionRefs": ["§1"]
+    },
+    "nonGoalSummary": {
+      "text": "本文不表示两个 Fork 已经实现该算法，也不替代未来 schema 实现 Feature；Route、Provider、Session 双写、正式读取切换与真实 Agent 决策属于 F41–F45；Hash 不是加密也不是授权，不新增白名单之外的保护范围。",
+      "sectionRefs": ["§1", "§13"]
+    }
+  },
+  "thesis": "OpenMAIC 与 DeepTutor 只有对同一份白名单投影施加同一套语义规范化规则、产生逐字节相同的 canonical JSON，三个 digest/hash 才能跨语言、跨阶段地充当完整性 SSOT。",
+  "elements": [
+    {
+      "id": "strict-parse",
+      "label": "严格解析（版本化 schema 先于规范化）",
+      "type": "process",
+      "role": "boundary",
+      "topics": ["normalization-rules", "canonical-pipeline"],
+      "sectionRefs": ["§4.1", "§3"]
+    },
+    {
+      "id": "domain-object",
+      "label": "已通过版本化 schema 严格解析的领域对象",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["canonical-pipeline"],
+      "sectionRefs": ["§3"]
+    },
+    {
+      "id": "digest-projection",
+      "label": "Digest Profile 字段白名单投影",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["digest-profiles", "canonical-pipeline"],
+      "sectionRefs": ["§5.2", "§6.2", "§7.2", "§9.1"]
+    },
+    {
+      "id": "semantic-normalization",
+      "label": "Fusion 语义规范化（Unicode / 对象字段 / 数组 / 时间 / 数字 / 缺失与 null）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["normalization-rules", "canonical-pipeline"],
+      "sectionRefs": ["§4.2", "§4.3", "§4.4", "§4.5", "§4.6", "§4.7"]
+    },
+    {
+      "id": "canonical-digest-envelope",
+      "label": "CanonicalDigestEnvelope（canonicalization / purpose / valueSchemaVersion / value）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["canonical-pipeline"],
+      "sectionRefs": ["§3.1"]
+    },
+    {
+      "id": "jcs-canonicalization",
+      "label": "RFC 8785 JSON Canonicalization Scheme 序列化",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["normalization-rules", "canonical-pipeline"],
+      "sectionRefs": ["§4.8", "§3"]
+    },
+    {
+      "id": "canonical-json-bytes",
+      "label": "Canonical JSON UTF-8 bytes（无 BOM、无结尾换行）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["canonical-pipeline"],
+      "sectionRefs": ["§4.8"]
+    },
+    {
+      "id": "sha256-digest",
+      "label": "SHA-256 与 wire digest 生成（sha256:<64 位小写 hex>）",
+      "type": "process",
+      "role": "producer",
+      "topics": ["canonical-pipeline"],
+      "sectionRefs": ["§3", "§4.8"]
+    },
+    {
+      "id": "semantic-request-digest",
+      "label": "semanticRequestDigest",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["digest-profiles"],
+      "sectionRefs": ["§5.1", "§5.2", "§5.3"]
+    },
+    {
+      "id": "fact-set-digest",
+      "label": "factSetDigest",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["digest-profiles"],
+      "sectionRefs": ["§6.1", "§6.2", "§6.3"]
+    },
+    {
+      "id": "canonical-payload-hash",
+      "label": "canonicalPayloadHash",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["digest-profiles"],
+      "sectionRefs": ["§7.1", "§7.2", "§7.3"]
+    },
+    {
+      "id": "golden-fixtures",
+      "label": "Golden Fixtures（canonical-digest-v1.json 权威测试向量）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["golden-fixtures-vectors"],
+      "sectionRefs": ["§10"]
+    },
+    {
+      "id": "fail-closed",
+      "label": "失败关闭：任何一步不合规即拒绝计算，不回退到 JSON.stringify/json.dumps 或尽力而为拼接",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["error-semantics", "invariants-and-gates"],
+      "sectionRefs": ["§3", "§8", "§11", "§12"]
+    },
+    {
+      "id": "digest-invariants",
+      "label": "digest/hash 不变量：先投影后 hash、字段白名单、跨语言同字节、purpose 不可互换、hash 不是授权也不是加密",
+      "type": "constraint",
+      "role": "authority",
+      "topics": ["invariants-and-gates"],
+      "sectionRefs": ["§12"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-parse-domain-object",
+      "from": "strict-parse",
+      "to": "domain-object",
+      "type": "produces",
+      "label": "拒绝未知字段、类型错误、超限输入与重复 key 后产出已解析的领域对象"
+    },
+    {
+      "id": "e-projection-consumes-domain-object",
+      "from": "digest-projection",
+      "to": "domain-object",
+      "type": "consumes",
+      "label": "从规范化后的领域对象构造字段白名单对象"
+    },
+    {
+      "id": "e-projection-envelope",
+      "from": "digest-projection",
+      "to": "canonical-digest-envelope",
+      "type": "produces",
+      "label": "白名单投影构成 Envelope.value，并与 canonicalization / purpose / valueSchemaVersion 一起封装",
+      "qualifiers": { "ownership": "owned" }
+    },
+    {
+      "id": "e-normalization-envelope",
+      "from": "semantic-normalization",
+      "to": "canonical-digest-envelope",
+      "type": "consumes",
+      "label": "对 Envelope.value 执行 NFC、对象字段、数组语义、时间、数字、缺失与 null 的规范化"
+    },
+    {
+      "id": "e-jcs-envelope",
+      "from": "jcs-canonicalization",
+      "to": "canonical-digest-envelope",
+      "type": "consumes",
+      "label": "对规范化后的 Envelope 执行 RFC 8785 JCS 序列化"
+    },
+    {
+      "id": "e-jcs-bytes",
+      "from": "jcs-canonicalization",
+      "to": "canonical-json-bytes",
+      "type": "produces",
+      "label": "唯一 canonical JSON，编码为无 BOM、无结尾换行的 UTF-8 bytes"
+    },
+    {
+      "id": "e-sha256-bytes",
+      "from": "sha256-digest",
+      "to": "canonical-json-bytes",
+      "type": "consumes",
+      "label": "对 canonical UTF-8 bytes 计算 SHA-256"
+    },
+    {
+      "id": "e-sha256-semantic-request",
+      "from": "sha256-digest",
+      "to": "semantic-request-digest",
+      "type": "produces",
+      "label": "purpose = semantic-request，valueSchemaVersion = fusion-semantic-request-digest-v1"
+    },
+    {
+      "id": "e-sha256-fact-set",
+      "from": "sha256-digest",
+      "to": "fact-set-digest",
+      "type": "produces",
+      "label": "purpose = lesson-fact-set，valueSchemaVersion = fusion-lesson-fact-set-digest-v1"
+    },
+    {
+      "id": "e-sha256-payload-hash",
+      "from": "sha256-digest",
+      "to": "canonical-payload-hash",
+      "type": "produces",
+      "label": "purpose = profile-update-candidate，valueSchemaVersion = fusion-profile-update-candidate-digest-v1"
+    },
+    {
+      "id": "e-fixtures-bytes",
+      "from": "golden-fixtures",
+      "to": "canonical-json-bytes",
+      "type": "validates",
+      "label": "每个向量给出唯一 canonicalJson 与 UTF-8 byte length"
+    },
+    {
+      "id": "e-fixtures-semantic-request",
+      "from": "golden-fixtures",
+      "to": "semantic-request-digest",
+      "type": "validates",
+      "label": "semantic-request purpose 至少一个成功向量及其预期 wire digest"
+    },
+    {
+      "id": "e-fixtures-fact-set",
+      "from": "golden-fixtures",
+      "to": "fact-set-digest",
+      "type": "validates",
+      "label": "lesson-fact-set purpose 至少一个成功向量及其预期 wire digest"
+    },
+    {
+      "id": "e-fixtures-payload-hash",
+      "from": "golden-fixtures",
+      "to": "canonical-payload-hash",
+      "type": "validates",
+      "label": "profile-update-candidate purpose 至少一个成功向量及其预期 wire digest"
+    },
+    {
+      "id": "e-fact-set-depends-semantic-request",
+      "from": "fact-set-digest",
+      "to": "semantic-request-digest",
+      "type": "depends-on",
+      "label": "factSetDigest 的 value 白名单包含 semanticRequestDigest",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e-payload-hash-depends-semantic-request",
+      "from": "canonical-payload-hash",
+      "to": "semantic-request-digest",
+      "type": "depends-on",
+      "label": "canonicalPayloadHash 的 value 白名单包含 semanticRequestDigest",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e-payload-hash-depends-fact-set",
+      "from": "canonical-payload-hash",
+      "to": "fact-set-digest",
+      "type": "depends-on",
+      "label": "canonicalPayloadHash 的 value 白名单包含 factSetDigest",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e-jcs-depends-normalization",
+      "from": "jcs-canonicalization",
+      "to": "semantic-normalization",
+      "type": "depends-on",
+      "label": "JCS 序列化必须发生在语义规范化完成之后"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "fail-closed",
+      "attachedTo": [
+        "strict-parse",
+        "semantic-normalization",
+        "canonical-digest-envelope",
+        "sha256-digest"
+      ]
+    },
+    {
+      "elementId": "digest-invariants",
+      "attachedTo": [
+        "digest-projection",
+        "semantic-normalization",
+        "jcs-canonicalization",
+        "sha256-digest",
+        "canonical-digest-envelope"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "doc-position",
+      "title": "文档定位与安全边界",
+      "proposition": "本文以 fusion-c14n-v1 定稿 OpenMAIC(TS) 与 DeepTutor(Python) 共用的三个 digest/hash 的规范化字节与摘要算法，关闭 F29 缺口；SHA-256 是完整性与关联工具，不是加密，也不得因为字段最终只显示 digest 就纳入不该跨边界的正文或个人信息。",
+      "sectionRefs": ["§1", "§2"]
+    },
+    {
+      "id": "canonical-pipeline",
+      "title": "唯一处理流水线",
+      "proposition": "三个 digest 必须经过同一条流水线：严格解析的领域对象 → 白名单投影 → Fusion 语义规范化 → Domain Separation Envelope → RFC 8785 JCS → UTF-8 bytes → SHA-256 → sha256:64 位小写 hex；任何一步不合规都必须拒绝计算。",
+      "sectionRefs": ["§3", "§3.1"]
+    },
+    {
+      "id": "normalization-rules",
+      "title": "通用语义规范化规则",
+      "proposition": "严格解析先于规范化：先按 schema 拒绝未知字段与非法值，再统一 Unicode NFC、object key 排序与 escaping、数组 sequence/set 语义、时间、数字与缺失/null，最后按 JCS 产出无 BOM、无结尾换行的 UTF-8。",
+      "sectionRefs": ["§4", "§4.1", "§4.2", "§4.3", "§4.4", "§4.5", "§4.6", "§4.7", "§4.8"]
+    },
+    {
+      "id": "digest-profiles",
+      "title": "三个 Digest Profile",
+      "proposition": "semanticRequestDigest / factSetDigest / canonicalPayloadHash 各有独立 purpose、valueSchemaVersion 与 value 白名单，并各自明确排除不进入 canonical input 的字段；purpose 使同一组 JSON 字段在不同用途下不可互换。",
+      "sectionRefs": ["§5", "§6", "§7"]
+    },
+    {
+      "id": "versioning-and-compat",
+      "title": "规范版本与兼容",
+      "proposition": "规范版本由 canonicalization + purpose + valueSchemaVersion 共同决定：改说明不变版本，改受保护字段/数组语义/时间数字规则提升 valueSchemaVersion，改 JCS/Unicode/hash 算法提升 canonicalization；未知版本以 unsupported_digest_version 失败关闭。",
+      "sectionRefs": ["§8"]
+    },
+    {
+      "id": "cross-language-impl",
+      "title": "TypeScript 与 Python 实现要求",
+      "proposition": "两端提供相同逻辑接口，字段投影与 JCS canonicalizer 分离；禁止依赖对象插入顺序、localeCompare、默认 json.dumps 或 Decimal 隐式转 binary64；校验 digest 使用 constant-time 比较。",
+      "sectionRefs": ["§9"]
+    },
+    {
+      "id": "golden-fixtures-vectors",
+      "title": "Golden Fixtures 与测试要求",
+      "proposition": "权威测试向量位于单一 fixture 文件，每个正常向量含规范化 canonicalValue、唯一 canonicalJson、UTF-8 byte length 与预期 SHA-256 wire digest，拒绝向量记录失败阶段与稳定 reason code，两端共同消费同一文件。",
+      "sectionRefs": ["§10"]
+    },
+    {
+      "id": "error-semantics",
+      "title": "错误语义",
+      "proposition": "规范建议一组稳定 reason code；客户端输入错误、版本不支持与实际 digest mismatch 均为永久失败，不进行自动无限重试，只有处理所需服务暂时不可用才进入可恢复重试。",
+      "sectionRefs": ["§11"]
+    },
+    {
+      "id": "invariants-and-gates",
+      "title": "不变量与实施门禁",
+      "proposition": "先投影后 hash、字段白名单、相同语义相同字节、不同用途不可互换、hash 不是授权也不是加密、失败关闭等不变量，以及共享 fixture、负向测试等门禁，是跨 Fork digest/hash Feature 标为 passing 的前置条件。",
+      "sectionRefs": ["§12"]
+    },
+    {
+      "id": "pending-items",
+      "title": "后续实现中的待定项",
+      "proposition": "本规范只关闭算法选择：现有契约字段到三份白名单的映射、每个 observation kind 的受限 value schema、RFC 8785 库锁定、数据库版本字段与索引、v1/v2 双读迁移以及四类 confidence 的 schema 提升仍待实现时完成。",
+      "sectionRefs": ["§13"]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 14,
+    "topicCount": 10,
+    "edgeCount": 18,
+    "attachmentCount": 2,
+    "note": "元素数 14 略高于 preferred budget 12：三个 Digest Profile 的产物与共享流水线的每一段都各自具有独立语义，故未做合并。"
+  }
+}

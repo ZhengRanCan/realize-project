@@ -1,0 +1,386 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "deeptutor-fusion-pipeline",
+    "title": "DeepTutor 自动画像与学习状态流水线",
+    "sourcePath": "测试文档/fixture-c-candidate-inbox-driven-profile-pipeline.md",
+    "role": "target",
+    "scope": {
+      "text": "本文统合“在没有人类主动对话时，DeepTutor 如何由 OpenMAIC Candidate 事件驱动 Agent 自动更新学习状态”的讨论结论，是一份配套的 DeepTutor 内部处理规范：定义逻辑职责、处理语义与推荐物理选型（可靠接收、Fact、Mastery、Agent Proposal、Memory 流水线）。",
+      "sectionRefs": ["§1"]
+    },
+    "nonGoalSummary": {
+      "text": "本文描述的是待实现方案，当前 DeepTutor 尚没有完整的 Candidate Inbox、Fusion Fact Store、后台 Projector 和自动 L2/L3 调度闭环；本文不重新定义 Receipt enum 与 Candidate/Receipt 跨域协议（文档 06 为 SSOT），不定义 learner 解析（文档 08）与 digest/hash（文档 10），不把示例字段视为最终 DDL、API 或 Agent prompt，也不执行实现。",
+      "sectionRefs": ["§1", "§19"]
+    }
+  },
+  "thesis": "无人类对话时，DeepTutor 需建立一条可恢复、可审计、可重放的后台流水线，把 OpenMAIC Candidate 可靠接收为内部事实，再由确定性 Mastery 投影与受限 Agent 提议（经校验）分别派生 Mastery 与可审计的 fusion Memory，接收状态与下游成果分开表达。",
+  "elements": [
+    {
+      "id": "candidate",
+      "label": "OpenMAIC Candidate（外部候选观察）",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["t_pipeline", "t_receive", "t_mapping"],
+      "sectionRefs": ["§2", "§3", "§10"]
+    },
+    {
+      "id": "candidateReceiver",
+      "label": "Candidate 接收事务（Fusion API）",
+      "type": "process",
+      "role": "producer",
+      "topics": ["t_receive"],
+      "sectionRefs": ["§5", "§5.1", "§5.2"]
+    },
+    {
+      "id": "receipt",
+      "label": "Receipt（接收确认，accepted 语义）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t_receive", "t_idempotency"],
+      "sectionRefs": ["§5.3", "§15"]
+    },
+    {
+      "id": "candidateInbox",
+      "label": "Candidate Inbox（可靠接收存储）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["t_receive", "t_inbox", "t_model"],
+      "sectionRefs": ["§6", "§7.2"]
+    },
+    {
+      "id": "fusionLessonBinding",
+      "label": "FusionLessonBinding（lessonSessionId → learnerSubjectId）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["t_model", "t_worker"],
+      "sectionRefs": ["§7.1", "§9"]
+    },
+    {
+      "id": "diagnosisRecord",
+      "label": "DiagnosisRecord（课中诊断权威记录）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["t_confidence", "t_model", "t_mapping"],
+      "sectionRefs": ["§4.1", "§7.4"]
+    },
+    {
+      "id": "candidateProjection",
+      "label": "Candidate Projection（外部观察 → 内部事实）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["t_mapping"],
+      "sectionRefs": ["§10", "§10.1"]
+    },
+    {
+      "id": "fusionLearningFact",
+      "label": "FusionLearningFact（不可变内部事实）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["t_pipeline", "t_model", "t_mapping"],
+      "sectionRefs": ["§7.5", "§10"]
+    },
+    {
+      "id": "masteryEvidenceProjector",
+      "label": "MasteryEvidenceProjector",
+      "type": "process",
+      "role": "producer",
+      "topics": ["t_projectors"],
+      "sectionRefs": ["§11"]
+    },
+    {
+      "id": "profileProposalAgent",
+      "label": "受限 Profile Proposal Agent",
+      "type": "process",
+      "role": "producer",
+      "topics": ["t_projectors"],
+      "sectionRefs": ["§12"]
+    },
+    {
+      "id": "profileFactProposal",
+      "label": "ProfileFactProposal（结构化画像候选）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["t_projectors"],
+      "sectionRefs": ["§12"]
+    },
+    {
+      "id": "proposalValidator",
+      "label": "Proposal Validator",
+      "type": "process",
+      "role": "boundary",
+      "topics": ["t_projectors"],
+      "sectionRefs": ["§12"]
+    },
+    {
+      "id": "fusionConsolidation",
+      "label": "Fusion Memory Consolidation（后台编排器）",
+      "type": "process",
+      "role": "producer",
+      "topics": ["t_memory"],
+      "sectionRefs": ["§13", "§13.1"]
+    },
+    {
+      "id": "fusionMemorySurface",
+      "label": "Fusion Memory Surface（L1 snapshot / L2 fusion.md / L3 recent·profile·scope）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t_memory"],
+      "sectionRefs": ["§13"]
+    },
+    {
+      "id": "processingOutcome",
+      "label": "CandidateProcessingOutcome（分阶段成果与 revision）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["t_idempotency", "t_lifecycle"],
+      "sectionRefs": ["§15", "§17"]
+    },
+    {
+      "id": "confidenceModel",
+      "label": "四类 Confidence 区分模型",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": ["t_confidence"],
+      "sectionRefs": ["§4", "§4.1", "§4.2", "§4.3"]
+    },
+    {
+      "id": "singleAuthorityBackend",
+      "label": "单一权威后端原则",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["t_inbox"],
+      "sectionRefs": ["§6.3"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_receiver_consumes_candidate",
+      "from": "candidateReceiver",
+      "to": "candidate",
+      "type": "consumes",
+      "label": "验证服务身份、schema/version、大小与必要引用后接收 Candidate"
+    },
+    {
+      "id": "e_receiver_produces_inbox",
+      "from": "candidateReceiver",
+      "to": "candidateInbox",
+      "type": "produces",
+      "label": "以 candidateId 或 idempotencyKey 执行唯一写入，原子写入 Inbox 与初始处理状态"
+    },
+    {
+      "id": "e_receiver_produces_receipt",
+      "from": "candidateReceiver",
+      "to": "receipt",
+      "type": "produces",
+      "label": "提交成功后返回 Receipt（不返回 learner 标识）"
+    },
+    {
+      "id": "e_projection_consumes_inbox",
+      "from": "candidateProjection",
+      "to": "candidateInbox",
+      "type": "consumes",
+      "label": "leaseNext 读取已接收待处理的 Candidate"
+    },
+    {
+      "id": "e_projection_depends_binding",
+      "from": "candidateProjection",
+      "to": "fusionLessonBinding",
+      "type": "depends-on",
+      "label": "由 lessonSessionId 解析内部 learnerSubjectId",
+      "qualifiers": { "ownership": "reference" }
+    },
+    {
+      "id": "e_projection_consumes_diagnosis",
+      "from": "candidateProjection",
+      "to": "diagnosisRecord",
+      "type": "consumes",
+      "label": "来源为 deeptutor_diagnosis 时重新读取权威 DiagnosisRecord，校验 learner/lesson/revision/摘要"
+    },
+    {
+      "id": "e_projection_produces_fact",
+      "from": "candidateProjection",
+      "to": "fusionLearningFact",
+      "type": "produces",
+      "label": "按 provenance 完整生成不可变 FusionLearningFact，不合格观察记为 skipped/rejected"
+    },
+    {
+      "id": "e_projection_produces_outcome",
+      "from": "candidateProjection",
+      "to": "processingOutcome",
+      "type": "produces",
+      "label": "记录 factProjectionStatus"
+    },
+    {
+      "id": "e_mastery_consumes_fact",
+      "from": "masteryEvidenceProjector",
+      "to": "fusionLearningFact",
+      "type": "consumes",
+      "label": "只接受映射到权威知识点且满足证据门槛的 Fact"
+    },
+    {
+      "id": "e_mastery_produces_outcome",
+      "from": "masteryEvidenceProjector",
+      "to": "processingOutcome",
+      "type": "produces",
+      "label": "记录 masteryProjectionStatus（applied/skipped/rejected）与新 mastery revision"
+    },
+    {
+      "id": "e_agent_consumes_fact",
+      "from": "profileProposalAgent",
+      "to": "fusionLearningFact",
+      "type": "consumes",
+      "label": "从多条事实做语义归纳、判断冲突并提议画像候选"
+    },
+    {
+      "id": "e_agent_produces_proposal",
+      "from": "profileProposalAgent",
+      "to": "profileFactProposal",
+      "type": "produces",
+      "label": "只返回结构化 ProfileFactProposal（含依据引用）"
+    },
+    {
+      "id": "e_validator_validates_proposal",
+      "from": "proposalValidator",
+      "to": "profileFactProposal",
+      "type": "validates",
+      "label": "校验 schema、引用存在性、证据数量、confidence 门槛、敏感字段、冲突策略与 target slot"
+    },
+    {
+      "id": "e_validator_produces_outcome",
+      "from": "proposalValidator",
+      "to": "processingOutcome",
+      "type": "produces",
+      "label": "记录 proposalStatus"
+    },
+    {
+      "id": "e_consolidation_consumes_fact",
+      "from": "fusionConsolidation",
+      "to": "fusionLearningFact",
+      "type": "consumes",
+      "label": "FusionSnapshotAdapter 以 FusionLearningFacts 为输入"
+    },
+    {
+      "id": "e_consolidation_consumes_proposal",
+      "from": "fusionConsolidation",
+      "to": "profileFactProposal",
+      "type": "consumes",
+      "label": "仅已通过校验的 Proposal 进入 Memory；验证失败的 Proposal 不进入"
+    },
+    {
+      "id": "e_consolidation_produces_surface",
+      "from": "fusionConsolidation",
+      "to": "fusionMemorySurface",
+      "type": "produces",
+      "label": "L1 fusion snapshot/trace → L2/fusion.md → L3 recent/profile/scope"
+    },
+    {
+      "id": "e_consolidation_produces_outcome",
+      "from": "fusionConsolidation",
+      "to": "processingOutcome",
+      "type": "produces",
+      "label": "记录 memoryL2Status / memoryL3Status 与 revisions"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "confidenceModel",
+      "attachedTo": ["fusionLearningFact", "profileFactProposal"]
+    },
+    {
+      "elementId": "singleAuthorityBackend",
+      "attachedTo": ["candidateInbox"]
+    }
+  ],
+  "relationGap": [
+    {
+      "from": "fusionLessonBinding",
+      "to": "fusionMemorySurface",
+      "intendedMeaning": "Learner 删除、lesson 删除或合法撤回必须沿引用链传播：LessonBinding → Candidate Inbox → Processing Runs → Fusion Learning Facts → Diagnosis references → Mastery evidence/projection references → Fusion L1/L2/L3 派生内容，并对已进入聚合文档的内容重建受影响的 L2/L3。",
+      "reason": "关系词表没有“级联删除 / 失效传播 + 派生内容重建”的语义，且该链条跨越多个中间载体，无法在不失真的前提下压成一条 edge。"
+    }
+  ],
+  "topics": [
+    {
+      "id": "t_pipeline",
+      "title": "目标后台流水线与事件驱动架构",
+      "proposition": "目标不是 HTTP 请求内同步调用一次大模型，而是建立可恢复、可审计、可重放的后台流水线：Candidate → Inbox → Lesson Binding → FusionLearningFact →（Mastery 投影 / 受限 Agent 提议 → Validator → Memory → L2/L3）；接收事务与后续计算分离，Mastery 与长期 Memory 是从同一 Fact 派生的不同投影，互不作为隐式前置条件。",
+      "sectionRefs": ["§2", "§3"]
+    },
+    {
+      "id": "t_confidence",
+      "title": "四类 Confidence 的区分",
+      "proposition": "至少区分 mappingConfidence、diagnosisConfidence、observationConfidence、aggregationConfidence，各自保留来源、算法版本与缺失原因，不相乘成单一总分，也不能直接更新长期状态；deeptutor_diagnosis 必须回读权威 DiagnosisRecord 而非只信回传数字。",
+      "sectionRefs": ["§4", "§4.1", "§4.2", "§4.3"]
+    },
+    {
+      "id": "t_receive",
+      "title": "Candidate 接收事务与 Receipt",
+      "proposition": "Fusion API 在短事务内完成服务身份/schema/binding/hash/幂等唯一写入并原子落 Inbox，成功后返回严格含义的 Receipt；相同幂等键不同 hash 拒绝为 idempotency_conflict，临时故障不得先返回 accepted 再落盘；accepted 不等于 processed。",
+      "sectionRefs": ["§5", "§5.1", "§5.2", "§5.3"]
+    },
+    {
+      "id": "t_inbox",
+      "title": "CandidateInboxStore 逻辑端口与物理选型",
+      "proposition": "业务依赖逻辑端口 CandidateInboxStore；Integrated MVP 推荐独立 SQLite（与 Memory Markdown、Chat Session Store、L1 Trace 分离），PocketBase 部署实现同等逻辑约束；一个部署只能有一个权威后端，文件系统 Queue/L1 JSONL/Markdown/Session Store/notebook_entries 不适合作为 Inbox。",
+      "sectionRefs": ["§6", "§6.1", "§6.2", "§6.3"]
+    },
+    {
+      "id": "t_model",
+      "title": "逻辑持久模型",
+      "proposition": "职责级 schema 覆盖 fusion_lesson_bindings、fusion_candidate_inbox、fusion_processing_runs、fusion_diagnosis_records、fusion_learning_facts；同一 Candidate/Observation 在相同映射版本下只生成一个逻辑事实，重映射需新 revision 或显式 supersede。",
+      "sectionRefs": ["§7", "§7.1", "§7.2", "§7.3", "§7.4", "§7.5"]
+    },
+    {
+      "id": "t_worker",
+      "title": "Inbox Worker 状态机与后台用户作用域",
+      "proposition": "Worker 状态机为 pending → processing → { processed, retry_scheduled, dead_letter, discarded }，过期 lease 可被其他 Worker 接管且只重试幂等步骤；每个 Processing Run 必须先由 Binding 恢复 learnerSubjectId 并安装 CurrentUser/UserScope，禁止使用 Candidate 自带 learner、禁止回退 admin/default，多 learner 不得共享进程级可变上下文。",
+      "sectionRefs": ["§8", "§9"]
+    },
+    {
+      "id": "t_mapping",
+      "title": "外部 Candidate 到内部事实的映射",
+      "proposition": "Candidate Projection 校验来源/时间/lesson 归属、对 deeptutor_diagnosis 重读权威 DiagnosisRecord、解析知识点映射与 revision、规范化值并生成不可变 FusionLearningFact；现有 Quiz/Evidence、Session Store、L1 Trace、Markdown 都不作为外部 Fusion 事实的唯一权威载体。",
+      "sectionRefs": ["§10", "§10.1"]
+    },
+    {
+      "id": "t_projectors",
+      "title": "确定性 Mastery 投影与受限 Agent 提议",
+      "proposition": "MasteryEvidenceProjector 是确定性领域服务，以 factId+projectorVersion 幂等并经现有 Mastery/Learning Service 执行规则；受限 Agent 只返回带依据的结构化 ProfileFactProposal，禁止直接写 mastery_levels 或 L2/L3，Proposal Validator 负责 schema/引用/门槛/敏感字段/冲突校验。",
+      "sectionRefs": ["§11", "§12"]
+    },
+    {
+      "id": "t_memory",
+      "title": "Fusion Memory Surface 与自动 Consolidation 调度",
+      "proposition": "新增逻辑 fusion surface：Facts + validated Proposals → FusionSnapshotAdapter → L1 → L2/fusion.md → L3 recent/profile/scope；调度中 Candidate/Fact 立即持久化、Mastery 小批量、L2 按 debounce、L3 按阈值/窗口/显著变化触发，同一 learner 同槽位只允许一个 consolidation lease，接收请求内不跑完整 L3。",
+      "sectionRefs": ["§13", "§13.1"]
+    },
+    {
+      "id": "t_idempotency",
+      "title": "幂等、并发、失败恢复与完成语义",
+      "proposition": "每阶段拥有独立幂等键与 revision，按“至少一次执行、效果幂等”设计；下游状态分别记录且可重试，L3 暂时失败不回滚已提交 Fact/Mastery；接收状态与下游成果拆开查询，禁止用一个 success 同时代表 accepted/facts_projected/mastery_applied/memory_* 等状态。",
+      "sectionRefs": ["§14", "§15"]
+    },
+    {
+      "id": "t_lifecycle",
+      "title": "数据生命周期、删除与可观测性",
+      "proposition": "删除/撤回沿引用链 Binding→Inbox→Runs→Facts→Diagnosis→Mastery→L1/L2/L3 执行并重建受影响聚合文档，删除期间禁止新 lease；至少提供分阶段 Outcome 查询、队列/告警指标、Projector/Agent/Consolidator 版本统计与受限人工恢复入口，恢复操作须产生审计记录。",
+      "sectionRefs": ["§16", "§17"]
+    },
+    {
+      "id": "t_rollout",
+      "title": "实施切片与待定稿项",
+      "proposition": "后续代码按 7 个依赖顺序切片实施，每片须有失败注入、重启恢复、跨 learner 隔离、幂等重放与删除测试；SQLite/PocketBase 选型、DDL/索引/备份、Receipt/Outcome API、DiagnosisRecord 载体、confidence 阈值、Agent prompt、调度 SLA 与文档 06/10 的最终映射仍未定稿。",
+      "sectionRefs": ["§18", "§19"]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 17,
+    "topicCount": 12,
+    "edgeCount": 18,
+    "attachmentCount": 2,
+    "note": "element 数量高于 preferred budget 12：文档横跨接收事务、持久模型、投影、Memory 调度与生命周期五大块，此处保留机制而非压缩节点。"
+  }
+}

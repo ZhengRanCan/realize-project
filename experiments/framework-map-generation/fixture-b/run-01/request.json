@@ -1,0 +1,28 @@
+{
+  "fixture": "b",
+  "fixtureLabel": "B · Data / transformation heavy",
+  "runDir": "experiments/framework-map-generation/fixture-b/run-01",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens": 65536,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "docPath": "测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md",
+  "docSha256": "08d52471285f7cd95cd8dec296a30f9ac0d3f7d54c102bed7328a7c9f8f2e89a",
+  "documentSha256": "08d52471285f7cd95cd8dec296a30f9ac0d3f7d54c102bed7328a7c9f8f2e89a",
+  "promptPath": "ai/framework-map-generation.prompt.md",
+  "promptFingerprint": "295e9c9923b330f3",
+  "promptSha256": "295e9c9923b330f3a16bc80c8151da8fd1a31aa59fdd0a022e96918c263be2dc",
+  "userMessageSha256": "f850195fb13309f6d761883f0fdc53fde9dbc63da8b6c9c8b66e888954c15d1d",
+  "systemPromptChars": 5,
+  "userMessageChars": 29691,
+  "startedAt": "2026-09-26T13:50:20.227Z",
+  "finishedAt": "2026-09-26T13:51:30.368Z",
+  "status": "success",
+  "error": null
+}

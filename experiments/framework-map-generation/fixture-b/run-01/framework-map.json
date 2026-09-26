@@ -1,0 +1,381 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "canonical-hash-digest-integrity-spec",
+    "title": "Canonical Hash / Digest 与完整性规范",
+    "sourcePath": "测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md",
+    "role": "target",
+    "scope": {
+      "text": "本文定稿 OpenMAIC（TypeScript）与 DeepTutor（Python）共用的 fusion-c14n-v1 规范化规范：规定三个 digest/hash（semanticRequestDigest、factSetDigest、canonicalPayloadHash）必须共同经过的唯一处理流水线、各自的字段白名单、通用语义规范化规则与 wire 格式，并解释为什么不能直接对收到的 JSON 文本计算 hash。",
+      "sectionRefs": [
+        "§1",
+        "§2"
+      ]
+    },
+    "nonGoalSummary": {
+      "text": "本文只关闭算法选择缺口：它不表示两个 Fork 已经实现该算法，也不替代未来的 schema 实现 Feature；Route、Provider、Session 双写、正式读取切换与真实 Agent 决策仍属 F41–F45。字段到白名单的映射、每个 observation kind 的受限 value schema、RFC 8785 库的选型锁定、数据库 digest 版本字段与索引、v1/v2 双读迁移策略，以及四类 confidence 到 Candidate wire schema 的映射，都留给实现时完成。",
+      "sectionRefs": [
+        "§1",
+        "§13"
+      ]
+    }
+  },
+  "thesis": "三个 digest/hash 只有经过同一条 fusion-c14n-v1 流水线（严格解析 → 白名单投影 → 语义规范化 → Domain Separation Envelope → JCS → UTF-8 字节 → SHA-256）才具有跨语言可比性；任何一步不满足规范都必须拒绝计算，不得回退到平台默认序列化。",
+  "elements": [
+    {
+      "id": "digest_pipeline",
+      "label": "唯一处理流水线（fusion-c14n-v1）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "topic_pipeline_rules"
+      ],
+      "sectionRefs": [
+        "§3"
+      ]
+    },
+    {
+      "id": "canonical_envelope",
+      "label": "CanonicalDigestEnvelope（canonicalization / purpose / valueSchemaVersion / value）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": [
+        "topic_pipeline_rules"
+      ],
+      "sectionRefs": [
+        "§3.1"
+      ]
+    },
+    {
+      "id": "semantic_normalization",
+      "label": "Fusion 语义规范化（NFC、时间、数组语义、数字）",
+      "type": "process",
+      "role": "intermediate",
+      "topics": [
+        "topic_pipeline_rules"
+      ],
+      "sectionRefs": [
+        "§4"
+      ]
+    },
+    {
+      "id": "profile_projection",
+      "label": "Digest Profile 字段白名单投影",
+      "type": "process",
+      "role": "intermediate",
+      "topics": [
+        "topic_pipeline_rules",
+        "topic_digest_profiles"
+      ],
+      "sectionRefs": [
+        "§3",
+        "§5.2",
+        "§6.2",
+        "§7.2"
+      ]
+    },
+    {
+      "id": "semantic_request_digest",
+      "label": "semanticRequestDigest（purpose = semantic-request）",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "topic_digest_profiles"
+      ],
+      "sectionRefs": [
+        "§5",
+        "§5.1",
+        "§5.3"
+      ]
+    },
+    {
+      "id": "fact_set_digest",
+      "label": "factSetDigest（purpose = lesson-fact-set）",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "topic_digest_profiles"
+      ],
+      "sectionRefs": [
+        "§6",
+        "§6.1",
+        "§6.3"
+      ]
+    },
+    {
+      "id": "canonical_payload_hash",
+      "label": "canonicalPayloadHash（purpose = profile-update-candidate）",
+      "type": "artifact",
+      "role": "output",
+      "topics": [
+        "topic_digest_profiles"
+      ],
+      "sectionRefs": [
+        "§7",
+        "§7.1",
+        "§7.3"
+      ]
+    },
+    {
+      "id": "cross_language_interface",
+      "label": "TypeScript / Python 共同 digest 接口（projectForDigest / canonicalize / digest / verify）",
+      "type": "artifact",
+      "role": "boundary",
+      "topics": [
+        "topic_cross_language_impl"
+      ],
+      "sectionRefs": [
+        "§9",
+        "§9.1",
+        "§9.2",
+        "§9.3",
+        "§9.4"
+      ]
+    },
+    {
+      "id": "golden_fixtures",
+      "label": "Golden Fixtures（canonical-digest-v1.json：成功向量与拒绝向量）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": [
+        "topic_fixtures_and_gates"
+      ],
+      "sectionRefs": [
+        "§10"
+      ]
+    },
+    {
+      "id": "version_rule",
+      "label": "规范版本构成与升级规则（canonicalization + purpose + valueSchemaVersion）",
+      "type": "constraint",
+      "role": "authority",
+      "topics": [
+        "topic_version_and_errors"
+      ],
+      "sectionRefs": [
+        "§8"
+      ]
+    },
+    {
+      "id": "failure_semantics",
+      "label": "失败关闭与稳定 reason code（unsupported_digest_version / digest_mismatch / idempotency_conflict …）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "topic_version_and_errors"
+      ],
+      "sectionRefs": [
+        "§11"
+      ]
+    },
+    {
+      "id": "implementation_gate",
+      "label": "不变量与实施门禁（先投影后 hash、字段白名单、相同语义相同字节、Hash 不是授权/加密）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "topic_fixtures_and_gates"
+      ],
+      "sectionRefs": [
+        "§12"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "digest_pipeline",
+      "to": "semantic_normalization",
+      "type": "contains",
+      "label": "流水线结构上包含 Fusion 语义规范化步骤",
+      "qualifiers": {
+        "ownership": "owned",
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e2",
+      "from": "digest_pipeline",
+      "to": "profile_projection",
+      "type": "contains",
+      "label": "流水线结构上包含 Digest Profile 字段白名单投影步骤",
+      "qualifiers": {
+        "ownership": "owned",
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e3",
+      "from": "profile_projection",
+      "to": "canonical_envelope",
+      "type": "produces",
+      "label": "白名单投影 + 语义规范化后的值被包进 CanonicalDigestEnvelope 作为 canonical input",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "many"
+        }
+      }
+    },
+    {
+      "id": "e4",
+      "from": "digest_pipeline",
+      "to": "canonical_envelope",
+      "type": "consumes",
+      "label": "对 Envelope 执行 RFC 8785 JCS -> UTF-8 bytes（无 BOM、无结尾换行）-> SHA-256",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e5",
+      "from": "digest_pipeline",
+      "to": "semantic_request_digest",
+      "type": "produces",
+      "label": "purpose = semantic-request，valueSchemaVersion = fusion-semantic-request-digest-v1"
+    },
+    {
+      "id": "e6",
+      "from": "digest_pipeline",
+      "to": "fact_set_digest",
+      "type": "produces",
+      "label": "purpose = lesson-fact-set，valueSchemaVersion = fusion-lesson-fact-set-digest-v1"
+    },
+    {
+      "id": "e7",
+      "from": "digest_pipeline",
+      "to": "canonical_payload_hash",
+      "type": "produces",
+      "label": "purpose = profile-update-candidate，valueSchemaVersion = fusion-profile-update-candidate-digest-v1"
+    },
+    {
+      "id": "e8",
+      "from": "fact_set_digest",
+      "to": "semantic_request_digest",
+      "type": "depends-on",
+      "label": "factSetDigest 的 value 白名单包含 semanticRequestDigest 字段"
+    },
+    {
+      "id": "e9",
+      "from": "canonical_payload_hash",
+      "to": "fact_set_digest",
+      "type": "depends-on",
+      "label": "canonicalPayloadHash 的 value 白名单包含 factSetDigest 字段"
+    },
+    {
+      "id": "e10",
+      "from": "canonical_payload_hash",
+      "to": "semantic_request_digest",
+      "type": "depends-on",
+      "label": "canonicalPayloadHash 的 value 白名单包含 semanticRequestDigest 字段"
+    },
+    {
+      "id": "e11",
+      "from": "cross_language_interface",
+      "to": "digest_pipeline",
+      "type": "depends-on",
+      "label": "两端实现必须遵循同一流水线，字段投影与 JCS canonicalizer 分离"
+    },
+    {
+      "id": "e12",
+      "from": "golden_fixtures",
+      "to": "cross_language_interface",
+      "type": "validates",
+      "label": "两端实现共同消费同一 fixture 文件，逐字节校验 canonical bytes、byte length 与 SHA-256",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "many"
+        }
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "version_rule",
+      "attachedTo": [
+        "canonical_envelope",
+        "profile_projection"
+      ]
+    },
+    {
+      "elementId": "failure_semantics",
+      "attachedTo": [
+        "digest_pipeline",
+        "golden_fixtures"
+      ]
+    },
+    {
+      "elementId": "implementation_gate",
+      "attachedTo": [
+        "cross_language_interface",
+        "digest_pipeline"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "topic_pipeline_rules",
+      "title": "唯一流水线与通用语义规范化",
+      "proposition": "三个 digest 必须经过同一条 fusion-c14n-v1 流水线：先按已知 schema 严格解析，再投影到 Digest Profile 白名单，再做 Fusion 语义规范化（NFC、时间、数组 set/sequence、数字、缺失/null），最后包进 Domain Separation Envelope 用 RFC 8785 JCS 序列化为 UTF-8 字节并计算 SHA-256；任何一步不合规都拒绝计算，不回退到 JSON.stringify / json.dumps 默认输出。",
+      "sectionRefs": [
+        "§3",
+        "§4"
+      ]
+    },
+    {
+      "id": "topic_digest_profiles",
+      "title": "三个 Digest Profile 的白名单与排除",
+      "proposition": "三个 purpose 各有独立的 value 白名单与明确排除清单：semanticRequestDigest 绑定课前请求的共同语义根（语义变化才改变 digest），factSetDigest 冻结 closeout 后的权威事实内容，canonicalPayloadHash 绑定发送给 DeepTutor 的 ProfileUpdateCandidate 合同 payload；purpose 防止同一组字段在不同用途下产生可互换的 digest。",
+      "sectionRefs": [
+        "§5",
+        "§6",
+        "§7"
+      ]
+    },
+    {
+      "id": "topic_version_and_errors",
+      "title": "规范版本兼容与错误语义",
+      "proposition": "规范版本由 canonicalization + purpose + valueSchemaVersion 三部分共同决定：受保护字段、数组语义、时间/数字规则变化升级 valueSchemaVersion，JCS/Unicode/hash 算法变化升级 canonicalization；接收方不认识任一版本时以 unsupported_digest_version 失败关闭。错误以稳定 reason code 表达，客户端输入错误、版本不支持和 digest mismatch 均为永久失败，只有服务暂时不可用才进入可恢复重试。",
+      "sectionRefs": [
+        "§8",
+        "§11"
+      ]
+    },
+    {
+      "id": "topic_cross_language_impl",
+      "title": "TypeScript 与 Python 实现要求",
+      "proposition": "两端提供相同逻辑接口（projectForDigest / canonicalize / digest / verify），字段投影与 JCS canonicalizer 分离；TS 不得依赖对象插入顺序或 localeCompare，Python 不得用 json.dumps(sort_keys=True) 冒充 JCS 或把 Decimal 暗中转为 binary64；Receipt 校验使用 constant-time 比较，日志最多记录截断后的 digest 前缀。",
+      "sectionRefs": [
+        "§9"
+      ]
+    },
+    {
+      "id": "topic_fixtures_and_gates",
+      "title": "Golden Fixtures 与实施门禁",
+      "proposition": "权威测试向量集中在同一份 fixture 文件，正常向量含 canonicalValue / canonicalJson / byte length / 预期 wire digest，拒绝向量记录失败阶段与稳定 reason code，两端不得复制成两份各自维护；在共享 fixture、canonical bytes/byte length/SHA-256 验证、key 顺序随机化与各类负向测试通过之前，不得把跨 Fork digest/hash Feature 标为 passing。",
+      "sectionRefs": [
+        "§10",
+        "§12"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 12,
+    "topicCount": 5,
+    "edgeCount": 12,
+    "attachmentCount": 3,
+    "note": "本文是契约/规范（target），不是既有系统描述。§1/§2 由 document.scope 承载，§13 由 document.nonGoalSummary 承载；constraint 类元素（version_rule / failure_semantics / implementation_gate）走 attachments，不进入 edges。"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "fixture": "a",
+  "fixtureLabel": "A · Concept / Architecture heavy",
+  "runDir": "experiments/framework-map-generation/fixture-a/run-04",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens": 65536,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "docPath": "测试文档/18-context-consumption-semantic-model.md",
+  "docSha256": "338bb2d632f800b53b20b1fcaa10ec235fdf7154107acb7925f87da27cb11c6a",
+  "documentSha256": "338bb2d632f800b53b20b1fcaa10ec235fdf7154107acb7925f87da27cb11c6a",
+  "promptPath": "ai/framework-map-generation.prompt.md",
+  "promptFingerprint": "295e9c9923b330f3",
+  "promptSha256": "295e9c9923b330f3a16bc80c8151da8fd1a31aa59fdd0a022e96918c263be2dc",
+  "userMessageSha256": "ced80b1052cb5b67a5d2248ca3077e32102e4d048c82018d9bbdeb95ff268eec",
+  "systemPromptChars": 5,
+  "userMessageChars": 30191,
+  "startedAt": "2026-09-26T13:47:30.966Z",
+  "finishedAt": "2026-09-26T13:48:59.822Z",
+  "status": "success",
+  "error": null
+}

@@ -1,0 +1,72 @@
+===== F07 Phase 3 · 产物完整性验证 =====
+命令: node tmp/verify-f07-phase3.js
+时间: 2026-09-26T14:11:16.144Z
+
+发现 run 目录 16 个
+
+[1] 产物完备性（每个 run 五件套）
+  ✓ a/run-02（Phase 2 样本）
+  ✓ a/run-03
+  ✓ a/run-04
+  ✓ a/run-05
+  ✓ b/run-01
+  ✓ b/run-02
+  ✓ b/run-03
+  ✓ c/run-01
+  ✓ c/run-02
+  ✓ c/run-03
+  ✓ d/run-01
+  ✓ d/run-02
+  ✓ d/run-03
+  ✓ e/run-01
+  ✓ e/run-02
+  ✓ e/run-03
+
+[2] 参数 / provider / model 一致性（Phase 3 的 15 个 run）
+  ✓ generationParams 唯一  {"temperature":1,"max_tokens":65536,"timeout_ms":900000,"max_attempts":1}
+  ✓ provider / model / baseUrl 唯一  deepseek|deepseek-flash|https://api.deepseek.com
+  ✓ promptSha256 唯一（未中途改 prompt）  295e9c9923b330f3
+  ✓ 每个 fixture 的 documentSha256 唯一
+  ✓ official run 数 = 15  实际 15
+
+[3] artifactSha256 与实际文件一致（证明产物未被覆盖或改写）
+  ✓ a/run-02  9ac9dd4284b1deb5
+  ✓ a/run-03  b9f322165fdab5a4
+  ✓ a/run-04  895831c2545435b7
+  ✓ a/run-05  9564668322e8ce92
+  ✓ b/run-01  5871bdffeca56666
+  ✓ b/run-02  03501be5fd5bb6c6
+  ✓ b/run-03  a2484c7b2b4e186f
+  ✓ c/run-01  332976129101ba13
+  ✓ c/run-02  5dfe6e497770516b
+  ✓ c/run-03  111386f7a5341e9b
+  ✓ d/run-01  780b40b17e99cfdf
+  ✓ d/run-02  4fd1508c4151d253
+  ✓ d/run-03  3fea10b147038e3c
+  ✓ e/run-01  ceff7170d07fbb71
+  ✓ e/run-02  6d2a852d8f818550
+  ✓ e/run-03  5d2c3e26294861d2
+
+[4] 无 .tmp 残留 · repair 全部为 none
+  ✓ 无 .tmp.json 残留
+  ✓ repair 全部为 none
+
+[5] run 编号单调（无复用）
+  ✓ a: 02, 03, 04, 05
+  ✓ b: 01, 02, 03
+  ✓ c: 01, 02, 03
+  ✓ d: 01, 02, 03
+  ✓ e: 01, 02, 03
+
+[6] 统计
+  run 总数（含 Phase 2 样本）: 16
+  HARD = 0 的 run: 16
+  validator FAIL: 0
+  非 success 状态: 0
+  finish_reason != stop: 0
+  completion 合计 408550（reasoning 338693，占 83%）
+  单 run completion 最大值 40419（对照 max_tokens 65536）
+
+════════════════════════════════
+结果: 全部通过（无覆盖、无篡改、无残留、无修补）
+════════════════════════════════

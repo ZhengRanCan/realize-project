@@ -1,0 +1,541 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "f13-f16-after-sales-runbook",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current",
+    "scope": {
+      "text": "本文是一份运行验证与部署手册：把 F13–F16 售后链路达到「全部 passing」所需的剩余工作拆成人工 reviewer 可逐步执行的操作步骤——本地构建前置检查、CloudBase 部署（云函数 / 触发器 / HTTP 网关 / 环境变量）、沙箱模式三条全链路用例与 mock 通知验证、证据留存与独立审查 checklist、沙箱到真实环境的切换，以及 §10 的库存释放时机决策项。",
+      "sectionRefs": [
+        "§F13–F16 售后链路运行验证 & 部署手册"
+      ]
+    },
+    "nonGoalSummary": {
+      "text": "本文不定义 F13–F16 的业务需求与接口契约（这些在各自 feature.md / details/design.md / verification.md 中），不包含实现代码，也不单方面裁定 §10 的库存释放时机——该决策由 reviewer 在 F15 passing 前填写决策记录并同步到 F15 verification.md §9。"
+    }
+  },
+  "thesis": "F13 → F14 → F15 → F16 依次依赖，本手册把这条链路的部署、沙箱验证、证据留存与真实环境切换拆成可执行步骤；链路中唯一未闭合的机制点是未发货仅退款的库存释放时机。",
+  "elements": [
+    {
+      "id": "submit_after_sales",
+      "label": "submitAfterSales（用户提交售后申请）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "chain_overview",
+        "sandbox_verification"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§4.2",
+        "§4.4",
+        "§6.1"
+      ]
+    },
+    {
+      "id": "cancel_after_sales",
+      "label": "cancelAfterSales（用户撤销售后申请）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "chain_overview",
+        "sandbox_verification"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§4.4",
+        "§6.1"
+      ]
+    },
+    {
+      "id": "submit_return_logistics",
+      "label": "submitReturnLogistics（用户提交退货物流单号）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "chain_overview",
+        "sandbox_verification"
+      ],
+      "sectionRefs": [
+        "§3.1",
+        "§4.3",
+        "§6.2"
+      ]
+    },
+    {
+      "id": "approve_after_sales",
+      "label": "processAfterSales（商家审批与售后状态推进）",
+      "type": "process",
+      "role": "authority",
+      "topics": [
+        "chain_overview",
+        "sandbox_verification",
+        "stock_release_decision"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§4.2",
+        "§4.3",
+        "§6.2",
+        "§8"
+      ]
+    },
+    {
+      "id": "compensate_assets",
+      "label": "runCompensation（库存 / 优惠券 / 积分回补）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "sandbox_verification",
+        "evidence_retention",
+        "stock_release_decision"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§4.2",
+        "§4.7",
+        "§5.3",
+        "§10"
+      ]
+    },
+    {
+      "id": "retry_compensation",
+      "label": "retryAfterSalesCompensation（定时重试失败补偿）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "cloudbase_deploy",
+        "sandbox_verification",
+        "troubleshooting"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§3.2",
+        "§4.7",
+        "§5.3"
+      ]
+    },
+    {
+      "id": "force_compensation",
+      "label": "forceRestockAndAssets（管理员手动强制补偿）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "sandbox_verification",
+        "review_checklist"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§4.8",
+        "§6.3"
+      ]
+    },
+    {
+      "id": "refund_order",
+      "label": "refundOrder（发起微信退款，沙箱 / 真实）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "cloudbase_deploy",
+        "sandbox_verification",
+        "real_env_switch",
+        "troubleshooting"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§3.1",
+        "§4.2",
+        "§5.4",
+        "§7.2",
+        "§8"
+      ]
+    },
+    {
+      "id": "refund_notify",
+      "label": "refundNotify（退款结果回调处理）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "cloudbase_deploy",
+        "sandbox_verification",
+        "pay_boundary"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§3.3",
+        "§4.5",
+        "§5.4"
+      ]
+    },
+    {
+      "id": "refund_query_cron",
+      "label": "refundQueryCron（定时查单纠偏）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "cloudbase_deploy",
+        "sandbox_verification",
+        "troubleshooting"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§3.2",
+        "§4.6",
+        "§5.4"
+      ]
+    },
+    {
+      "id": "order",
+      "label": "订单（afterSalesStatus / refundStatus / stockRestored 状态载体）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": [
+        "chain_overview",
+        "sandbox_verification",
+        "troubleshooting"
+      ],
+      "sectionRefs": [
+        "§4.2",
+        "§4.3",
+        "§4.4",
+        "§8"
+      ]
+    },
+    {
+      "id": "assets",
+      "label": "商品库存 / 优惠券 / 积分（补偿对象）",
+      "type": "artifact",
+      "role": "target",
+      "topics": [
+        "sandbox_verification",
+        "evidence_retention",
+        "review_checklist",
+        "stock_release_decision"
+      ],
+      "sectionRefs": [
+        "§4.1",
+        "§4.7",
+        "§5.3",
+        "§6.3"
+      ]
+    },
+    {
+      "id": "refund_common_config",
+      "label": "refundCommon/config.js（F16 共享退款配置库）",
+      "type": "artifact",
+      "role": "boundary",
+      "topics": [
+        "cloudbase_deploy",
+        "pay_boundary",
+        "local_build"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§3.1",
+        "§9"
+      ]
+    },
+    {
+      "id": "stock_release_timing",
+      "label": "库存释放时机决策（APPROVED 立即释放 vs REFUND_SUCCESS 释放）",
+      "type": "constraint",
+      "role": "authority",
+      "topics": [
+        "stock_release_decision",
+        "review_checklist"
+      ],
+      "sectionRefs": [
+        "§10",
+        "§6.3"
+      ]
+    },
+    {
+      "id": "idempotency_guard",
+      "label": "补偿幂等闸门（同一订单只回补一次，stockRestored 判定）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "sandbox_verification",
+        "review_checklist",
+        "stock_release_decision"
+      ],
+      "sectionRefs": [
+        "§5.3",
+        "§6.4",
+        "§10"
+      ]
+    },
+    {
+      "id": "pay_domain_boundary",
+      "label": "与 F01 支付域的隔离边界（不复用 payOrder / payNotify）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "pay_boundary",
+        "real_env_switch"
+      ],
+      "sectionRefs": [
+        "§9"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_submit_produces_order",
+      "from": "submit_after_sales",
+      "to": "order",
+      "type": "produces",
+      "label": "生成售后申请记录（afterSalesStatus=REQUESTED，type 为 REFUND_ONLY 或 RETURN_REFUND）",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e_cancel_transforms_order",
+      "from": "cancel_after_sales",
+      "to": "order",
+      "type": "transforms-to",
+      "label": "撤销后 afterSalesStatus=CANCELLED，cancelledBy / cancelledAt 写入；库存 / 优惠券 / 积分均不变",
+      "qualifiers": {
+        "cardinality": {
+          "from": "zero-or-one",
+          "to": "one"
+        }
+      }
+    },
+    {
+      "id": "e_return_logistics_transforms_order",
+      "from": "submit_return_logistics",
+      "to": "order",
+      "type": "transforms-to",
+      "label": "afterSalesStatus 由 WAIT_RETURN 推进为 RETURN_SHIPPED"
+    },
+    {
+      "id": "e_approve_transforms_order",
+      "from": "approve_after_sales",
+      "to": "order",
+      "type": "transforms-to",
+      "label": "审批推进售后状态：REQUESTED → APPROVED / WAIT_RETURN → WAIT_INSPECTION → REFUND_PENDING"
+    },
+    {
+      "id": "e_refund_order_transforms_order",
+      "from": "refund_order",
+      "to": "order",
+      "type": "transforms-to",
+      "label": "下调单后 refundStatus=PROCESSING，返回 mode 与 outRefundNo"
+    },
+    {
+      "id": "e_refund_notify_transforms_order",
+      "from": "refund_notify",
+      "to": "order",
+      "type": "transforms-to",
+      "label": "沙箱 / 真实回调 SUCCESS 后 refundStatus=SUCCESS、afterSalesStatus=REFUNDED、refundedAt 写入"
+    },
+    {
+      "id": "e_query_cron_transforms_order",
+      "from": "refund_query_cron",
+      "to": "order",
+      "type": "transforms-to",
+      "label": "查单纠偏：80% 命中时推进退款结果；连续 10 次失败置 REFUND_FAILED"
+    },
+    {
+      "id": "e_approve_controls_compensation",
+      "from": "approve_after_sales",
+      "to": "compensate_assets",
+      "type": "controls",
+      "label": "processAfterSales 的 REFUND_SUCCESS 分支调用 runCompensation；APPROVE_REFUND_ONLY 分支当前不调用",
+      "note": "§10 决策 B 会在此处增加提前释放库存的前置步骤"
+    },
+    {
+      "id": "e_retry_controls_compensation",
+      "from": "retry_compensation",
+      "to": "compensate_assets",
+      "type": "controls",
+      "label": "每 10 分钟扫描 refundCompensationError 非空的订单并重跑补偿"
+    },
+    {
+      "id": "e_force_controls_compensation",
+      "from": "force_compensation",
+      "to": "compensate_assets",
+      "type": "controls",
+      "label": "仅管理员可调用，只补资产、不修改 afterSalesStatus"
+    },
+    {
+      "id": "e_compensation_produces_assets",
+      "from": "compensate_assets",
+      "to": "assets",
+      "type": "produces",
+      "label": "products.stock 按订单商品数量回补、有效优惠券恢复可用、积分退回",
+      "qualifiers": {
+        "ownership": "owned"
+      }
+    },
+    {
+      "id": "e_refund_order_consumes_config",
+      "from": "refund_order",
+      "to": "refund_common_config",
+      "type": "consumes",
+      "label": "F16 退款云函数独立使用 refundCommon/config.js，不复用支付域代码",
+      "qualifiers": {
+        "ownership": "shared"
+      }
+    },
+    {
+      "id": "e_refund_notify_consumes_config",
+      "from": "refund_notify",
+      "to": "refund_common_config",
+      "type": "consumes",
+      "qualifiers": {
+        "ownership": "shared"
+      }
+    },
+    {
+      "id": "e_query_cron_consumes_config",
+      "from": "refund_query_cron",
+      "to": "refund_common_config",
+      "type": "consumes",
+      "qualifiers": {
+        "ownership": "shared"
+      }
+    },
+    {
+      "id": "e_notify_depends_on_refund_order",
+      "from": "refund_notify",
+      "to": "refund_order",
+      "type": "depends-on",
+      "label": "回调报文以 refundOrder 返回的 outRefundNo 关联退款单",
+      "qualifiers": {
+        "cardinality": {
+          "from": "one",
+          "to": "one"
+        }
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "stock_release_timing",
+      "attachedTo": [
+        "compensate_assets",
+        "approve_after_sales"
+      ]
+    },
+    {
+      "elementId": "idempotency_guard",
+      "attachedTo": [
+        "compensate_assets",
+        "order"
+      ]
+    },
+    {
+      "elementId": "pay_domain_boundary",
+      "attachedTo": [
+        "refund_order",
+        "refund_common_config"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "chain_overview",
+      "title": "售后链路总览与依赖",
+      "proposition": "F13 → F14 → F15 → F16 依次依赖，每个 Feature 对应一组云函数；F12 已被这四个 Feature 替代，Round 19 完成 unblock。",
+      "sectionRefs": [
+        "§1"
+      ]
+    },
+    {
+      "id": "local_build",
+      "title": "本地前置：代码检查与构建",
+      "proposition": "部署前需对全部相关云函数跑 node --check、完成 h5 / mp-weixin 构建，并确认 .gitignore 已屏蔽 .env / *.pem / *.key 等敏感文件。",
+      "sectionRefs": [
+        "§2"
+      ]
+    },
+    {
+      "id": "cloudbase_deploy",
+      "title": "CloudBase 部署",
+      "proposition": "按既定顺序部署 11 个云函数，为两个补偿类函数配置定时触发器，为 refundNotify 创建 /refundNotify HTTP 网关路由，沙箱模式只强制少量 WECHAT_REFUND_* 变量。",
+      "sectionRefs": [
+        "§3"
+      ]
+    },
+    {
+      "id": "sandbox_verification",
+      "title": "沙箱模式运行验证",
+      "proposition": "用三条用例（未发货仅退款 / 已发货退货退款 / 撤销与越权）覆盖全链路状态推进，再用 mock 通知、查单 cron、失败重试与强制补偿验证异常路径。",
+      "sectionRefs": [
+        "§4"
+      ]
+    },
+    {
+      "id": "evidence_retention",
+      "title": "证据留存规范",
+      "proposition": "每个 Feature passing 前需按 F13、F14、F15、F16 分别留存截图与日志，并做仓库与日志的密钥安全审计。",
+      "sectionRefs": [
+        "§5"
+      ]
+    },
+    {
+      "id": "review_checklist",
+      "title": "独立审查 Checklist",
+      "proposition": "按 F13–F16 各自 verification.md 逐项勾选，并叠加本节的跨 Feature 全局复核与 F12 重新验收结论。",
+      "sectionRefs": [
+        "§6"
+      ]
+    },
+    {
+      "id": "real_env_switch",
+      "title": "沙箱 → 真实环境切换",
+      "proposition": "沙箱 passing 后配置真实 WECHAT_REFUND_* 变量、删除沙箱 mock 入口、用 0.01 元真实退款验证，并重跑沙箱用例加一条商户平台对账用例。",
+      "sectionRefs": [
+        "§7"
+      ]
+    },
+    {
+      "id": "troubleshooting",
+      "title": "故障排查速查",
+      "proposition": "以「现象 / 可能原因 / 排查方式」三列给出沙箱与真实环境下常见故障的定位路径。",
+      "sectionRefs": [
+        "§8"
+      ]
+    },
+    {
+      "id": "pay_boundary",
+      "title": "与 F01 支付域的边界",
+      "proposition": "F16 退款云函数独立使用 refundCommon/config.js，不复用 payOrder / payNotify；WX_PAY_* 仅作缺省回退，真实切换需独立配置 WECHAT_REFUND_*。",
+      "sectionRefs": [
+        "§9"
+      ]
+    },
+    {
+      "id": "stock_release_decision",
+      "title": "未发货仅退款库存释放时机决策",
+      "proposition": "F12 允许未发货链路在 APPROVED 或 REFUNDED 释放库存，F15 当前只在 REFUND_SUCCESS 释放；两种实现各有风险，需 reviewer 在 F15 passing 前签字决策并同步到 F15 verification.md §9。",
+      "sectionRefs": [
+        "§10"
+      ]
+    },
+    {
+      "id": "revision_history",
+      "title": "修订记录",
+      "proposition": "v0.1 首次编写、v0.2 新增 §10 决策项、v0.3 新增 REVIEWER-GUIDE.md 作为 reviewer 入门指南。",
+      "sectionRefs": [
+        "§11"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 16,
+    "topicCount": 11,
+    "edgeCount": 15,
+    "attachmentCount": 3,
+    "note": "元素数超出 preferred budget 12：本手册横跨部署、沙箱验证与真实切换三段操作面，且 §1 明确给出了 F13–F16 的 10 个云函数级节点，压缩会丢失机制。"
+  }
+}
