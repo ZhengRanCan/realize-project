@@ -359,17 +359,8 @@ function arg(name) {
   return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : null;
 }
 
-function main() {
-  const mapPath = arg('--map');
-  if (!mapPath) {
-    console.error('用法: node scripts/check-map.js --map <map.json> [--plan <overview-plan.json>]');
-    process.exit(2);
-  }
-  const planPath = arg('--plan');
-  const map = JSON.parse(fs.readFileSync(path.resolve(ROOT, mapPath), 'utf8'));
-  const plan = planPath ? JSON.parse(fs.readFileSync(path.resolve(ROOT, planPath), 'utf8')) : undefined;
-  const r = checkMap(map, { plan, planPath });
-
+// ── 报告渲染（CLI 与生成器共用同一份格式） ──────────────────
+function renderReport(mapPath, map, r) {
   const L = [];
   L.push(`===== check-map: ${mapPath} =====`);
   L.push(`document      ${map.document.title}`);
@@ -406,12 +397,25 @@ function main() {
   }
   L.push('注: element budget / 单点 Topic / 某类元素为 0 / 无主轴 / DAG 是 Warning 或 Informational，不是语义缺陷。relationGap 少而散时逐条列 W5，多而密时聚合成一条 W8 + detail 段。');
   L.push('════════════════════════════════');
-  console.log(L.join('\n'));
+  return L.join('\n');
+}
+
+function main() {
+  const mapPath = arg('--map');
+  if (!mapPath) {
+    console.error('用法: node scripts/check-map.js --map <map.json> [--plan <overview-plan.json>]');
+    process.exit(2);
+  }
+  const planPath = arg('--plan');
+  const map = JSON.parse(fs.readFileSync(path.resolve(ROOT, mapPath), 'utf8'));
+  const plan = planPath ? JSON.parse(fs.readFileSync(path.resolve(ROOT, planPath), 'utf8')) : undefined;
+  const r = checkMap(map, { plan, planPath });
+  console.log(renderReport(mapPath, map, r));
   process.exit(r.hard.length === 0 ? 0 : 1);
 }
 
 module.exports = {
-  checkMap, readDocHeadings, TYPE_ENUM, RELATION_ENUM, KNOWN_ROLES, PREFERRED_ELEMENT_BUDGET,
+  checkMap, renderReport, readDocHeadings, TYPE_ENUM, RELATION_ENUM, KNOWN_ROLES, PREFERRED_ELEMENT_BUDGET,
   CARDINALITY_ENUM, QUALIFIER_KEYS, OWNERSHIP_KNOWN, GAP_DENSITY_MIN_COUNT, GAP_DENSITY_MIN_RATIO,
 };
 

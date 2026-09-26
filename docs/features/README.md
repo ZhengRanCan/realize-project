@@ -62,7 +62,7 @@ XX-feature-name/
 | 04 | l0-framework-map | Technical Pass / UX Validation Pending | DSH agent | 用户 | - |
 | 05 | l0-generalization-gate | Executed（Gate = PASS，待验收） | DSH agent | 用户 | - |
 | 06 | contract-and-validators | Executed（待验收；含 F09 修复：H8/W7/W8、W4→I6、heading tree） | DSH agent | 用户 | - |
-| 07 | generation-pipeline | **Ready**（09 Gate = PASS → 已解除 Blocked） | TBD | TBD | - |
+| 07 | ai-framework-map-generation | **In Progress**（Gateway Safety ✅ 33/33；Phase 2 smoke test 待跑） | DSH agent（本轮）→ TBD | 用户 | - |
 | 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |
 | 09 | contract-adversarial-test | **Completed / Closed**（Gate = PASS） | DSH agent | 用户 | 2026-09-26 |
 
