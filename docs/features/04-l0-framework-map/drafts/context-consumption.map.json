@@ -169,6 +169,7 @@
   ],
 
   "meta": {
+    "validationGranularity": "sourceUnit",
     "elementCount": 12,
     "topicCount": 5,
     "edgeCount": 4,

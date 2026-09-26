@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://realize-project.local/schema/framework-map.schema.json",
+  "title": "framework-map（L0）",
+  "description": "Feature 03 定义的 L0 框架图契约。本文件只负责【结构层】：字段存在 / 数据类型 / 枚举 / ID 格式 / 引用完整性。语义判断（concept vs state、何时用 attachment、Capacity gap、Relation gap、不要强行串链）见 docs/framework-map-contract.md。注意：本契约刻意【不】限制 element 数量（没有 maxItems），也不把 role 做成 enum。",
+  "type": "object",
+  "required": ["mapVersion", "level", "document", "elements", "edges", "attachments", "topics", "meta"],
+  "additionalProperties": false,
+
+  "properties": {
+    "mapVersion": { "type": "integer", "minimum": 1 },
+    "level": { "const": "L0" },
+
+    "document": { "$ref": "#/$defs/document" },
+
+    "thesis": {
+      "type": "string",
+      "description": "可选。文档级中心命题；原文若没有明确中心命题可以省略。不参与任何 coverage。"
+    },
+
+    "elements": {
+      "type": "array",
+      "minItems": 1,
+      "description": "图上所有的框。刻意不设 maxItems —— 元素预算是认知容量 heuristic（preferred 12），不是 semantic validity。超预算由 check-map 报 Warning。",
+      "items": { "$ref": "#/$defs/element" }
+    },
+
+    "edges": {
+      "type": "array",
+      "description": "主轴机制关系。只放 process / artifact；concept / constraint / state 走 attachments。",
+      "items": { "$ref": "#/$defs/edge" }
+    },
+
+    "attachments": {
+      "type": "array",
+      "description": "侧挂：不是边，不进关系词表。",
+      "items": { "$ref": "#/$defs/attachment" }
+    },
+
+    "relationGap": {
+      "type": "array",
+      "description": "显式表达「现有 8 词无法在不失真的前提下表达」的关系。**不进入 edges[]**。每条产生 WARNING / REVIEW REQUIRED，而不是被逼着用错误的词硬套。",
+      "items": { "$ref": "#/$defs/relationGap" }
+    },
+
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/topic" }
+    },
+
+    "meta": { "$ref": "#/$defs/meta" }
+  },
+
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+
+    "document": {
+      "type": "object",
+      "required": ["id", "title", "sourcePath", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "role": { "enum": ["current", "target"] },
+        "scope": { "$ref": "#/$defs/documentEntry" },
+        "nonGoalSummary": { "$ref": "#/$defs/documentEntry" }
+      }
+    },
+
+    "documentEntry": {
+      "type": "object",
+      "description": "文档级导航入口：承载不属于任何 Topic 的文档定位语义（如「这是什么文档」「非目标」）。它是一种合法入口，不需要为它造 Topic。",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "sourceUnitIds": { "$ref": "#/$defs/nonEmptyStringArray" },
+        "sectionRefs": { "$ref": "#/$defs/nonEmptyStringArray" }
+      }
+    },
+
+    "elementType": {
+      "description": "允许的 element 类型词表。这是 allowed vocabulary，不是「每张图必须凑齐」的 checklist —— 某一类为 0 是正常形态。",
+      "enum": ["concept", "component", "process", "artifact", "state", "constraint"]
+    },
+
+    "element": {
+      "type": "object",
+      "required": ["id", "label", "type", "role", "topics"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1 },
+        "type": { "$ref": "#/$defs/elementType" },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "description": "刻意【不】做成 enum：controlled-but-extensible。未知 role 由 check-map 报 WARNING。已知取值见 x-known-roles。",
+          "x-known-roles": [
+            "input", "output", "intermediate", "authority", "consumer", "producer",
+            "boundary", "target", "current", "instance", "excluded", "anti-pattern",
+            "semantic-level"
+          ]
+        },
+        "topics": { "$ref": "#/$defs/nonEmptyStringArray" },
+        "sourceUnitIds": { "type": "array", "items": { "type": "string" } },
+        "sectionRefs": { "type": "array", "items": { "type": "string" } }
+      },
+      "anyOf": [
+        { "properties": { "sourceUnitIds": { "minItems": 1 } }, "required": ["sourceUnitIds"] },
+        { "properties": { "sectionRefs": { "minItems": 1 } }, "required": ["sectionRefs"] }
+      ],
+      "description": "provenance 是硬规则：sourceUnitIds 与 sectionRefs 至少其一非空。§7.1 F1。"
+    },
+
+    "relationType": {
+      "description": "受控关系词表（8 词 + relates-to 兜底）。表外词 = HARD ERROR。需要表达词表之外的关系时，用 relationGap，不要新增词。",
+      "enum": [
+        "produces", "consumes", "transforms-to", "depends-on",
+        "contains", "controls", "validates", "constrains",
+        "relates-to"
+      ]
+    },
+
+    "edge": {
+      "type": "object",
+      "required": ["from", "to", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "$ref": "#/$defs/id" },
+        "to": { "$ref": "#/$defs/id" },
+        "type": { "$ref": "#/$defs/relationType" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "attachment": {
+      "type": "object",
+      "required": ["elementId", "attachedTo"],
+      "additionalProperties": false,
+      "properties": {
+        "elementId": { "$ref": "#/$defs/id" },
+        "attachedTo": { "$ref": "#/$defs/nonEmptyStringArray" }
+      }
+    },
+
+    "relationGap": {
+      "type": "object",
+      "description": "关系缺口登记。不进入 edges[]，不产生新的关系词。",
+      "required": ["from", "to", "intendedMeaning", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "$ref": "#/$defs/id" },
+        "to": { "$ref": "#/$defs/id" },
+        "intendedMeaning": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "fixture": { "type": "string" }
+      }
+    },
+
+    "topic": {
+      "type": "object",
+      "required": ["id", "title", "proposition"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "title": { "type": "string", "minLength": 1 },
+        "proposition": { "type": "string", "minLength": 1 },
+        "blockIds": { "type": "array", "items": { "type": "string" } },
+        "sectionRefs": { "type": "array", "items": { "type": "string" } }
+      },
+      "anyOf": [
+        { "properties": { "blockIds": { "minItems": 1 } }, "required": ["blockIds"] },
+        { "properties": { "sectionRefs": { "minItems": 1 } }, "required": ["sectionRefs"] }
+      ],
+      "description": "N1：每个 Topic 至少关联一个 element 或一个 block / section。Topic **不要求**有 L0 element（§7.1 F3）—— 元素关联由 element.topics 反向表达。"
+    },
+
+    "meta": {
+      "type": "object",
+      "required": ["validationGranularity"],
+      "properties": {
+        "validationGranularity": {
+          "type": "string",
+          "minLength": 1,
+          "description": "溯源与可达性的粒度。sourceUnit（已建 sourceUnits）或 section (provisional)。两种粒度**不得**合成一个 coverage 数字。"
+        },
+        "elementCount": { "type": "integer", "minimum": 0 },
+        "topicCount": { "type": "integer", "minimum": 0 },
+        "edgeCount": { "type": "integer", "minimum": 0 },
+        "attachmentCount": { "type": "integer", "minimum": 0 },
+        "documentEntrySourceUnitIds": { "type": "array", "items": { "type": "string" } },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

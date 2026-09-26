@@ -132,6 +132,23 @@
     { "elementId": "E-12", "attachedTo": ["E-06", "E-07"] }
   ],
 
+  "relationGap": [
+    {
+      "from": "E-02",
+      "to": "E-01",
+      "intendedMeaning": "Candidate Inbox 持有 / 存储 Candidate",
+      "reason": "existing vocabulary cannot express this without distortion：contains 的既定语义是「component 嵌套 process」，用在「存储持有」上是拉伸",
+      "fixture": "C"
+    },
+    {
+      "from": "E-07",
+      "to": "E-06",
+      "intendedMeaning": "Proposal 通过校验后被放行进入下游",
+      "reason": "existing vocabulary cannot express this without distortion：validates 只表达「谁校验谁」，缺「通过 / 放行」这一结果语义",
+      "fixture": "C"
+    }
+  ],
+
   "topics": [
     {
       "id": "T-01",

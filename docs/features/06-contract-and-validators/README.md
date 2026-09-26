@@ -258,5 +258,16 @@ Fixture E  纯 Operational Runbook
 ## 9. 状态
 
 - **创建时间**：2026-09-26
-- **状态**：进行中
-- **配套文档**：`execution-prompt.md` · `validation-checklist.md`
+- **执行**：完成 Task 1 ~ 6
+- **结果**：
+
+```text
+schema          无 maxItems（刻意）；role 非 enum；relationGap 为独立结构
+check-map       HARD / WARN / INFO 三级；词表从 schema 读（单一真相）
+test:map        19/19 通过（覆盖三级 severity 的边界）
+A / B / C       三篇 HARD = 0
+```
+
+- **判定**：待 reviewer 按 `validation-checklist.md` 验证
+- **配套文档**：`execution-prompt.md` · `validation-checklist.md` · `results/notes.md`
+- **下一步**：Phase 2b（Contract 对抗测试）—— 用 Fixture D（真 ER-heavy）与 E（纯 runbook）去打 schema 与 validator

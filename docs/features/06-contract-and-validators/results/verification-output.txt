@@ -1,0 +1,97 @@
+===== Feature 06 · 三篇 Fixture 的 check-map 结果 =====
+运行: 2026-09-26 20:44
+
+--- A（sourceUnit 粒度；需要 --plan）---
+===== check-map: docs/features/04-l0-framework-map/drafts/context-consumption.map.json =====
+document      Pre-class Fusion Context Consumption 语义模型
+granularity   sourceUnit
+stats         elements 12 · edges 4 · attachments 7 · topics 5 · relationGap 0
+coverage      87/87 有路径（本粒度内）
+
+HARD ERROR (0)
+  （无）
+
+WARNING (0)
+  （无）
+
+INFORMATIONAL (2)
+  i I1 component = 0（正常形态差异，不是缺陷）
+  i I2 state = 0（正常形态差异，不是缺陷）
+
+════════════════════════════════
+结果: HARD 0 · WARN 0 · INFO 2
+PASS（无契约违反）
+注: element budget 是 Warning；某类元素为 0 / 无主轴 / DAG / Topic 无 element 是 Informational，不是异常。
+════════════════════════════════
+
+--- B（section 粒度 · provisional）---
+===== check-map: docs/features/05-l0-generalization-gate/drafts/fixture-b.map.json =====
+document      Canonical Hash / Digest 与完整性规范（fusion-c14n-v1）
+granularity   section (provisional)   ⚠️ provisional — 不得与 sourceUnit 粒度混算
+stats         elements 12 · edges 6 · attachments 5 · topics 5 · relationGap 1
+coverage      13/13 有路径（本粒度内）
+
+HARD ERROR (0)
+  （无）
+
+WARNING (2)
+  ! W4 T-01 只挂了一个 block / section
+  ! W5 relationGap[0] E-10 ⇢ E-09：「TypeScript / Python 两端实现必须与同一份 Golden Fixtures 产生逐字节相同的结果」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）
+
+INFORMATIONAL (2)
+  i I2 state = 0（正常形态差异，不是缺陷）
+  i I5 T-01 没有 L0 element（Topic 与 element 已解耦，合法）
+
+════════════════════════════════
+结果: HARD 0 · WARN 2 · INFO 2
+PASS（无契约违反）
+注: element budget 是 Warning；某类元素为 0 / 无主轴 / DAG / Topic 无 element 是 Informational，不是异常。
+════════════════════════════════
+
+--- C（section 粒度 · provisional）---
+===== check-map: docs/features/05-l0-generalization-gate/drafts/fixture-c.map.json =====
+document      DeepTutor 自动画像与学习状态流水线
+granularity   section (provisional)   ⚠️ provisional — 不得与 sourceUnit 粒度混算
+stats         elements 12 · edges 8 · attachments 4 · topics 6 · relationGap 2
+coverage      19/19 有路径（本粒度内）
+
+HARD ERROR (0)
+  （无）
+
+WARNING (2)
+  ! W5 relationGap[0] E-02 ⇢ E-01：「Candidate Inbox 持有 / 存储 Candidate」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）
+  ! W5 relationGap[1] E-07 ⇢ E-06：「Proposal 通过校验后被放行进入下游」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）
+
+INFORMATIONAL (3)
+  i I1 component = 0（正常形态差异，不是缺陷）
+  i I4 非单链拓扑：收敛节点 E-04, E-08（按 consumes 归一化后的多入边）—— 形态差异，不是异常
+  i I5 T-06 没有 L0 element（Topic 与 element 已解耦，合法）
+
+════════════════════════════════
+结果: HARD 0 · WARN 2 · INFO 3
+PASS（无契约违反）
+注: element budget 是 Warning；某类元素为 0 / 无主轴 / DAG / Topic 无 element 是 Informational，不是异常。
+════════════════════════════════
+
+--- test-check-map ---
+===== test-check-map =====
+  PASS  基线最小 map：Hard Error = 0
+  PASS  未知 element type → HARD
+  PASS  缺 provenance → HARD
+  PASS  provenance 指向不存在的小节 → HARD
+  PASS  悬空 edge 端点 → HARD
+  PASS  表外关系词 → HARD
+  PASS  无导航路径 → HARD
+  PASS  原文小节无法解析 → 只 WARNING，不误报 HARD
+  PASS  element id 重复 → HARD
+  PASS  主轴出现 constraint → HARD
+  PASS  element > 12 → WARNING 且不是 HARD
+  PASS  未知 role → WARNING 且不是 HARD
+  PASS  relationGap → WARNING 且不是 HARD
+  PASS  Topic 只挂一个 block/section → WARNING
+  PASS  component = 0 与 state = 0 → INFORMATIONAL（不是 WARN/HARD）
+  PASS  Topic 没有 element → INFORMATIONAL（不是 HARD）
+  PASS  出现收敛节点（DAG）→ INFORMATIONAL
+  PASS  没有主轴 → INFORMATIONAL
+  PASS  词表确实从 schema 读（6 类 / 9 词）
+===== 19 passed, 0 failed =====

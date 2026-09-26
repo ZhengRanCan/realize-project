@@ -131,6 +131,16 @@
     { "elementId": "E-12", "attachedTo": ["E-03", "E-07"] }
   ],
 
+  "relationGap": [
+    {
+      "from": "E-10",
+      "to": "E-09",
+      "intendedMeaning": "TypeScript / Python 两端实现必须与同一份 Golden Fixtures 产生逐字节相同的结果",
+      "reason": "existing vocabulary cannot express this without distortion：depends-on 只表示依赖，表达不了「必须一致」",
+      "fixture": "B"
+    }
+  ],
+
   "topics": [
     {
       "id": "T-01",
