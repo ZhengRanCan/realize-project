@@ -115,64 +115,114 @@
   ],
 
   "edges": [
-    { "from": "E-03", "to": "E-04", "type": "contains" },
-    { "from": "E-03", "to": "E-05", "type": "contains" },
-    { "from": "E-05", "to": "E-06", "type": "contains" },
-    { "from": "E-04", "to": "E-01", "type": "depends-on" },
-    { "from": "E-06", "to": "E-06", "type": "depends-on" },
-    { "from": "E-07", "to": "E-06", "type": "depends-on" },
-    { "from": "E-08", "to": "E-06", "type": "depends-on" },
-    { "from": "E-10", "to": "E-06", "type": "depends-on" },
-    { "from": "E-11", "to": "E-06", "type": "depends-on" }
+    {
+      "id": "R-01",
+      "from": "E-03",
+      "to": "E-04",
+      "type": "contains",
+      "label": "PlanBundle = { plan: Plan }（唯一一个 Plan）",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "R-02",
+      "from": "E-03",
+      "to": "E-05",
+      "type": "contains",
+      "label": "PlanBundle = { stages: Stage[] }（短周期 goal 可以没有 Stage）",
+      "qualifiers": { "cardinality": { "from": "one", "to": "zero-or-many" }, "ownership": "owned" }
+    },
+    {
+      "id": "R-03",
+      "from": "E-05",
+      "to": "E-06",
+      "type": "contains",
+      "label": "Every initial Task belongs to one Stage（原文 L395）；Stage 拥有 Task 的归属",
+      "qualifiers": { "cardinality": { "from": "one", "to": "one-or-many" }, "ownership": "owned" }
+    },
+    {
+      "id": "R-04",
+      "from": "E-04",
+      "to": "E-01",
+      "type": "depends-on",
+      "label": "Plan 属于一个 Goal（goalId）；One Goal may have multiple historical Plan versions（原文 L262）",
+      "qualifiers": { "cardinality": { "from": "one-or-many", "to": "one" }, "ownership": "owned" }
+    },
+    {
+      "id": "R-05",
+      "from": "E-06",
+      "to": "E-06",
+      "type": "depends-on",
+      "label": "Task.dependsOnTaskIds（持久化依赖，原文 L396）",
+      "qualifiers": { "cardinality": { "from": "zero-or-many", "to": "zero-or-many" }, "ownership": "reference" }
+    },
+    {
+      "id": "R-06",
+      "from": "E-07",
+      "to": "E-06",
+      "type": "depends-on",
+      "label": "TaskResult 记录某个 Task 实际发生了什么：只引用 Task，不拥有它",
+      "qualifiers": { "cardinality": { "from": "one-or-many", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "R-07",
+      "from": "E-08",
+      "to": "E-06",
+      "type": "depends-on",
+      "label": "FocusSession belongs to exactly one Goal/Plan/Task（原文 L588）",
+      "qualifiers": { "cardinality": { "from": "zero-or-many", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "R-08",
+      "from": "E-10",
+      "to": "E-06",
+      "type": "depends-on",
+      "label": "某日决定执行哪个 Task：选择引用 Task，不改动 Task",
+      "qualifiers": { "cardinality": { "from": "zero-or-many", "to": "one" }, "ownership": "reference" }
+    },
+    {
+      "id": "R-09",
+      "from": "E-11",
+      "to": "E-06",
+      "type": "depends-on",
+      "label": "PlanChangeSummary references stable Task ids and dates（原文 L743）",
+      "qualifiers": { "cardinality": { "from": "zero-or-many", "to": "zero-or-many" }, "ownership": "reference" }
+    },
+    {
+      "id": "R-10",
+      "from": "E-09",
+      "to": "E-07",
+      "type": "contains",
+      "label": "DailyReview may reference or summarize the Task results recorded for that date（原文 L605）—— 引用而非拥有",
+      "qualifiers": { "cardinality": { "from": "one", "to": "zero-or-many" }, "ownership": "reference" }
+    },
+    {
+      "id": "R-11",
+      "from": "E-02",
+      "to": "E-01",
+      "type": "relates-to",
+      "label": "UserProfile is cross-goal reusable user context（原文 L271）：被规划引用，不被任何单个 Goal 拥有",
+      "qualifiers": { "cardinality": { "from": "one", "to": "zero-or-many" }, "ownership": "shared" }
+    }
   ],
 
   "attachments": [
     { "elementId": "E-02", "attachedTo": ["E-03"] },
-    { "elementId": "E-09", "attachedTo": ["E-07"] },
     { "elementId": "E-12", "attachedTo": ["E-01", "E-04", "E-05", "E-06", "E-08"] }
   ],
 
   "relationGap": [
     {
-      "from": "E-03",
-      "to": "E-04",
-      "intendedMeaning": "PlanBundle 是聚合根：PlanBundle = Plan + Stage[] + Task[]（组合关系）",
-      "reason": "existing vocabulary cannot express this without distortion：contains 的既定语义是「component 嵌套 process」，用于领域聚合组合是拉伸",
+      "from": "E-06",
+      "to": "E-06",
+      "intendedMeaning": "同一 PlanBundle 内的 Task 依赖必须构成无环图，且「依赖已满足」= 被引用 Task 为 done（图级不变量 + 条件满足语义）",
+      "reason": "base verb + qualifiers 已能表达「Task depends-on Task，两端 zero-or-many」（见 R-05）；剩下的是**关系自身的不变量**：无环性、作用域限定在同一个 PlanBundle、以及「满足」的条件语义。这属 Constraint 语义，在没有 constraint.parameters 表达面之前仍登记为缺口。",
       "fixture": "D"
     },
     {
       "from": "E-05",
       "to": "E-06",
-      "intendedMeaning": "Every initial Task belongs to one Stage，且 scheduledDate 必须落在该 Stage 区间内（ownership + 跨实体约束）",
-      "reason": "existing vocabulary cannot express this without distortion：这是归属（belongs-to）而不是依赖，也说不出「恰好一个」与日期区间约束",
-      "fixture": "D"
-    },
-    {
-      "from": "E-06",
-      "to": "E-06",
-      "intendedMeaning": "Task 之间的显式依赖图：同一 PlanBundle 内、无环、只有引用 Task 为 done 才算满足",
-      "reason": "existing vocabulary cannot express this without distortion：自环无法表达基数与无环性，也没有「满足条件」语义",
-      "fixture": "D"
-    },
-    {
-      "from": "E-09",
-      "to": "E-07",
-      "intendedMeaning": "一天可以有多条 Task result，但每个 Goal/date 只有一条 DailyReview；DailyReview 引用/汇总 TaskResult",
-      "reason": "existing vocabulary cannot express this without distortion：没有 reference / summarize 关系词，且「每 Goal/date 至多一条」这类基数无处表达",
-      "fixture": "D"
-    },
-    {
-      "from": "E-02",
-      "to": "E-01",
-      "intendedMeaning": "UserProfile 是跨 goal 复用上下文，被规划引用，但不属于任何单个 Goal",
-      "reason": "existing vocabulary cannot express this without distortion：没有「被引用但不被拥有」的关系词",
-      "fixture": "D"
-    },
-    {
-      "from": "E-01",
-      "to": "E-04",
-      "intendedMeaning": "一个 Goal 可以有多条历史 Plan 版本，但同一时刻至多一条 active plan",
-      "reason": "existing vocabulary cannot express this without distortion：关系词没有基数（1:N 与 at-most-one），也没有「active」这一条件",
+      "intendedMeaning": "Task.scheduledDate 必须落在其所属 Stage 的 [startDate, endDate] 区间内（跨实体区间包含不变量）",
+      "reason": "归属关系本身已由 R-03（contains + owned + one/one-or-many）表达；剩下的是**跨实体的区间包含约束**，属 Constraint 语义。保留为 relationGap 而不是 Constraint 登记项，因为它是**成对锚定**的（Stage—Task 两端的相对定位），与「单实体槽位唯一性」不是一类。",
       "fixture": "D"
     }
   ],
@@ -226,9 +276,9 @@
     "validationGranularity": "section (provisional)",
     "elementCount": 12,
     "topicCount": 7,
-    "edgeCount": 9,
-    "attachmentCount": 3,
-    "relationGapCount": 6,
-    "note": "D 没有 sourceUnits；溯源为原文小节。小节标题为英文词形（## Goal / ## PlanBundle…），非数字编号。"
+    "edgeCount": 11,
+    "attachmentCount": 2,
+    "relationGapCount": 2,
+    "note": "D 没有 sourceUnits；溯源为原文小节。小节标题为英文词形（## Goal / ## PlanBundle…），非数字编号 —— section parser 按 Markdown heading tree 解析，本节全 21 个小节均可解析（N2/N3 已执行）。关系层为两层：base verb（8 词）+ qualifiers（cardinality / ownership）。"
   }
 }

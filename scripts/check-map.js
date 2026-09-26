@@ -25,16 +25,66 @@ const TYPE_ENUM = schema.$defs.elementType.enum;
 const RELATION_ENUM = schema.$defs.relationType.enum;
 const KNOWN_ROLES = schema.$defs.element.properties.role['x-known-roles'];
 const PREFERRED_ELEMENT_BUDGET = 12; // heuristic，不是语义有效性
+// 结构属性（qualifiers）的词表同样从 schema 读
+const CARDINALITY_ENUM = schema.$defs.cardinalityValue.enum;
+const QUALIFIER_KEYS = Object.keys(schema.$defs.edgeQualifiers.properties);
+const OWNERSHIP_KNOWN = schema.$defs.edgeQualifiers.properties.ownership['x-known-values'];
+// 关系缺口聚合阈值：缺口条数够多 **且** 占比够高，才说明关系层整体不够用
+const GAP_DENSITY_MIN_COUNT = 3;
+const GAP_DENSITY_MIN_RATIO = 0.5;
 
 // ── 原文 / plan 的读取 ──────────────────────────────────────
-function readDocSections(sourcePath) {
+/**
+ * 解析原文的 **Markdown Heading Tree**。
+ *
+ * 长期语义（见 docs/framework-map-contract.md）：原文的导航单位是 Markdown 标题层级，
+ * **不是**数字章节编号。「## 4. 总览」与「## Goal」都是合法的小节标题；编号只是标题
+ * 文本的一部分，不是语法。此处只做一件最小的事：把所有 heading 收进一棵树，并给每个
+ * heading 一个稳定 key（有编号取编号 token，否则取标题文本），供 `§<key>` 引用解析。
+ *
+ * N2 / N3 需要什么粒度，就从树里**选**一层，而不是把「## N.」写死：
+ * sectionLevel = 最浅的、且至少有 2 个标题的那一层（跳过孤零零的文档大标题）。
+ */
+function readDocHeadings(sourcePath) {
   const txt = fs.readFileSync(path.resolve(ROOT, sourcePath), 'utf8');
-  const top = new Set(), sub = new Set();
-  txt.split(/\r?\n/).forEach((l) => {
-    let m = l.match(/^## (\d+)\./); if (m) top.add(m[1]);
-    m = l.match(/^### (\d+\.\d+)/); if (m) sub.add(m[1]);
+  const heads = [];
+  // 围栏代码块内的 `#` 是注释，不是标题 —— 必须按 Markdown 语义跳过，
+  // 否则 runbook 里的 shell 注释（"# 期望: 无输出"）会被当成 level-1 标题。
+  let fenceChar = null, fenceLen = 0;
+  txt.split(/\r?\n/).forEach((line, i) => {
+    const f = line.match(/^[ \t]{0,3}(`{3,}|~{3,})/);
+    if (f) {
+      const ch = f[1][0], len = f[1].length;
+      if (!fenceChar) { fenceChar = ch; fenceLen = len; return; }
+      if (ch === fenceChar && len >= fenceLen) { fenceChar = null; fenceLen = 0; return; }
+    }
+    if (fenceChar) return;
+    const m = line.match(/^(#{1,6})[ \t]+(.*\S)[ \t]*$/);
+    if (!m) return;
+    const text = m[2].trim();
+    const num = text.match(/^(\d+(?:\.\d+)*)[.、]?[ \t]/);
+    heads.push({ level: m[1].length, text, key: num ? num[1] : text, line: i + 1 });
   });
-  return { top: [...top].sort((a, b) => a - b), sub: [...sub].sort() };
+  const byLevel = new Map();
+  heads.forEach((h) => byLevel.set(h.level, (byLevel.get(h.level) || 0) + 1));
+  const levels = [...byLevel.keys()].sort((a, b) => a - b);
+  const sectionLevel = levels.find((l) => byLevel.get(l) >= 2) ?? levels[0] ?? null;
+  return {
+    heads,
+    sectionLevel,
+    top: heads.filter((h) => h.level === sectionLevel).map((h) => h.key),
+    all: heads.map((h) => h.key),
+  };
+}
+
+/** 兼容旧调用方直接传入 `{top, sub}`（测试用）。 */
+function normalizeSections(input) {
+  if (!input) return null;
+  if (Array.isArray(input.heads) || Array.isArray(input.all)) {
+    return { heads: input.heads || [], sectionLevel: input.sectionLevel ?? null, top: input.top || [], all: input.all || [] };
+  }
+  const top = input.top || [], sub = input.sub || [];
+  return { heads: [], sectionLevel: null, top, all: [...top, ...sub] };
 }
 
 /**
@@ -89,15 +139,15 @@ function checkMap(map, opts = {}) {
       warn.push('W0 未提供 --plan → 无法建立 sourceUnit 全集，跳过引用解析与 N2 / N3 导航校验，避免误报 HARD');
     }
   } else {
-    sec = opts.docSections || readDocSections(map.document.sourcePath);
+    sec = normalizeSections(opts.docSections) || readDocHeadings(map.document.sourcePath);
     if (!sec.top.length) {
-      // 原文小节标题不是数字形式（例如 Fixture A 用「## 一、」）→ 无法建立"位置全集"。
+      // 原文一个 heading 都解析不出来（或只有文档大标题）→ 无法建立"位置全集"。
       // 此时**不能**把每个引用都判成悬空引用 —— 那会把格式差异误报成契约违反。
       sectionUnresolved = true;
       skipped.push('引用可解析性与 N2 / N3（原文小节无法解析）');
-      warn.push('W0 无法从原文解析出小节标题（文档可能使用非数字标题）→ 跳过 section 粒度的引用 / 导航校验，避免误报 HARD');
+      warn.push('W0 无法从原文解析出小节标题（doc 可能没有 Markdown heading）→ 跳过 section 粒度的引用 / 导航校验，避免误报 HARD');
     } else {
-      validUnits = new Set([...sec.top.map((n) => '§' + n), ...sec.sub.map((n) => '§' + n)]);
+      validUnits = new Set(sec.all.map((n) => '§' + n));
       universe = sec.top.map((n) => '§' + n);
     }
   }
@@ -116,12 +166,48 @@ function checkMap(map, opts = {}) {
     if (!topicIds.has(t)) hard.push(`H3 ${e.id} 的 topics 指向不存在的 topic: ${t}`);
   }));
 
-  // ── H4 edge 表外词 / H3 edge 端点 ────────────────────────
+  // ── H4 edge 表外词 / H8 qualifier 形态 / H3 edge 端点 ────
+  const unknownQualifierValues = new Set();
   edges.forEach((ed, i) => {
-    if (!RELATION_ENUM.includes(ed.type)) hard.push(`H4 edges[${i}] relation "${ed.type}" 是表外词（要表达词表之外的关系请用 relationGap）`);
-    if (!byId.has(ed.from)) hard.push(`H3 edges[${i}] from="${ed.from}" 不存在`);
-    if (!byId.has(ed.to)) hard.push(`H3 edges[${i}] to="${ed.to}" 不存在`);
+    const tag = ed.id || `edges[${i}]`;
+    if (!RELATION_ENUM.includes(ed.type)) hard.push(`H4 ${tag} relation "${ed.type}" 是表外词（要表达词表之外的关系请用 relationGap）`);
+    if (!byId.has(ed.from)) hard.push(`H3 ${tag} from="${ed.from}" 不存在`);
+    if (!byId.has(ed.to)) hard.push(`H3 ${tag} to="${ed.to}" 不存在`);
+
+    // qualifiers 是**结构属性**，不是第三层词表。形态错 = HARD；取值未知 = WARNING。
+    const q = ed.qualifiers;
+    if (q !== undefined) {
+      if (q === null || typeof q !== 'object' || Array.isArray(q)) {
+        hard.push(`H8 ${tag} qualifiers 必须是对象`);
+      } else {
+        Object.keys(q).forEach((k) => {
+          if (!QUALIFIER_KEYS.includes(k)) hard.push(`H8 ${tag} qualifiers.${k} 不是已知的结构属性（只允许 ${QUALIFIER_KEYS.join(' / ')}）`);
+        });
+        const c = q.cardinality;
+        if (c !== undefined) {
+          if (c === null || typeof c !== 'object' || Array.isArray(c)) {
+            hard.push(`H8 ${tag} qualifiers.cardinality 必须是 {from,to} 对象`);
+          } else {
+            ['from', 'to'].forEach((side) => {
+              if (c[side] === undefined) hard.push(`H8 ${tag} qualifiers.cardinality 缺少 ${side} 端`);
+              else if (!CARDINALITY_ENUM.includes(c[side])) unknownQualifierValues.add(`${tag}.cardinality.${side}=${c[side]}`);
+            });
+            Object.keys(c).forEach((k) => {
+              if (k !== 'from' && k !== 'to') hard.push(`H8 ${tag} qualifiers.cardinality.${k} 不是已知字段（只允许 from / to）`);
+            });
+          }
+        }
+        const o = q.ownership;
+        if (o !== undefined) {
+          if (typeof o !== 'string' || !o) hard.push(`H8 ${tag} qualifiers.ownership 必须是非空字符串`);
+          else if (!OWNERSHIP_KNOWN.includes(o)) unknownQualifierValues.add(`${tag}.ownership=${o}`);
+        }
+      }
+    }
   });
+  if (unknownQualifierValues.size) {
+    warn.push(`W7 qualifier 取值未知（controlled-but-extensible，不判 Hard）: ${[...unknownQualifierValues].join(', ')}`);
+  }
   const relatesTo = edges.filter((e) => e.type === 'relates-to').length;
   if (relatesTo > 1) warn.push(`W6 relates-to 兜底词使用了 ${relatesTo} 次（>1）—— 兜底词一多说明词表不够用`);
 
@@ -210,17 +296,25 @@ function checkMap(map, opts = {}) {
       + (hasNav ? '；内容都有 L1/L2 入口 → 只需检查 Navigation invariant' : '；且存在无路径内容 → 需要重新抽象'));
   }
 
-  // ── W3 / W4 topic 形态 ──────────────────────────────────
+  // ── W3 topic 数 ─────────────────────────────────────────
   if (topics.length > 10) warn.push(`W3 Topic 数 ${topics.length} > 10`);
-  topics.forEach((t) => {
-    const nBlocks = (t.blockIds || []).length + (t.sectionRefs || []).length;
-    if (nBlocks === 1) warn.push(`W4 ${t.id} 只挂了一个 block / section`);
-  });
 
-  // ── W5 relationGap 存在 ─────────────────────────────────
-  gaps.forEach((g, i) => {
-    warn.push(`W5 relationGap[${i}] ${g.from} ⇢ ${g.to}：「${g.intendedMeaning}」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）`);
-  });
+  // ── W5 relationGap：单条 vs 聚合 ────────────────────────
+  // 单条 relationGap 是**正常**的登记行为，不需要在报告顶部刷 N 遍。
+  // 只有当缺口密度高到说明"关系层整体不够用"时，才升成一条聚合 Warning。
+  const representedRelations = edges.length;
+  const gapDensity = gaps.length + representedRelations > 0
+    ? gaps.length / (gaps.length + representedRelations)
+    : 0;
+  const densityFires = gaps.length >= GAP_DENSITY_MIN_COUNT && gapDensity >= GAP_DENSITY_MIN_RATIO;
+  const gapDetails = gaps.map((g, i) =>
+    `W5 relationGap[${i}] ${g.from} ⇢ ${g.to}：「${g.intendedMeaning}」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）`);
+  if (densityFires) {
+    warn.push(`W8 关系缺口密度过高：relationGap ${gaps.length} / (relationGap ${gaps.length} + 已表达关系 ${representedRelations}) = ${gapDensity.toFixed(2)} ≥ ${GAP_DENSITY_MIN_RATIO}（且 ≥ ${GAP_DENSITY_MIN_COUNT} 条）`
+      + ` —— 说明不是个别关系缺词，而是关系层需要补充结构属性（见 detail 段逐条明细）`);
+  } else {
+    gapDetails.forEach((m) => warn.push(m));
+  }
 
   // ── INFO：形态差异，不是异常 ────────────────────────────
   const typeCount = (t) => els.filter((e) => e.type === t).length;
@@ -238,13 +332,24 @@ function checkMap(map, opts = {}) {
     const nEl = els.filter((e) => (e.topics || []).includes(t.id)).length;
     if (nEl === 0) info.push(`I5 ${t.id} 没有 L0 element（Topic 与 element 已解耦，合法）`);
   });
+  // I6（原 W4）：Topic 只挂一个 block / section —— 单点 Topic 是形态差异，不是缺陷
+  topics.forEach((t) => {
+    const nNav = (t.blockIds || []).length + (t.sectionRefs || []).length;
+    if (nNav === 1) info.push(`I6 ${t.id} 只挂了一个 block / section（单点 Topic，形态差异）`);
+  });
 
   return {
     hard, warn, info, granularity, skipped,
+    // 聚合 Warning 命中时，逐条明细挪到 detail 段，不在顶部刷 N 遍
+    relationGapDetails: densityFires ? gapDetails : [],
     // 状态必须区分 PASS 与 PASS WITH INCOMPLETE VALIDATION ——
     // 一旦 N1~N3 根本没执行，就不能让人误以为 Navigation invariant 已验证通过
     status: hard.length > 0 ? 'FAIL' : (skipped.length > 0 ? 'PASS WITH INCOMPLETE VALIDATION' : 'PASS'),
-    stats: { elements: els.length, edges: edges.length, attachments: atts.length, topics: topics.length, relationGap: gaps.length, universe: universe.length, unreachable: unreachable.length },
+    stats: {
+      elements: els.length, edges: edges.length, attachments: atts.length, topics: topics.length,
+      relationGap: gaps.length, gapDensity: Number(gapDensity.toFixed(2)),
+      universe: universe.length, unreachable: unreachable.length,
+    },
   };
 }
 
@@ -269,7 +374,7 @@ function main() {
   L.push(`===== check-map: ${mapPath} =====`);
   L.push(`document      ${map.document.title}`);
   L.push(`granularity   ${r.granularity}${/provisional/i.test(r.granularity) ? '   ⚠️ provisional — 不得与 sourceUnit 粒度混算' : ''}`);
-  L.push(`stats         elements ${r.stats.elements} · edges ${r.stats.edges} · attachments ${r.stats.attachments} · topics ${r.stats.topics} · relationGap ${r.stats.relationGap}`);
+  L.push(`stats         elements ${r.stats.elements} · edges ${r.stats.edges} · attachments ${r.stats.attachments} · topics ${r.stats.topics} · relationGap ${r.stats.relationGap} · gapDensity ${r.stats.gapDensity}`);
   L.push(`coverage      ${r.skipped.length ? 'SKIPPED（未执行，见 W0 与下方 skipped 段）' : `${r.stats.universe - r.stats.unreachable}/${r.stats.universe} 有路径（本粒度内）`}`);
   L.push('');
   L.push(`HARD ERROR (${r.hard.length})`);
@@ -283,6 +388,11 @@ function main() {
   L.push(`INFORMATIONAL (${r.info.length})`);
   r.info.forEach((m) => L.push('  i ' + m));
   if (!r.info.length) L.push('  （无）');
+  if (r.relationGapDetails.length) {
+    L.push('');
+    L.push(`RELATION GAP DETAIL (${r.relationGapDetails.length}) —— 已聚合为 W8，不再逐条占用 WARNING 名额`);
+    r.relationGapDetails.forEach((m) => L.push('  · ' + m.replace(/^W5 /, '')));
+  }
   L.push('');
   L.push(`SKIPPED (${r.skipped.length})`);
   r.skipped.forEach((m) => L.push('  – ' + m));
@@ -294,12 +404,15 @@ function main() {
   if (r.status === 'PASS WITH INCOMPLETE VALIDATION') {
     L.push('⚠️ 有检查未执行 —— **不得**据此认为 Navigation invariant 已验证通过。');
   }
-  L.push('注: element budget 是 Warning；某类元素为 0 / 无主轴 / DAG / Topic 无 element 是 Informational，不是异常。');
+  L.push('注: element budget / 单点 Topic / 某类元素为 0 / 无主轴 / DAG 是 Warning 或 Informational，不是语义缺陷。relationGap 少而散时逐条列 W5，多而密时聚合成一条 W8 + detail 段。');
   L.push('════════════════════════════════');
   console.log(L.join('\n'));
   process.exit(r.hard.length === 0 ? 0 : 1);
 }
 
-module.exports = { checkMap, TYPE_ENUM, RELATION_ENUM, KNOWN_ROLES, PREFERRED_ELEMENT_BUDGET };
+module.exports = {
+  checkMap, readDocHeadings, TYPE_ENUM, RELATION_ENUM, KNOWN_ROLES, PREFERRED_ELEMENT_BUDGET,
+  CARDINALITY_ENUM, QUALIFIER_KEYS, OWNERSHIP_KNOWN, GAP_DENSITY_MIN_COUNT, GAP_DENSITY_MIN_RATIO,
+};
 
 if (require.main === module) main();

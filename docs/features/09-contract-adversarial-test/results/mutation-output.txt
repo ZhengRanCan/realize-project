@@ -2,21 +2,7 @@
 目的：证明「错误产物会被拦住」，而不只是「正确产物没被误报」。
 
 ─── Fixture D ───
-基线: HARD 0 · WARN 7 · INFO 3 · 状态 PASS WITH INCOMPLETE VALIDATION
-
-| Mutation | 期望 | 实际 | 结果 |
-|---|---|---|---|
-| M1 删除 provenance | HARD H2 | HARD (H2) | ✅ 拦住 |
-| M2 element type 改成第 7 类 | HARD H1 | HARD (H1) | ✅ 拦住 |
-| M3 edge 使用表外 relation | HARD H4 | HARD (H4) | ✅ 拦住 |
-| M4 制造 dangling reference | HARD H3 | HARD (H3) | ✅ 拦住 |
-| M5 塞一个孤立 element | HARD H7 | HARD (H7) | ✅ 拦住 |
-| M6 删除某 Topic（无 element）的导航入口 | HARD H5 | HARD (H5) | ✅ 拦住 |
-| M8 让某一顶层小节失去所有入口 | HARD H5 | 未被拦住 | ❌ 漏网 |
-| M7 强行串联两个无关节点 | 判不出来（人工审计项） | HARD 0 · WARN 7 | ✅ 如预期未被检测 |
-
-─── Fixture E ───
-基线: HARD 0 · WARN 5 · INFO 5 · 状态 PASS
+基线: HARD 0 · WARN 2 · INFO 3 · 状态 PASS
 
 | Mutation | 期望 | 实际 | 结果 |
 |---|---|---|---|
@@ -27,10 +13,24 @@
 | M5 塞一个孤立 element | HARD H7 | HARD (H7) | ✅ 拦住 |
 | M6 删除某 Topic（无 element）的导航入口 | HARD H5 | HARD (H5) | ✅ 拦住 |
 | M8 让某一顶层小节失去所有入口 | HARD H5 | HARD (H5) | ✅ 拦住 |
-| M7 强行串联两个无关节点 | 判不出来（人工审计项） | HARD 0 · WARN 5 | ✅ 如预期未被检测 |
+| M7 强行串联两个无关节点 | 判不出来（人工审计项） | HARD 0 · WARN 2 | ✅ 如预期未被检测 |
+
+─── Fixture E ───
+基线: HARD 0 · WARN 3 · INFO 7 · 状态 PASS
+
+| Mutation | 期望 | 实际 | 结果 |
+|---|---|---|---|
+| M1 删除 provenance | HARD H2 | HARD (H2) | ✅ 拦住 |
+| M2 element type 改成第 7 类 | HARD H1 | HARD (H1) | ✅ 拦住 |
+| M3 edge 使用表外 relation | HARD H4 | HARD (H4) | ✅ 拦住 |
+| M4 制造 dangling reference | HARD H3 | HARD (H3) | ✅ 拦住 |
+| M5 塞一个孤立 element | HARD H7 | HARD (H7) | ✅ 拦住 |
+| M6 删除某 Topic（无 element）的导航入口 | HARD H5 | HARD (H5) | ✅ 拦住 |
+| M8 让某一顶层小节失去所有入口 | HARD H5 | HARD (H5) | ✅ 拦住 |
+| M7 强行串联两个无关节点 | 判不出来（人工审计项） | HARD 0 · WARN 3 | ✅ 如预期未被检测 |
 
 ════════════════════════════════
-拦截率: 13/14 = 93%
+拦截率: 14/14 = 100%
 M7（强行串联无关节点）：validator 判不出来是**设计如此** —— 它属 semantic rule，不是 schema rule。
-M7 记录: [{"fx":"D","changed":false,"hard":0,"warn":7},{"fx":"E","changed":false,"hard":0,"warn":5}]
+M7 记录: [{"fx":"D","changed":false,"hard":0,"warn":2},{"fx":"E","changed":false,"hard":0,"warn":3}]
 ════════════════════════════════

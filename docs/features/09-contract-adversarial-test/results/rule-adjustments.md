@@ -3,6 +3,14 @@
 > Feature 09 · Task 6
 > 依据：`adversarial-report.md` · `verification-output.txt` · `mutation-output.txt`
 > **本文件只给建议；实际改动由用户裁决后另行执行。**
+>
+> ✅ **裁决与执行结果见 `repair-round.md`**（R1–R8 对照表）：
+> 本文件的 §2（W4 → INFO）、§3（新增占比 Warning）、§3.2（修小节解析器根因）、
+> §4（选 (b) 可选字段）、§5（记录 constraint 参数位缺口）**全部被采纳并已落地**；
+> 最终 `Gate = PASS`（`adversarial-report.md` §7）。
+>
+> ⚠️ 一处与建议不同：§3.1 建议的阈值是 `relationGap ≥ 0.5 × edges`，
+> 实际落地为 `relationGap / (relationGap + edges) ≥ 0.5` 且 `relationGap ≥ 3`（见 `repair-round.md` §3）。
 
 ---
 

@@ -297,7 +297,7 @@ BLOCKED      没有可用的 Fixture（**当前状态**，见 results/fixture-se
 | 项 | 裁决 | 说明 |
 |---|---|---|
 | **H7 孤立元素** | **保持 HARD** | 一个 L0 element 既没有 edge 也没有 attachment，它存在于 Framework Map 上的理由基本不成立。Phase 2b 若 ER-heavy 真出现**合法**孤立元素，再降级不迟 |
-| **W4 单 Block Topic** | **保持 Warning**（本次作为**统计项**） | 已在 Fixture B 命中一次且明显合法（那是个"问题动机"Topic）。**若 D / E 又出现多个自然的 single-block Topic，则后续应改为 W4 → INFO**，但现在不提前改 |
+| **W4 单 Block Topic** | ~~保持 Warning~~ → **已降级为 INFO（I6）** | 已在 Fixture B 命中一次且明显合法（那是个"问题动机"Topic）。**预设的降级条件（"若 D / E 又出现多个自然的 single-block Topic"）在本次已满足**：E 又出现 2 次（T-03 撤销与越权 · T-08 修订记录），跨篇共 3 次全部自然 → 修复轮改为 `I6`（见 `results/repair-round.md` §3） |
 | **W0 输出状态** | ✅ **已修正** | 原文小节解析失败时会跳过引用 / N2 / N3。原先只出 W0，`coverage` 会显示 `0/0`，容易被误读成"验证通过"。现在输出区分：<br>`状态: PASS` vs `状态: PASS WITH INCOMPLETE VALIDATION`，并列出 `SKIPPED` 段。Phase 2b 专门验证这一点 |
 
 ---
@@ -370,19 +370,56 @@ mutation      M1~M8 × 2 篇 → 拦截率 13/14；唯一漏网 = D 的 M8（正
 ### 当前 Gate
 
 ```text
-Gate = PARTIAL PASS
-两篇 Fixture 均已 QUALIFIED、建模并跑通；
-ER-heavy 一侧的 Navigation 覆盖仍待 validator 修复后复测。
+Gate = PASS
 ```
 
+**四条条件（修复轮之后）**：
+
+| # | 条件 | 判定 |
+|---|---|---|
+| 1 | Semantic gap = 0 | ✅ 两篇均不需要第 7 类 element |
+| 2 | Relation gap 可控 | ✅ **D 6 → 2**（基本关系 + 结构属性表达 5 类原缺口；剩 2 类属 Constraint 语义） |
+| 3 | Capacity 只是 heuristic | ✅ E = 13 触发 `W1`；预算保持 12，未改 |
+| 4 | Validator 无明显误报 | ✅ FP = 0；**FN 1 处已修复并复测**（M8 在 D 上被拦住） |
+
+**必须保留的边界措辞：**
+
+> Framework Map 的关系模型支持**基本关系 + 结构属性**（`cardinality` / `ownership`）；
+> **复杂关系不变量仍属 Constraint 语义**（无环、区间包含、条件唯一），
+> 在 `constraint.parameters` 表达面出现之前以 **Structured Constraint Gap** 记录，**不阻塞 Gate**。
+
+### 修复轮（R1–R8）：已执行完成
+
+用户裁决后的修复全部落地，记录见 **`results/repair-round.md`**：
+
+```text
+R1  section parser → Markdown heading tree（含围栏代码块感知）
+R2  复测 D：coverage 21/21 · SKIPPED 0 · 状态 PASS；M8 在 D 上被拦住 → 拦截率 14/14 = 100%
+R3  edges[] 增补可选 id / label / qualifiers{cardinality, ownership}
+      形态错 → H8（HARD）；取值未知 → W7（WARNING，controlled-but-extensible）
+R4  D 重表达：relationGap 6 → 2，缺口密度 0.40 → 0.15，edges 9 → 11
+R5  contains 放宽为「结构性包含 / 组成」；Goal references UserProfile 仍不得用 contains
+R6  W4 → I6（INFORMATIONAL）；新增关系缺口密度聚合告警 W8 + detail 段
+R7  Structured Constraint Gap 登记（无 constraint.parameters，不阻塞 Gate）
+R8  Gate 更新为 PASS
+```
+
+**没有做的事（本轮范围外）**：第 7 类 element · 一批新关系动词 · `constraint` 参数 DSL · 主轴规则 · 泳道 · 改 `12` 预算。
+
+**修复前那两件"需先修的事"**：① 已修（parser）；② 已裁决并执行 **(b) 可选字段**版本（不是新增关系词）。
+
+**⚠️ Feature 07 仍保持 Blocked** —— 本轮**没有**为它解冻（它是生成链路，与本次修复的范围不同）。
+
 **四条条件**：Semantic gap = 0 ✅ · Relation gap 可控 ❌（D 6 条）· Capacity 只是 heuristic ✅ · Validator 无明显误报 ⚠️（FP = 0，但有 1 处已确证覆盖缺口）
+
+> ↑ 以上为**修复前**判定，已被本节的修复轮结论取代（`Gate = PASS`）。
 
 **两件需先修的事**（详见 `results/rule-adjustments.md`）：
 
 1. **扩展小节解析器**：`## <任意标题>` 都应被识别为小节锚点 → 修完 D 的 `N2/N3` 才能跑，M8 才能对 D 生效
 2. **决定对实体网络的词汇表回应**：(a) 接受 `relationGap` 为设计内逃逸口并把"实体网络会欠表达关系"写成已知限制；或 (b) 给 `edges[]` 增加**可选**基数/归属字段（不新增关系词）。**倾向 (b)，但属 Contract 改动，待裁决**
 
-**⚠️ Feature 07 仍保持 Blocked** —— 直到上面两件修完并复测 D。
+**⚠️ Feature 07 仍保持 Blocked** —— 注意：修复轮已经把这两件修完并复测 D，**但 Feature 07 的解冻不由本轮决定**（它是生成链路，属另一条线）。
 
 ### 交付物
 
@@ -390,8 +427,9 @@ ER-heavy 一侧的 Navigation 覆盖仍待 validator 修复后复测。
 drafts/fixture-d.map.json · fixture-e.map.json      candidate map（非 Gold）
 drafts/build-mutations.js                           可复现的 mutation 运行器
 results/fixture-selection-{d,e}.md · -v2.md · -e-single-document-reverification.md
-results/adversarial-report.md                       ★ 四类观察 + mutation + topology + Gate
-results/rule-adjustments.md                         ★ 规则升降级建议
+results/adversarial-report.md                       ★ 四类观察 + mutation + topology + Gate（§7 为修复轮复测与最终判定）
+results/rule-adjustments.md                         规则升降级建议（修复轮的输入；执行结果见 repair-round.md）
+results/repair-round.md                             ★ 修复轮执行记录（R1–R8 对照 + 复测证据 + 最终 Gate）
 results/verification-output.txt · mutation-output.txt
 ```
 

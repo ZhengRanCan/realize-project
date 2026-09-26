@@ -134,10 +134,47 @@
       "required": ["from", "to", "type"],
       "additionalProperties": false,
       "properties": {
+        "id": { "type": "string", "minLength": 1 },
         "from": { "$ref": "#/$defs/id" },
         "to": { "$ref": "#/$defs/id" },
         "type": { "$ref": "#/$defs/relationType" },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "可选。边的自然语言标签，用于承载该条边在原文里的具体说法（不是新词表）。"
+        },
+        "qualifiers": { "$ref": "#/$defs/edgeQualifiers" },
         "note": { "type": "string" }
+      },
+      "description": "关系分三层：【基本语义】type（8 词受控词表）；【结构属性】qualifiers（基数 / 归属）；【外挂约束】更复杂的业务不变量用 constraint 元素表达，**不**在本字段里长词表。"
+    },
+
+    "cardinalityValue": {
+      "description": "基数取值。刻意用两端表达（from 端 / to 端），而不是「1:1 / 1:N」字符串 —— 两端对称、可分别校验、后续可扩展 aggregate。",
+      "enum": ["one", "zero-or-one", "one-or-many", "zero-or-many", "many"]
+    },
+
+    "edgeQualifiers": {
+      "type": "object",
+      "description": "关系的结构性质。回答「这条关系的结构长什么样」，不回答「这是什么关系」（那是 type 的职责）。刻意保持小：只放 cardinality 与 ownership。",
+      "additionalProperties": false,
+      "properties": {
+        "cardinality": {
+          "type": "object",
+          "description": "两端基数。校验粒度：from 端与 to 端各自的取值必须落在基数词表内；结构性不变量（如「同一个 Plan 的 Stage 序必须无环」「日期区间不得重叠」）**不**在此表达。",
+          "required": ["from", "to"],
+          "additionalProperties": false,
+          "properties": {
+            "from": { "$ref": "#/$defs/cardinalityValue" },
+            "to": { "$ref": "#/$defs/cardinalityValue" }
+          }
+        },
+        "ownership": {
+          "type": "string",
+          "minLength": 1,
+          "description": "owned = 生命周期 / 归属由 from 端管理；reference = 只引用不拥有；shared = 关系存在但不是单一 ownership。controlled-but-extensible：未知取值由 check-map 报 WARNING（同 role 的处理），因为它可能随文档出现新形态。",
+          "x-known-values": ["owned", "reference", "shared"]
+        }
       }
     },
 

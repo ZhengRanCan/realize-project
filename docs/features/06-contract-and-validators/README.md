@@ -75,9 +75,9 @@ F05 虽然 Gate = PASS，但它的结论范围**仅限 A / B / C 三篇**。有�
 
 | 交付物 | 负责检查 |
 |---|---|
-| `schema/framework-map.schema.json` | 字段存在 · 数据类型 · 枚举 · ID 格式 · 引用完整性 · 基础结构 |
-| `scripts/check-map.js` | provenance · reachability（N1~N3）· edge vocabulary · attachment legality · element budget warning · 同概念重复（判据 F）· topic coverage · orphan block · 非法 relation |
-| `docs/framework-map-contract.md` | **为什么这么建模**：concept vs state 怎么区分 · 什么时候该用 attachment · 什么叫 Capacity gap · 什么叫 Relation gap · 哪些是 hard rule、哪些只是 heuristic |
+| `schema/framework-map.schema.json` | 字段存在 · 数据类型 · 枚举 · ID 格式 · 引用完整性 · 基础结构<br>（F09 增补：edge 可选 `id` / `label` / `qualifiers{cardinality, ownership}`） |
+| `scripts/check-map.js` | provenance · reachability（N1~N3）· edge vocabulary · **qualifier 形态（H8）/ 取值（W7）** · attachment legality · element budget warning · 同概念重复（判据 F）· topic coverage · orphan block · 非法 relation · **关系缺口密度（W5 / W8）** |
+| `docs/framework-map-contract.md` | **为什么这么建模**：concept vs state 怎么区分 · 什么时候该用 attachment · 什么叫 Capacity gap · **关系的三层（基本语义 / 结构属性 / 外挂约束）** · 什么叫 Relation gap 与 Structured Constraint Gap · 哪些是 hard rule、哪些只是 heuristic |
 
 > `framework-map-contract.md` 不是"再抄一遍 schema"，它记录的是**schema 表达不了的那部分判断**。
 
@@ -197,6 +197,8 @@ dangling reference（edge 端点、attachment 目标、topic 的 blockIds 不存
 edge 使用非法 relation 词
 无导航路径（N1~N3 任一失败）
 同 ID 重复
+孤立元素（H7，判据 B）
+qualifiers 形态错（H8：缺 from/to 端、不是对象、出现未知结构属性）
 ```
 
 ### 5.2 Warning（需要人看一眼）
@@ -205,9 +207,12 @@ edge 使用非法 relation 词
 element > 12（preferred budget）
 role 未知
 Topic 太多
-某 Topic 只有一个 block
-relationGap 存在
+qualifier 取值未知（W7：controlled-but-extensible，与 role 同策略）
+relationGap 存在 —— 少而散时逐条 W5
+关系缺口密度过高（W8）—— 多而密时聚合成一条，明细挪到 detail 段
 ```
+
+> **W8 触发公式（既定，不按个案调参）：** `relationGapCount / (relationGapCount + edges.length) ≥ 0.5` **且** `relationGapCount ≥ 3`。
 
 ### 5.3 Informational（**只是形态差异，不是异常**）
 
@@ -217,10 +222,13 @@ state = 0
 没有主轴
 出现 DAG
 Topic 没有 element
+单点 Topic（原 W4，已降级为 I6）
 ```
 
 > **最后一类尤其重要。** 过去这些东西很容易被误判成"异常"，现在已经有跨 Fixture 证据说明它们**只是正常的形态差异**：
 > 三篇的 type 分布完全不同；C 就是 DAG；B / C 各有一个没有 element 的 Topic。
+>
+> **原 `W4`（Topic 只挂一个 block/section）在 Feature 09 被降级为 `I6`**：一个 Topic 只承载一节"问题动机"是合法的窄 Topic，作为告警价值低、噪音高。
 
 ---
 
@@ -263,10 +271,14 @@ Fixture E  纯 Operational Runbook
 
 ```text
 schema          无 maxItems（刻意）；role 非 enum；relationGap 为独立结构
+                Feature 09 增补：edge 可选 id / label / qualifiers（cardinality + ownership）
+                edge 形态错 → H8；qualifier 取值未知 → W7
 check-map       HARD / WARN / INFO 三级；词表从 schema 读（单一真相）
                 另：检查被跳过时状态为 PASS WITH INCOMPLETE VALIDATION
-test:map        21/21 通过（覆盖三级 severity 的边界 + skipped 状态）
-A / B / C       三篇 HARD = 0，状态均为 PASS
+                Feature 09 修订：W4 → I6；W5 少而散逐条、多而密聚合为 W8 + detail 段
+                原文小节按 Markdown heading tree 解析（围栏代码块内的 # 不是标题）
+test:map        29/29 通过（三级 severity 边界 + skipped 状态 + heading tree + qualifiers）
+A / B / C / D / E  五篇 HARD = 0，状态均为 PASS
 ```
 
 - **判定**：待 reviewer 按 `validation-checklist.md` 验证

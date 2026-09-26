@@ -159,9 +159,11 @@ t('relationGap → WARNING 且不是 HARD', () => {
   return has(r.warn, /W5 relationGap\[0\]/) || r.warn.join(' | ');
 });
 
-t('Topic 只挂一个 block/section → WARNING', () => {
+t('Topic 只挂一个 block/section → 已降级为 INFORMATIONAL（原 W4）', () => {
   const r = run(baseMap());
-  return has(r.warn, /W4 T-01 只挂了一个/) || r.warn.join(' | ');
+  if (!has(r.info, /I6 T-01 只挂了一个/)) return 'INFO 里没有: ' + r.info.join(' | ');
+  const bad = [...r.warn, ...r.hard].filter((m) => /只挂了一个/.test(m));
+  return bad.length === 0 || '仍被当成 WARN/HARD: ' + bad.join(' | ');
 });
 
 // ── INFORMATIONAL 组（**绝不能是 HARD / WARNING**）───────────
@@ -200,7 +202,83 @@ t('没有主轴 → INFORMATIONAL', () => {
   return has(r.info, /I3 没有主轴/) || r.info.join(' | ');
 });
 
-// ── 词表来自 schema（单一真相）──────────────────────────────
+// ── section parser：Markdown heading tree（不是数字章节语法）───
+t('非数字标题（## Goal）也能解析为小节全集', () => {
+  const { readDocHeadings } = require('./check-map');
+  const h = readDocHeadings('测试文档/fixture-d-goal-plan-task-state-model.md');
+  if (h.sectionLevel !== 2) return 'sectionLevel=' + h.sectionLevel;
+  if (!h.top.includes('Goal')) return 'top 里没有 Goal: ' + h.top.join(', ');
+  if (!h.top.includes('FocusSession, TaskResult and DailyReview')) return '带逗号的长标题没解析出来';
+  return h.all.includes('4.1') || h.all.length >= 21 ? true : 'all=' + h.all.length;
+});
+
+t('围栏代码块里的 # 注释不是标题（runbook 场景）', () => {
+  const { readDocHeadings } = require('./check-map');
+  const h = readDocHeadings('测试文档/fixture-e-f13-f16-runbook.md');
+  if (h.sectionLevel !== 2) return 'sectionLevel=' + h.sectionLevel + '（被代码注释压到了 level 1）';
+  const polluted = h.all.filter((k) => /期望|CloudBase CLI|目录下/.test(k));
+  if (polluted.length) return '代码注释被当成标题: ' + polluted.join(', ');
+  return h.top.length === 11 || 'top=' + h.top.join(', ');
+});
+
+// ── qualifiers：基本关系 + 结构属性 ──────────────────────────
+const q = (over) => ({ cardinality: { from: 'one', to: 'one-or-many' }, ownership: 'owned', ...over });
+
+t('合法 qualifiers → 无 HARD、无 W7', () => {
+  const m = baseMap();
+  m.edges[0].qualifiers = q();
+  const r = run(m);
+  if (r.hard.length) return '出现了 HARD: ' + r.hard.join(' | ');
+  return !has(r.warn, /W7/) || r.warn.join(' | ');
+});
+
+t('qualifier 取值未知 → WARNING（W7，不是 HARD）', () => {
+  const m = baseMap();
+  m.edges[0].qualifiers = q({ ownership: 'borrowed', cardinality: { from: 'lots', to: 'one' } });
+  const r = run(m);
+  if (r.hard.length) return '被当成 HARD: ' + r.hard.join(' | ');
+  return (has(r.warn, /W7/) && has(r.warn, /borrowed/) && has(r.warn, /lots/)) || r.warn.join(' | ');
+});
+
+t('qualifiers.cardinality 缺 to 端 → HARD（形态错）', () => {
+  const m = baseMap();
+  m.edges[0].qualifiers = { cardinality: { from: 'one' } };
+  const r = run(m);
+  return has(r.hard, /H8 .*缺少 to 端/) || r.hard.join(' | ');
+});
+
+t('qualifiers 里出现未知结构属性 → HARD（不许长第三层词表）', () => {
+  const m = baseMap();
+  m.edges[0].qualifiers = { aggregation: 'composite' };
+  const r = run(m);
+  return has(r.hard, /H8 .*aggregation/) || r.hard.join(' | ');
+});
+
+// ── relationGap：少而散逐条 W5，多而密集合成 W8 ─────────────
+const gap = (i) => ({
+  from: 'E-01', to: 'E-02', intendedMeaning: 'g' + i, reason: 'r' + i, fixture: 'TEST',
+});
+
+t('relationGap 少而散 → 逐条 W5（不聚合）', () => {
+  const m = baseMap();
+  m.relationGap = [gap(1), gap(2)];
+  m.edges = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(() => ({ from: 'E-02', to: 'E-01', type: 'consumes' }));
+  const r = run(m);
+  if (has(r.warn, /W8/)) return '不该聚合却聚合了: ' + r.warn.join(' | ');
+  return (has(r.warn, /W5 relationGap\[0\]/) && has(r.warn, /W5 relationGap\[1\]/)) || r.warn.join(' | ');
+});
+
+t('relationGap 多而密 → 聚合为一条 W8，明细挪到 detail 段', () => {
+  const m = baseMap();
+  m.relationGap = [gap(1), gap(2), gap(3)];
+  m.edges = [{ from: 'E-02', to: 'E-01', type: 'consumes' }]; // 3/(3+1) = 0.75 ≥ 0.5，且 ≥ 3 条
+  const r = run(m);
+  if (!has(r.warn, /W8 关系缺口密度过高/)) return '没有聚合: ' + r.warn.join(' | ');
+  if (has(r.warn, /W5 relationGap/)) return '聚合后仍在顶部逐条刷 W5';
+  return r.relationGapDetails.length === 3 || 'detail=' + r.relationGapDetails.length;
+});
+
+
 t('词表确实从 schema 读（6 类 / 9 词）', () => {
   const { TYPE_ENUM, RELATION_ENUM } = require('./check-map');
   if (TYPE_ENUM.length !== 6) return 'TYPE_ENUM=' + TYPE_ENUM.length;

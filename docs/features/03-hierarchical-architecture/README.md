@@ -373,6 +373,9 @@ semantic-level
 
 ## 6. 关系词表（第一版**候选**通用词表）
 
+> **关系分三层（Feature 09 修订）：** `type`（基本语义，受控词表）+ `qualifiers`（结构属性：`cardinality` / `ownership`）+ `constraint`（外挂不变量）。
+> "词表不够用"的第一反应应该是**问是不是缺结构属性**，而不是加第 9 个动词。详见 `docs/framework-map-contract.md` §5。
+
 ### 6.1 受控 8 词
 
 > 与 §5.1 同样的限定：这 8 个词是**候选**词表，不是"已证明通用"的关系集合。
@@ -384,12 +387,14 @@ semantic-level
 | `consumes` | A 消费 B | Outline Generation → Generation Projection |
 | `transforms-to` | A 被转换为 B | Frozen Context → Generation Projection |
 | `depends-on` | A 依赖 B | Generation Projection → Frozen Context |
-| `contains` | A 包含 B（component 嵌套 process） | Outline Generator → Generate Outline |
+| `contains` | **A 的结构中包含 B（结构性包含 / 组成）**；ownership 由 qualifier 表达 | Outline Generator → Generate Outline；`PlanBundle contains Plan` + `ownership: owned` |
 | `controls` | A 控制 B | 调度器 → 生成任务 |
 | `validates` | A 校验 B | — |
 | `constrains` | A 约束 B | Consumption ≠ Alignment → Scene Generation |
 
 兜底：`relates-to`。**兜底词如果在图上出现频繁，说明词表设计失败**，应回到这一步重新设计，而不是继续加词。
+
+**`contains` 的边界（不得放宽）：** "引用但无归属"**不能**用 `contains`。例如 `Goal references UserProfile`（UserProfile 是跨 goal 复用上下文，不属于任何单个 Goal）必须写成 `relates-to` + `ownership: shared`，而不是 `contains`。
 
 ### 6.2 方向：主动语序
 
