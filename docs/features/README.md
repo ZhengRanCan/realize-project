@@ -12,7 +12,13 @@ docs/features/
 │   ├── execution-prompt.md
 │   ├── validation-checklist.md
 │   └── results/
-└── 02-xxx/                      # 未来的 feature
+├── 02-xxx/                      # 未来的 feature
+└── 03-hierarchical-architecture/ # Feature 03: 层级式文档模型（L0→L3）
+    ├── README.md                # 现行规格
+    ├── execution-prompt.md
+    ├── validation-checklist.md
+    ├── drafts/                  # Phase 1/2 的手工框架图
+    └── _archive/                # 被取代的旧草案
 ```
 
 ## Feature 命名规范
@@ -49,7 +55,8 @@ XX-feature-name/
 
 | ID | Name | Status | Executor | Reviewer | Completed |
 |----|------|--------|----------|----------|-----------|
-| 01 | human-review-repair | 待执行 | TBD | TBD | - |
+| 01 | human-review-repair | Completed | DSH agent | 用户 | 2026-09-26 |
+| 03 | hierarchical-architecture | In Progress | TBD | TBD | - |
 
 ## 创建新 Feature
 
