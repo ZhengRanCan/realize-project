@@ -1,0 +1,1197 @@
+{
+  "inventoryVersion": 1,
+  "document": {
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md"
+  },
+  "items": [
+    {
+      "id": "S-01",
+      "statement": "F13–F16 之间存在依赖顺序 F13 → F14 → F15 → F16，且 F12 已被这四个 Feature 替代。",
+      "tag": "依赖顺序",
+      "sources": [
+        {
+          "sectionRef": "§1",
+          "lines": "L13-L27",
+          "quote": "依赖：**F13 → F14 → F15 → F16**。F12 已被这四个 Feature 替代。"
+        }
+      ]
+    },
+    {
+      "id": "S-02",
+      "statement": "Round 19 时 F13–F16 全部处于 passing，F12 unblock 完成并切换到 passing。",
+      "tag": "状态",
+      "sources": [
+        {
+          "sectionRef": "§1",
+          "lines": "L13-L27",
+          "quote": "Round 19：F13–F16 全部 `passing`，F12 unblock 完成并切 `passing`。"
+        }
+      ]
+    },
+    {
+      "id": "S-03",
+      "statement": "提交前必须对列出的一批云函数逐个执行 node --check，预期所有文件无错误输出且 exit 0。",
+      "tag": "前置校验",
+      "sources": [
+        {
+          "sectionRef": "§2.1",
+          "lines": "L31-L50",
+          "quote": "for f in ... do node --check \"$f\"; done；预期：所有文件无错误输出，`exit 0`。"
+        }
+      ]
+    },
+    {
+      "id": "S-04",
+      "statement": "npm 构建必须同时产出 dist/build/h5 与 dist/build/mp-weixin 两个产物。",
+      "tag": "构建",
+      "sources": [
+        {
+          "sectionRef": "§2.2",
+          "lines": "L52-L62",
+          "quote": "预期：`dist/build/h5` 与 `dist/build/mp-weixin` 都生成产物。"
+        }
+      ]
+    },
+    {
+      "id": "S-05",
+      "statement": "受限 PowerShell 环境下 npx uni build 会触发 spawn EPERM，必须在普通 cmd / PowerShell FullLanguage / WSL 终端复测。",
+      "tag": "环境约束",
+      "sources": [
+        {
+          "sectionRef": "§2.2",
+          "lines": "L52-L62",
+          "quote": "当前受限 PowerShell 环境下 `npx uni build` 会触发 `spawn EPERM`，需在普通 cmd / PowerShell FullLanguage / WSL 终端复测。"
+        }
+      ]
+    },
+    {
+      "id": "S-06",
+      "statement": ".gitignore 必须包含 .env、.env.*、*.pem、*.key、*.b64.enc、secrets/、key/*.pem、key/*.pem.b64，git status 时不应出现这些敏感文件。",
+      "tag": "安全",
+      "sources": [
+        {
+          "sectionRef": "§2.3",
+          "lines": "L63-L80",
+          "quote": ".gitignore 必须包含以下条目（防止密钥误提交）… 执行 `git status` 时**不应**出现 `.env / *.pem / *.key` 等敏感文件。"
+        }
+      ]
+    },
+    {
+      "id": "S-07",
+      "statement": "云函数部署顺序固定为 refundCommon、submitAfterSales、cancelAfterSales、submitReturnLogistics、processAfterSales、queryAdminAfterSales、retryAfterSalesCompensation、forceRestockAndAssets、refundOrder、refundNotify、refundQueryCron。",
+      "tag": "部署",
+      "sources": [
+        {
+          "sectionRef": "§3.1",
+          "lines": "L84-L107",
+          "quote": "| 1 | `refundCommon`（无需单独部署，作为 lib 被 require） | F16 | … | 11 | `refundQueryCron` | F16 |"
+        }
+      ]
+    },
+    {
+      "id": "S-08",
+      "statement": "refundCommon 无需单独部署，它作为 lib 被 require。",
+      "tag": "部署",
+      "sources": [
+        {
+          "sectionRef": "§3.1",
+          "lines": "L84-L107",
+          "quote": "| 1 | `refundCommon`（无需单独部署，作为 lib 被 require） | F16 |"
+        }
+      ]
+    },
+    {
+      "id": "S-09",
+      "statement": "每个云函数的部署命令为：进入 cloudfunctions/<fnName> 目录、npm install、再用 tcb fn deploy <fnName> 部署。",
+      "tag": "部署",
+      "sources": [
+        {
+          "sectionRef": "§3.1",
+          "lines": "L84-L107",
+          "quote": "cd cloudfunctions/<fnName>；npm install；# 用 CloudBase CLI：tcb fn deploy <fnName>"
+        }
+      ]
+    },
+    {
+      "id": "S-10",
+      "statement": "retryAfterSalesCompensation 必须配置定时触发器，Cron 表达式为 */10 * * * *（每 10 分钟）。",
+      "tag": "触发器",
+      "sources": [
+        {
+          "sectionRef": "§3.2",
+          "lines": "L109-L117",
+          "quote": "| `retryAfterSalesCompensation` | 定时触发器 | `*/10 * * * *` | 每 10 分钟 |"
+        }
+      ]
+    },
+    {
+      "id": "S-11",
+      "statement": "refundQueryCron 必须配置定时触发器，Cron 表达式为 */5 * * * *（每 5 分钟）。",
+      "tag": "触发器",
+      "sources": [
+        {
+          "sectionRef": "§3.2",
+          "lines": "L109-L117",
+          "quote": "| `refundQueryCron` | 定时触发器 | `*/5 * * * *` | 每 5 分钟 |"
+        }
+      ]
+    },
+    {
+      "id": "S-12",
+      "statement": "需要为 /refundNotify 创建 CloudBase HTTP 网关 HTTPS 路由，目标函数为 refundNotify，并把该 HTTPS URL 配置到 WECHAT_REFUND_NOTIFY_URL。",
+      "tag": "网关路由",
+      "sources": [
+        {
+          "sectionRef": "§3.3",
+          "lines": "L118-L129",
+          "quote": "| `/refundNotify` | `refundNotify` | … HTTPS URL 配置到 `WECHAT_REFUND_NOTIFY_URL` 环境变量。"
+        }
+      ]
+    },
+    {
+      "id": "S-13",
+      "statement": "payNotify 已存在的 /payNotify 路由保持不变，且与 /refundNotify 相互独立。",
+      "tag": "边界",
+      "sources": [
+        {
+          "sectionRef": "§3.3",
+          "lines": "L118-L129",
+          "quote": "注：`payNotify` 已存在的 `/payNotify` 路由保持不变。两者独立。"
+        }
+      ]
+    },
+    {
+      "id": "S-14",
+      "statement": "F13–F15 不需要任何环境变量。",
+      "tag": "环境变量",
+      "sources": [
+        {
+          "sectionRef": "§3.4",
+          "lines": "L130-L148",
+          "quote": "F13–F15 不需要任何环境变量。"
+        }
+      ]
+    },
+    {
+      "id": "S-15",
+      "statement": "F16 沙箱模式需要显式设置 WECHAT_REFUND_MODE=sandbox（默认可省略）以及 WECHAT_REFUND_APPID、WECHAT_REFUND_MCHID、WECHAT_REFUND_SERIAL_NO。",
+      "tag": "环境变量",
+      "sources": [
+        {
+          "sectionRef": "§3.4",
+          "lines": "L130-L148",
+          "quote": "WECHAT_REFUND_MODE = sandbox   # 默认值，可省略；WECHAT_REFUND_APPID = (任一字符串)；WECHAT_REFUND_MCHID = (任一字符串)；WECHAT_REFUND_SERIAL_NO = (任一字符串)"
+        }
+      ]
+    },
+    {
+      "id": "S-16",
+      "statement": "沙箱模式下其他 WECHAT_REFUND_* 环境变量不强制设置。",
+      "tag": "环境变量",
+      "sources": [
+        {
+          "sectionRef": "§3.4",
+          "lines": "L130-L148",
+          "quote": "其他 `WECHAT_REFUND_*` 在沙箱模式下不强制。"
+        }
+      ]
+    },
+    {
+      "id": "S-17",
+      "statement": "沙箱验证需要在 users 集合预置测试用户 A（points=1000）与测试主理人 test_admin 两条数据。",
+      "tag": "数据前置",
+      "sources": [
+        {
+          "sectionRef": "§4.1",
+          "lines": "L151-L195",
+          "quote": "需要在 `users` 集合中预置 2 条数据：// 测试用户 A（普通用户）… // 测试主理人（管理员）"
+        }
+      ]
+    },
+    {
+      "id": "S-18",
+      "statement": "admin_whitelist 集合需预置 { openid: 'test_admin', active: true }。",
+      "tag": "数据前置",
+      "sources": [
+        {
+          "sectionRef": "§4.1",
+          "lines": "L151-L195",
+          "quote": "`admin_whitelist` 集合预置：{ openid: 'test_admin', active: true }"
+        }
+      ]
+    },
+    {
+      "id": "S-19",
+      "statement": "products 集合需预置 prod_1，库存 stock=10。",
+      "tag": "数据前置",
+      "sources": [
+        {
+          "sectionRef": "§4.1",
+          "lines": "L151-L195",
+          "quote": "`products` 集合预置 1 个商品，库存 = 10：{ _id: 'prod_1', … stock: 10 }"
+        }
+      ]
+    },
+    {
+      "id": "S-20",
+      "statement": "coupons 集合需预置 1 张有效券和 1 张过期券（可选）。",
+      "tag": "数据前置",
+      "sources": [
+        {
+          "sectionRef": "§4.1",
+          "lines": "L151-L195",
+          "quote": "`coupons` 集合预置 1 张有效 + 1 张过期券（可选）"
+        }
+      ]
+    },
+    {
+      "id": "S-21",
+      "statement": "用例 1 中 submitAfterSales 提交成功后期望 code=0、afterSalesStatus='REQUESTED'、afterSalesType='REFUND_ONLY'。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§4.2",
+          "lines": "L197-L215",
+          "quote": "期望: code=0, afterSalesStatus='REQUESTED', afterSalesType='REFUND_ONLY'"
+        }
+      ]
+    },
+    {
+      "id": "S-22",
+      "statement": "用例 1 中管理员执行 processAfterSales(action='APPROVE_REFUND_ONLY') 后期望 afterSalesStatus='APPROVED'、cancellationStatus='APPROVED'。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§4.2",
+          "lines": "L197-L215",
+          "quote": "期望: code=0, afterSalesStatus='APPROVED', cancellationStatus='APPROVED'"
+        }
+      ]
+    },
+    {
+      "id": "S-23",
+      "statement": "用例 1 中 refundOrder 期望 code=0、mode='sandbox'、refundStatus='PROCESSING' 并生成 outRefundNo。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§4.2",
+          "lines": "L197-L215",
+          "quote": "期望: code=0, mode='sandbox', refundStatus='PROCESSING', outRefundNo=R<...>"
+        }
+      ]
+    },
+    {
+      "id": "S-24",
+      "statement": "用例 1 中沙箱 mock 回调 refundNotify 后期望订单 afterSalesStatus='REFUNDED'、refundStatus='SUCCESS'、refundedAt 已写入。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§4.2",
+          "lines": "L197-L215",
+          "quote": "期望: 订单 afterSalesStatus='REFUNDED', refundStatus='SUCCESS', refundedAt 已写入"
+        }
+      ]
+    },
+    {
+      "id": "S-25",
+      "statement": "用例 1 要求 audit_logs 含 REQUEST、APPROVE_REFUND_ONLY、REFUND_REQUEST、REFUND_NOTIFY、REFUND_SUCCESS、AFTER_SALES_RESTORE 共 6 条记录。",
+      "tag": "证据",
+      "sources": [
+        {
+          "sectionRef": "§4.2",
+          "lines": "L197-L215",
+          "quote": "验证 audit_logs 含 REQUEST / APPROVE_REFUND_ONLY / REFUND_REQUEST / REFUND_NOTIFY / REFUND_SUCCESS / AFTER_SALES_RESTORE 6 条"
+        }
+      ]
+    },
+    {
+      "id": "S-26",
+      "statement": "F12 5.2 设计要求未发货取消在 APPROVED 时就释放库存，而 F15 当前在 REFUND_SUCCESS 才触发补偿，这是 F15 passing 前需与 reviewer 确认的已知待办。",
+      "tag": "待办",
+      "sources": [
+        {
+          "sectionRef": "§4.2",
+          "lines": "L197-L215",
+          "quote": "当前 F15 的 `processAfterSales` 的 `REFUND_SUCCESS` 才触发补偿 — 如果要在 `APPROVED` 即释放，需要扩展 `runCompensation` 入口或新增 `onApproveRefundOnly` 钩子。这是个**已知的待办**"
+        }
+      ]
+    },
+    {
+      "id": "S-27",
+      "statement": "用例 2（已发货退货退款）的状态链路为 REQUESTED → WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§4.3",
+          "lines": "L216-L236",
+          "quote": "期望: afterSalesStatus='WAIT_RETURN' … 'RETURN_SHIPPED' … 'WAIT_INSPECTION' … 'REFUND_PENDING' … 'REFUNDED'"
+        }
+      ]
+    },
+    {
+      "id": "S-28",
+      "statement": "用例 2 中 refundOrder 后 refundStatus='PROCESSING'，沙箱通知后 afterSalesStatus='REFUNDED' 且 prod_1 库存 +1。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§4.3",
+          "lines": "L216-L236",
+          "quote": "6. refundOrder(orderId=A2.id) 期望: refundStatus='PROCESSING'；7. 沙箱 mock 通知 refundNotify 期望: afterSalesStatus='REFUNDED', 库存 +1 (prod_1)"
+        }
+      ]
+    },
+    {
+      "id": "S-29",
+      "statement": "cancelAfterSales 成功后期望 afterSalesStatus='CANCELLED'、cancelledBy=test_user_a、cancelledAt 已写入。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§4.4",
+          "lines": "L237-L248",
+          "quote": "期望: afterSalesStatus='CANCELLED', cancelledBy=test_user_a, cancelledAt 已写入"
+        }
+      ]
+    },
+    {
+      "id": "S-30",
+      "statement": "撤销后库存、优惠券、积分不应发生变化，stockRestored / couponRestored / pointsRestored 均为 false。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§4.4",
+          "lines": "L237-L248",
+          "quote": "撤销后库存 / 优惠券 / 积分不应发生变化（stockRestored / couponRestored / pointsRestored 均为 false）"
+        }
+      ]
+    },
+    {
+      "id": "S-31",
+      "statement": "非订单所有者调用 cancelAfterSales 后期望 code=-1、msg='无权操作该订单'。",
+      "tag": "权限",
+      "sources": [
+        {
+          "sectionRef": "§4.4",
+          "lines": "L237-L248",
+          "quote": "用 test_user_b (非订单所有者) 调用 cancelAfterSales(orderId=A1.id) 期望: code=-1, msg='无权操作该订单'"
+        }
+      ]
+    },
+    {
+      "id": "S-32",
+      "statement": "沙箱 mock 方式 A：POST /refundNotify 必须带 X-Mock-Source: sandbox Header 与 __mock body，期望 HTTP 200 且 body 为 { code: 'SUCCESS', refundStatus: 'SUCCESS' }。",
+      "tag": "回调",
+      "sources": [
+        {
+          "sectionRef": "§4.5",
+          "lines": "L251-L275",
+          "quote": "Header：`X-Mock-Source: sandbox` … 期望：HTTP 200，body `{ code: 'SUCCESS', refundStatus: 'SUCCESS' }`。"
+        }
+      ]
+    },
+    {
+      "id": "S-33",
+      "statement": "沙箱 mock 方式 B：通过 cloud.callFunction 调用 refundNotify，并传入 headers 与 JSON 字符串 body。",
+      "tag": "调试",
+      "sources": [
+        {
+          "sectionRef": "§4.5",
+          "lines": "L276-L287",
+          "quote": "await cloud.callFunction({ name: 'refundNotify', data: { headers: { 'X-Mock-Source': 'sandbox' }, body: JSON.stringify(...) } })"
+        }
+      ]
+    },
+    {
+      "id": "S-34",
+      "statement": "refundQueryCron 默认 5 分钟一次，期望返回 { code: 0, scanned: N, success: 1, stillProcessing: 0, failed: 0, mode: 'sandbox' }（在 80% 成功率命中时）。",
+      "tag": "定时任务",
+      "sources": [
+        {
+          "sectionRef": "§4.6",
+          "lines": "L288-L300",
+          "quote": "期望返回：`{ code: 0, scanned: N, success: 1, stillProcessing: 0, failed: 0, mode: 'sandbox' }`（若 80% 成功率命中）。"
+        }
+      ]
+    },
+    {
+      "id": "S-35",
+      "statement": "删除 products.prod_1 后走完整链路，processAfterSales 应返回 code=-1、compensationFailed=true，且订单 refundCompensationError 非空、refundCompensationRetryCount=0。",
+      "tag": "失败路径",
+      "sources": [
+        {
+          "sectionRef": "§4.7",
+          "lines": "L301-L315",
+          "quote": "期望: processAfterSales 返回 code=-1, msg='...', compensationFailed=true；期望: 订单 refundCompensationError 非空，refundCompensationRetryCount=0"
+        }
+      ]
+    },
+    {
+      "id": "S-36",
+      "statement": "恢复 products.prod_1 并手动触发 retryAfterSalesCompensation 后，订单 stockRestored=true。",
+      "tag": "失败恢复",
+      "sources": [
+        {
+          "sectionRef": "§4.7",
+          "lines": "L301-L315",
+          "quote": "5. 手动触发 retryAfterSalesCompensation 期望: result.retrying 或 result.success 增加，订单 stockRestored=true"
+        }
+      ]
+    },
+    {
+      "id": "S-37",
+      "statement": "forceRestockAndAssets 仅管理员可调用，且只补资产、不修改 afterSalesStatus。",
+      "tag": "权限",
+      "sources": [
+        {
+          "sectionRef": "§4.8",
+          "lines": "L316-L328",
+          "quote": "期望：仅管理员可调用；只补资产不改 `afterSalesStatus`。"
+        }
+      ]
+    },
+    {
+      "id": "S-38",
+      "statement": "每个 Feature 在 passing 前必须留存 §5 规定的截图 / 日志证据。",
+      "tag": "证据",
+      "sources": [
+        {
+          "sectionRef": "§5",
+          "lines": "L329-L332",
+          "quote": "每个 Feature `passing` 前需留存以下截图 / 日志："
+        }
+      ]
+    },
+    {
+      "id": "S-39",
+      "statement": "F15 必须留存并发幂等证据：同一订单被 REFUND_SUCCESS 调用 10 次仅补偿一次。",
+      "tag": "幂等",
+      "sources": [
+        {
+          "sectionRef": "§5.3",
+          "lines": "L349-L358",
+          "quote": "并发幂等测试：同一订单被 `REFUND_SUCCESS` 调用 10 次仅补偿一次"
+        }
+      ]
+    },
+    {
+      "id": "S-40",
+      "statement": "F15 失败场景证据要求 refundCompensationError 字段被写入，订单状态保持 REFUND_PENDING / APPROVED。",
+      "tag": "失败路径",
+      "sources": [
+        {
+          "sectionRef": "§5.3",
+          "lines": "L349-L358",
+          "quote": "失败场景：`refundCompensationError` 字段被写入，订单状态保持 `REFUND_PENDING / APPROVED`"
+        }
+      ]
+    },
+    {
+      "id": "S-41",
+      "statement": "F16 必须留存重复通知 / 重复调用的幂等日志。",
+      "tag": "幂等",
+      "sources": [
+        {
+          "sectionRef": "§5.4",
+          "lines": "L359-L367",
+          "quote": "重复通知 / 重复调用的幂等日志"
+        }
+      ]
+    },
+    {
+      "id": "S-42",
+      "statement": "安全审计要求 git grep 退款密钥无输出，且 CloudBase 函数日志中检索 KEY/PRIVATE 无命中。",
+      "tag": "安全",
+      "sources": [
+        {
+          "sectionRef": "§5.5",
+          "lines": "L368-L381",
+          "quote": "git grep -E 'WECHAT_REFUND_(API_V3_KEY|MERCHANT_PRIVATE_KEY|PLATFORM_PUBLIC_KEY)=' 期望: 无输出；在 CloudBase 函数日志中检索 KEY/PRIVATE 关键字 期望: 无命中"
+        }
+      ]
+    },
+    {
+      "id": "S-43",
+      "statement": "F13 要求待发货、待收货、已完成订单能打开正确类型的申请表单。",
+      "tag": "验收",
+      "sources": [
+        {
+          "sectionRef": "§6.1",
+          "lines": "L386-L394",
+          "quote": "待发货、待收货、已完成订单能打开正确类型的申请表单"
+        }
+      ]
+    },
+    {
+      "id": "S-44",
+      "statement": "F13 要求金额超实付、空原因、越权订单被服务端拒绝。",
+      "tag": "校验",
+      "sources": [
+        {
+          "sectionRef": "§6.1",
+          "lines": "L386-L394",
+          "quote": "金额超实付 / 空原因 / 越权订单被服务端拒绝"
+        }
+      ]
+    },
+    {
+      "id": "S-45",
+      "statement": "F13 要求 REQUESTED 状态可撤销，撤销后恢复原订单状态且不回补库存。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§6.1",
+          "lines": "L386-L394",
+          "quote": "`REQUESTED` 状态可撤销，撤销后恢复原订单状态且不回补库存"
+        }
+      ]
+    },
+    {
+      "id": "S-46",
+      "statement": "F13 要求重复提交 / 撤销不会生成重复售后记录。",
+      "tag": "幂等",
+      "sources": [
+        {
+          "sectionRef": "§6.1",
+          "lines": "L386-L394",
+          "quote": "重复提交 / 撤销不会生成重复售后记录"
+        }
+      ]
+    },
+    {
+      "id": "S-47",
+      "statement": "F13 要求 F14 / F15 / F16 范围内无越界改动。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§6.1",
+          "lines": "L386-L394",
+          "quote": "F14 / F15 / F16 范围内无越界改动"
+        }
+      ]
+    },
+    {
+      "id": "S-48",
+      "statement": "F14 要求待审 Tab 仅返回 REQUESTED 状态的订单。",
+      "tag": "过滤",
+      "sources": [
+        {
+          "sectionRef": "§6.2",
+          "lines": "L395-L402",
+          "quote": "待审 Tab 仅返回 `REQUESTED`"
+        }
+      ]
+    },
+    {
+      "id": "S-49",
+      "statement": "F14 要求同意未发货进入 APPROVED，同意已发货进入 WAIT_RETURN。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§6.2",
+          "lines": "L395-L402",
+          "quote": "同意未发货进入 `APPROVED`，同意已发货进入 `WAIT_RETURN`"
+        }
+      ]
+    },
+    {
+      "id": "S-50",
+      "statement": "F14 要求拒绝操作无原因时被拦截。",
+      "tag": "校验",
+      "sources": [
+        {
+          "sectionRef": "§6.2",
+          "lines": "L395-L402",
+          "quote": "拒绝无原因被拦截"
+        }
+      ]
+    },
+    {
+      "id": "S-51",
+      "statement": "F14 要求非管理员、非 REQUESTED、重复审批全部被拒绝且无副作用。",
+      "tag": "权限",
+      "sources": [
+        {
+          "sectionRef": "§6.2",
+          "lines": "L395-L402",
+          "quote": "非管理员 / 非 `REQUESTED` / 重复审批全部被拒绝且无副作用"
+        }
+      ]
+    },
+    {
+      "id": "S-52",
+      "statement": "F14 要求审计日志可追溯。",
+      "tag": "证据",
+      "sources": [
+        {
+          "sectionRef": "§6.2",
+          "lines": "L395-L402",
+          "quote": "审计日志可追溯"
+        }
+      ]
+    },
+    {
+      "id": "S-53",
+      "statement": "F15 要求已发货退货退款 → 验货通过 → 确认退款成功后，每个 SKU 库存 +qty。",
+      "tag": "补偿",
+      "sources": [
+        {
+          "sectionRef": "§6.3",
+          "lines": "L403-L412",
+          "quote": "已发货退货退款 → 验货通过 → 确认退款成功后每个 SKU 库存 +qty"
+        }
+      ]
+    },
+    {
+      "id": "S-54",
+      "statement": "F15 要求并发 / 重复触发只补偿一次。",
+      "tag": "幂等",
+      "sources": [
+        {
+          "sectionRef": "§6.3",
+          "lines": "L403-L412",
+          "quote": "并发 / 重复触发只补偿一次"
+        }
+      ]
+    },
+    {
+      "id": "S-55",
+      "statement": "F15 要求有效优惠券恢复为可用，过期券保持过期并有记录。",
+      "tag": "补偿",
+      "sources": [
+        {
+          "sectionRef": "§6.3",
+          "lines": "L403-L412",
+          "quote": "有效优惠券恢复为可用，过期券保持过期并有记录"
+        }
+      ]
+    },
+    {
+      "id": "S-56",
+      "statement": "F15 要求使用积分的订单只退回一次，账户不存在时记录错误。",
+      "tag": "补偿",
+      "sources": [
+        {
+          "sectionRef": "§6.3",
+          "lines": "L403-L412",
+          "quote": "使用积分的订单只退回一次，账户不存在时记录错误"
+        }
+      ]
+    },
+    {
+      "id": "S-57",
+      "statement": "F15 要求补偿失败时 refundCompensationError 落库且订单不被标记为成功。",
+      "tag": "失败路径",
+      "sources": [
+        {
+          "sectionRef": "§6.3",
+          "lines": "L403-L412",
+          "quote": "补偿失败时 `refundCompensationError` 落库且订单不被标记为成功"
+        }
+      ]
+    },
+    {
+      "id": "S-58",
+      "statement": "F15 要求强制补偿仅管理员可调用，且不修改 afterSalesStatus。",
+      "tag": "权限",
+      "sources": [
+        {
+          "sectionRef": "§6.3",
+          "lines": "L403-L412",
+          "quote": "强制补偿仅管理员可调用，且不修改 `afterSalesStatus`"
+        }
+      ]
+    },
+    {
+      "id": "S-59",
+      "statement": "F16 要求 refundOrder 沙箱调用返回 PROCESSING，outRefundNo 唯一且可复用幂等。",
+      "tag": "幂等",
+      "sources": [
+        {
+          "sectionRef": "§6.4",
+          "lines": "L413-L421",
+          "quote": "`refundOrder` 沙箱调用返回 `PROCESSING`，`outRefundNo` 唯一且可复用幂等"
+        }
+      ]
+    },
+    {
+      "id": "S-60",
+      "statement": "F16 要求沙箱通知经 X-Mock-Source: sandbox 触发后正确推进 afterSalesStatus='REFUNDED' 并调用 processAfterSales。",
+      "tag": "回调",
+      "sources": [
+        {
+          "sectionRef": "§6.4",
+          "lines": "L413-L421",
+          "quote": "沙箱通知 `refundNotify` 经 `X-Mock-Source: sandbox` 触发后正确推进 `afterSalesStatus='REFUNDED'` 并调 `processAfterSales`"
+        }
+      ]
+    },
+    {
+      "id": "S-61",
+      "statement": "F16 要求 refundQueryCron 沙箱查单在 80% 命中率下成功推进。",
+      "tag": "定时任务",
+      "sources": [
+        {
+          "sectionRef": "§6.4",
+          "lines": "L413-L421",
+          "quote": "`refundQueryCron` 沙箱查单 80% 命中率下成功推进"
+        }
+      ]
+    },
+    {
+      "id": "S-62",
+      "statement": "F16 要求连续 10 次查单失败后置 REFUND_FAILED。",
+      "tag": "阈值",
+      "sources": [
+        {
+          "sectionRef": "§6.4",
+          "lines": "L413-L421",
+          "quote": "连续 10 次查单失败置 `REFUND_FAILED`"
+        }
+      ]
+    },
+    {
+      "id": "S-63",
+      "statement": "F16 要求日志不含密钥 / 私钥 / 证书内容，且 .gitignore 已屏蔽 .env / *.pem / *.key。",
+      "tag": "安全",
+      "sources": [
+        {
+          "sectionRef": "§6.4",
+          "lines": "L413-L421",
+          "quote": "日志不含密钥 / 私钥 / 证书内容；`.gitignore` 已屏蔽 `.env / *.pem / *.key`"
+        }
+      ]
+    },
+    {
+      "id": "S-64",
+      "statement": "F12 重新验收已在 Round 19 完成，F12 feature.md 的 status 已改为 passing。",
+      "tag": "状态",
+      "sources": [
+        {
+          "sectionRef": "§6.5",
+          "lines": "L422-L428",
+          "quote": "Round 19 已完成（已改为 `passing`）"
+        }
+      ]
+    },
+    {
+      "id": "S-65",
+      "statement": "真实模式必须配置 WECHAT_REFUND_MODE=real、APPID、MCHID、SERIAL_NO、MERCHANT_PRIVATE_KEY、PLATFORM_PUBLIC_KEY、PLATFORM_PUBLIC_KEY_ID、API_V3_KEY、NOTIFY_URL、API_BASE_URL 这些变量。",
+      "tag": "环境变量",
+      "sources": [
+        {
+          "sectionRef": "§7.1",
+          "lines": "L433-L449",
+          "quote": "WECHAT_REFUND_MODE = real；WECHAT_REFUND_APPID = <真实 AppID>；… WECHAT_REFUND_API_BASE_URL = https://api.mch.weixin.qq.com （默认）"
+        }
+      ]
+    },
+    {
+      "id": "S-66",
+      "statement": "所有 WECHAT_REFUND_* 变量仅从 CloudBase 控制台设置，仓库内任何位置不得包含其值。",
+      "tag": "安全",
+      "sources": [
+        {
+          "sectionRef": "§7.1",
+          "lines": "L433-L449",
+          "quote": "所有变量**仅从 CloudBase 控制台设置**，仓库内任何位置不得包含其值。"
+        }
+      ]
+    },
+    {
+      "id": "S-67",
+      "statement": "切换步骤 1 要求把真实变量写入 CloudBase 函数配置，由 refundOrder / refundNotify / refundQueryCron 三个函数共享。",
+      "tag": "切换",
+      "sources": [
+        {
+          "sectionRef": "§7.2",
+          "lines": "L450-L460",
+          "quote": "把上述变量写入 CloudBase 函数配置（`refundOrder / refundNotify / refundQueryCron` 三个函数共享）"
+        }
+      ]
+    },
+    {
+      "id": "S-68",
+      "statement": "切换时必须删除沙箱 __mock 调用入口，并确认 refundOrder 在真实模式下不进入 mockRefundApply 分支。",
+      "tag": "切换",
+      "sources": [
+        {
+          "sectionRef": "§7.2",
+          "lines": "L450-L460",
+          "quote": "删除沙箱 `__mock` 调用入口（确认 `refundOrder` 在真实模式下不进入 `mockRefundApply` 分支）"
+        }
+      ]
+    },
+    {
+      "id": "S-69",
+      "statement": "真实环境前置验证必须用 0.01 元真实退款，并在微信支付商户平台查看退款记录、在用户真实微信钱包确认到账。",
+      "tag": "验证",
+      "sources": [
+        {
+          "sectionRef": "§7.2",
+          "lines": "L450-L460",
+          "quote": "用 0.01 元真实退款（自付商品 + 自退款）；在微信支付商户平台查看退款记录；在用户真实微信钱包确认到账"
+        }
+      ]
+    },
+    {
+      "id": "S-70",
+      "statement": "前置验证通过后，把 WECHAT_REFUND_MODE=real 设为正式值。",
+      "tag": "切换",
+      "sources": [
+        {
+          "sectionRef": "§7.2",
+          "lines": "L450-L460",
+          "quote": "通过后把 `WECHAT_REFUND_MODE=real` 设为正式值"
+        }
+      ]
+    },
+    {
+      "id": "S-71",
+      "statement": "切换后必须把所有 WECHAT_REFUND_*_MOCK 类前缀变量从 CloudBase 配置移除，防止误用。",
+      "tag": "切换",
+      "sources": [
+        {
+          "sectionRef": "§7.2",
+          "lines": "L450-L460",
+          "quote": "把所有 `WECHAT_REFUND_*_MOCK` 类前缀变量从 CloudBase 配置移除（防止误用）"
+        }
+      ]
+    },
+    {
+      "id": "S-72",
+      "statement": "切换后回归需重跑 §4.2 / §4.3 / §4.4 / §4.5 / §4.6 / §4.7 / §4.8，并增加真实环境小金额退款 → 商户平台对账用例。",
+      "tag": "回归",
+      "sources": [
+        {
+          "sectionRef": "§7.3",
+          "lines": "L461-L467",
+          "quote": "重跑 §4.2 / §4.3 / §4.4 / §4.5 / §4.6 / §4.7 / §4.8；增加一项\"真实环境小金额退款 → 商户平台对账\" 用例"
+        }
+      ]
+    },
+    {
+      "id": "S-73",
+      "statement": "refundOrder 沙箱返回 mode 字段缺失时，原因是旧版本云函数，应重新部署 refundOrder。",
+      "tag": "排障",
+      "sources": [
+        {
+          "sectionRef": "§8",
+          "lines": "L468-L480",
+          "quote": "| `refundOrder` 沙箱返回 `mode` 字段缺失 | 旧版本云函数 | 重新部署 `refundOrder` |"
+        }
+      ]
+    },
+    {
+      "id": "S-74",
+      "statement": "refundNotify 返回 400 且提示签名校验失败时，真实模式下应检查 WECHAT_REFUND_PLATFORM_PUBLIC_KEY 配置。",
+      "tag": "排障",
+      "sources": [
+        {
+          "sectionRef": "§8",
+          "lines": "L468-L480",
+          "quote": "| `refundNotify` 返回 400 + `签名校验失败` | 真实模式下未配置 `WECHAT_REFUND_PLATFORM_PUBLIC_KEY` | 检查 CloudBase 函数配置 |"
+        }
+      ]
+    },
+    {
+      "id": "S-75",
+      "statement": "refundQueryCron 一直 stillProcessing 递增时，原因是沙箱 mock 命中 20% CLOSED 分支，多触发几次即可。",
+      "tag": "排障",
+      "sources": [
+        {
+          "sectionRef": "§8",
+          "lines": "L468-L480",
+          "quote": "| `refundQueryCron` 一直 `stillProcessing` 递增 | 沙箱 mock 命中 20% CLOSED 分支 | 多触发几次，预期 80% SUCCESS |"
+        }
+      ]
+    },
+    {
+      "id": "S-76",
+      "statement": "retryAfterSalesCompensation 的 failed 递增时，应检查 products / coupons / users 数据。",
+      "tag": "排障",
+      "sources": [
+        {
+          "sectionRef": "§8",
+          "lines": "L468-L480",
+          "quote": "| `retryAfterSalesCompensation` `failed` 递增 | `refundCompensationError` 持续非空 | 检查 `products / coupons / users` 数据 |"
+        }
+      ]
+    },
+    {
+      "id": "S-77",
+      "statement": "processAfterSales 拒绝 REFUND_SUCCESS 状态转移时，应检查订单当前状态是否不在 APPROVED 或 REFUND_PENDING。",
+      "tag": "排障",
+      "sources": [
+        {
+          "sectionRef": "§8",
+          "lines": "L468-L480",
+          "quote": "| `processAfterSales` 拒绝 `REFUND_SUCCESS` 状态转移 | 订单当前状态不在 `APPROVED` 或 `REFUND_PENDING` | 检查 `afterSalesStatus` |"
+        }
+      ]
+    },
+    {
+      "id": "S-78",
+      "statement": "列表页售后 Tab 不显示订单时，原因是 afterSalesStatus 仍为空，用户端需调 fetchOrderById 触发 fetchLatest。",
+      "tag": "排障",
+      "sources": [
+        {
+          "sectionRef": "§8",
+          "lines": "L468-L480",
+          "quote": "| 列表页\"售后\" Tab 不显示订单 | `afterSalesStatus` 仍为空 | 用户端调 `fetchOrderById` 触发 fetchLatest |"
+        }
+      ]
+    },
+    {
+      "id": "S-79",
+      "statement": "F16 退款云函数独立使用 refundCommon/config.js，不复用 payOrder / payNotify 的代码。",
+      "tag": "边界",
+      "sources": [
+        {
+          "sectionRef": "§9",
+          "lines": "L481-L488",
+          "quote": "F16 退款云函数**独立**使用 `refundCommon/config.js`，不复用 `payOrder / payNotify` 的代码"
+        }
+      ]
+    },
+    {
+      "id": "S-80",
+      "statement": "共享 WX_PAY_* 环境变量仅作为缺省回退（WECHAT_REFUND_APPID 缺省时回退 WX_PAY_APPID），且不修改支付核心文件。",
+      "tag": "回退",
+      "sources": [
+        {
+          "sectionRef": "§9",
+          "lines": "L481-L488",
+          "quote": "共享 `WX_PAY_*` 环境变量仅作为**缺省回退**（`WECHAT_REFUND_APPID` 缺省时回退 `WX_PAY_APPID`），不修改支付核心文件"
+        }
+      ]
+    },
+    {
+      "id": "S-81",
+      "statement": "真实环境切换需独立配置 WECHAT_REFUND_*，避免污染支付域。",
+      "tag": "边界",
+      "sources": [
+        {
+          "sectionRef": "§9",
+          "lines": "L481-L488",
+          "quote": "真实环境切换需独立配置 `WECHAT_REFUND_*`，避免污染支付域"
+        }
+      ]
+    },
+    {
+      "id": "S-82",
+      "statement": "F12 §5.2 规定：当售后最终进入 REFUNDED，或未发货 REFUND_ONLY 明确进入代表取消成功的 APPROVED / 旧版 CLOSED 时，服务端事务必须按订单商品数量回补 products.stock。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L489-L496",
+          "quote": "当售后最终进入 `REFUNDED`，或未发货 `REFUND_ONLY` 明确进入代表取消成功的 `APPROVED` / 旧版 `CLOSED` 时，服务端事务必须按订单商品数量回补 `products.stock`。"
+        }
+      ]
+    },
+    {
+      "id": "S-83",
+      "statement": "F15 当前实现选择只在 REFUND_SUCCESS 时释放库存，与 F06 老路径 processCancellation.APPROVE 的'立刻释放'语义不一致。",
+      "tag": "现状差异",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L489-L496",
+          "quote": "F15 当前实现选择了**只在 `REFUND_SUCCESS` 时释放**，这与 F06 老路径 `processCancellation.APPROVE` 的\"立刻释放\"语义不一致。"
+        }
+      ]
+    },
+    {
+      "id": "S-84",
+      "statement": "F06 老路径（cancelOrder → processCancellation.APPROVE）在商家点同意取消申请时立即释放库存，状态链路为 REQUESTED → APPROVED → REFUND_PENDING。",
+      "tag": "现状对照",
+      "sources": [
+        {
+          "sectionRef": "§现状对照表",
+          "lines": "L497-L503",
+          "quote": "F06 老路径：`cancelOrder` → `processCancellation.APPROVE` | 商家点\"同意取消申请\" | **APPROVE 时立即** | `REQUESTED → APPROVED → REFUND_PENDING`"
+        }
+      ]
+    },
+    {
+      "id": "S-85",
+      "statement": "F13/F14 新路径（submitAfterSales → processAfterSales.APPROVE_REFUND_ONLY）在 REFUND_SUCCESS 时释放库存，状态链路为 REQUESTED → APPROVED → REFUND_PENDING → REFUNDED。",
+      "tag": "现状对照",
+      "sources": [
+        {
+          "sectionRef": "§现状对照表",
+          "lines": "L497-L503",
+          "quote": "F13/F14 新路径：`submitAfterSales` → `processAfterSales.APPROVE_REFUND_ONLY` | 商家点\"同意\"（详情页） | **REFUND_SUCCESS 时**（资金到账） | `REQUESTED → APPROVED → REFUND_PENDING → REFUNDED`"
+        }
+      ]
+    },
+    {
+      "id": "S-86",
+      "statement": "风险 A（保守，F15 当前实现）必须等资金到账才释放库存；优点是避免用户拒收退款时库存永久丢失，缺点是商家需要两次操作、用户在 REFUND_PENDING 阶段看不到库存已回补。",
+      "tag": "取舍",
+      "sources": [
+        {
+          "sectionRef": "§两种实现的风险",
+          "lines": "L504-L515",
+          "quote": "风险 A（保守，F15 当前实现）：必须等资金到账才释放库存；优点：避免用户拒收退款时库存永久丢失…缺点：商家需要两次操作…用户在 `REFUND_PENDING` 阶段看不到库存已回补"
+        }
+      ]
+    },
+    {
+      "id": "S-87",
+      "statement": "风险 B（激进，F06 老路径）商家一同意就释放库存；优点是商家操作少、体验直接，缺点是用户拒收退款或支付失败时库存可能已经卖给其他人、导致真实库存不足。",
+      "tag": "取舍",
+      "sources": [
+        {
+          "sectionRef": "§两种实现的风险",
+          "lines": "L504-L515",
+          "quote": "风险 B（激进，F06 老路径）：商家一同意就释放库存；优点：商家操作少（一次）；用户体验更直接；缺点：如果用户拒收退款或支付失败，库存可能已经卖给其他人，导致真实库存不足"
+        }
+      ]
+    },
+    {
+      "id": "S-88",
+      "statement": "决策 1 选 A（保守）则 F15 当前实现无需调整，processAfterSales.APPROVE_REFUND_ONLY 不调用 runCompensation。",
+      "tag": "决策",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L516-L526",
+          "quote": "选 A（保守）→ 当前 F15 实现无需调整。`processAfterSales.APPROVE_REFUND_ONLY` 不调用 `runCompensation`，保持原样。"
+        }
+      ]
+    },
+    {
+      "id": "S-89",
+      "statement": "决策 1 选 B（激进）需在 processAfterSales/lib/compensation.js 暴露 releaseStockOnly(tx, order, now)，并在 APPROVE_REFUND_ONLY 分支开头调用。",
+      "tag": "决策",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L516-L526",
+          "quote": "选 B（激进）→ 需要给 `processAfterSales.APPROVE_REFUND_ONLY` 增加\"提前释放库存\"的前置步骤。建议在 `processAfterSales/lib/compensation.js` 暴露一个 `releaseStockOnly(tx, order, now)` 函数，然后在 `APPROVE_REFUND_ONLY` 分支开头调用。"
+        }
+      ]
+    },
+    {
+      "id": "S-90",
+      "statement": "决策 2：若选 B，需决定是否同步释放优惠券 / 积分；是则完全镜像 F15 完整补偿、将 releaseStockOnly 扩展为 releaseAllAssets，否则仅释放库存。",
+      "tag": "决策",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L516-L526",
+          "quote": "是 → 完全镜像 F15 完整补偿，扩展 `releaseStockOnly` 为 `releaseAllAssets`。否 → 仅释放库存，优惠券 / 积分仍按资金到账后退回。"
+        }
+      ]
+    },
+    {
+      "id": "S-91",
+      "statement": "决策 3：强烈不推荐在 submitAfterSales 阶段增加 preferredReleaseStock 字段让用户选择释放时机，因为与 F13 5.1 的'撤销不触发库存或资产回退'互斥。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L516-L526",
+          "quote": "**强烈不推荐**——这会让用户侧的语义混乱。F13 文档明确\"撤销不影响库存\"——如果允许用户选时机，与 F13 5.1 的\"撤销不触发库存或资产回退\"互斥。"
+        }
+      ]
+    },
+    {
+      "id": "S-92",
+      "statement": "默认推荐保持 F15 当前保守实现（REFUND_SUCCESS 时释放库存）。",
+      "tag": "决策",
+      "sources": [
+        {
+          "sectionRef": "§默认推荐",
+          "lines": "L527-L540",
+          "quote": "**保持 F15 当前实现（保守路径）**"
+        }
+      ]
+    },
+    {
+      "id": "S-93",
+      "statement": "默认推荐理由之一：F06 老路径写 stockRestored=true、F15 新路径也写 stockRestored=true，两者代码路径不同且互不感知，同一订单既走 F06 又走 F13 时库存可能重复释放（虽有 stockRestored 闸门，但需保证写入顺序与检查先后）。",
+      "tag": "风险",
+      "sources": [
+        {
+          "sectionRef": "§默认推荐",
+          "lines": "L527-L540",
+          "quote": "F06 老路径用的是 `processCancellation`，F13 新路径用的是 `processAfterSales`，两者**写库存释放的代码路径完全不同**…但**互不感知**…库存可能重复释放（虽然有 `if (order.stockRestored === true) return` 闸门，但两个 action 的写入顺序与 `stockRestored` 检查的先后需要保证）。"
+        }
+      ]
+    },
+    {
+      "id": "S-94",
+      "statement": "默认推荐理由之二：F15 的 REFUND_SUCCESS 路径保证用户资金已退回再释放库存，对账更清晰；且 audit_logs 可查完整链路，资金相关字段 refundedAt 明确写入。",
+      "tag": "风险",
+      "sources": [
+        {
+          "sectionRef": "§默认推荐",
+          "lines": "L527-L540",
+          "quote": "F15 的\"必须 `REFUND_SUCCESS`\"路径天然保证了\"用户资金已退回\"再释放库存，对账更清晰。F12/F13/F14/F15/F16 的 `audit_logs` 能查到完整链路，**任何资金相关的字段（`refundedAt`）都明确写入**"
+        }
+      ]
+    },
+    {
+      "id": "S-95",
+      "statement": "无论选 A 还是 B 都存在 UX 副作用：用户走 F13 路径后，商家需要两次操作（同意 + 确认退款成功）才能让订单到 REFUNDED。",
+      "tag": "UX",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L541-L546",
+          "quote": "用户走 F13 路径后，商家需要两次操作才能让订单到 `REFUNDED`（同意 + 确认退款成功）"
+        }
+      ]
+    },
+    {
+      "id": "S-96",
+      "statement": "after-sales-detail.vue 在 APPROVED 状态下应同时显示'确认退款成功'按钮（当前已实现）。",
+      "tag": "UX",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L541-L546",
+          "quote": "商家工作台 `after-sales-detail.vue` 在 `APPROVED` 状态下应同时显示\"确认退款成功\"按钮（当前已实现，见 §6.2）"
+        }
+      ]
+    },
+    {
+      "id": "S-97",
+      "statement": "cancelOrder / submitAfterSales 在用户侧是两个不同入口，F13 已在 order/list/index.vue 和 order-detail/index.vue 都提供'申请售后'入口。",
+      "tag": "入口",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L541-L546",
+          "quote": "`cancelOrder` / `submitAfterSales` 在用户侧是**两个不同入口**，F13 已经在 `order/list/index.vue` 和 `order-detail/index.vue` 都提供了\"申请售后\"入口"
+        }
+      ]
+    },
+    {
+      "id": "S-98",
+      "statement": "决策记录必须在 F15 passing 前填写，并同步到 F15 verification.md §9 勾选项。",
+      "tag": "流程",
+      "sources": [
+        {
+          "sectionRef": "§10",
+          "lines": "L547-L564",
+          "quote": "此决策记录必须同步到 `docs/harness/features/individual_feature/F15-after-sales-stock-rollback/verification.md` §9 勾选项。"
+        }
+      ]
+    },
+    {
+      "id": "S-99",
+      "statement": "修订记录 v0.3 新增 docs/harness/REVIEWER-GUIDE.md 作为 reviewer 入门指南，推荐 reviewer 优先阅读该指南。",
+      "tag": "流程",
+      "sources": [
+        {
+          "sectionRef": "§11",
+          "lines": "L565-L573",
+          "quote": "v0.3 | 2026-03 | 新增 `docs/harness/REVIEWER-GUIDE.md` 作为 reviewer 入门指南（推荐 reviewer 优先阅读该指南）"
+        }
+      ]
+    }
+  ]
+}

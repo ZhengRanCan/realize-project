@@ -1,0 +1,2202 @@
+```json
+<<<FRAMEWORK_MAP>>>
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "goal-plan-stage-task-target-model-contract",
+    "title": "Goal / Plan / Stage / Task target model contract",
+    "sourcePath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+    "role": "target",
+    "scope": {
+      "text": "本文档是规划领域的 F40 目标数据模型契约，未来数据模型迁移在改动 models/、planner、replanner、storage 或页面数据消费前应以本文档为事实来源。",
+      "sectionRefs": ["§Purpose"]
+    },
+    "nonGoalSummary": {
+      "text": "F40 不删除 DailyPlan[]、不改 storage key、不改兼容读取、不实现 AI 或 planner 重写；后续迁移步骤不得视作 F40 的一部分。",
+      "sectionRefs": ["§Purpose", "§DailyPlan legacy boundary", "§Migration direction"]
+    }
+  },
+  "thesis": "目标核心链路是 Goal + UserProfile -> InitialPlanContext -> PlanBundle，重规划链路是 Goal + UserProfile + current PlanBundle + UserFeedback/DailyReview/Stage progress -> ReplanContext -> new PlanBundle/PlanChangeSet；DailyPlan[] 仅作为 legacy 兼容保留。",
+  "elements": [
+    {
+      "id": "E-Goal",
+      "label": "Goal",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-F40", "T-Goal"],
+      "sectionRefs": ["§F40 conclusion", "§Goal"]
+    },
+    {
+      "id": "E-UserProfile",
+      "label": "UserProfile",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-F40", "T-UserProfile"],
+      "sectionRefs": ["§F40 conclusion", "§UserProfile"]
+    },
+    {
+      "id": "E-InitialPlanContext",
+      "label": "InitialPlanContext",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-F40", "T-Initial"],
+      "sectionRefs": ["§F40 conclusion", "§Initial planning flow"]
+    },
+    {
+      "id": "E-ReplanContext",
+      "label": "ReplanContext",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-F40", "T-Replan"],
+      "sectionRefs": ["§F40 conclusion", "§Replanning flow"]
+    },
+    {
+      "id": "E-PlanBundle",
+      "label": "PlanBundle",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-F40", "T-ModelLayers", "T-PlanBundle"],
+      "sectionRefs": ["§F40 conclusion", "§Model layers", "§PlanBundle"]
+    },
+    {
+      "id": "E-Plan",
+      "label": "Plan",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-ModelLayers", "T-Plan"],
+      "sectionRefs": ["§Model layers", "§Plan"]
+    },
+    {
+      "id": "E-Stage",
+      "label": "Stage",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-ModelLayers", "T-Stage"],
+      "sectionRefs": ["§Model layers", "§Stage"]
+    },
+    {
+      "id": "E-Task",
+      "label": "Task",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-ModelLayers", "T-Task"],
+      "sectionRefs": ["§Model layers", "§Task"]
+    },
+    {
+      "id": "E-DailyReview",
+      "label": "DailyReview",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-F40", "T-ModelLayers", "T-DailyReview"],
+      "sectionRefs": ["§F40 conclusion", "§Model layers", "§DailyReview"]
+    },
+    {
+      "id": "E-FocusSession",
+      "label": "FocusSession",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-ModelLayers", "T-FocusSession"],
+      "sectionRefs": ["§Model layers", "§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-TaskResult",
+      "label": "TaskResult",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-ModelLayers", "T-FocusSession"],
+      "sectionRefs": ["§Model layers", "§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-TodayTaskSelection",
+      "label": "TodayTaskSelection",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-ModelLayers", "T-TodayTaskSelection"],
+      "sectionRefs": ["§Model layers", "§TodayTaskSelection"]
+    },
+    {
+      "id": "E-DailyReviewPromptDismissal",
+      "label": "DailyReviewPromptDismissal",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-ModelLayers", "T-Dismissal"],
+      "sectionRefs": ["§Model layers", "§DailyReviewPromptDismissal"]
+    },
+    {
+      "id": "E-PlanChangeSummary",
+      "label": "PlanChangeSummary",
+      "type": "artifact",
+      "role": "target",
+      "topics": ["T-ModelLayers", "T-PlanChangeSummary"],
+      "sectionRefs": ["§Model layers", "§PlanChangeSummary"]
+    },
+    {
+      "id": "E-DailyPlan",
+      "label": "DailyPlan legacy",
+      "type": "artifact",
+      "role": "excluded",
+      "topics": ["T-ModelLayers", "T-Legacy"],
+      "sectionRefs": ["§Model layers", "§DailyPlan legacy boundary"]
+    },
+    {
+      "id": "E-DailyTaskView",
+      "label": "DailyTaskView",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-ModelLayers", "T-ComputedViews"],
+      "sectionRefs": ["§Model layers", "§Computed views"]
+    },
+    {
+      "id": "E-TodaySuggestionView",
+      "label": "TodaySuggestionView",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-ModelLayers", "T-ComputedViews"],
+      "sectionRefs": ["§Model layers", "§Computed views"]
+    },
+    {
+      "id": "E-PlanBundleCalendarView",
+      "label": "PlanBundleCalendarView",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-ModelLayers", "T-ComputedViews"],
+      "sectionRefs": ["§Model layers", "§Computed views"]
+    },
+    {
+      "id": "E-TaskCardView",
+      "label": "TaskCardView",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-TaskCard", "T-ComputedViews"],
+      "sectionRefs": ["§Task Card computed contract", "§Computed views"]
+    },
+    {
+      "id": "E-ReplanAiInput",
+      "label": "ReplanAiInput",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-Replan"],
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "E-UserPlanFeedback",
+      "label": "UserPlanFeedback",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-Replan"],
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "E-InitialPlanning",
+      "label": "Initial planning",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-Initial"],
+      "sectionRefs": ["§Initial planning flow"]
+    },
+    {
+      "id": "E-Replanning",
+      "label": "Replanning",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-Replan"],
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "E-TaskCardSelector",
+      "label": "Task Card selector",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-TaskCard"],
+      "sectionRefs": ["§Task Card computed contract"]
+    },
+    {
+      "id": "E-RecordProgress",
+      "label": "Record progress transaction",
+      "type": "process",
+      "role": "authority",
+      "topics": ["T-FocusSession", "T-PlanChangeSummary"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview", "§PlanChangeSummary"]
+    },
+    {
+      "id": "E-PersistPlanChange",
+      "label": "Persist deterministic plan change",
+      "type": "process",
+      "role": "authority",
+      "topics": ["T-PlanChangeSummary"],
+      "sectionRefs": ["§PlanChangeSummary"]
+    },
+    {
+      "id": "E-ViewDerivation",
+      "label": "View derivation",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-ComputedViews"],
+      "sectionRefs": ["§Computed views"]
+    },
+    {
+      "id": "E-MigrationDirection",
+      "label": "Migration direction",
+      "type": "process",
+      "role": "boundary",
+      "topics": ["T-Migration"],
+      "sectionRefs": ["§Migration direction"]
+    },
+    {
+      "id": "E-FocusSessionState",
+      "label": "FocusSession state machine",
+      "type": "state",
+      "role": "semantic-level",
+      "topics": ["T-FocusSession"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-TaskCardAvailability",
+      "label": "TaskCardAvailability",
+      "type": "state",
+      "role": "semantic-level",
+      "topics": ["T-TaskCard"],
+      "sectionRefs": ["§Task Card computed contract"]
+    },
+    {
+      "id": "E-PlanAdjustmentRisk",
+      "label": "Plan adjustmentRisk",
+      "type": "state",
+      "role": "semantic-level",
+      "topics": ["T-Plan"],
+      "sectionRefs": ["§Goal", "§Plan"]
+    },
+    {
+      "id": "E-ModelLayers",
+      "label": "Model layers",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": ["T-ModelLayers"],
+      "sectionRefs": ["§Model layers"]
+    },
+    {
+      "id": "C-DocumentScope",
+      "label": "Document scope as F40 source of truth",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Purpose"],
+      "sectionRefs": ["§Purpose"]
+    },
+    {
+      "id": "C-F40NonGoals",
+      "label": "F40 non-goals and later-work boundary",
+      "type": "constraint",
+      "role": "excluded",
+      "topics": ["T-Purpose", "T-Legacy", "T-Migration"],
+      "sectionRefs": ["§Purpose", "§DailyPlan legacy boundary", "§Migration direction"]
+    },
+    {
+      "id": "C-CoreChain",
+      "label": "Core chain and transient contexts",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-F40"],
+      "sectionRefs": ["§F40 conclusion"]
+    },
+    {
+      "id": "C-ReplanChain",
+      "label": "Replanning chain and currentPlanBundle injection",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-F40", "T-Replan"],
+      "sectionRefs": ["§F40 conclusion", "§Replanning flow"]
+    },
+    {
+      "id": "C-InitialContextRules",
+      "label": "InitialPlanContext assembly and no DailyReview dependency",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Initial"],
+      "sectionRefs": ["§Initial planning flow"]
+    },
+    {
+      "id": "C-AIValidation",
+      "label": "AI output validation before PlanBundle",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Initial", "T-Plan"],
+      "sectionRefs": ["§Initial planning flow", "§Plan"]
+    },
+    {
+      "id": "C-ReplanTriggers",
+      "label": "Replanning triggers",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Replan"],
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "C-ReplanPreservation",
+      "label": "Replanning preservation invariants",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Replan"],
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "C-ReplanInfeasible",
+      "label": "Explicit infeasible replanning result",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Replan"],
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "C-GoalFields",
+      "label": "Goal target fields and field intent",
+      "type": "constraint",
+      "role": "target",
+      "topics": ["T-Goal"],
+      "sectionRefs": ["§Goal"]
+    },
+    {
+      "id": "C-GoalBoundaries",
+      "label": "Goal boundaries and rejected contents",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Goal"],
+      "sectionRefs": ["§Goal"]
+    },
+    {
+      "id": "C-GoalUniqueness",
+      "label": "One active plan per Goal",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Goal"],
+      "sectionRefs": ["§Goal"]
+    },
+    {
+      "id": "C-DailyAvailableMinutes",
+      "label": "dailyAvailableMinutes semantics",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Goal"],
+      "sectionRefs": ["§Goal"]
+    },
+    {
+      "id": "C-GoalCompletionCancellation",
+      "label": "Goal completion and cancellation rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Goal"],
+      "sectionRefs": ["§Goal"]
+    },
+    {
+      "id": "C-UserProfileBoundaries",
+      "label": "UserProfile preference boundaries",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-UserProfile"],
+      "sectionRefs": ["§UserProfile"]
+    },
+    {
+      "id": "C-PlanBundleRules",
+      "label": "PlanBundle aggregate rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-PlanBundle"],
+      "sectionRefs": ["§PlanBundle"]
+    },
+    {
+      "id": "C-PlanRules",
+      "label": "Plan metadata and adjustment rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Plan"],
+      "sectionRefs": ["§Plan"]
+    },
+    {
+      "id": "C-PlanStructure",
+      "label": "Plan structureType and detailedThrough",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Plan"],
+      "sectionRefs": ["§Plan"]
+    },
+    {
+      "id": "C-PlanInitialContract",
+      "label": "F67 initial-plan contract and Stage/Task materialization",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Plan"],
+      "sectionRefs": ["§Plan"]
+    },
+    {
+      "id": "C-StageRules",
+      "label": "Stage fields and date-range rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Stage"],
+      "sectionRefs": ["§Stage"]
+    },
+    {
+      "id": "C-StageCompletion",
+      "label": "Stage completion semantics and replan trigger",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Stage"],
+      "sectionRefs": ["§Stage"]
+    },
+    {
+      "id": "C-TaskTargetShape",
+      "label": "Task target shape and stable id",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Task"],
+      "sectionRefs": ["§Task"]
+    },
+    {
+      "id": "C-TaskDependencies",
+      "label": "Task dependency validity and satisfaction",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Task"],
+      "sectionRefs": ["§Task"]
+    },
+    {
+      "id": "C-TaskScheduling",
+      "label": "Task scheduling, minutes, and minimumLine rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Task"],
+      "sectionRefs": ["§Task"]
+    },
+    {
+      "id": "C-TaskCardRules",
+      "label": "Task Card selector window, recommendation, and purity",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-TaskCard"],
+      "sectionRefs": ["§Task Card computed contract"]
+    },
+    {
+      "id": "C-ExecutionConceptSeparation",
+      "label": "FocusSession, TaskResult, DailyReview separation",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-FocusSession"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "C-TaskResultPersistence",
+      "label": "TaskResult persisted fields and status timestamp",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-FocusSession"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "C-DailyReviewUniqueness",
+      "label": "DailyReview per Goal/date uniqueness and history",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-FocusSession", "T-DailyReview"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview", "§DailyReview"]
+    },
+    {
+      "id": "C-ExecutionStorage",
+      "label": "Dedicated execution storage and energy boundary",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-FocusSession"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "C-TaskResultTaskUpdate",
+      "label": "Paired write from TaskResult save to Task status",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-FocusSession", "T-PlanChangeSummary"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview", "§PlanChangeSummary"]
+    },
+    {
+      "id": "C-TodaySelectionRules",
+      "label": "TodayTaskSelection authorization and history rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-TodayTaskSelection"],
+      "sectionRefs": ["§TodayTaskSelection"]
+    },
+    {
+      "id": "C-DailyReviewCompatibility",
+      "label": "DailyReview compatibility, normalization, and draft rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-DailyReview"],
+      "sectionRefs": ["§DailyReview"]
+    },
+    {
+      "id": "C-DailyReviewPrivacy",
+      "label": "DailyReview note privacy",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-DailyReview"],
+      "sectionRefs": ["§DailyReview"]
+    },
+    {
+      "id": "C-DismissalRules",
+      "label": "DailyReviewPromptDismissal rules and cascade",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Dismissal"],
+      "sectionRefs": ["§DailyReviewPromptDismissal"]
+    },
+    {
+      "id": "C-PlanChangeSummaryRules",
+      "label": "PlanChangeSummary idempotency and fact rules",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-PlanChangeSummary"],
+      "sectionRefs": ["§PlanChangeSummary"]
+    },
+    {
+      "id": "C-DailyPlanLegacy",
+      "label": "DailyPlan legacy role, deletion direction, and risks",
+      "type": "constraint",
+      "role": "excluded",
+      "topics": ["T-Legacy"],
+      "sectionRefs": ["§DailyPlan legacy boundary"]
+    },
+    {
+      "id": "C-ComputedViewRules",
+      "label": "Computed view derivation boundaries",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-ComputedViews"],
+      "sectionRefs": ["§Computed views"]
+    },
+    {
+      "id": "C-MigrationSteps",
+      "label": "Later migration steps after F40",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Migration"],
+      "sectionRefs": ["§Migration direction"]
+    },
+    {
+      "id": "C-HistoricalNotes",
+      "label": "Historical notes F16/F39/F41/F56/F58",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Historical"],
+      "sectionRefs": ["§Historical notes", "§2026-05-26 F16", "§2026-06-26 F39", "§2026-06-27 F41", "§2026-07-03 F56", "§2026-07-09 F58"]
+    },
+    {
+      "id": "C-F40ReviewScope",
+      "label": "F40 model and migration-direction review scope",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Purpose"],
+      "sectionRefs": ["§Purpose"]
+    },
+    {
+      "id": "C-F41Scope",
+      "label": "F41 pure models-layer implementation scope",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Purpose"],
+      "sectionRefs": ["§Purpose"]
+    },
+    {
+      "id": "C-F65Extensions",
+      "label": "F65 preferredApproach, structureType, detailedThrough, dependsOnTaskIds, estimatedMinutes",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Goal", "T-Plan"],
+      "sectionRefs": ["§Goal", "§Plan"]
+    },
+    {
+      "id": "C-F67InitialPlanContract",
+      "label": "F67 initial plan structureType/detailedThrough requirements",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Plan"],
+      "sectionRefs": ["§Plan"]
+    },
+    {
+      "id": "C-F58Creation",
+      "label": "F58 creation start fields and transient intent data",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Goal", "T-Historical"],
+      "sectionRefs": ["§Goal", "§2026-07-09 F58"]
+    },
+    {
+      "id": "C-F56Preview",
+      "label": "F56 optional taskType and transient preview candidates",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Historical"],
+      "sectionRefs": ["§2026-07-03 F56"]
+    },
+    {
+      "id": "C-F16Reschedule",
+      "label": "F16 reschedule tracking fields and partial/skipped follow-up",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Historical", "T-Task"],
+      "sectionRefs": ["§2026-05-26 F16"]
+    },
+    {
+      "id": "C-F39Validation",
+      "label": "F39 strict validation and F40 supersession",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Historical"],
+      "sectionRefs": ["§2026-06-26 F39"]
+    },
+    {
+      "id": "C-F41ModelTypes",
+      "label": "F41 model-layer runtime types and legacy retention",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-Historical"],
+      "sectionRefs": ["§2026-06-27 F41"]
+    },
+    {
+      "id": "C-PlanChangeAtomic",
+      "label": "Atomic PlanBundle plus summary persistence",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-PlanChangeSummary"],
+      "sectionRefs": ["§PlanChangeSummary"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "ED-01",
+      "from": "E-InitialPlanning",
+      "to": "E-InitialPlanContext",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-02",
+      "from": "E-InitialPlanning",
+      "to": "E-PlanBundle",
+      "type": "produces"
+    },
+    {
+      "id": "ED-03",
+      "from": "E-InitialPlanContext",
+      "to": "E-Goal",
+      "type": "contains"
+    },
+    {
+      "id": "ED-04",
+      "from": "E-InitialPlanContext",
+      "to": "E-UserProfile",
+      "type": "contains"
+    },
+    {
+      "id": "ED-05",
+      "from": "E-PlanBundle",
+      "to": "E-Plan",
+      "type": "contains"
+    },
+    {
+      "id": "ED-06",
+      "from": "E-PlanBundle",
+      "to": "E-Stage",
+      "type": "contains"
+    },
+    {
+      "id": "ED-07",
+      "from": "E-PlanBundle",
+      "to": "E-Task",
+      "type": "contains"
+    },
+    {
+      "id": "ED-08",
+      "from": "E-Plan",
+      "to": "E-Goal",
+      "type": "depends-on"
+    },
+    {
+      "id": "ED-09",
+      "from": "E-Stage",
+      "to": "E-Task",
+      "type": "contains"
+    },
+    {
+      "id": "ED-10",
+      "from": "E-Replanning",
+      "to": "E-ReplanContext",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-11",
+      "from": "E-Replanning",
+      "to": "E-PlanBundle",
+      "type": "produces"
+    },
+    {
+      "id": "ED-12",
+      "from": "E-ReplanContext",
+      "to": "E-Goal",
+      "type": "contains"
+    },
+    {
+      "id": "ED-13",
+      "from": "E-ReplanContext",
+      "to": "E-UserProfile",
+      "type": "contains"
+    },
+    {
+      "id": "ED-14",
+      "from": "E-ReplanContext",
+      "to": "E-PlanBundle",
+      "type": "contains"
+    },
+    {
+      "id": "ED-15",
+      "from": "E-ReplanContext",
+      "to": "E-UserPlanFeedback",
+      "type": "contains"
+    },
+    {
+      "id": "ED-16",
+      "from": "E-ReplanContext",
+      "to": "E-DailyReview",
+      "type": "contains"
+    },
+    {
+      "id": "ED-17",
+      "from": "E-ReplanContext",
+      "to": "E-ReplanAiInput",
+      "type": "produces"
+    },
+    {
+      "id": "ED-18",
+      "from": "E-TaskCardSelector",
+      "to": "E-PlanBundle",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-19",
+      "from": "E-TaskCardSelector",
+      "to": "E-TaskCardView",
+      "type": "produces"
+    },
+    {
+      "id": "ED-20",
+      "from": "E-FocusSession",
+      "to": "E-TaskResult",
+      "type": "produces"
+    },
+    {
+      "id": "ED-21",
+      "from": "E-FocusSession",
+      "to": "E-Task",
+      "type": "relates-to"
+    },
+    {
+      "id": "ED-22",
+      "from": "E-TaskResult",
+      "to": "E-Task",
+      "type": "relates-to"
+    },
+    {
+      "id": "ED-23",
+      "from": "E-RecordProgress",
+      "to": "E-TaskResult",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-24",
+      "from": "E-RecordProgress",
+      "to": "E-DailyReview",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-25",
+      "from": "E-RecordProgress",
+      "to": "E-PlanBundle",
+      "type": "controls"
+    },
+    {
+      "id": "ED-26",
+      "from": "E-TodayTaskSelection",
+      "to": "E-Task",
+      "type": "relates-to"
+    },
+    {
+      "id": "ED-27",
+      "from": "E-DailyReview",
+      "to": "E-TaskResult",
+      "type": "contains"
+    },
+    {
+      "id": "ED-28",
+      "from": "E-ViewDerivation",
+      "to": "E-PlanBundle",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-29",
+      "from": "E-ViewDerivation",
+      "to": "E-DailyReview",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-30",
+      "from": "E-ViewDerivation",
+      "to": "E-UserProfile",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-31",
+      "from": "E-ViewDerivation",
+      "to": "E-DailyTaskView",
+      "type": "produces"
+    },
+    {
+      "id": "ED-32",
+      "from": "E-ViewDerivation",
+      "to": "E-TodaySuggestionView",
+      "type": "produces"
+    },
+    {
+      "id": "ED-33",
+      "from": "E-ViewDerivation",
+      "to": "E-PlanBundleCalendarView",
+      "type": "produces"
+    },
+    {
+      "id": "ED-34",
+      "from": "E-DailyPlan",
+      "to": "E-PlanBundle",
+      "type": "relates-to"
+    },
+    {
+      "id": "ED-35",
+      "from": "E-MigrationDirection",
+      "to": "E-DailyPlan",
+      "type": "transforms-to"
+    },
+    {
+      "id": "ED-36",
+      "from": "E-PersistPlanChange",
+      "to": "E-PlanChangeSummary",
+      "type": "produces"
+    },
+    {
+      "id": "ED-37",
+      "from": "E-PersistPlanChange",
+      "to": "E-PlanBundle",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-38",
+      "from": "E-PersistPlanChange",
+      "to": "E-DailyReview",
+      "type": "consumes"
+    },
+    {
+      "id": "ED-39",
+      "from": "E-DailyReviewPromptDismissal",
+      "to": "E-Goal",
+      "type": "relates-to"
+    },
+    {
+      "id": "ED-40",
+      "from": "E-PlanChangeSummary",
+      "to": "E-PlanBundle",
+      "type": "relates-to"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "C-DocumentScope",
+      "attachedTo": ["E-ModelLayers"]
+    },
+    {
+      "elementId": "C-F40NonGoals",
+      "attachedTo": ["E-ModelLayers"]
+    },
+    {
+      "elementId": "C-CoreChain",
+      "attachedTo": ["E-PlanBundle"]
+    },
+    {
+      "elementId": "C-ReplanChain",
+      "attachedTo": ["E-ReplanContext"]
+    },
+    {
+      "elementId": "C-InitialContextRules",
+      "attachedTo": ["E-InitialPlanContext"]
+    },
+    {
+      "elementId": "C-AIValidation",
+      "attachedTo": ["E-PlanBundle"]
+    },
+    {
+      "elementId": "C-ReplanTriggers",
+      "attachedTo": ["E-Replanning"]
+    },
+    {
+      "elementId": "C-ReplanPreservation",
+      "attachedTo": ["E-Replanning"]
+    },
+    {
+      "elementId": "C-ReplanInfeasible",
+      "attachedTo": ["E-Replanning"]
+    },
+    {
+      "elementId": "C-GoalFields",
+      "attachedTo": ["E-Goal"]
+    },
+    {
+      "elementId": "C-GoalBoundaries",
+      "attachedTo": ["E-Goal"]
+    },
+    {
+      "elementId": "C-GoalUniqueness",
+      "attachedTo": ["E-Goal"]
+    },
+    {
+      "elementId": "C-DailyAvailableMinutes",
+      "attachedTo": ["E-Goal"]
+    },
+    {
+      "elementId": "C-GoalCompletionCancellation",
+      "attachedTo": ["E-Goal"]
+    },
+    {
+      "elementId": "C-UserProfileBoundaries",
+      "attachedTo": ["E-UserProfile"]
+    },
+    {
+      "elementId": "C-PlanBundleRules",
+      "attachedTo": ["E-PlanBundle"]
+    },
+    {
+      "elementId": "C-PlanRules",
+      "attachedTo": ["E-Plan"]
+    },
+    {
+      "elementId": "C-PlanStructure",
+      "attachedTo": ["E-Plan"]
+    },
+    {
+      "elementId": "C-PlanInitialContract",
+      "attachedTo": ["E-Plan"]
+    },
+    {
+      "elementId": "C-StageRules",
+      "attachedTo": ["E-Stage"]
+    },
+    {
+      "elementId": "C-StageCompletion",
+      "attachedTo": ["E-Stage"]
+    },
+    {
+      "elementId": "C-TaskTargetShape",
+      "attachedTo": ["E-Task"]
+    },
+    {
+      "elementId": "C-TaskDependencies",
+      "attachedTo": ["E-Task"]
+    },
+    {
+      "elementId": "C-TaskScheduling",
+      "attachedTo": ["E-Task"]
+    },
+    {
+      "elementId": "C-TaskCardRules",
+      "attachedTo": ["E-TaskCardView"]
+    },
+    {
+      "elementId": "C-ExecutionConceptSeparation",
+      "attachedTo": ["E-FocusSession"]
+    },
+    {
+      "elementId": "C-TaskResultPersistence",
+      "attachedTo": ["E-TaskResult"]
+    },
+    {
+      "elementId": "C-DailyReviewUniqueness",
+      "attachedTo": ["E-DailyReview"]
+    },
+    {
+      "elementId": "C-ExecutionStorage",
+      "attachedTo": ["E-TaskResult"]
+    },
+    {
+      "elementId": "C-TaskResultTaskUpdate",
+      "attachedTo": ["E-RecordProgress"]
+    },
+    {
+      "elementId": "C-TodaySelectionRules",
+      "attachedTo": ["E-TodayTaskSelection"]
+    },
+    {
+      "elementId": "C-DailyReviewCompatibility",
+      "attachedTo": ["E-DailyReview"]
+    },
+    {
+      "elementId": "C-DailyReviewPrivacy",
+      "attachedTo": ["E-DailyReview"]
+    },
+    {
+      "elementId": "C-DismissalRules",
+      "attachedTo": ["E-DailyReviewPromptDismissal"]
+    },
+    {
+      "elementId": "C-PlanChangeSummaryRules",
+      "attachedTo": ["E-PlanChangeSummary"]
+    },
+    {
+      "elementId": "C-DailyPlanLegacy",
+      "attachedTo": ["E-DailyPlan"]
+    },
+    {
+      "elementId": "C-ComputedViewRules",
+      "attachedTo": ["E-DailyTaskView"]
+    },
+    {
+      "elementId": "C-MigrationSteps",
+      "attachedTo": ["E-MigrationDirection"]
+    },
+    {
+      "elementId": "C-HistoricalNotes",
+      "attachedTo": ["E-ModelLayers"]
+    },
+    {
+      "elementId": "C-F40ReviewScope",
+      "attachedTo": ["E-ModelLayers"]
+    },
+    {
+      "elementId": "C-F41Scope",
+      "attachedTo": ["E-ModelLayers"]
+    },
+    {
+      "elementId": "C-F65Extensions",
+      "attachedTo": ["E-Plan"]
+    },
+    {
+      "elementId": "C-F67InitialPlanContract",
+      "attachedTo": ["E-Plan"]
+    },
+    {
+      "elementId": "C-F58Creation",
+      "attachedTo": ["E-Goal"]
+    },
+    {
+      "elementId": "C-F56Preview",
+      "attachedTo": ["E-Goal"]
+    },
+    {
+      "elementId": "C-F16Reschedule",
+      "attachedTo": ["E-Task"]
+    },
+    {
+      "elementId": "C-F39Validation",
+      "attachedTo": ["E-ModelLayers"]
+    },
+    {
+      "elementId": "C-F41ModelTypes",
+      "attachedTo": ["E-ModelLayers"]
+    },
+    {
+      "elementId": "C-PlanChangeAtomic",
+      "attachedTo": ["E-PersistPlanChange"]
+    },
+    {
+      "elementId": "E-ModelLayers",
+      "attachedTo": ["E-PlanBundle"]
+    },
+    {
+      "elementId": "E-FocusSessionState",
+      "attachedTo": ["E-FocusSession"]
+    },
+    {
+      "elementId": "E-TaskCardAvailability",
+      "attachedTo": ["E-TaskCardView"]
+    },
+    {
+      "elementId": "E-PlanAdjustmentRisk",
+      "attachedTo": ["E-Plan"]
+    }
+  ],
+  "topics": [
+    {
+      "id": "T-Purpose",
+      "title": "Purpose and F40/F41 scope",
+      "proposition": "本文档定位为 F40 规划领域目标数据模型契约，并明确 F40/F41 的非目标与后续边界。",
+      "sectionRefs": ["§Purpose"]
+    },
+    {
+      "id": "T-F40",
+      "title": "F40 conclusion and core chains",
+      "proposition": "目标核心链路是 Goal+UserProfile→InitialPlanContext→PlanBundle，重规划链路是上下文→ReplanContext→新 PlanBundle/PlanChangeSet；DailyPlan[] 仅 legacy。",
+      "sectionRefs": ["§F40 conclusion"]
+    },
+    {
+      "id": "T-ModelLayers",
+      "title": "Model layers",
+      "proposition": "模型分为持久化真值、瞬态 planner 输入、计算视图、legacy 兼容四层。",
+      "sectionRefs": ["§Model layers"]
+    },
+    {
+      "id": "T-Initial",
+      "title": "Initial planning flow",
+      "proposition": "初始规划从 Goal+UserProfile 组装 InitialPlanContext 生成 PlanBundle，不依赖 DailyReview，AI 输出必须校验。",
+      "sectionRefs": ["§Initial planning flow"]
+    },
+    {
+      "id": "T-Replan",
+      "title": "Replanning flow",
+      "proposition": "重规划由多种 Trigger 驱动，装配 ReplanContext 后产出新 PlanBundle/PlanChangeSet，并保留历史事实。",
+      "sectionRefs": ["§Replanning flow"]
+    },
+    {
+      "id": "T-Goal",
+      "title": "Goal",
+      "proposition": "Goal 是目标意图与目标级硬约束，含 F40/F65 字段、每日预算、完成/取消与偏好边界。",
+      "sectionRefs": ["§Goal"]
+    },
+    {
+      "id": "T-UserProfile",
+      "title": "UserProfile",
+      "proposition": "UserProfile 是跨目标可复用上下文，区分排期偏好与表达偏好，并限制 energy/MBTI/仪式用途。",
+      "sectionRefs": ["§UserProfile"]
+    },
+    {
+      "id": "T-PlanBundle",
+      "title": "PlanBundle",
+      "proposition": "PlanBundle 是核心持久化规划聚合，含 Plan/Stage/Task，可序列化且页面只消费派生视图。",
+      "sectionRefs": ["§PlanBundle"]
+    },
+    {
+      "id": "T-Plan",
+      "title": "Plan",
+      "proposition": "Plan 是计划元数据与策略记录，含生成来源、可行性、结构类型、调整风险与重规划保留规则。",
+      "sectionRefs": ["§Plan"]
+    },
+    {
+      "id": "T-Stage",
+      "title": "Stage",
+      "proposition": "Stage 是长程阶段，含 purpose/outcome/scopeNotes/estimatedMinutes，不替代 Task 且不自动完成 Goal。",
+      "sectionRefs": ["§Stage"]
+    },
+    {
+      "id": "T-Task",
+      "title": "Task",
+      "proposition": "Task 是最小可执行规划单元，含目标形态字段、依赖、排期、minimumLine 与完成/跳过语义。",
+      "sectionRefs": ["§Task"]
+    },
+    {
+      "id": "T-TaskCard",
+      "title": "Task Card computed contract",
+      "proposition": "Task Card 计算契约由纯 selector 派生 availability、锁定依赖与确定性推荐。",
+      "sectionRefs": ["§Task Card computed contract"]
+    },
+    {
+      "id": "T-FocusSession",
+      "title": "FocusSession, TaskResult and DailyReview",
+      "proposition": "FocusSession、TaskResult、DailyReview 是独立执行概念，分别承载计时、任务结果与日回顾。",
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "T-TodayTaskSelection",
+      "title": "TodayTaskSelection",
+      "proposition": "TodayTaskSelection 记录某日决定执行哪个既有 Task，并受活动 PlanBundle、依赖与日期授权约束。",
+      "sectionRefs": ["§TodayTaskSelection"]
+    },
+    {
+      "id": "T-DailyReview",
+      "title": "DailyReview",
+      "proposition": "DailyReview 是日级执行历史，含兼容字段、隐私边界与不得被重规划改写的不变量。",
+      "sectionRefs": ["§DailyReview"]
+    },
+    {
+      "id": "T-Dismissal",
+      "title": "DailyReviewPromptDismissal",
+      "proposition": "DailyReviewPromptDismissal 是 UI 提示历史，不是执行或回顾真值，且有资格与级联规则。",
+      "sectionRefs": ["§DailyReviewPromptDismissal"]
+    },
+    {
+      "id": "T-PlanChangeSummary",
+      "title": "PlanChangeSummary",
+      "proposition": "PlanChangeSummary 是确定性调整的持久化回执，幂等、原子、保护隐私且不复制真值。",
+      "sectionRefs": ["§PlanChangeSummary"]
+    },
+    {
+      "id": "T-Legacy",
+      "title": "DailyPlan legacy boundary",
+      "proposition": "DailyPlan[] 不属于未来核心领域模型，仅保留 legacy storage/adapter 兼容，并有删除方向与迁移风险。",
+      "sectionRefs": ["§DailyPlan legacy boundary"]
+    },
+    {
+      "id": "T-ComputedViews",
+      "title": "Computed views",
+      "proposition": "计算视图不是持久化真值，页面数据由 service/selector 从核心模型生成。",
+      "sectionRefs": ["§Computed views"]
+    },
+    {
+      "id": "T-Migration",
+      "title": "Migration direction",
+      "proposition": "F40 之后的迁移被拆成后续特性步骤，不得视作 F40 的一部分。",
+      "sectionRefs": ["§Migration direction"]
+    },
+    {
+      "id": "T-Historical",
+      "title": "Historical notes",
+      "proposition": "历史记录 F16/F39/F41/F56/F58 对模型字段、校验、类型与创建路径的增量。",
+      "sectionRefs": ["§Historical notes", "§2026-05-26 F16", "§2026-06-26 F39", "§2026-06-27 F41", "§2026-07-03 F56", "§2026-07-09 F58"]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 81,
+    "topicCount": 21,
+    "edgeCount": 40,
+    "attachmentCount": 53
+  }
+}
+<<<MAP_SELECTION>>>
+{
+  "selectionVersion": 1,
+  "document": {
+    "title": "Goal / Plan / Stage / Task target model contract",
+    "sourcePath": "测试文档/fixture-d-goal-plan-task-state-model.md"
+  },
+  "inventoryRef": {
+    "path": "测试文档/fixture-d-goal-plan-task-state-model.md",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "itemCount": 154
+  },
+  "dispositions": [
+    {
+      "semanticId": "S-01",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DocumentScope"},
+      "reason": "文档定位与 source-of-truth 规则由 C-DocumentScope 承载，并挂在模型层概念上。"
+    },
+    {
+      "semanticId": "S-02",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F40NonGoals"},
+      "reason": "F40 不删除 DailyPlan[]、不改 storage key/兼容读取、不实现 AI/planner 重写等非目标由 C-F40NonGoals 承载。"
+    },
+    {
+      "semanticId": "S-03",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F41Scope"},
+      "reason": "F41 只在纯 models/ 层实现目标新增，planner/replanner/AI/storage/UI/DailyPlan 删除属后续工作，由 C-F41Scope 承载。"
+    },
+    {
+      "semanticId": "S-04",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-CoreChain"},
+      "reason": "Goal+UserProfile→InitialPlanContext→PlanBundle 的核心链路由 C-CoreChain 作为约束表达，并连接对应 artifact。"
+    },
+    {
+      "semanticId": "S-05",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanChain"},
+      "reason": "重规划链路与 ReplanContext 装配规则由 C-ReplanChain 承载，并被 ReplanContext 侧挂。"
+    },
+    {
+      "semanticId": "S-06",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-Goal"},
+      "reason": "Goal 是原始目标意图与目标级硬约束，由 E-Goal 元素直接承载。"
+    },
+    {
+      "semanticId": "S-07",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-UserProfile"},
+      "reason": "UserProfile 是跨目标用户上下文与表达/排期偏好，由 E-UserProfile 元素承载。"
+    },
+    {
+      "semanticId": "S-08",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-CoreChain"},
+      "reason": "InitialPlanContext 与 ReplanContext 是瞬态输入而非持久真值，由 C-CoreChain 的 transient 规则承载。"
+    },
+    {
+      "semanticId": "S-09",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-PlanBundle"},
+      "reason": "PlanBundle 是核心持久化规划聚合，由 E-PlanBundle 元素承载。"
+    },
+    {
+      "semanticId": "S-10",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanPreservation"},
+      "reason": "DailyReview 是执行事实且重规划不得改写，由 C-ReplanPreservation 承载。"
+    },
+    {
+      "semanticId": "S-11",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyPlanLegacy"},
+      "reason": "DailyPlan[] 不属于未来核心模型、仅 legacy 兼容且待独立破坏性迁移移除，由 C-DailyPlanLegacy 承载。"
+    },
+    {
+      "semanticId": "S-12",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-ModelLayers"},
+      "reason": "四层模型划分由 E-ModelLayers 概念元素承载，并通过 attachments 挂在 PlanBundle 上。"
+    },
+    {
+      "semanticId": "S-13",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-InitialContextRules"},
+      "reason": "初始规划不得依赖 DailyReview 的前置条件由 C-InitialContextRules 承载。"
+    },
+    {
+      "semanticId": "S-14",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-InitialContextRules"},
+      "reason": "InitialPlanContext 由 service 运行时组装、只含首计划前数据、不长期存储，由 C-InitialContextRules 承载。"
+    },
+    {
+      "semanticId": "S-15",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-AIValidation"},
+      "reason": "DeepSeek 压缩 schema 与 AI 输出必须校验后才能成为 PlanBundle，由 C-AIValidation 承载。"
+    },
+    {
+      "semanticId": "S-16",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-Replanning"},
+      "reason": "现实与计划背离时重规划更新或替换计划，由 E-Replanning 过程元素承载。"
+    },
+    {
+      "semanticId": "S-17",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanTriggers"},
+      "reason": "拒绝计划、反馈、Stage 完成、日回顾、产能/截止变化、计划不可行等触发条件由 C-ReplanTriggers 承载。"
+    },
+    {
+      "semanticId": "S-18",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanChain"},
+      "reason": "currentPlanBundle 由 service 从 storage 读取并注入 ReplanContext，由 C-ReplanChain 承载。"
+    },
+    {
+      "semanticId": "S-19",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanChain"},
+      "reason": "ReplanContext 是瞬态输入、不是持久真值来源，由 C-ReplanChain 承载。"
+    },
+    {
+      "semanticId": "S-20",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-ReplanAiInput"},
+      "reason": "AI replanner 接收从 ReplanContext 派生的 ReplanAiInput，由 E-ReplanAiInput 元素承载。"
+    },
+    {
+      "semanticId": "S-21",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanPreservation"},
+      "reason": "重规划必须保留已完成任务事实与历史 DailyReview[]，由 C-ReplanPreservation 承载。"
+    },
+    {
+      "semanticId": "S-22",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanPreservation"},
+      "reason": "重规划不得静默丢弃未完成任务，由 C-ReplanPreservation 承载。"
+    },
+    {
+      "semanticId": "S-23",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanInfeasible"},
+      "reason": "无法在截止前产出可行计划时必须返回显式 infeasible 结果，由 C-ReplanInfeasible 承载。"
+    },
+    {
+      "semanticId": "S-24",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-Goal"},
+      "reason": "Goal 回答想要什么、什么算完成、截止日期、可分配时间，由 E-Goal 元素承载。"
+    },
+    {
+      "semanticId": "S-25",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalFields"},
+      "reason": "F40 为 Goal 新增 originalInput/successCriteria/scopeNotes/startingPoint/constraints，由 C-GoalFields 承载。"
+    },
+    {
+      "semanticId": "S-26",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F65Extensions"},
+      "reason": "F65 preferredApproach 与 adjustmentRisk 的附加扩展由 C-F65Extensions 承载。"
+    },
+    {
+      "semanticId": "S-27",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-PlanAdjustmentRisk"},
+      "reason": "adjustmentRisk 仅在 needs_adjustment 时存在及 legacy 回退 infeasible，由 E-PlanAdjustmentRisk 状态元素承载。"
+    },
+    {
+      "semanticId": "S-28",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalBoundaries"},
+      "reason": "preferredApproach 来源限定及不得从 MBTI/塔罗/状态卡/行为画像推断，由 C-GoalBoundaries 承载。"
+    },
+    {
+      "semanticId": "S-29",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalBoundaries"},
+      "reason": "preferredApproach 不覆盖 deadline、daily capacity 或显式硬约束，由 C-GoalBoundaries 承载。"
+    },
+    {
+      "semanticId": "S-30",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalFields"},
+      "reason": "Goal 各字段语义由 C-GoalFields 统一承载，并侧挂到 E-Goal。"
+    },
+    {
+      "semanticId": "S-31",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalBoundaries"},
+      "reason": "被拒绝归入 Goal 的 MBTI/塔罗/表达风格、每日反馈、计划策略、页面文案由 C-GoalBoundaries 承载。"
+    },
+    {
+      "semanticId": "S-32",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalUniqueness"},
+      "reason": "一个 Goal 可有多个历史 Plan 版本但同一时刻至多一个 active plan，由 C-GoalUniqueness 承载。"
+    },
+    {
+      "semanticId": "S-33",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyAvailableMinutes"},
+      "reason": "dailyAvailableMinutes 是 goal-scoped 规划约束且必须为正整数，由 C-DailyAvailableMinutes 承载。"
+    },
+    {
+      "semanticId": "S-34",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyAvailableMinutes"},
+      "reason": "dailyAvailableMinutes 是每日预算而非用户每日工作承诺，由 C-DailyAvailableMinutes 承载。"
+    },
+    {
+      "semanticId": "S-35",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F58Creation"},
+      "reason": "F58 从目标措辞、deadline、daily budget 开始，taskType/successCriteria/startingPoint 仅在显式抽取/澄清/假设时加入，由 C-F58Creation 承载。"
+    },
+    {
+      "semanticId": "S-36",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalCompletionCancellation"},
+      "reason": "Goal 完成在 goal 级判定而非单任务自动完成，由 C-GoalCompletionCancellation 承载。"
+    },
+    {
+      "semanticId": "S-37",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-GoalCompletionCancellation"},
+      "reason": "Goal 取消必须显式处理相关 Plan/Stage/Task/Review 记录，由 C-GoalCompletionCancellation 承载。"
+    },
+    {
+      "semanticId": "S-38",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-UserProfile"},
+      "reason": "UserProfile 回答用户通常如何工作或接收任务表达，由 E-UserProfile 元素承载。"
+    },
+    {
+      "semanticId": "S-39",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-UserProfileBoundaries"},
+      "reason": "排期偏好与表达偏好的字段边界由 C-UserProfileBoundaries 承载。"
+    },
+    {
+      "semanticId": "S-40",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-UserProfileBoundaries"},
+      "reason": "UserProfile.energyLevel 只是默认/当前偏好，实际执行日能量属于 DailyReview.energy，由 C-UserProfileBoundaries 承载。"
+    },
+    {
+      "semanticId": "S-41",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-UserProfileBoundaries"},
+      "reason": "MBTI 与仪式偏好只能影响表达和轻度排序，不得作为预测/诊断/硬决策证据，由 C-UserProfileBoundaries 承载。"
+    },
+    {
+      "semanticId": "S-42",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-PlanBundle"},
+      "reason": "PlanBundle 由 plan/stages/tasks 构成且是初始规划与重规划主要输出，由 E-PlanBundle 元素承载。"
+    },
+    {
+      "semanticId": "S-43",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanBundleRules"},
+      "reason": "页面应消费由 PlanBundle 派生的 service/view-model 输出而非原始 storage，由 C-PlanBundleRules 承载。"
+    },
+    {
+      "semanticId": "S-44",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanBundleRules"},
+      "reason": "PlanBundle 必须 JSON 可序列化，由 C-PlanBundleRules 承载。"
+    },
+    {
+      "semanticId": "S-45",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanBundleRules"},
+      "reason": "ID 必须稳定且不得依赖标题文本，由 C-PlanBundleRules 承载。"
+    },
+    {
+      "semanticId": "S-46",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-Plan"},
+      "reason": "Plan 回答属于哪个目标、是否可行、如何生成、为何这样安排，由 E-Plan 元素承载。"
+    },
+    {
+      "semanticId": "S-47",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanRules"},
+      "reason": "F40 为 Plan 新增 version/generationSource/generationReason/strategySummary/feasibilitySummary/infeasibleReason/replannedFromPlanId，由 C-PlanRules 承载。"
+    },
+    {
+      "semanticId": "S-48",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F65Extensions"},
+      "reason": "F65 为 Plan 增加 structureType 与 detailedThrough，由 C-F65Extensions 承载。"
+    },
+    {
+      "semanticId": "S-49",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanStructure"},
+      "reason": "缺失 structureType 保留 legacy staged-plan 契约且不虚构偏好，由 C-PlanStructure 承载。"
+    },
+    {
+      "semanticId": "S-50",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanStructure"},
+      "reason": "detailedThrough 的日期区间约束与严格校验拒绝晚于它的 Task，由 C-PlanStructure 承载。"
+    },
+    {
+      "semanticId": "S-51",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanStructure"},
+      "reason": "缺失 detailedThrough 保留全日期范围含具体 Task 的 legacy 计划，由 C-PlanStructure 承载。"
+    },
+    {
+      "semanticId": "S-52",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F67InitialPlanContract"},
+      "reason": "F67 要求新成功初始计划具备 structureType/detailedThrough，且 detailedThrough=min(deadline,today+6)，由 C-F67InitialPlanContract 承载。"
+    },
+    {
+      "semanticId": "S-53",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanInitialContract"},
+      "reason": "Stage ranges 覆盖整个 Plan 窗口含今天与 deadline，由 C-PlanInitialContract 承载。"
+    },
+    {
+      "semanticId": "S-54",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanInitialContract"},
+      "reason": "具体 Task 只存在于 detailedThrough 当日或之前，更晚日期保持 Stage 级方向，由 C-PlanInitialContract 承载。"
+    },
+    {
+      "semanticId": "S-55",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-StageRules"},
+      "reason": "Stage.estimatedMinutes 表示整周期工作量且可超过当前物化 Task 分钟总和，由 C-StageRules 承载。"
+    },
+    {
+      "semanticId": "S-56",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanInitialContract"},
+      "reason": "Stage 分钟总和必须适配 inclusive plan days * dailyAvailableMinutes，由 C-PlanInitialContract 承载。"
+    },
+    {
+      "semanticId": "S-57",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanInitialContract"},
+      "reason": "每个初始 Task 属于一个 Stage 且 scheduled date 在 Stage 范围内，由 C-PlanInitialContract 承载。"
+    },
+    {
+      "semanticId": "S-58",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanInitialContract"},
+      "reason": "AI dependency client keys 是瞬态转换标识，持久依赖使用 Task.dependsOnTaskIds，由 C-PlanInitialContract 承载。"
+    },
+    {
+      "semanticId": "S-59",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanInitialContract"},
+      "reason": "初始 AI Task id 由 planId+clientTaskKey 稳定确定且不依赖标题或输出顺序，由 C-PlanInitialContract 承载。"
+    },
+    {
+      "semanticId": "S-60",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanRules"},
+      "reason": "Plan 应携带可追溯摘要元数据而非完整 prompt/瞬态上下文，由 C-PlanRules 承载。"
+    },
+    {
+      "semanticId": "S-61",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanRules"},
+      "reason": "目标无法适配 deadline/capacity 时 Plan.status=infeasible 必须显式，由 C-PlanRules 承载。"
+    },
+    {
+      "semanticId": "S-62",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanRules"},
+      "reason": "重规划可创建新版本或受控变更集但必须保留历史事实，由 C-PlanRules 承载。"
+    },
+    {
+      "semanticId": "S-63",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanRules"},
+      "reason": "未解决 adjustmentRisk 不得被正常调整清除/升降，组合风险取更严重级别，由 C-PlanRules 承载。"
+    },
+    {
+      "semanticId": "S-64",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanRules"},
+      "reason": "AI 不得直接变更 storage 中的既有计划，service 校验并应用结果，由 C-PlanRules 承载。"
+    },
+    {
+      "semanticId": "S-65",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-Stage"},
+      "reason": "Stage 是计划中的长程阶段并回答当前阶段与产出，由 E-Stage 元素承载。"
+    },
+    {
+      "semanticId": "S-66",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-StageRules"},
+      "reason": "F40/F65 为 Stage 增加 purpose/outcome/scopeNotes/estimatedMinutes，由 C-StageRules 承载。"
+    },
+    {
+      "semanticId": "S-67",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-StageRules"},
+      "reason": "Stage 用于长程概览与细化，不替代近期 Task，由 C-StageRules 承载。"
+    },
+    {
+      "semanticId": "S-68",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-StageCompletion"},
+      "reason": "Stage 完成不会自动完成 Goal，由 C-StageCompletion 承载。"
+    },
+    {
+      "semanticId": "S-69",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-StageCompletion"},
+      "reason": "Stage 完成可以触发对未来阶段/任务的重规划，由 C-StageCompletion 承载。"
+    },
+    {
+      "semanticId": "S-70",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-StageRules"},
+      "reason": "Stage 日期范围必须保持在父计划日期范围内，由 C-StageRules 承载。"
+    },
+    {
+      "semanticId": "S-71",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-Task"},
+      "reason": "Task 是最小可执行规划单元并回答某天做什么、多久、最低完成线，由 E-Task 元素承载。"
+    },
+    {
+      "semanticId": "S-72",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskTargetShape"},
+      "reason": "F40 目标 Task 形态与 F41 严格校验字段由 C-TaskTargetShape 承载。"
+    },
+    {
+      "semanticId": "S-73",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskDependencies"},
+      "reason": "F65 为 Task 增加 dependsOnTaskIds 字段，由 C-TaskDependencies 承载。"
+    },
+    {
+      "semanticId": "S-74",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskDependencies"},
+      "reason": "依赖必须引用同一 PlanBundle 的 Task，自依赖/重复/缺失/环无效，由 C-TaskDependencies 承载。"
+    },
+    {
+      "semanticId": "S-75",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskDependencies"},
+      "reason": "依赖仅当被引用 Task 为 done 时满足，todo/partial/skipped 保持未满足，由 C-TaskDependencies 承载。"
+    },
+    {
+      "semanticId": "S-76",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskDependencies"},
+      "reason": "仅排期顺序不构成依赖，用户可执行另一可用 Task 而不使 Plan 失效，由 C-TaskDependencies 承载。"
+    },
+    {
+      "semanticId": "S-77",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskTargetShape"},
+      "reason": "Task.id 必须稳定且不得依赖 title，由 C-TaskTargetShape 承载。"
+    },
+    {
+      "semanticId": "S-78",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskScheduling"},
+      "reason": "scheduledDate 是目标执行日期而 legacy date 不约束新模型，由 C-TaskScheduling 承载。"
+    },
+    {
+      "semanticId": "S-79",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskScheduling"},
+      "reason": "多个 Task 可共享同一 scheduledDate，由 C-TaskScheduling 承载。"
+    },
+    {
+      "semanticId": "S-80",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskScheduling"},
+      "reason": "estimatedMinutes 必须为正整数且单日总分钟不得超过 dailyAvailableMinutes，由 C-TaskScheduling 承载。"
+    },
+    {
+      "semanticId": "S-81",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskScheduling"},
+      "reason": "minimumLine 必填且必须保持显式，由 C-TaskScheduling 承载。"
+    },
+    {
+      "semanticId": "S-82",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskScheduling"},
+      "reason": "Task 完成不等于 Goal 完成，Task 跳过不等于 Goal 取消，由 C-TaskScheduling 承载。"
+    },
+    {
+      "semanticId": "S-83",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-TaskCardAvailability"},
+      "reason": "done Task 为 closed 的可用性判定由 E-TaskCardAvailability 状态元素承载。"
+    },
+    {
+      "semanticId": "S-84",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-TaskCardAvailability"},
+      "reason": "未完成且至少一个未完成显式依赖的 Task 为 locked，由 E-TaskCardAvailability 承载。"
+    },
+    {
+      "semanticId": "S-85",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-TaskCardAvailability"},
+      "reason": "其他 todo/partial/历史 skipped Task 为 available，由 E-TaskCardAvailability 承载。"
+    },
+    {
+      "semanticId": "S-86",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskCardRules"},
+      "reason": "默认候选窗口、显式放宽范围与未来排期不成为硬锁，由 C-TaskCardRules 承载。"
+    },
+    {
+      "semanticId": "S-87",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskCardRules"},
+      "reason": "唯一推荐按 scheduledDate、priority、稳定 Task id 确定性排序，由 C-TaskCardRules 承载。"
+    },
+    {
+      "semanticId": "S-88",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskCardRules"},
+      "reason": "selector 不读 storage、不调 AI、不写推荐事实、不改 PlanBundle，由 C-TaskCardRules 承载。"
+    },
+    {
+      "semanticId": "S-89",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ExecutionConceptSeparation"},
+      "reason": "Focus timing、TaskResult、DailyReview 是彼此独立领域概念，由 C-ExecutionConceptSeparation 承载。"
+    },
+    {
+      "semanticId": "S-90",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-FocusSessionState"},
+      "reason": "FocusSession 状态机 running→paused→running→completed 且 cancelled 为终态替代，由 E-FocusSessionState 状态元素承载。"
+    },
+    {
+      "semanticId": "S-91",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-FocusSession"},
+      "reason": "FocusSession 墙钟时间从时间戳恢复并封顶于目标时长，由 E-FocusSession 过程元素承载。"
+    },
+    {
+      "semanticId": "S-92",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-TaskResult"},
+      "reason": "TaskResult 定义及其持久化字段（归属、日期、状态、FocusSession 引用、手动分钟、评级、备注、时间戳）由 E-TaskResult 元素承载。"
+    },
+    {
+      "semanticId": "S-93",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskResultPersistence"},
+      "reason": "TaskResult 可选状态变更时间戳用于区分真实迁移与同状态保存重试，legacy 回退创建时间，由 C-TaskResultPersistence 承载。"
+    },
+    {
+      "semanticId": "S-94",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewUniqueness"},
+      "reason": "多任务日可有多个 Task result，但每 Goal/date 只有一个 DailyReview，由 C-DailyReviewUniqueness 承载。"
+    },
+    {
+      "semanticId": "S-95",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewUniqueness"},
+      "reason": "DailyReview.planId 记录产生被回顾结果的 Plan 上下文但不创建第二个 Review 槽位，由 C-DailyReviewUniqueness 承载。"
+    },
+    {
+      "semanticId": "S-96",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewCompatibility"},
+      "reason": "当前模型内嵌 taskResults 同时暴露 legacy completed/partial/skipped id 数组，由 C-DailyReviewCompatibility 承载。"
+    },
+    {
+      "semanticId": "S-97",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ExecutionConceptSeparation"},
+      "reason": "单任务记录进展可同一事务提交 Task result 与 DailyReview 字段，但便利不使概念相同，由 C-ExecutionConceptSeparation 承载。"
+    },
+    {
+      "semanticId": "S-98",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ExecutionStorage"},
+      "reason": "F61 引入 Goal 级 FocusSession[] 与 TaskResult[] 存储并保留内嵌 Review 字段兼容，由 C-ExecutionStorage 承载。"
+    },
+    {
+      "semanticId": "S-99",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ExecutionConceptSeparation"},
+      "reason": "focus timer/session 产生任务级执行证据且本身不是 DailyReview，由 C-ExecutionConceptSeparation 承载。"
+    },
+    {
+      "semanticId": "S-100",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ExecutionConceptSeparation"},
+      "reason": "Task 状态与实际投入分钟不得存为日级能量，日级能量不得复制到每个 Task result，由 C-ExecutionConceptSeparation 承载。"
+    },
+    {
+      "semanticId": "S-101",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ReplanPreservation"},
+      "reason": "重规划可读取 FocusSession/TaskResult 但必须保留已提交执行历史，由 C-ReplanPreservation 承载。"
+    },
+    {
+      "semanticId": "S-102",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskResultPersistence"},
+      "reason": "TaskResult.status=skipped 表示今日未完成，不取消 Task，由 C-TaskResultPersistence 承载。"
+    },
+    {
+      "semanticId": "S-103",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TaskResultTaskUpdate"},
+      "reason": "保存 TaskResult 通过一次 storage 编排的成对写入（带快照回滚）更新当前 PlanBundle Task 状态，由 C-TaskResultTaskUpdate 承载。"
+    },
+    {
+      "semanticId": "S-104",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ExecutionConceptSeparation"},
+      "reason": "DailyReview 不是 FocusSession 或 TaskResult 保持有效执行事实的必要条件，由 C-ExecutionConceptSeparation 承载。"
+    },
+    {
+      "semanticId": "S-105",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-TodayTaskSelection"},
+      "reason": "TodayTaskSelection 回答用户在某个具体日期决定执行哪个既有 Task，由 E-TodayTaskSelection 元素承载。"
+    },
+    {
+      "semanticId": "S-106",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "一个 Goal/Plan/date 至多一个 selection，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-107",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "selection 引用的 Task 必须位于当前活动 PlanBundle 中，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-108",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "未来 Task 只能通过有界近期候选服务选择且显式依赖已满足，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-109",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "允许跨 Stage 选择，Stage 顺序本身不构成授权或锁，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-110",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "selection 可授权在 scheduledDate 之前执行但绝不改写该日期，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-111",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "FocusSession.date 与 TaskResult.date 存储真实执行日期，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-112",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "旧日期与旧 Plan 的 selection 保留为历史，不能授权不同日期或当前 Plan，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-113",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-TodaySelectionRules"},
+      "reason": "selection 不是 TaskResult、DailyReview、Replan 或计划排期变更陈述，由 C-TodaySelectionRules 承载。"
+    },
+    {
+      "semanticId": "S-114",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-DailyReview"},
+      "reason": "DailyReview 是日级执行历史并回答某天实际发生了什么，由 E-DailyReview 元素承载。"
+    },
+    {
+      "semanticId": "S-115",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewCompatibility"},
+      "reason": "legacy completedTaskIds/partialTaskIds/skippedTaskIds 可规范化为 taskResults，由 C-DailyReviewCompatibility 承载。"
+    },
+    {
+      "semanticId": "S-116",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewCompatibility"},
+      "reason": "既有 energy 与内嵌 taskResults 保持兼容字段直到单独迁移移除，由 C-DailyReviewCompatibility 承载。"
+    },
+    {
+      "semanticId": "S-117",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewCompatibility"},
+      "reason": "新 workload Review 可省略 legacy energy，兼容视图可展示回退但不得持久化为用户事实，由 C-DailyReviewCompatibility 承载。"
+    },
+    {
+      "semanticId": "S-118",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewCompatibility"},
+      "reason": "DailyReview 草稿可含客观 TaskResult 摘要但不得编造 workload 反馈或 note，由 C-DailyReviewCompatibility 承载。"
+    },
+    {
+      "semanticId": "S-119",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewUniqueness"},
+      "reason": "DailyReview 是历史事实，重规划可读但不得静默改写，由 C-DailyReviewUniqueness 承载。"
+    },
+    {
+      "semanticId": "S-120",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyReviewPrivacy"},
+      "reason": "Review notes 是私密用户数据且默认不得记录或上传，由 C-DailyReviewPrivacy 承载。"
+    },
+    {
+      "semanticId": "S-121",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-DailyReviewPromptDismissal"},
+      "reason": "DailyReviewPromptDismissal 是 UI 提示历史而非执行或回顾真值，由 E-DailyReviewPromptDismissal 元素承载。"
+    },
+    {
+      "semanticId": "S-122",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DismissalRules"},
+      "reason": "一个 Goal/Plan/executionDate 至多一个 dismissal，由 C-DismissalRules 承载。"
+    },
+    {
+      "semanticId": "S-123",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DismissalRules"},
+      "reason": "dismissal 表示显式跳过 Yesterday Summary 提示且不得创建空 DailyReview 或推断 workload/note，由 C-DismissalRules 承载。"
+    },
+    {
+      "semanticId": "S-124",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DismissalRules"},
+      "reason": "eligibility 限于当前 Goal/Plan 在今天之前最近的 TaskResult 日期，由 C-DismissalRules 承载。"
+    },
+    {
+      "semanticId": "S-125",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DismissalRules"},
+      "reason": "历史 dismissal 不能授权、编辑或抑制不同的 Goal/Plan/executionDate，由 C-DismissalRules 承载。"
+    },
+    {
+      "semanticId": "S-126",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DismissalRules"},
+      "reason": "Goal 删除会移除 Goal-scoped dismissal 集合，由 C-DismissalRules 承载。"
+    },
+    {
+      "semanticId": "S-127",
+      "disposition": "represented",
+      "target": {"kind": "element", "id": "E-PlanChangeSummary"},
+      "reason": "PlanChangeSummary 是解释一次确定性调整的持久化回执且不是第二 Plan 真值源，由 E-PlanChangeSummary 元素承载。"
+    },
+    {
+      "semanticId": "S-128",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeSummaryRules"},
+      "reason": "一个 Goal/Plan/trigger fingerprint 至多一个 summary，重复重试返回既有回执且不重规划，由 C-PlanChangeSummaryRules 承载。"
+    },
+    {
+      "semanticId": "S-129",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeSummaryRules"},
+      "reason": "summary 引用稳定 Task id 与日期但绝不复制私密 TaskResult/DailyReview notes，由 C-PlanChangeSummaryRules 承载。"
+    },
+    {
+      "semanticId": "S-130",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeSummaryRules"},
+      "reason": "satisfiedTaskIds 保留为 Plan 历史中已完成 Task，不意味物理删除，由 C-PlanChangeSummaryRules 承载。"
+    },
+    {
+      "semanticId": "S-131",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeSummaryRules"},
+      "reason": "retainedTaskIds 使未变化的未完成工作显式化以免静默丢失，由 C-PlanChangeSummaryRules 承载。"
+    },
+    {
+      "semanticId": "S-132",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeSummaryRules"},
+      "reason": "acknowledgedAt 表示用户已消费 Today 通知，确认不删历史也不改 Plan 事实，由 C-PlanChangeSummaryRules 承载。"
+    },
+    {
+      "semanticId": "S-133",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeSummaryRules"},
+      "reason": "TaskResult trigger 仅可调整当前 Plan 未完成工作，DailyReview trigger 仅可使用显式 workload rating，由 C-PlanChangeSummaryRules 承载。"
+    },
+    {
+      "semanticId": "S-134",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeAtomic"},
+      "reason": "PlanBundle+summary 持久化原子，DailyReview 触发持久化额外在同一事务包含 Review，由 C-PlanChangeAtomic 承载。"
+    },
+    {
+      "semanticId": "S-135",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-PlanChangeSummaryRules"},
+      "reason": "Replanner 保持纯函数与确定性，storage/编排属于 replanner.ts 之外的服务，由 C-PlanChangeSummaryRules 承载。"
+    },
+    {
+      "semanticId": "S-136",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyPlanLegacy"},
+      "reason": "DailyPlan[] 不属于未来核心模型，其当前角色为 legacy 持久化形态、兼容读写面与 adapter 输入输出，由 C-DailyPlanLegacy 承载。"
+    },
+    {
+      "semanticId": "S-137",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyPlanLegacy"},
+      "reason": "DailyPlan[] 未来由独立破坏性迁移/修复特性删除，由 C-DailyPlanLegacy 承载。"
+    },
+    {
+      "semanticId": "S-138",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F40NonGoals"},
+      "reason": "F40 仅记录删除方向、不删代码、不改 daily-plans:{goalId} 键、不改兼容读取/adapter，由 C-F40NonGoals 承载。"
+    },
+    {
+      "semanticId": "S-139",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyPlanLegacy"},
+      "reason": "新特性不得将 DailyPlan[] 扩展为真值来源，由 C-DailyPlanLegacy 承载。"
+    },
+    {
+      "semanticId": "S-140",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-DailyPlanLegacy"},
+      "reason": "models/plan.ts、planner legacy 输出、storage key、plan-view 页面消费等迁移风险由 C-DailyPlanLegacy 承载。"
+    },
+    {
+      "semanticId": "S-141",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ComputedViewRules"},
+      "reason": "计算视图不是持久化真值，由 C-ComputedViewRules 承载。"
+    },
+    {
+      "semanticId": "S-142",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ComputedViewRules"},
+      "reason": "页面数据应由 service/selector 从 PlanBundle/DailyReview/UserProfile 生成，页面不得直接从 raw storage 组装长期状态，由 C-ComputedViewRules 承载。"
+    },
+    {
+      "semanticId": "S-143",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-ComputedViewRules"},
+      "reason": "Today suggestions 可改变展示优先级或文案但不改核心计划事实，由 C-ComputedViewRules 承载。"
+    },
+    {
+      "semanticId": "S-144",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-MigrationSteps"},
+      "reason": "F40 后迁移拆为扩展模型、定义 schema、更新 planner、替换 DailyPlan 视图、破坏性迁移移除等步骤，由 C-MigrationSteps 承载。"
+    },
+    {
+      "semanticId": "S-145",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F40NonGoals"},
+      "reason": "后续迁移步骤不得视为 F40 的一部分，由 C-F40NonGoals 承载。"
+    },
+    {
+      "semanticId": "S-146",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F16Reschedule"},
+      "reason": "F16 为 Task 增加 rescheduledFromDate/rescheduledFromStatus/rescheduleReason，由 C-F16Reschedule 承载。"
+    },
+    {
+      "semanticId": "S-147",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F16Reschedule"},
+      "reason": "F16 partial/skipped follow-up 通过更新同一 task 的 scheduledDate，历史事实保留在 DailyReview.taskResults，由 C-F16Reschedule 承载。"
+    },
+    {
+      "semanticId": "S-148",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F39Validation"},
+      "reason": "F39 增加严格校验函数、未回答语义充分性，F40 取代其窄校验焦点，由 C-F39Validation 承载。"
+    },
+    {
+      "semanticId": "S-149",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F41ModelTypes"},
+      "reason": "F41 后 Goal/Plan/Stage/Task 校验与规范化覆盖 F40 目标新增字段，由 C-F41ModelTypes 承载。"
+    },
+    {
+      "semanticId": "S-150",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F41ModelTypes"},
+      "reason": "F41 后 InitialPlanContext/ReplanContext/ReplanReason/UserPlanFeedback 作为运行时输入类型存在，legacy 仍保留，由 C-F41ModelTypes 承载。"
+    },
+    {
+      "semanticId": "S-151",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F56Preview"},
+      "reason": "F56 中 Goal.taskType 为可选模型字段，创建 UI 要求 taskType/successCriteria/startingPoint 但旧存储目标仍有效，由 C-F56Preview 承载。"
+    },
+    {
+      "semanticId": "S-152",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F56Preview"},
+      "reason": "F56 初始计划预览候选是瞬态 service/session 数据，不是持久真值且确认前不影响 Today/Calendar，由 C-F56Preview 承载。"
+    },
+    {
+      "semanticId": "S-153",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F58Creation"},
+      "reason": "F58 首创建界面只要求 goal wording/deadline/daily budget，意图问答与假设是瞬态 planner 输入，由 C-F58Creation 承载。"
+    },
+    {
+      "semanticId": "S-154",
+      "disposition": "represented",
+      "target": {"kind": "constraint", "id": "C-F58Creation"},
+      "reason": "F58 正式确认路径写入 Goal/UserProfile/PlanBundle 且不再产生 legacy daily-plan 副本，由 C-F58Creation 承载。"
+    }
+  ]
+}
+```

@@ -24,12 +24,15 @@
 
 ---
 
-### 一、信息面（硬规则）
+### 一、信息面（硬规则 · **本阶段刻意不给你原文**）
 
-1. 你可以使用：本次 user message 里的**原文**、**heading tree**、**Semantic Inventory**。
-2. **不得**引用：实现代码、其它文档、既有的人工图、其它 run 的产物、任何外部知识。
-3. 文档没写的关系**不要补**。
-4. Inventory 是**清单不是命令**：它有遗漏的可能，也可能把不够重要的东西列进来。
+1. 你可以使用：本次 user message 里的 **Semantic Inventory** 与 **heading tree**（以及 Contract / 两份 schema）。
+2. ⚠️ **本次不提供原文**，你也**不得**凭记忆或常识去补原文内容。
+   Inventory 的每条都带 `sectionRef` / `lines` / `quote` —— 那就是你的**全部证据面**。
+3. 这样设计是**故意的**：上一阶段（Stage A）负责"看懂文档"，你负责"做选择与表达"。
+   两阶段分开，才能判断某条语义到底是在**理解**时丢的，还是在**选择/表达**时丢的。
+4. **不得**引用：实现代码、其它文档、既有的人工图、其它 run 的产物、任何外部知识。
+5. Inventory 是**清单不是命令**：它可能有遗漏，也可能把不够重要的东西列进来。
    你**不必须**让每条都上图 —— 但你**必须**为每条给出选择轨迹（见 §七）。
 
 ---
@@ -258,23 +261,24 @@ null                                  → 仅当 disposition = "omitted"
 
 {{DOC_PATH}}
 
-### 原文（唯一信息面）
-
-````markdown
-{{DOCUMENT_TEXT}}
-````
-
 ### heading tree（`sectionRef` 的 §key 必须取自这里）
 
 ```text
 {{HEADING_TREE}}
 ```
 
-### Semantic Inventory（上一阶段的产物 · 你要逐条交代的那份清单）
+### Semantic Inventory（上一阶段的产物 · 你要逐条交代的那份清单 · **这是你唯一的证据面**）
 
 ```json
 {{INVENTORY}}
 ```
+
+### ⚠️ 本次不提供原文
+
+原文已被上一阶段消化成上面的 Inventory。
+**不要**试图回忆或重建原文；`sectionRef` / `lines` / `quote` 就是全部依据。
+如果某条语义在 Inventory 里说得不够清楚，就**如实**在 selection 的 reason 里写明"依据不足"，
+而不是自己补一段原文。
 
 ### framework-map 契约（`schema/framework-map.schema.json`）
 

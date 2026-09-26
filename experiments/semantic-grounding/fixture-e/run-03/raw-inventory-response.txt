@@ -1,0 +1,128 @@
+{
+  "inventoryVersion": 1,
+  "document": {
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "current"
+  },
+  "items": [
+    {
+      "id": "S-01",
+      "statement": "四个 Feature 的依赖顺序是 F13 → F14 → F15 → F16，F12 已被这四个 Feature 替代。",
+      "tag": "依赖",
+      "sources": [
+        { "sectionRef": "§1", "lines": "L13-L27", "quote": "依赖：F13 → F14 → F15 → F16。F12 已被这四个 Feature 替代。" }
+      ]
+    },
+    {
+      "id": "S-02",
+      "statement": "Round 19 后 F13–F16 全部为 passing，F12 unblock 完成并切换为 passing。",
+      "tag": "状态",
+      "sources": [
+        { "sectionRef": "§1", "lines": "L27", "quote": "Round 19：F13–F16 全部 passing，F12 unblock 完成并切 passing。" },
+        { "sectionRef": "§6.5", "lines": "L422-L427", "quote": "Round 19 已完成（已改为 passing）" }
+      ]
+    },
+    {
+      "id": "S-03",
+      "statement": ".gitignore 必须包含 .env、.env.*、*.pem、*.key、*.b64.enc、secrets/、key/*.pem、key/*.pem.b64 等条目以防密钥误提交。",
+      "tag": "安全",
+      "sources": [
+        { "sectionRef": "§2.3", "lines": "L63-L80", "quote": ".gitignore 必须包含以下条目（防止密钥误提交）" }
+      ]
+    },
+    {
+      "id": "S-04",
+      "statement": "执行 git status 时不应出现 .env / *.pem / *.key 等敏感文件。",
+      "tag": "安全",
+      "sources": [
+        { "sectionRef": "§2.3", "lines": "L78-L80", "quote": "执行 git status 时**不应**出现 .env / *.pem / *.key 等敏感文件。" }
+      ]
+    },
+    {
+      "id": "S-05",
+      "statement": "云函数部署有固定顺序（refundCommon 起至 refundQueryCron 共 11 步），其中 refundCommon 无需单独部署，作为 lib 被 require。",
+      "tag": "部署",
+      "sources": [
+        { "sectionRef": "§3.1", "lines": "L84-L107", "quote": "refundCommon（无需单独部署，作为 lib 被 require）" }
+      ]
+    },
+    {
+      "id": "S-06",
+      "statement": "retryAfterSalesCompensation 由定时触发器驱动，cron 表达式为 */10 * * * *（每 10 分钟）。",
+      "tag": "触发器",
+      "sources": [
+        { "sectionRef": "§3.2", "lines": "L109-L116", "quote": "retryAfterSalesCompensation | 定时触发器 | */10 * * * * | 每 10 分钟" }
+      ]
+    },
+    {
+      "id": "S-07",
+      "statement": "refundQueryCron 由定时触发器驱动，cron 表达式为 */5 * * * *（每 5 分钟）。",
+      "tag": "触发器",
+      "sources": [
+        { "sectionRef": "§3.2", "lines": "L109-L116", "quote": "refundQueryCron | 定时触发器 | */5 * * * * | 每 5 分钟" }
+      ]
+    },
+    {
+      "id": "S-08",
+      "statement": "F16 退款回调需在 CloudBase HTTP 网关创建一条 HTTPS 路由 /refundNotify，目标函数为 refundNotify。",
+      "tag": "网关",
+      "sources": [
+        { "sectionRef": "§3.3", "lines": "L118-L128", "quote": "/refundNotify | refundNotify" }
+      ]
+    },
+    {
+      "id": "S-09",
+      "statement": "payNotify 已存在的 /payNotify 路由保持不变，与 /refundNotify 两者独立。",
+      "tag": "边界",
+      "sources": [
+        { "sectionRef": "§3.3", "lines": "L125-L127", "quote": "注：payNotify 已存在的 /payNotify 路由保持不变。两者独立。" }
+      ]
+    },
+    {
+      "id": "S-10",
+      "statement": "退款回调的 HTTPS URL 需配置到 WECHAT_REFUND_NOTIFY_URL 环境变量。",
+      "tag": "配置",
+      "sources": [
+        { "sectionRef": "§3.3", "lines": "L127", "quote": "HTTPS URL 配置到 WECHAT_REFUND_NOTIFY_URL 环境变量。" }
+      ]
+    },
+    {
+      "id": "S-11",
+      "statement": "F13–F15 不需要任何环境变量。",
+      "tag": "配置",
+      "sources": [
+        { "sectionRef": "§3.4", "lines": "L130-L147", "quote": "F13–F15 不需要任何环境变量。" }
+      ]
+    },
+    {
+      "id": "S-12",
+      "statement": "F16 沙箱模式需显式设置 WECHAT_REFUND_APPID / MCHID / SERIAL_NO 三项，其余 WECHAT_REFUND_* 在沙箱模式下不强制；WECHAT_REFUND_MODE=sandbox 为默认值可省略。",
+      "tag": "配置",
+      "sources": [
+        { "sectionRef": "§3.4", "lines": "L132-L147", "quote": "其他 WECHAT_REFUND_* 在沙箱模式下不强制。" }
+      ]
+    },
+    {
+      "id": "S-13",
+      "statement": "用例1：submitAfterSales 成功后期望 code=0、afterSalesStatus=REQUESTED、afterSalesType=REFUND_ONLY。",
+      "tag": "状态迁移",
+      "sources": [
+        { "sectionRef": "§4.2", "lines": "L197-L214", "quote": "期望: code=0, afterSalesStatus=REQUESTED, afterSalesType=REFUND_ONLY" }
+      ]
+    },
+    {
+      "id": "S-14",
+      "statement": "未发货仅退款中 processAfterSales APPROVE_REFUND_ONLY 后，afterSalesStatus=APPROVED 且 cancellationStatus=APPROVED。",
+      "tag": "状态迁移",
+      "sources": [
+        { "sectionRef": "§4.2", "lines": "L197-L214", "quote": "期望: code=0, afterSalesStatus=APPROVED, cancellationStatus=APPROVED" }
+      ]
+    },
+    {
+      "id": "S-15",
+      "statement": "refundOrder 沙箱调用成功后期望 mode=sandbox、refundStatus=PROCESSING、outRefundNo 以 R 开头。",
+      "tag": "状态迁移",
+      "sources": [
+        { "sectionRef": "§4.2", "lines": "L197-L214", "quote": "期望: code=0, mode=sandbox, refundStatus=PROCESSING, outRefundNo=R" }
+     

@@ -1,0 +1,134 @@
+{
+  "feature": "F10-semantic-grounding",
+  "fixture": "d",
+  "fixtureLabel": "D · ER-heavy / multi-entity network",
+  "runDir": "experiments/semantic-grounding/fixture-d/run-02",
+  "stage": "both",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens": 65536,
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "documentPath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+  "documentSha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236",
+  "promptA": {
+    "path": "ai/semantic-inventory.prompt.md",
+    "sha256": "5881a640c1050f308552ab5b7e9d1b7612d26e6e15754e4acfdd7c614328b785",
+    "fingerprint": "5881a640c1050f30"
+  },
+  "promptB": {
+    "path": "ai/framework-map-synthesis.prompt.md",
+    "sha256": "13408b9340c8ecb19b61d6c6637240dcfcf4f62dfc55a7a7a16b8d1a57a24d24",
+    "fingerprint": "13408b9340c8ecb1"
+  },
+  "frozen": {
+    "model": "deepseek-flash",
+    "generationParams": {
+      "temperature": 1,
+      "max_tokens": 65536,
+      "timeout_ms": 900000,
+      "max_attempts": 1
+    },
+    "document": {
+      "path": "测试文档/fixture-d-goal-plan-task-state-model.md",
+      "sha256": "6f2c5f47258e4f8442edb1fbebe658cdb8557a6dc6ce40beceb2dc367ceb8236"
+    },
+    "promptA": {
+      "path": "ai/semantic-inventory.prompt.md",
+      "sha256": "5881a640c1050f308552ab5b7e9d1b7612d26e6e15754e4acfdd7c614328b785"
+    },
+    "promptB": {
+      "path": "ai/framework-map-synthesis.prompt.md",
+      "sha256": "13408b9340c8ecb19b61d6c6637240dcfcf4f62dfc55a7a7a16b8d1a57a24d24"
+    },
+    "schemas": {
+      "semanticInventory": {
+        "path": "schema/semantic-inventory.schema.json",
+        "sha256": "f277419d25424c2da9721db1ad765af033881dba6e27f8124be5a0dd27f65eff"
+      },
+      "frameworkMap": {
+        "path": "schema/framework-map.schema.json",
+        "sha256": "56e66faabcd8ca7ea15dcb8925dc559368a8695a6bb9ca60b0a826ef9dcd8c22"
+      },
+      "mapSelection": {
+        "path": "schema/map-selection.schema.json",
+        "sha256": "eaa6a58f0f935b63faf236e91244d17d270b2389e713a83f8f0efad371ed84c8"
+      }
+    },
+    "contract": {
+      "path": "docs/framework-map-contract.md",
+      "sha256": "a70443517c1a0cb37a185f3d949710c00f9a104f8efc758da16516c40f6716da"
+    },
+    "validator": {
+      "path": "scripts/check-map.js",
+      "sha256": "1c1dbe45281d373ae6e86edff1785b4241d94d0512d46005e4e22e4dee565c7f"
+    }
+  },
+  "startedAt": "2026-09-26T14:37:58.450Z",
+  "finishedAt": "2026-09-26T14:39:50.756Z",
+  "status": "stage-a-shape-invalid",
+  "error": null,
+  "stages": {
+    "a": {
+      "status": "shape-invalid",
+      "attempts": 1,
+      "latencyMs": 112297,
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 9989,
+        "completion_tokens": 39168,
+        "total_tokens": 49157,
+        "prompt_tokens_details": {
+          "cached_tokens": 9855
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 10995
+        },
+        "prompt_cache_hit_tokens": 9855,
+        "prompt_cache_miss_tokens": 134
+      },
+      "protocol": {
+        "rawResponseSaved": true,
+        "jsonExtracted": true,
+        "tempWrite": true,
+        "readBackVerified": true,
+        "atomicRename": true
+      }
+    },
+    "b": {
+      "status": null,
+      "attempts": 0,
+      "latencyMs": null,
+      "finishReason": null,
+      "usage": null,
+      "protocol": {
+        "rawResponseSaved": false,
+        "jsonExtracted": false,
+        "tempWrite": false,
+        "readBackVerified": false,
+        "atomicRename": false,
+        "checkMapExecuted": false
+      }
+    }
+  },
+  "repair": "none",
+  "artifactSha256": {
+    "semantic-inventory.json": "9c9f5a3b41c9f860ced2ffae27637428b62961e49f5aa60bd7c6ffbe52308778"
+  },
+  "integrity": {
+    "inventory": {
+      "problems": [
+        "S-152b id 格式非法",
+        "S-153b id 格式非法"
+      ],
+      "itemCount": 264
+    },
+    "selection": null
+  },
+  "validator": null
+}

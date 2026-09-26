@@ -70,7 +70,9 @@ const DEFAULTS = {
   schemaB: path.join('schema', 'framework-map.schema.json'),
   selectionSchema: path.join('schema', 'map-selection.schema.json'),
   model: 'deepseek-flash',
-  maxTokens: 65536,
+  // 分阶段输出预算（用户裁决：给太大空间会让 Stage A 越写越散）
+  maxTokensA: 16384,
+  maxTokensB: 12288,
   temperature: 1,
   timeoutMs: 900000,
   maxAttempts: 1,
@@ -106,7 +108,8 @@ function usage(msg) {
   if (msg) console.error(`✗ ${msg}`);
   console.error('用法: node scripts/run-semantic-grounding.js --fixture <a|b|c|d|e> [--stage a|b|both]');
   console.error('      [--run N] [--out DIR] [--inventory FILE] [--model M] [--temperature T]');
-  console.error('      [--max-tokens N] [--max-attempts N] [--timeout-ms N] [--allow-settings-fallback]');
+  console.error('      [--max-tokens-a N]（Stage A 默认 16384）[--max-tokens-b N]（Stage B 默认 12288）');
+  console.error('      [--max-attempts N] [--timeout-ms N] [--allow-settings-fallback]');
   console.error('      # 离线 stub（零模型调用）: [--stub-a-content FILE] [--stub-a-http N] [--stub-a-transport-error TEXT]');
   console.error('      #                        [--stub-b-content FILE] [--stub-b-http N] [--stub-b-transport-error TEXT]');
   process.exit(EXIT.USAGE);
@@ -132,6 +135,8 @@ const sha256 = (t) => crypto.createHash('sha256').update(t).digest('hex');
 const rel = (p) => path.relative(ROOT, p).replace(/\\/g, '/');
 const nowIso = () => new Date().toISOString();
 const writeText = (f, t) => fs.writeFileSync(f, t, 'utf8');
+/** 冻结条件引用：路径 + 内容 hash（用于事后证明"这轮实验用的是这一版"）。 */
+const artifactRef = (p) => ({ path: rel(p), sha256: sha256(fs.readFileSync(p, 'utf8')) });
 
 const isStubStage = (s) => !!(args[`stub${s.toUpperCase()}Content`] || args[`stub${s.toUpperCase()}Http`] || args[`stub${s.toUpperCase()}TransportError`]);
 
@@ -267,27 +272,32 @@ function splitTwoBlocks(text) {
   return { map: extractJson(text.slice(i + A.length, j)), selection: extractJson(text.slice(j + B.length)) };
 }
 
-/** Stage A 产物的**结构**校验（决定能否进入 Stage B）。 */
+/** Stage A 产物的**结构**校验。返回 {blocking, advisory}：
+ *  · blocking  → 内容级问题（duplicate id / 缺 statement / 缺 sources / §key 不存在）→ **不允许进入 Stage B**
+ *  · advisory  → **纯格式**问题（如 id 写成 S-152b）→ 记录为 integrity FAIL，但**允许进入 Stage B**
+ *    （理由：id 仍是唯一、可引用的字符串；让一个后缀把整个 run 的 map 抹掉，会白白失去 E2/E3/E4 的归因数据。
+ *      这条是对"格式合法"的从宽读法，已登记在 results/ 里，可随时改回严格。） */
 function checkInventoryShape(inv, headingKeys) {
-  const problems = [];
-  if (!inv || typeof inv !== 'object' || Array.isArray(inv)) return ['顶层不是 JSON 对象'];
-  ['inventoryVersion', 'document', 'items'].forEach((k) => { if (!(k in inv)) problems.push(`缺少必填字段 ${k}`); });
-  if (!Array.isArray(inv.items) || inv.items.length === 0) { problems.push('items 不是非空数组'); return problems; }
+  const blocking = [], advisory = [];
+  if (!inv || typeof inv !== 'object' || Array.isArray(inv)) return { blocking: ['顶层不是 JSON 对象'], advisory };
+  ['inventoryVersion', 'document', 'items'].forEach((k) => { if (!(k in inv)) blocking.push(`缺少必填字段 ${k}`); });
+  if (!Array.isArray(inv.items) || inv.items.length === 0) { blocking.push('items 不是非空数组'); return { blocking, advisory }; }
   const seen = new Set();
   inv.items.forEach((it, i) => {
     const tag = it && it.id ? it.id : `items[${i}]`;
-    if (!it || typeof it !== 'object') { problems.push(`${tag} 不是对象`); return; }
-    if (!it.id || !/^S-[0-9]{2,3}$/.test(it.id)) problems.push(`${tag} id 格式非法`);
-    else if (seen.has(it.id)) problems.push(`duplicate id: ${it.id}`);
+    if (!it || typeof it !== 'object') { blocking.push(`${tag} 不是对象`); return; }
+    if (!it.id) blocking.push(`${tag} 缺 id`);
+    else if (!/^S-[0-9]{2,3}$/.test(it.id)) advisory.push(`id 格式非严格（${it.id}）`);
+    else if (seen.has(it.id)) blocking.push(`duplicate id: ${it.id}`);
     else seen.add(it.id);
-    if (!it.statement || String(it.statement).trim().length < 8) problems.push(`${tag} statement 缺失或过短`);
-    if (!Array.isArray(it.sources) || it.sources.length === 0) problems.push(`${tag} 缺少 sources`);
+    if (!it.statement || String(it.statement).trim().length < 8) blocking.push(`${tag} statement 缺失或过短`);
+    if (!Array.isArray(it.sources) || it.sources.length === 0) blocking.push(`${tag} 缺少 sources`);
     else it.sources.forEach((s, k) => {
-      if (!s || !s.sectionRef) problems.push(`${tag}.sources[${k}] 缺 sectionRef`);
-      else if (headingKeys && !headingKeys.has(s.sectionRef)) problems.push(`${tag}.sources[${k}] 引用了不存在的 §key: ${s.sectionRef}`);
+      if (!s || !s.sectionRef) blocking.push(`${tag}.sources[${k}] 缺 sectionRef`);
+      else if (headingKeys && !headingKeys.has(s.sectionRef)) blocking.push(`${tag}.sources[${k}] 引用了不存在的 §key: ${s.sectionRef}`);
     });
   });
-  return problems;
+  return { blocking, advisory };
 }
 
 /** Stage B 的选择轨迹完整性 + 引用闭合（deterministic，只报告）。 */
@@ -384,10 +394,10 @@ function runValidator(map, mapRelPath) {
  * 传输层
  * ------------------------------------------------------------------ */
 
-async function callModel(creds, system, user) {
+async function callModel(creds, system, user, maxTokens) {
   const params = {
     temperature: Number(args.temperature),
-    max_tokens: Number(args.maxTokens),
+    max_tokens: Number(maxTokens),
     timeout_ms: Number(args.timeoutMs) || DEFAULTS.timeoutMs,
     max_attempts: Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts),
   };
@@ -448,7 +458,7 @@ function stubCall(stageKey) {
     const c = env && env.choices && env.choices[0] && env.choices[0].message && env.choices[0].message.content;
     if (typeof c === 'string') content = c;
   } catch { /* 不是信封 → 整段当 content */ }
-  return { content, usage: null, latencyMs: 1, finishReason: 'stub', attempts: 1, params: { temperature: Number(args.temperature), max_tokens: Number(args.maxTokens), timeout_ms: Number(args.timeoutMs) || DEFAULTS.timeoutMs, max_attempts: Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts) } };
+  return { content, usage: null, latencyMs: 1, finishReason: 'stub', attempts: 1, params: { temperature: Number(args.temperature), max_tokens: Number(stageKey === 'a' ? (args.maxTokensA || args.maxTokens || DEFAULTS.maxTokensA) : (args.maxTokensB || args.maxTokens || DEFAULTS.maxTokensB)), timeout_ms: Number(args.timeoutMs) || DEFAULTS.timeoutMs, max_attempts: Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts) } };
 }
 
 /* ------------------------------------------------------------------ *
@@ -459,6 +469,12 @@ function finish(runDir, meta, code) {
   meta.finishedAt = nowIso();
   writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
   process.exit(code);
+}
+
+/** 增量写 run-meta：**每个阶段结束就落一次盘**。
+ *  这样即使进程被 kill（或长 run 中途被打断），已完成阶段的证据也不会失去记录。 */
+function saveMeta(runDir, meta) {
+  writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify({ ...meta, savedAt: nowIso() }, null, 2)}\n`);
 }
 
 async function main() {
@@ -479,9 +495,13 @@ async function main() {
   const runDir = allocateRunDir();
   fs.mkdirSync(runDir, { recursive: true });
 
+  const maxTokensA = Number(args.maxTokensA || args.maxTokens || DEFAULTS.maxTokensA);
+  const maxTokensB = Number(args.maxTokensB || args.maxTokens || DEFAULTS.maxTokensB);
+
   const generationParams = {
     temperature: Number(args.temperature),
-    max_tokens: Number(args.maxTokens),
+    max_tokens_stage_a: maxTokensA,
+    max_tokens_stage_b: maxTokensB,
     timeout_ms: Number(args.timeoutMs) || DEFAULTS.timeoutMs,
     max_attempts: Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts),
   };
@@ -501,6 +521,23 @@ async function main() {
     documentSha256: sha256(docText),
     promptA: { path: rel(promptAPath), sha256: promptA.sha256, fingerprint: promptA.fingerprint },
     promptB: { path: rel(promptBPath), sha256: promptB.sha256, fingerprint: promptB.fingerprint },
+    // ── 本轮实验的**冻结条件**（用户要求：逐 run 固定记录）──
+    // model / temperature / max_tokens / max_attempts / 两个 prompt hash /
+    // 文档 hash / schema 与 contract 版本（hash）/ 校验器 hash
+    frozen: {
+      model: creds.model,
+      generationParams,
+      document: { path: fixture.doc, sha256: sha256(docText) },
+      promptA: { path: rel(promptAPath), sha256: promptA.sha256 },
+      promptB: { path: rel(promptBPath), sha256: promptB.sha256 },
+      schemas: {
+        semanticInventory: artifactRef(schemaAPath),
+        frameworkMap: artifactRef(schemaBPath),
+        mapSelection: artifactRef(selectionSchemaPath),
+      },
+      contract: artifactRef(path.join(ROOT, 'docs', 'framework-map-contract.md')),
+      validator: artifactRef(path.join(ROOT, 'scripts', 'check-map.js')),
+    },
     startedAt: nowIso(),
     finishedAt: null,
     status: null,
@@ -523,6 +560,9 @@ async function main() {
   console.log(`model      ${creds.model}`);
   console.log(`promptA    ${promptA.fingerprint} · promptB ${promptB.fingerprint}`);
   console.log(`run dir    ${rel(runDir)}`);
+  console.log(`冻结条件   model=${creds.model} temp=${generationParams.temperature} mtA=${generationParams.max_tokens_stage_a} mtB=${generationParams.max_tokens_stage_b} att=${generationParams.max_attempts}`);
+  console.log(`           promptA=${promptA.sha256.slice(0, 12)} promptB=${promptB.sha256.slice(0, 12)} doc=${meta.documentSha256.slice(0, 12)}`);
+  console.log(`           framework-map.schema=${meta.frozen.schemas.frameworkMap.sha256.slice(0, 12)} contract=${meta.frozen.contract.sha256.slice(0, 12)} check-map=${meta.frozen.validator.sha256.slice(0, 12)}`);
 
   /* ---------------- inventory 来源 ---------------- */
   let inventory = null, inventoryRelPath = null, inventorySha = null;
@@ -546,7 +586,7 @@ async function main() {
     console.log('\nStage A（semantic inventory）…');
     let resA;
     try {
-      resA = stubA ? stubCall('a') : await callModel(creds, promptA.system, userMessage);
+      resA = stubA ? stubCall('a') : await callModel(creds, promptA.system, userMessage, maxTokensA);
       if (resA.error) throw resA.error;
     } catch (error) {
       meta.stages.a.status = 'transport-failed'; meta.stages.a.error = error.message;
@@ -583,17 +623,31 @@ async function main() {
     inventorySha = sha256(fs.readFileSync(path.join(runDir, 'semantic-inventory.json'), 'utf8'));
     meta.artifactSha256['semantic-inventory.json'] = inventorySha;
 
-    const invProblems = checkInventoryShape(inv, headings.keys);
-    meta.integrity.inventory = { problems: invProblems, itemCount: (inv.items || []).length };
-    meta.stages.a.status = invProblems.length ? 'shape-invalid' : 'success';
-    console.log(`Stage A 完成：${(inv.items || []).length} 条语义${invProblems.length ? `（结构问题 ${invProblems.length} 条）` : '（结构合法）'}`);
+    const shape = checkInventoryShape(inv, headings.keys);
+    meta.integrity.inventory = {
+      blocking: shape.blocking,
+      advisory: shape.advisory,
+      problems: [...shape.blocking, ...shape.advisory], // 兼容字段：两者都算 integrity FAIL
+      itemCount: (inv.items || []).length,
+    };
+    meta.stages.a.status = shape.blocking.length ? 'shape-invalid'
+      : (shape.advisory.length ? 'success-with-format-advisory' : 'success');
+    console.log(`Stage A 完成：${(inv.items || []).length} 条语义`
+      + `${shape.blocking.length ? `（**阻断性问题 ${shape.blocking.length} 条**）` : ''}`
+      + `${shape.advisory.length ? `（格式提示 ${shape.advisory.length} 条，不阻断）` : ''}`
+      + `${!shape.blocking.length && !shape.advisory.length ? '（结构合法）' : ''}`);
+    saveMeta(runDir, meta); // 增量落盘：即使后面被 kill，Stage A 的证据也有记录
 
-    if (invProblems.length) {
-      // 规则：**malformed inventory 不允许进入 Stage B**
+    if (shape.blocking.length) {
+      // 规则：**malformed inventory（内容级）不允许进入 Stage B**
       meta.status = 'stage-a-shape-invalid';
-      console.error('✗ Stage A 产物结构不合法 → **不进入 Stage B**（产物原样保留，不修补）');
-      invProblems.slice(0, 8).forEach((p) => console.error(`    · ${p}`));
+      console.error('✗ Stage A 产物内容不合法 → **不进入 Stage B**（产物原样保留，不修补）');
+      shape.blocking.slice(0, 8).forEach((p) => console.error(`    · ${p}`));
       finish(runDir, meta, EXIT.RECORDED_WITH_FAIL);
+    }
+    if (shape.advisory.length) {
+      console.log('格式提示（记为 integrity FAIL，但**允许进入 Stage B** —— 否则一个后缀会抹掉整个 run 的归因数据）：');
+      shape.advisory.slice(0, 8).forEach((p) => console.log(`    ~ ${p}`));
     }
     if (stage === 'a') { meta.status = 'stage-a-only'; console.log('\n--stage a：到此为止（inv 已冻结）'); finish(runDir, meta, EXIT.CLEAN); }
   } else {
@@ -603,20 +657,27 @@ async function main() {
     inventory = JSON.parse(fs.readFileSync(invPath, 'utf8'));
     inventoryRelPath = rel(invPath);
     inventorySha = sha256(fs.readFileSync(invPath, 'utf8'));
-    const invProblems = checkInventoryShape(inventory, headings.keys);
-    meta.integrity.inventory = { problems: invProblems, itemCount: (inventory.items || []).length, reusedFrom: inventoryRelPath, sha256: inventorySha };
+    const shape = checkInventoryShape(inventory, headings.keys);
+    meta.integrity.inventory = {
+      blocking: shape.blocking, advisory: shape.advisory,
+      problems: [...shape.blocking, ...shape.advisory],
+      itemCount: (inventory.items || []).length, reusedFrom: inventoryRelPath, sha256: inventorySha,
+    };
     console.log(`\n复用 inventory：${inventoryRelPath}（${(inventory.items || []).length} 条）`);
-    if (invProblems.length) { meta.status = 'stage-a-shape-invalid'; finish(runDir, meta, EXIT.RECORDED_WITH_FAIL); }
+    saveMeta(runDir, meta);
+    if (shape.blocking.length) { meta.status = 'stage-a-shape-invalid'; finish(runDir, meta, EXIT.RECORDED_WITH_FAIL); }
   }
 
   /* ---------------- Stage B ---------------- */
+  // ⚠️ **Stage B 不注入原文**（用户裁决）：输入只有 inventory + heading tree + 两份 schema。
+  //    理由：①同一篇文档不再输入两遍；②更关键 —— 若 Stage B 能重读原文，
+  //    就无法判断一条语义是在 Extraction 丢的还是在 Selection 丢的。
   const userMessageB = promptB.user
     .replace(/\{\{DOC_PATH\}\}/g, fixture.doc)
     .replace(/\{\{HEADING_TREE\}\}/g, headings.text)
     .replace(/\{\{INVENTORY\}\}/g, JSON.stringify(inventory, null, 2))
     .replace(/\{\{SCHEMA\}\}/g, fs.readFileSync(schemaBPath, 'utf8').trim())
-    .replace(/\{\{SELECTION_SCHEMA\}\}/g, fs.readFileSync(selectionSchemaPath, 'utf8').trim())
-    .replace(/\{\{DOCUMENT_TEXT\}\}/g, docText.trim());
+    .replace(/\{\{SELECTION_SCHEMA\}\}/g, fs.readFileSync(selectionSchemaPath, 'utf8').trim());
 
   const recB = {
     stage: 'B', fixture: fixtureId, mode: meta.mode, provider: creds.provider, baseUrl: creds.baseUrlRedacted,
@@ -630,7 +691,7 @@ async function main() {
   console.log('\nStage B（framework map synthesis）…');
   let resB;
   try {
-    resB = stubB ? stubCall('b') : await callModel(creds, promptB.system, userMessageB);
+    resB = stubB ? stubCall('b') : await callModel(creds, promptB.system, userMessageB, maxTokensB);
     if (resB.error) throw resB.error;
   } catch (error) {
     meta.stages.b.status = 'transport-failed'; meta.stages.b.error = error.message;

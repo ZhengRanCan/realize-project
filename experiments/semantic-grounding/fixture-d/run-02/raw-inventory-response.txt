@@ -1,0 +1,3178 @@
+{
+  "inventoryVersion": 1,
+  "document": {
+    "title": "Goal / Plan / Stage / Task target model contract",
+    "sourcePath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+    "role": "target"
+  },
+  "items": [
+    {
+      "id": "S-01",
+      "statement": "本文档是规划领域的 F40 目标数据模型契约，未来数据模型迁移在修改 models/、planner、replanner、storage 或页面数据消费前应以其为事实来源。",
+      "tag": "契约范围",
+      "sources": [
+        {
+          "sectionRef": "§Purpose",
+          "lines": "L3",
+          "quote": "This document is the F40 target data model contract for the planning domain. Future data model migration should use this document as the source of truth before changing `models/`, planner, replanner, storage, or page data consumption."
+        }
+      ]
+    },
+    {
+      "id": "S-02",
+      "statement": "F40 是模型与迁移方向评审，不删除 DailyPlan[]，不修改 storage keys，不修改兼容读取，也不实现 AI 或 planner 重写。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§Purpose",
+          "lines": "L3",
+          "quote": "F40 is a model and migration-direction review. It does not delete `DailyPlan[]`, does not change storage keys, does not change compatibility reads, and does not implement AI or planner rewrites."
+        }
+      ]
+    },
+    {
+      "id": "S-03",
+      "statement": "F41 在纯 models/ 层实现 F40 目标新增项；Planner/replanner behavior、AI integration、storage migration、UI/view-model consumption 与 DailyPlan[] deletion 留待后续工作。",
+      "tag": "阶段边界",
+      "sources": [
+        {
+          "sectionRef": "§Purpose",
+          "lines": "L3",
+          "quote": "F41 implements the F40 target additions in the pure `models/` layer. Planner/replanner behavior, AI integration, storage migration, UI/view-model consumption, and `DailyPlan[]` deletion remain later work."
+        }
+      ]
+    },
+    {
+      "id": "S-04",
+      "statement": "目标初始规划核心链为 Goal + UserProfile -> InitialPlanContext -> PlanBundle(Plan + Stage[] + Task[])。",
+      "tag": "核心链",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "Goal + UserProfile\n  -> InitialPlanContext\n  -> PlanBundle(Plan + Stage[] + Task[])"
+        }
+      ]
+    },
+    {
+      "id": "S-05",
+      "statement": "目标重规划核心链为 Goal + UserProfile + current PlanBundle + UserFeedback / DailyReview / Stage progress -> ReplanContext -> new PlanBundle or PlanChangeSet。",
+      "tag": "核心链",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "Goal + UserProfile + current PlanBundle + UserFeedback / DailyReview / Stage progress\n  -> ReplanContext\n  -> new PlanBundle or PlanChangeSet"
+        }
+      ]
+    },
+    {
+      "id": "S-06",
+      "statement": "Goal 是用户原始目标意图与目标范围硬约束。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "`Goal` is the user's original goal intent and goal-scoped hard constraints."
+        }
+      ]
+    },
+    {
+      "id": "S-07",
+      "statement": "UserProfile 是跨目标用户上下文与表达/排期偏好。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "`UserProfile` is cross-goal user context and expression/scheduling preference."
+        }
+      ]
+    },
+    {
+      "id": "S-08",
+      "statement": "InitialPlanContext 与 ReplanContext 是瞬态 planner 输入，不是持久核心领域模型。",
+      "tag": "瞬态输入",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "`InitialPlanContext` and `ReplanContext` are transient planner inputs, not persistent core domain models."
+        }
+      ]
+    },
+    {
+      "id": "S-09",
+      "statement": "PlanBundle 是核心持久规划聚合。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "`PlanBundle` is the core persistent planning aggregate."
+        }
+      ]
+    },
+    {
+      "id": "S-10",
+      "statement": "DailyReview 是执行历史/事实，可用于重规划，但重规划不得改写它。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "`DailyReview` is execution history/fact and may inform replanning, but must not be rewritten by replanning."
+        }
+      ]
+    },
+    {
+      "id": "S-11",
+      "statement": "DailyPlan[] 不属于未来核心领域模型；它仅作为 legacy storage/adapter 兼容保留，直到单独 breaking migration 或 repair feature 将其移除。",
+      "tag": "兼容边界",
+      "sources": [
+        {
+          "sectionRef": "§F40 conclusion",
+          "lines": "L12",
+          "quote": "`DailyPlan[]` is not part of the future core domain model. It remains only as legacy storage/adapter compatibility until a separate breaking migration or repair feature removes it."
+        }
+      ]
+    },
+    {
+      "id": "S-12",
+      "statement": "Persistent truth 层包含 Goal、UserProfile、PlanBundle（含 Plan、Stage[]、Task[]）、DailyReview[]、TodayTaskSelection[]、DailyReviewPromptDismissal[]、PlanChangeSummary[]。",
+      "tag": "模型分层",
+      "sources": [
+        {
+          "sectionRef": "§Model layers",
+          "lines": "L35",
+          "quote": "Persistent truth:\nGoal\nUserProfile\nPlanBundle\n  ├── Plan\n  ├── Stage[]\n  └── Task[]\nDailyReview[]\nTodayTaskSelection[]\nDailyReviewPromptDismissal[]\nPlanChangeSummary[]"
+        }
+      ]
+    },
+    {
+      "id": "S-13",
+      "statement": "Transient planner input 层包含 InitialPlanContext 与 ReplanContext。",
+      "tag": "模型分层",
+      "sources": [
+        {
+          "sectionRef": "§Model layers",
+          "lines": "L35",
+          "quote": "Transient planner input:\nInitialPlanContext\nReplanContext"
+        }
+      ]
+    },
+    {
+      "id": "S-14",
+      "statement": "Computed view 层包含 DailyTaskView、TodaySuggestionView、PlanBundleCalendarView。",
+      "tag": "模型分层",
+      "sources": [
+        {
+          "sectionRef": "§Model layers",
+          "lines": "L35",
+          "quote": "Computed view:\nDailyTaskView\nTodaySuggestionView\nPlanBundleCalendarView"
+        }
+      ]
+    },
+    {
+      "id": "S-15",
+      "statement": "Legacy compatibility 层包含 DailyPlan[]。",
+      "tag": "模型分层",
+      "sources": [
+        {
+          "sectionRef": "§Model layers",
+          "lines": "L35",
+          "quote": "Legacy compatibility:\nDailyPlan[]"
+        }
+      ]
+    },
+    {
+      "id": "S-16",
+      "statement": "初始规划从用户意图与可复用用户上下文创建第一个 PlanBundle。",
+      "tag": "初始规划",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "Initial planning creates the first `PlanBundle` from user intent and reusable user context."
+        }
+      ]
+    },
+    {
+      "id": "S-17",
+      "statement": "初始规划不得依赖 DailyReview[]，因为尚无执行历史。",
+      "tag": "前置约束",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "It must not depend on `DailyReview[]` because no execution history exists yet."
+        }
+      ]
+    },
+    {
+      "id": "S-18",
+      "statement": "初始规划流程为 Goal + UserProfile 汇入 InitialPlanContext，再经 planner、schema/model validation，产出 PlanBundle。",
+      "tag": "流程",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "Goal[\"Goal<br/>original intent + hard constraints\"] --> Context[\"InitialPlanContext\"]\n  UserProfile[\"UserProfile<br/>cross-goal preferences\"] --> Context\n  Context --> Planner[\"DeepSeek / deterministic planner\"]\n  Planner --> Validate[\"schema / model validation\"]\n  Validate --> Bundle[\"PlanBundle<br/>Plan + Stage[] + Task[]\"]"
+        }
+      ]
+    },
+    {
+      "id": "S-19",
+      "statement": "InitialPlanContext 目标形状包含 goal: Goal、userProfile?: UserProfile、today: string。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "export interface InitialPlanContext {\n  goal: Goal\n  userProfile?: UserProfile\n  today: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-20",
+      "statement": "InitialPlanContext 由 service code 在运行时组装。",
+      "tag": "运行时组装",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "`InitialPlanContext` is assembled by service code at runtime."
+        }
+      ]
+    },
+    {
+      "id": "S-21",
+      "statement": "InitialPlanContext 只允许包含第一个 plan 生成前已存在的数据。",
+      "tag": "输入边界",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "It is allowed to include only data that exists before the first plan is generated."
+        }
+      ]
+    },
+    {
+      "id": "S-22",
+      "statement": "InitialPlanContext 不作为单独长期模型存储。",
+      "tag": "瞬态输入",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "It is not stored as a separate long-lived model."
+        }
+      ]
+    },
+    {
+      "id": "S-23",
+      "statement": "DeepSeek 输入可使用由 InitialPlanContext 派生的压缩 AI-specific schema。",
+      "tag": "AI 输入",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "DeepSeek input may use a compressed AI-specific schema derived from this context."
+        }
+      ]
+    },
+    {
+      "id": "S-24",
+      "statement": "AI 输出在成为 PlanBundle 前必须经过验证。",
+      "tag": "验证",
+      "sources": [
+        {
+          "sectionRef": "§Initial planning flow",
+          "lines": "L63",
+          "quote": "AI output must be validated before it becomes a `PlanBundle`."
+        }
+      ]
+    },
+    {
+      "id": "S-25",
+      "statement": "当现实偏离现有 plan 时，重规划会更新或替换当前 plan。",
+      "tag": "重规划",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "Replanning updates or replaces the current plan when reality diverges from the existing plan."
+        }
+      ]
+    },
+    {
+      "id": "S-26",
+      "statement": "重规划触发条件之一是用户拒绝或不喜欢已生成 plan。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "user rejects or dislikes the generated plan;"
+        }
+      ]
+    },
+    {
+      "id": "S-27",
+      "statement": "重规划触发条件之一是用户给出自由形式 plan feedback。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "user gives free-form plan feedback;"
+        }
+      ]
+    },
+    {
+      "id": "S-28",
+      "statement": "重规划触发条件之一是一个 stage 完成且下一 stage 需要 refinement。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "a stage is completed and the next stage needs refinement;"
+        }
+      ]
+    },
+    {
+      "id": "S-29",
+      "statement": "重规划触发条件之一是 daily review 显示部分完成或跳过的工作。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "daily review shows partial/skipped work;"
+        }
+      ]
+    },
+    {
+      "id": "S-30",
+      "statement": "重规划触发条件之一是 capacity 变化。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "capacity or deadline changes;"
+        }
+      ]
+    },
+    {
+      "id": "S-31",
+      "statement": "重规划触发条件之一是 deadline 变化。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "capacity or deadline changes;"
+        }
+      ]
+    },
+    {
+      "id": "S-32",
+      "statement": "重规划触发条件之一是当前 plan 变得不可行。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "the current plan becomes infeasible."
+        }
+      ]
+    },
+    {
+      "id": "S-33",
+      "statement": "replan service 会加载 Goal、UserProfile、current PlanBundle、UserFeedback / ReplanRequest，并按需加载 DailyReview[] / Stage progress，再组装 ReplanContext。",
+      "tag": "流程",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "Service --> Goal[\"load Goal\"]\n  Service --> Profile[\"load UserProfile\"]\n  Service --> Bundle[\"load current PlanBundle\"]\n  Service --> Feedback[\"load UserFeedback / ReplanRequest\"]\n  Service --> History[\"load DailyReview[] / Stage progress as needed\"]"
+        }
+      ]
+    },
+    {
+      "id": "S-34",
+      "statement": "ReplanReason 枚举包含 user_rejected_plan、user_feedback、stage_completed、daily_review、execution_progress、capacity_changed、deadline_changed、plan_infeasible。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "export type ReplanReason =\n  | 'user_rejected_plan'\n  | 'user_feedback'\n  | 'stage_completed'\n  | 'daily_review'\n  | 'execution_progress'\n  | 'capacity_changed'\n  | 'deadline_changed'\n  | 'plan_infeasible'"
+        }
+      ]
+    },
+    {
+      "id": "S-35",
+      "statement": "ReplanContext 目标形状包含 goal、userProfile?、currentPlanBundle、reason、today、userFeedback?、dailyReviews?、completedStageId?。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "export interface ReplanContext {\n  goal: Goal\n  userProfile?: UserProfile\n  currentPlanBundle: PlanBundle\n  reason: ReplanReason\n  today: string\n  userFeedback?: UserPlanFeedback\n  dailyReviews?: DailyReview[]\n  completedStageId?: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-36",
+      "statement": "UserPlanFeedback 形状包含 id、goalId、planId、message、createdAt。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "export interface UserPlanFeedback {\n  id: string\n  goalId: string\n  planId: string\n  message: string\n  createdAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-37",
+      "statement": "currentPlanBundle 由 service code 从 storage 读取并注入 ReplanContext。",
+      "tag": "运行时组装",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "`currentPlanBundle` is read from storage and injected into `ReplanContext` by service code."
+        }
+      ]
+    },
+    {
+      "id": "S-38",
+      "statement": "ReplanContext 是瞬态输入对象，不是持久 truth source。",
+      "tag": "瞬态输入",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "`ReplanContext` is a transient input object, not a persistent truth source."
+        }
+      ]
+    },
+    {
+      "id": "S-39",
+      "statement": "Deterministic replanner 可以消费完整 PlanBundle。",
+      "tag": "输入边界",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "Deterministic replanner may consume the full `PlanBundle`."
+        }
+      ]
+    },
+    {
+      "id": "S-40",
+      "statement": "AI replanner 应接收由 ReplanContext 派生的显式 ReplanAiInput，通常压缩为 current stage、unfinished tasks、completed facts 与 user feedback。",
+      "tag": "AI 输入",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "AI replanner should receive an explicit `ReplanAiInput` derived from `ReplanContext`, usually compressed to current stage, unfinished tasks, completed facts, and user feedback."
+        }
+      ]
+    },
+    {
+      "id": "S-41",
+      "statement": "重规划必须保留已完成 task facts 与历史 DailyReview[]。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "Replanning must preserve completed task facts and historical `DailyReview[]`."
+        }
+      ]
+    },
+    {
+      "id": "S-42",
+      "statement": "重规划不得静默丢弃未完成 tasks。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "Replanning must not silently discard unfinished tasks."
+        }
+      ]
+    },
+    {
+      "id": "S-43",
+      "statement": "如果重规划无法在 deadline 前产生可行 plan，必须返回显式 infeasible 结果。",
+      "tag": "失败处理",
+      "sources": [
+        {
+          "sectionRef": "§Replanning flow",
+          "lines": "L95",
+          "quote": "If replanning cannot produce a feasible plan before the deadline, it must return an explicit infeasible result."
+        }
+      ]
+    },
+    {
+      "id": "S-44",
+      "statement": "Goal 回答用户想要什么、什么算完成、deadline 是什么，以及该用户能为这个具体目标分配多少时间。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "It answers: what does the user want, what counts as done, what is the deadline, and how much time can this user allocate to this specific goal."
+        }
+      ]
+    },
+    {
+      "id": "S-45",
+      "statement": "Pre-F41 GoalStatus 枚举为 draft、active、completed、archived、cancelled。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "export type GoalStatus = 'draft' | 'active' | 'completed' | 'archived' | 'cancelled'"
+        }
+      ]
+    },
+    {
+      "id": "S-46",
+      "statement": "GoalTaskType 枚举包含 study_exam、writing_report、project_development、creative_work、habit_building、organizing_admin_life、other。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "export type GoalTaskType =\n  | 'study_exam'\n  | 'writing_report'\n  | 'project_development'\n  | 'creative_work'\n  | 'habit_building'\n  | 'organizing_admin_life'\n  | 'other'"
+        }
+      ]
+    },
+    {
+      "id": "S-47",
+      "statement": "Pre-F41 Goal 已实现字段包括 id、title、taskType?、description?、deadline、dailyAvailableMinutes、status、createdAt、updatedAt。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "export interface Goal {\n  id: string\n  title: string\n  taskType?: GoalTaskType\n  description?: string\n  deadline: string\n  dailyAvailableMinutes: number\n  status: GoalStatus\n  createdAt: string\n  updatedAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-48",
+      "statement": "F40 目标 Goal 新增 originalInput?、successCriteria?、scopeNotes?、startingPoint?、constraints?，由 F41 在 model layer 实现。",
+      "tag": "目标新增",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "F40 target additions, implemented in the model layer by F41:\n\nexport interface Goal {\n  id: string\n  title: string\n  description?: string\n  originalInput?: string\n  successCriteria?: string\n  scopeNotes?: string\n  startingPoint?: string\n  constraints?: string[]"
+        }
+      ]
+    },
+    {
+      "id": "S-49",
+      "statement": "F65 为 Goal 增加 additive 扩展 preferredApproach?。",
+      "tag": "扩展",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "F65 additive extension:\n\nexport interface Goal {\n  preferredApproach?: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-50",
+      "statement": "F73 定义 PlanAdjustmentRisk 为 'risk' | 'infeasible'，并为 Plan 增加 adjustmentRisk?。",
+      "tag": "扩展",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "export type PlanAdjustmentRisk = 'risk' | 'infeasible'\n\nexport interface Plan {\n  adjustmentRisk?: PlanAdjustmentRisk\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-51",
+      "statement": "adjustmentRisk 仅在 status = 'needs_adjustment' 时存在。",
+      "tag": "状态约束",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`adjustmentRisk` is present only while `status = 'needs_adjustment'`."
+        }
+      ]
+    },
+    {
+      "id": "S-52",
+      "statement": "adjustmentRisk 保留未解决条件是提示性 capacity risk 还是已证实的 deadline infeasibility。",
+      "tag": "语义区分",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "It preserves whether the unresolved condition is a cautionary capacity risk or a proven deadline infeasibility; legacy `needs_adjustment` Plans without the field conservatively fall back to `infeasible`."
+        }
+      ]
+    },
+    {
+      "id": "S-53",
+      "statement": "缺少 adjustmentRisk 的 legacy needs_adjustment Plans 保守回退为 infeasible。",
+      "tag": "默认回退",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "legacy `needs_adjustment` Plans without the field conservatively fall back to `infeasible`."
+        }
+      ]
+    },
+    {
+      "id": "S-54",
+      "statement": "preferredApproach 是 Goal-scoped 软偏好，例如从最熟悉的章节开始。",
+      "tag": "软偏好",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`preferredApproach` is a Goal-scoped soft preference such as “start from the most familiar chapter”."
+        }
+      ]
+    },
+    {
+      "id": "S-55",
+      "statement": "preferredApproach 必须来自用户措辞、已确认的 clarification answer 或用户显式补充。",
+      "tag": "来源约束",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "It must come from user wording, a confirmed clarification answer, or explicit user supplementation."
+        }
+      ]
+    },
+    {
+      "id": "S-56",
+      "statement": "preferredApproach 不覆盖 deadline、daily capacity 或显式硬约束。",
+      "tag": "优先级",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "It does not override the deadline, daily capacity, or explicit hard constraints, and it must not be inferred from MBTI, tarot, state cards, or behavior profiling."
+        }
+      ]
+    },
+    {
+      "id": "S-57",
+      "statement": "preferredApproach 不得从 MBTI、tarot、state cards 或 behavior profiling 推断。",
+      "tag": "禁止推断",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "it must not be inferred from MBTI, tarot, state cards, or behavior profiling."
+        }
+      ]
+    },
+    {
+      "id": "S-58",
+      "statement": "originalInput 字段意图是保存用户原始措辞，用于 AI semantic context。",
+      "tag": "字段意图",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`originalInput`: the user's raw wording, useful for AI semantic context."
+        }
+      ]
+    },
+    {
+      "id": "S-59",
+      "statement": "taskType 字段意图是用户选择的分类，用于 template、prompt 与 plan-shape guidance。",
+      "tag": "字段意图",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`taskType`: the user's selected category for template, prompt, and plan-shape guidance."
+        }
+      ]
+    },
+    {
+      "id": "S-60",
+      "statement": "successCriteria 字段意图是定义该 goal 被视为完成时必须为真的事项。",
+      "tag": "字段意图",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`successCriteria`: what must be true for this goal to be considered complete."
+        }
+      ]
+    },
+    {
+      "id": "S-61",
+      "statement": "scopeNotes 字段意图是定义该 goal 范围内或范围外的事项。",
+      "tag": "字段意图",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`scopeNotes`: what is in scope or out of scope for this goal."
+        }
+      ]
+    },
+    {
+      "id": "S-62",
+      "statement": "startingPoint 字段意图是记录用户当前水平、资产、blockers 或 baseline state。",
+      "tag": "字段意图",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`startingPoint`: the user's current level, assets, blockers, or baseline state for this goal."
+        }
+      ]
+    },
+    {
+      "id": "S-63",
+      "statement": "constraints 字段意图是 deadline 与 daily capacity 之外的 goal-specific hard constraints。",
+      "tag": "字段意图",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`constraints`: goal-specific hard constraints beyond deadline and daily capacity."
+        }
+      ]
+    },
+    {
+      "id": "S-64",
+      "statement": "Goal 拒绝承载 MBTI、tarot preference、ritual tone 与 expression style；这些属于 UserProfile。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "MBTI, tarot preference, ritual tone, and expression style. These belong to `UserProfile`."
+        }
+      ]
+    },
+    {
+      "id": "S-65",
+      "statement": "Goal 拒绝承载 daily execution feedback；这属于 DailyReview，并只进入 replanning context。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "Daily execution feedback. This belongs to `DailyReview` and enters only replanning context."
+        }
+      ]
+    },
+    {
+      "id": "S-66",
+      "statement": "Goal 拒绝承载 generated plan strategy；这属于 Plan。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "Generated plan strategy. This belongs to `Plan`."
+        }
+      ]
+    },
+    {
+      "id": "S-67",
+      "statement": "Goal 拒绝承载 page display copy；这属于 computed views。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "Page display copy. This belongs to computed views."
+        }
+      ]
+    },
+    {
+      "id": "S-68",
+      "statement": "一个 Goal 可以有多个历史 Plan versions，但同一时间至多一个 active plan。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "One `Goal` may have multiple historical `Plan` versions, but at most one active plan at a time."
+        }
+      ]
+    },
+    {
+      "id": "S-69",
+      "statement": "dailyAvailableMinutes 是 goal-scoped planning constraint，必须为正整数。",
+      "tag": "约束",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`dailyAvailableMinutes` is a goal-scoped planning constraint and must be a positive integer."
+        }
+      ]
+    },
+    {
+      "id": "S-70",
+      "statement": "dailyAvailableMinutes 是 plan-generation daily budget，不承诺用户每天恰好工作该时长。",
+      "tag": "语义澄清",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "`dailyAvailableMinutes` is a plan-generation daily budget, not a promise that the user will work exactly that long every day."
+        }
+      ]
+    },
+    {
+      "id": "S-71",
+      "statement": "F58 创建从 goal wording、deadline 与 daily budget 开始；taskType、successCriteria、startingPoint 仅在明确从措辞提取、经 intent clarification 确认或作为 assumptions 披露时加入。",
+      "tag": "创建规则",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "F58 creation starts from goal wording, deadline, and daily budget. `taskType`, `successCriteria`, and `startingPoint` are added only when explicitly extracted from the wording, confirmed through intent clarification, or disclosed as assumptions."
+        }
+      ]
+    },
+    {
+      "id": "S-72",
+      "statement": "Goal completion 在 goal level 判定，不由一个 task 自动完成决定。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "Goal completion is determined at the goal level, not by one task automatically completing."
+        }
+      ]
+    },
+    {
+      "id": "S-73",
+      "statement": "Goal cancellation 必须显式处理相关 Plan、Stage、Task 与 Review records。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§Goal",
+          "lines": "L168",
+          "quote": "Goal cancellation must explicitly handle related Plan, Stage, Task, and Review records."
+        }
+      ]
+    },
+    {
+      "id": "S-74",
+      "statement": "UserProfile 是 cross-goal reusable user context。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§UserProfile",
+          "lines": "L269",
+          "quote": "`UserProfile` is cross-goal reusable user context."
+        }
+      ]
+    },
+    {
+      "id": "S-75",
+      "statement": "UserProfile 回答用户通常偏好如何工作或接收 task expression。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§UserProfile",
+          "lines": "L269",
+          "quote": "It answers: how does the user generally prefer to work or receive task expression."
+        }
+      ]
+    },
+    {
+      "id": "S-76",
+      "statement": "UserProfile 当前实现形状包含 id、energyLevel、mbti?、workStyle、preferredFocusMinutes、ritualPreference、updatedAt。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§UserProfile",
+          "lines": "L269",
+          "quote": "export interface UserProfile {\n  id: string\n  energyLevel: EnergyLevel\n  mbti?: string\n  workStyle: WorkStyle\n  preferredFocusMinutes: number\n  ritualPreference: RitualPreference\n  updatedAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-77",
+      "statement": "UserProfile 中 scheduling preferences 包括 workStyle、preferredFocusMinutes 与默认 energyLevel。",
+      "tag": "边界",
+      "sources": [
+        {
+          "sectionRef": "§UserProfile",
+          "lines": "L269",
+          "quote": "Scheduling preferences: `workStyle`, `preferredFocusMinutes`, default `energyLevel`."
+        }
+      ]
+    },
+    {
+      "id": "S-78",
+      "statement": "UserProfile 中 expression preferences 包括 mbti、ritualPreference 与 personalized tone。",
+      "tag": "边界",
+      "sources": [
+        {
+          "sectionRef": "§UserProfile",
+          "lines": "L269",
+          "quote": "Expression preferences: `mbti`, `ritualPreference`, personalized tone."
+        }
+      ]
+    },
+    {
+      "id": "S-79",
+      "statement": "UserProfile.energyLevel 仅是默认或当前偏好；实际执行日 energy 属于 DailyReview.energy。",
+      "tag": "边界",
+      "sources": [
+        {
+          "sectionRef": "§UserProfile",
+          "lines": "L269",
+          "quote": "`energyLevel` in `UserProfile` is only a default or current preference. Actual execution-day energy belongs to `DailyReview.energy`."
+        }
+      ]
+    },
+    {
+      "id": "S-80",
+      "statement": "MBTI 与 ritual preferences 可影响表达和轻量排序，不得被视为科学预测、诊断或硬性 task decision evidence。",
+      "tag": "禁止用途",
+      "sources": [
+        {
+          "sectionRef": "§UserProfile",
+          "lines": "L269",
+          "quote": "MBTI and ritual preferences may affect expression and light ordering only. They must not be treated as scientific prediction, diagnosis, or hard task decision evidence."
+        }
+      ]
+    },
+    {
+      "id": "S-81",
+      "statement": "PlanBundle 是一次生成 plan 的核心持久 plan aggregate。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§PlanBundle",
+          "lines": "L296",
+          "quote": "`PlanBundle` is the core persistent plan aggregate for one generated plan."
+        }
+      ]
+    },
+    {
+      "id": "S-82",
+      "statement": "PlanBundle 形状包含 plan: Plan、stages: Stage[]、tasks: Task[]。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§PlanBundle",
+          "lines": "L296",
+          "quote": "export interface PlanBundle {\n  plan: Plan\n  stages: Stage[]\n  tasks: Task[]\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-83",
+      "statement": "PlanBundle 是 initial planning 与 replanning 的主要输出。",
+      "tag": "输出",
+      "sources": [
+        {
+          "sectionRef": "§PlanBundle",
+          "lines": "L296",
+          "quote": "`PlanBundle` is the primary output of initial planning and replanning."
+        }
+      ]
+    },
+    {
+      "id": "S-84",
+      "statement": "Pages 应消费由 PlanBundle 派生的 service/view-model outputs，而不是 raw storage structures。",
+      "tag": "消费边界",
+      "sources": [
+        {
+          "sectionRef": "§PlanBundle",
+          "lines": "L296",
+          "quote": "Pages should consume service/view-model outputs derived from `PlanBundle`, not raw storage structures."
+        }
+      ]
+    },
+    {
+      "id": "S-85",
+      "statement": "PlanBundle 必须可 JSON serializable。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§PlanBundle",
+          "lines": "L296",
+          "quote": "A `PlanBundle` must be JSON serializable."
+        }
+      ]
+    },
+    {
+      "id": "S-86",
+      "statement": "IDs 必须稳定，且不得依赖 title text。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§PlanBundle",
+          "lines": "L296",
+          "quote": "IDs are stable and must not depend on title text."
+        }
+      ]
+    },
+    {
+      "id": "S-87",
+      "statement": "Plan 是一次生成 plan 的 metadata 与 strategy record。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "`Plan` is the metadata and strategy record for a generated plan."
+        }
+      ]
+    },
+    {
+      "id": "S-88",
+      "statement": "Plan 回答它属于哪个 goal、是否 feasible、如何生成以及为何这样安排。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "It answers: which goal this plan belongs to, whether it is feasible, how it was generated, and why this arrangement exists."
+        }
+      ]
+    },
+    {
+      "id": "S-89",
+      "statement": "Pre-F41 PlanStatus 枚举为 draft、active、needs_adjustment、infeasible、completed、archived。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "export type PlanStatus =\n  | 'draft'\n  | 'active'\n  | 'needs_adjustment'\n  | 'infeasible'\n  | 'completed'\n  | 'archived'"
+        }
+      ]
+    },
+    {
+      "id": "S-90",
+      "statement": "Pre-F41 Plan 字段包括 id、goalId、status、startDate、deadline、dailyAvailableMinutes、createdAt、updatedAt。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "export interface Plan {\n  id: string\n  goalId: string\n  status: PlanStatus\n  startDate: string\n  deadline: string\n  dailyAvailableMinutes: number\n  createdAt: string\n  updatedAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-91",
+      "statement": "PlanGenerationSource 枚举为 deterministic、deepseek、manual。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "export type PlanGenerationSource = 'deterministic' | 'deepseek' | 'manual'"
+        }
+      ]
+    },
+    {
+      "id": "S-92",
+      "statement": "F40 目标 Plan 新增 version、generationSource、generatedAt、generationReason、strategySummary?、feasibilitySummary?、infeasibleReason?、replannedFromPlanId?。",
+      "tag": "目标新增",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "export interface Plan {\n  id: string\n  goalId: string\n  status: PlanStatus\n  version: number\n  generationSource: PlanGenerationSource\n  generatedAt: string\n  generationReason: 'initial' | ReplanReason\n  strategySummary?: string\n  feasibilitySummary?: string\n  infeasibleReason?: string\n  replannedFromPlanId?: string"
+        }
+      ]
+    },
+    {
+      "id": "S-93",
+      "statement": "F65 定义 PlanStructureType 为 'sequential' | 'flexible' | 'hybrid'，并为 Plan 增加 structureType? 与 detailedThrough?。",
+      "tag": "扩展",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "export type PlanStructureType = 'sequential' | 'flexible' | 'hybrid'\n\nexport interface Plan {\n  structureType?: PlanStructureType\n  detailedThrough?: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-94",
+      "statement": "缺少 structureType 时保留 legacy staged-plan contract，且不虚构用户偏好。",
+      "tag": "默认回退",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "A missing `structureType` preserves the legacy staged-plan contract and does not fabricate a user preference."
+        }
+      ]
+    },
+    {
+      "id": "S-95",
+      "statement": "detailedThrough 是已生成 concrete Tasks 的最后日期。",
+      "tag": "语义",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "`detailedThrough` is the last date for which concrete Tasks have been generated."
+        }
+      ]
+    },
+    {
+      "id": "S-96",
+      "statement": "当 detailedThrough 存在时，它必须位于 startDate 与 deadline 之间，且 strict PlanBundle validation 拒绝其后的 Tasks。",
+      "tag": "约束",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "When `detailedThrough` exists, it must stay within `startDate` and `deadline`, and strict PlanBundle validation rejects Tasks after it."
+        }
+      ]
+    },
+    {
+      "id": "S-97",
+      "statement": "缺少 detailedThrough 时保留 legacy plans，这些 plans 已包含跨越完整日期范围的 concrete Tasks。",
+      "tag": "默认回退",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "A missing `detailedThrough` preserves legacy plans that already contain concrete Tasks across their full date range."
+        }
+      ]
+    },
+    {
+      "id": "S-98",
+      "statement": "F67 要求新的成功 initial plans 必须包含 structureType 与 detailedThrough。",
+      "tag": "初始规划契约",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "New successful initial plans require `structureType` and `detailedThrough`."
+        }
+      ]
+    },
+    {
+      "id": "S-99",
+      "statement": "F67 规定 detailedThrough = min(deadline, today + 6 calendar days)。",
+      "tag": "公式",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "`detailedThrough = min(deadline, today + 6 calendar days)`."
+        }
+      ]
+    },
+    {
+      "id": "S-100",
+      "statement": "F67 要求 Stage ranges 覆盖完整 Plan window，包括 today 与 deadline。",
+      "tag": "范围约束",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "Stage ranges cover the full Plan window, including today and the deadline."
+        }
+      ]
+    },
+    {
+      "id": "S-101",
+      "statement": "F67 要求 Concrete Tasks 仅存在于 detailedThrough 当日或之前；之后日期保持 Stage-level direction，而不虚构 daily facts。",
+      "tag": "范围约束",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "Concrete Tasks exist only on or before `detailedThrough`; later dates remain Stage-level direction rather than fabricated daily facts."
+        }
+      ]
+    },
+    {
+      "id": "S-102",
+      "statement": "F67 指出 Stage estimatedMinutes 表示整周期工作，可超过当前已物化 Tasks 的总和。",
+      "tag": "工作量语义",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "Stage `estimatedMinutes` represent whole-cycle work and may exceed the sum of currently materialized Tasks."
+        }
+      ]
+    },
+    {
+      "id": "S-103",
+      "statement": "F67 要求 Total Stage minutes 必须适配 inclusive plan days * dailyAvailableMinutes。",
+      "tag": "容量约束",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "Total Stage minutes must fit `inclusive plan days * dailyAvailableMinutes`."
+        }
+      ]
+    },
+    {
+      "id": "S-104",
+      "statement": "F67 要求每个 initial Task 属于一个 Stage，且其 scheduled date 位于该 Stage range 内。",
+      "tag": "归属约束",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "Every initial Task belongs to one Stage and its scheduled date stays inside that Stage range."
+        }
+      ]
+    },
+    {
+      "id": "S-105",
+      "statement": "F67 指出 AI dependency client keys 是瞬态转换标识；持久化 dependencies 使用 Task.dependsOnTaskIds。",
+      "tag": "持久化",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "AI dependency client keys are transient conversion identifiers; persisted dependencies use `Task.dependsOnTaskIds`."
+        }
+      ]
+    },
+    {
+      "id": "S-106",
+      "statement": "F67 要求 initial AI Task ids 以 planId + clientTaskKey 稳定生成，不依赖 title 或输出数组顺序。",
+      "tag": "ID 稳定性",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "Initial AI Task ids are stable by `planId + clientTaskKey` and do not depend on title or output array order."
+        }
+      ]
+    },
+    {
+      "id": "S-107",
+      "statement": "Plan 应携带可追溯 summary metadata，而不是完整 prompt 或完整瞬态 context。",
+      "tag": "存储边界",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "`Plan` should carry traceable summary metadata, not the full prompt or full transient context."
+        }
+      ]
+    },
+    {
+      "id": "S-108",
+      "statement": "当 goal 无法适配 deadline/capacity 时，必须显式设置 Plan.status = 'infeasible'。",
+      "tag": "失败显式化",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "`Plan.status = 'infeasible'` must be explicit when the goal cannot fit within deadline/capacity."
+        }
+      ]
+    },
+    {
+      "id": "S-109",
+      "statement": "重规划可创建新 plan version 或返回受控 change set，但必须保留历史事实。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "Replanning may create a new plan version or return a controlled change set, but it must preserve historical facts."
+        }
+      ]
+    },
+    {
+      "id": "S-110",
+      "statement": "后续普通调整不能在没有显式重新建立 feasibility 的情况下清除、升级或降级未解决的 adjustmentRisk；合并风险保留更严重级别。",
+      "tag": "状态约束",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "A later normal adjustment cannot clear, upgrade or downgrade an unresolved `adjustmentRisk` without explicitly re-establishing feasibility; combined risks keep the more severe level."
+        }
+      ]
+    },
+    {
+      "id": "S-111",
+      "statement": "AI 不得直接修改 storage 中已有 plan；service code 负责验证并应用结果。",
+      "tag": "权限边界",
+      "sources": [
+        {
+          "sectionRef": "§Plan",
+          "lines": "L315",
+          "quote": "AI must not directly mutate an existing plan in storage. Service code validates and applies results."
+        }
+      ]
+    },
+    {
+      "id": "S-112",
+      "statement": "Stage 是 plan 内的 long-range phase。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "`Stage` is a long-range phase within a plan."
+        }
+      ]
+    },
+    {
+      "id": "S-113",
+      "statement": "对于长于近-term task horizon 的 goals，Stage 回答用户当前经过哪个 phase，以及该 phase 应产生什么 outcome。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "It answers: for goals longer than the near-term task horizon, what phase is the user currently working through and what outcome should that phase produce."
+        }
+      ]
+    },
+    {
+      "id": "S-114",
+      "statement": "Pre-F41 StageStatus 枚举为 planned、active、completed、skipped。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "export type StageStatus = 'planned' | 'active' | 'completed' | 'skipped'"
+        }
+      ]
+    },
+    {
+      "id": "S-115",
+      "statement": "Pre-F41 Stage 字段包括 id、goalId、planId、title、startDate、endDate、status、order、createdAt、updatedAt。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "export interface Stage {\n  id: string\n  goalId: string\n  planId: string\n  title: string\n  startDate: string\n  endDate: string\n  status: StageStatus\n  order: number\n  createdAt: string\n  updatedAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-116",
+      "statement": "F40 目标 Stage 新增 purpose?、outcome?、scopeNotes?，由 F41 在 model layer 实现。",
+      "tag": "目标新增",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "export interface Stage {\n  id: string\n  goalId: string\n  planId: string\n  title: string\n  purpose?: string\n  outcome?: string\n  scopeNotes?: string\n  startDate: string\n  endDate: string\n  status: StageStatus\n  order: number\n  createdAt: string\n  updatedAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-117",
+      "statement": "F65 为 Stage 增加 estimatedMinutes?，表示整个 phase 或 workstream 的正整数粗粒度工作量估计。",
+      "tag": "扩展",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "`Stage.estimatedMinutes` is a positive-integer coarse workload estimate for the whole phase or workstream."
+        }
+      ]
+    },
+    {
+      "id": "S-118",
+      "statement": "Stage.estimatedMinutes 不要求等于当前已物化近-term Tasks 的总和。",
+      "tag": "语义澄清",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "It is not required to equal the sum of the currently materialized near-term Tasks."
+        }
+      ]
+    },
+    {
+      "id": "S-119",
+      "statement": "Stage 用于 long-range overview 与 refinement，不替代近-term Task。",
+      "tag": "职责边界",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "Stage is for long-range overview and refinement; it does not replace near-term `Task`."
+        }
+      ]
+    },
+    {
+      "id": "S-120",
+      "statement": "Stage completion 不会自动完成 Goal。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "Stage completion does not automatically complete the `Goal`."
+        }
+      ]
+    },
+    {
+      "id": "S-121",
+      "statement": "Stage completion 可触发对 future stages/tasks 的 replanning。",
+      "tag": "触发条件",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "Stage completion may trigger replanning for future stages/tasks."
+        }
+      ]
+    },
+    {
+      "id": "S-122",
+      "statement": "Stage date ranges 必须位于 parent plan date range 内。",
+      "tag": "范围约束",
+      "sources": [
+        {
+          "sectionRef": "§Stage",
+          "lines": "L407",
+          "quote": "Stage date ranges must stay within the parent plan date range."
+        }
+      ]
+    },
+    {
+      "id": "S-123",
+      "statement": "Task 是最小可执行 planning unit。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "`Task` is the smallest executable planning unit."
+        }
+      ]
+    },
+    {
+      "id": "S-124",
+      "statement": "Task 回答用户某具体日期应做什么、应花多长时间，以及最低可接受完成线是什么。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "It answers: what should the user do on a specific day, how long it should take, and what the minimum acceptable completion line is."
+        }
+      ]
+    },
+    {
+      "id": "S-125",
+      "statement": "Pre-F41 Task 实现形状同时包含 legacy date 与 target scheduledDate。",
+      "tag": "兼容",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Pre-F41 implemented shape includes legacy `date` and target `scheduledDate`"
+        }
+      ]
+    },
+    {
+      "id": "S-126",
+      "statement": "TaskType 枚举为 focus、support、buffer、review。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "export type TaskType = 'focus' | 'support' | 'buffer' | 'review'"
+        }
+      ]
+    },
+    {
+      "id": "S-127",
+      "statement": "TaskStatus 枚举为 todo、done、partial、skipped。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "export type TaskStatus = 'todo' | 'done' | 'partial' | 'skipped'"
+        }
+      ]
+    },
+    {
+      "id": "S-128",
+      "statement": "TaskPriority 枚举为 high、medium、low。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "export type TaskPriority = 'high' | 'medium' | 'low'"
+        }
+      ]
+    },
+    {
+      "id": "S-129",
+      "statement": "Pre-F41 Task 字段包括 id、goalId、planId?、stageId?、title、description?、date、scheduledDate、estimatedMinutes、priority、type?、status、minimumLine、focusSuggestion?、caution?、createdAt?、updatedAt?。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "export interface Task {\n  id: string\n  goalId: string\n  planId?: string\n  stageId?: string\n  title: string\n  description?: string\n  date: string\n  scheduledDate: string\n  estimatedMinutes: number\n  priority: TaskPriority\n  type?: TaskType\n  status: TaskStatus\n  minimumLine: string\n  focusSuggestion?: string\n  caution?: string\n  createdAt?: string\n  updatedAt?: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-130",
+      "statement": "F40 目标 Task 形状由 F41 strict Task validation 强制，要求 planId、type、createdAt、updatedAt 等，并包含 rescheduledFromDate?、rescheduledFromStatus?、rescheduleReason?。",
+      "tag": "目标新增",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "F40 target shape, enforced by strict Task validation in F41:\n\nexport interface Task {\n  id: string\n  goalId: string\n  planId: string\n  stageId?: string\n  title: string\n  description?: string\n  scheduledDate: string\n  estimatedMinutes: number\n  priority: TaskPriority\n  type: TaskType\n  status: TaskStatus\n  minimumLine: string\n  focusSuggestion?: string\n  caution?: string\n  rescheduledFromDate?: string\n  rescheduledFromStatus?: Extract<TaskStatus, 'partial' | 'skipped'>\n  rescheduleReason?: TaskRescheduleReason"
+        }
+      ]
+    },
+    {
+      "id": "S-131",
+      "statement": "F65 为 Task 增加 dependsOnTaskIds?。",
+      "tag": "扩展",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "export interface Task {\n  dependsOnTaskIds?: string[]\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-132",
+      "statement": "每个 dependency 必须引用同一 PlanBundle 中的 Task。",
+      "tag": "依赖约束",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Every dependency must reference a Task in the same PlanBundle."
+        }
+      ]
+    },
+    {
+      "id": "S-133",
+      "statement": "Self dependencies、duplicate references、missing references 与 cycles 均无效。",
+      "tag": "依赖约束",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Self dependencies, duplicate references, missing references, and cycles are invalid."
+        }
+      ]
+    },
+    {
+      "id": "S-134",
+      "statement": "仅当被引用 Task status 为 done 时，dependency 才算满足。",
+      "tag": "依赖判定",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "A dependency is satisfied only when the referenced Task status is `done`."
+        }
+      ]
+    },
+    {
+      "id": "S-135",
+      "statement": "todo、partial 与 skipped 的 dependencies 仍算未满足。",
+      "tag": "依赖判定",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "`todo`, `partial`, and `skipped` dependencies remain unmet."
+        }
+      ]
+    },
+    {
+      "id": "S-136",
+      "statement": "仅 schedule order 不构成 dependency。",
+      "tag": "依赖约束",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Schedule order alone is not a dependency."
+        }
+      ]
+    },
+    {
+      "id": "S-137",
+      "statement": "用户可以执行另一个 available Task，而不会因此使 Plan 无效。",
+      "tag": "权限边界",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Users may execute another available Task without invalidating the Plan."
+        }
+      ]
+    },
+    {
+      "id": "S-138",
+      "statement": "Task.id 必须稳定，且不得依赖 title。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "`Task.id` must be stable and must not depend on `title`."
+        }
+      ]
+    },
+    {
+      "id": "S-139",
+      "statement": "Task.scheduledDate 是目标执行日期。",
+      "tag": "语义",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "`Task.scheduledDate` is the target execution date."
+        }
+      ]
+    },
+    {
+      "id": "S-140",
+      "statement": "Task.date 仅作为 legacy 字段，不应约束新模型设计。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "`Task.date` is legacy only and should not constrain new model design."
+        }
+      ]
+    },
+    {
+      "id": "S-141",
+      "statement": "多个 tasks 可以共享同一个 scheduledDate。",
+      "tag": "约束",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Multiple tasks may share the same `scheduledDate`."
+        }
+      ]
+    },
+    {
+      "id": "S-142",
+      "statement": "estimatedMinutes 必须为正整数。",
+      "tag": "阈值",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "`estimatedMinutes` must be a positive integer."
+        }
+      ]
+    },
+    {
+      "id": "S-143",
+      "statement": "单日总 task minutes 不得超过 plan 的 dailyAvailableMinutes。",
+      "tag": "容量约束",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "The total task minutes for one day must not exceed the plan's `dailyAvailableMinutes`."
+        }
+      ]
+    },
+    {
+      "id": "S-144",
+      "statement": "minimumLine 必填且必须保持显式。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "`minimumLine` is required and must remain explicit."
+        }
+      ]
+    },
+    {
+      "id": "S-145",
+      "statement": "Task completion 不等于 goal completion。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Task completion does not equal goal completion."
+        }
+      ]
+    },
+    {
+      "id": "S-146",
+      "statement": "Task skip 不等于 goal cancellation。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§Task",
+          "lines": "L470",
+          "quote": "Task skip does not equal goal cancellation."
+        }
+      ]
+    },
+    {
+      "id": "S-147",
+      "statement": "F65 增加一个 pure selector，从 PlanBundle 派生 Task Card facts。",
+      "tag": "计算契约",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "F65 adds a pure selector that derives Task Card facts from a PlanBundle:"
+        }
+      ]
+    },
+    {
+      "id": "S-148",
+      "statement": "TaskCardAvailability 枚举为 available、locked、closed。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "export type TaskCardAvailability = 'available' | 'locked' | 'closed'"
+        }
+      ]
+    },
+    {
+      "id": "S-149",
+      "statement": "TaskCardView 形状包含 taskId、stageId?、availability、isRecommended、unmetDependencyTaskIds。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "export interface TaskCardView {\n  taskId: string\n  stageId?: string\n  availability: TaskCardAvailability\n  isRecommended: boolean\n  unmetDependencyTaskIds: string[]\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-150",
+      "statement": "done Tasks 为 closed。",
+      "tag": "状态判定",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "`done` Tasks are `closed`."
+        }
+      ]
+    },
+    {
+      "id": "S-151",
+      "statement": "有至少一个未完成显式 dependency 的未完成 Task 为 locked。",
+      "tag": "状态判定",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "An unfinished Task with at least one unfinished explicit dependency is `locked`."
+        }
+      ]
+    },
+    {
+      "id": "S-152",
+      "statement": "其他 todo、partial 与历史 skipped Tasks 为 available。",
+      "tag": "状态判定",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "Other `todo`, `partial`, and historical `skipped` Tasks are `available`."
+        }
+      ]
+    },
+    {
+      "id": "S-153",
+      "statement": "默认 candidate window 结束于 target date；callers 可为后续 task-selection features 显式扩大日期范围。",
+      "tag": "窗口",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "The default candidate window ends on the target date; callers may explicitly broaden the date range for later task-selection features."
+        }
+      ]
+    },
+    {
+      "id": "S-152b",
+      "statement": "当 caller 有意包含未来日期时，未来 schedule dates 不成为 hard locks。",
+      "tag": "窗口",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "Future schedule dates do not become hard locks when the caller deliberately includes them."
+        }
+      ]
+    },
+    {
+      "id": "S-153b",
+      "statement": "单一 recommendation 由 scheduledDate、priority、稳定 Task id 依次确定性决定。",
+      "tag": "推荐规则",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "The single recommendation is deterministic by `scheduledDate`, priority, then stable Task id."
+        }
+      ]
+    },
+    {
+      "id": "S-154",
+      "statement": "selector 不读取 storage、不调用 AI、不写入 recommendation facts、也不修改 PlanBundle。",
+      "tag": "纯函数",
+      "sources": [
+        {
+          "sectionRef": "§Task Card computed contract",
+          "lines": "L558",
+          "quote": "The selector does not read storage, call AI, write recommendation facts, or mutate the PlanBundle."
+        }
+      ]
+    },
+    {
+      "id": "S-155",
+      "statement": "Focus timing、task execution result 与 daily review 是分离的领域概念，即使 UI 后续把它们连到一个执行流中。",
+      "tag": "概念边界",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "Focus timing, task execution result and daily review are separate domain concepts even when a UI later connects them in one execution flow."
+        }
+      ]
+    },
+    {
+      "id": "S-156",
+      "statement": "FocusSession 回答一次具体 focus process 运行了多久。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "`FocusSession` answers: how long did one concrete focus process run."
+        }
+      ]
+    },
+    {
+      "id": "S-157",
+      "statement": "FocusSession 恰好属于一个 Goal/Plan/Task，并在开始时持久化。",
+      "tag": "归属",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "It belongs to exactly one Goal/Plan/Task, is persisted when started"
+        }
+      ]
+    },
+    {
+      "id": "S-158",
+      "statement": "FocusSession 状态机为 running -> paused -> running -> completed，cancelled 是终态替代。",
+      "tag": "状态迁移",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "has the state machine `running -> paused -> running -> completed` with `cancelled` as a terminal alternative."
+        }
+      ]
+    },
+    {
+      "id": "S-159",
+      "statement": "FocusSession wall-clock time 从 timestamps 恢复并 capped at target duration，因此 process absence 不依赖 live page interval。",
+      "tag": "时序",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "Wall-clock time is recovered from timestamps and capped at the target duration, so process absence does not depend on a live page interval."
+        }
+      ]
+    },
+    {
+      "id": "S-160",
+      "statement": "TaskResult 回答一个 Task 在执行期间实际发生了什么。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "`TaskResult` answers: what actually happened to one Task during execution."
+        }
+      ]
+    },
+    {
+      "id": "S-161",
+      "statement": "持久化 TaskResult 包含稳定 taskId、goalId、planId ownership 与 execution date。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "stable `taskId`, `goalId`, and `planId` ownership;\nexecution date;"
+        }
+      ]
+    },
+    {
+      "id": "S-162",
+      "statement": "TaskResult result status 为 done、partial 或 skipped。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "result status: `done`, `partial`, or `skipped`;"
+        }
+      ]
+    },
+    {
+      "id": "S-163",
+      "statement": "TaskResult 包含 unique completed FocusSession references、derived timed seconds 与 user-confirmed manual minutes。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "unique completed FocusSession references, derived timed seconds, and user-confirmed manual minutes;"
+        }
+      ]
+    },
+    {
+      "id": "S-164",
+      "statement": "TaskResult 包含 task effort rating，值为 lighter、expected 或 harder。",
+      "tag": "枚举",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "task effort rating (`lighter`, `expected`, or `harder`);"
+        }
+      ]
+    },
+    {
+      "id": "S-165",
+      "statement": "TaskResult 包含可选 task-scoped note 与 creation/update timestamps。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "an optional task-scoped note;\ncreation/update timestamps."
+        }
+      ]
+    },
+    {
+      "id": "S-166",
+      "statement": "TaskResult 包含可选 status-change timestamp，仅用于区分真实状态迁移与同状态保存重试；legacy records 回退到 creation time。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "an optional status-change timestamp used only to distinguish a real status transition from a same-status save retry; legacy records fall back to creation time."
+        }
+      ]
+    },
+    {
+      "id": "S-167",
+      "statement": "DailyReview 回答一天整体如何。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "`DailyReview` answers: what the day was like overall."
+        }
+      ]
+    },
+    {
+      "id": "S-168",
+      "statement": "DailyReview 拥有 day-scoped workload feedback 与可选 daily note，并可引用或汇总该日期记录的 Task results。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "It owns day-scoped information such as workload feedback and an optional daily note, and may reference or summarize the Task results recorded for that date."
+        }
+      ]
+    },
+    {
+      "id": "S-169",
+      "statement": "多任务日可有多个 Task results，但每个 Goal/date 只能有一个 DailyReview。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "A multi-task day may have many Task results but only one DailyReview per Goal/date."
+        }
+      ]
+    },
+    {
+      "id": "S-170",
+      "statement": "planId 存在时记录产生被审查结果的 Plan context，但不会为同一天创建第二个 Review slot。",
+      "tag": "归因",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "`planId`, when present, records the Plan context that produced the reviewed results; it does not create a second Review slot for the same day."
+        }
+      ]
+    },
+    {
+      "id": "S-171",
+      "statement": "当前模型把 task outcomes 嵌入 DailyReview.taskResults，并同时暴露 legacy completed/partial/skipped id arrays。",
+      "tag": "兼容边界",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "The current model embeds task outcomes in `DailyReview.taskResults` and also exposes the legacy completed/partial/skipped id arrays."
+        }
+      ]
+    },
+    {
+      "id": "S-172",
+      "statement": "单任务“记录进展”交互可通过一个 application service transaction 同时提交 Task result fields 与 DailyReview fields。",
+      "tag": "事务",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "The single-task “记录进展” interaction may submit Task result fields and DailyReview fields together through one application service transaction."
+        }
+      ]
+    },
+    {
+      "id": "S-173",
+      "statement": "该 UI 与事务便利不使 TaskResult 与 DailyReview 两个概念相同。",
+      "tag": "概念边界",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "This UI and transaction convenience does not make the two concepts identical."
+        }
+      ]
+    },
+    {
+      "id": "S-174",
+      "statement": "F61 引入 Goal-scoped 的专用 FocusSession[] 与 TaskResult[] storage，同时保留 embedded Review fields 以兼容。",
+      "tag": "迁移",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "F61 introduces dedicated Goal-scoped `FocusSession[]` and `TaskResult[]` storage while preserving the embedded Review fields for compatibility."
+        }
+      ]
+    },
+    {
+      "id": "S-175",
+      "statement": "focus timer/session 产生 task-scoped execution evidence，它本身不是 DailyReview。",
+      "tag": "概念边界",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "A focus timer/session produces task-scoped execution evidence; it is not itself a DailyReview."
+        }
+      ]
+    },
+    {
+      "id": "S-176",
+      "statement": "Task status 与实际投入 minutes 不得存为 day-level energy。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "Task status and actual invested minutes must not be stored as day-level energy."
+        }
+      ]
+    },
+    {
+      "id": "S-177",
+      "statement": "Daily energy 不得复制到每个 Task result，除非未来 feature 显式引入 task-scoped energy。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "Daily energy must not be copied onto every Task result unless a future feature explicitly introduces task-scoped energy."
+        }
+      ]
+    },
+    {
+      "id": "S-178",
+      "statement": "Replanning 可读取 FocusSession 与 TaskResult，但必须保留已提交 execution history。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "Replanning may read both concepts but must preserve committed execution history."
+        }
+      ]
+    },
+    {
+      "id": "S-179",
+      "statement": "TaskResult.status = skipped 表示“今日未完成”，并不取消 Task。",
+      "tag": "语义",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "`TaskResult.status = skipped` means “今日未完成”; it does not cancel the Task."
+        }
+      ]
+    },
+    {
+      "id": "S-180",
+      "statement": "保存 TaskResult 会通过一个 storage-orchestrated paired write with snapshot rollback 更新对应的当前 PlanBundle Task status。",
+      "tag": "事务",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "Saving a TaskResult updates the corresponding current PlanBundle Task status through one storage-orchestrated paired write with snapshot rollback."
+        }
+      ]
+    },
+    {
+      "id": "S-181",
+      "statement": "DailyReview 不是 FocusSession 或 TaskResult 保持为有效 execution facts 的必要条件。",
+      "tag": "依赖",
+      "sources": [
+        {
+          "sectionRef": "§FocusSession, TaskResult and DailyReview",
+          "lines": "L584",
+          "quote": "DailyReview is not required for either FocusSession or TaskResult to remain valid execution facts."
+        }
+      ]
+    },
+    {
+      "id": "S-182",
+      "statement": "TodayTaskSelection 回答用户决定在某个具体日期执行哪个已有 Task。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "`TodayTaskSelection` answers: which existing Task has the user decided to execute on one concrete date."
+        }
+      ]
+    },
+    {
+      "id": "S-183",
+      "statement": "TodayTaskSelection 形状包含 id、goalId、planId、date、taskId、source: 'ai_recommended' | 'user_selected'、selectedAt、updatedAt。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "export interface TodayTaskSelection {\n  id: string\n  goalId: string\n  planId: string\n  date: string\n  taskId: string\n  source: 'ai_recommended' | 'user_selected'\n  selectedAt: string\n  updatedAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-184",
+      "statement": "一个 Goal/Plan/date 至多有一个 selection。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "One Goal/Plan/date has at most one selection."
+        }
+      ]
+    },
+    {
+      "id": "S-185",
+      "statement": "Selection 引用 current active PlanBundle 中的一个 Task。",
+      "tag": "引用约束",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "A selection references a Task in the current active PlanBundle."
+        }
+      ]
+    },
+    {
+      "id": "S-186",
+      "statement": "Future Task 只能通过 bounded near-term candidate service 选择，且仅当其显式 dependencies 已满足。",
+      "tag": "前置条件",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "A future Task may be selected only through the bounded near-term candidate service and only when its explicit dependencies are satisfied."
+        }
+      ]
+    },
+    {
+      "id": "S-187",
+      "statement": "允许 Cross-Stage selection；Stage order 本身不是授权或锁。",
+      "tag": "权限边界",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "Cross-Stage selection is allowed; Stage order alone is not authorization or a lock."
+        }
+      ]
+    },
+    {
+      "id": "S-188",
+      "statement": "Selection 可授权在 Task.scheduledDate 之前执行，但绝不重写该日期。",
+      "tag": "权限边界",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "A selection can authorize execution before `Task.scheduledDate`, but never rewrites that date."
+        }
+      ]
+    },
+    {
+      "id": "S-189",
+      "statement": "FocusSession.date 与 TaskResult.date 存储真实执行日期。",
+      "tag": "语义",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "`FocusSession.date` and `TaskResult.date` store the real execution date."
+        }
+      ]
+    },
+    {
+      "id": "S-190",
+      "statement": "旧日期与旧 Plan 的 selections 仅保留为历史，不能授权不同的日期或当前 Plan。",
+      "tag": "历史边界",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "Old-date and old-Plan selections remain history and cannot authorize a different date or current Plan."
+        }
+      ]
+    },
+    {
+      "id": "S-191",
+      "statement": "Selection 不是 TaskResult、DailyReview、Replan，也不是 plan schedule 已改变的陈述。",
+      "tag": "概念边界",
+      "sources": [
+        {
+          "sectionRef": "§TodayTaskSelection",
+          "lines": "L624",
+          "quote": "A selection is not a TaskResult, DailyReview, Replan, or statement that the plan schedule changed."
+        }
+      ]
+    },
+    {
+      "id": "S-192",
+      "statement": "DailyReview 是 day-scoped execution history，回答一天实际发生了什么。",
+      "tag": "模型定义",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "`DailyReview` is day-scoped execution history.\n\nIt answers: what actually happened on a day."
+        }
+      ]
+    },
+    {
+      "id": "S-193",
+      "statement": "DailyReview 目标形状包含 id、goalId、planId、date、energy?、taskResults、note?、createdAt、updatedAt?、workloadRating?、taskResultIds?。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "export interface DailyReview {\n  id: string\n  goalId: string\n  planId: string\n  date: string\n  energy?: EnergyLevel\n  taskResults: Array<{\n    taskId: string\n    status: Extract<TaskStatus, 'done' | 'partial' | 'skipped'>\n  }>\n  note?: string\n  createdAt: string\n  updatedAt?: string\n  workloadRating?: 'light' | 'balanced' | 'heavy'\n  taskResultIds?: string[]\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-194",
+      "statement": "当前代码仍暴露 completedTaskIds、partialTaskIds 与 skippedTaskIds。",
+      "tag": "兼容",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "Current code still exposes `completedTaskIds`, `partialTaskIds`, and `skippedTaskIds`."
+        }
+      ]
+    },
+    {
+      "id": "S-195",
+      "statement": "这些 legacy arrays 可被规范化为 taskResults。",
+      "tag": "兼容",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "These legacy arrays may be normalized into `taskResults`."
+        }
+      ]
+    },
+    {
+      "id": "S-196",
+      "statement": "已有 energy 与 embedded taskResults 保持为 compatibility fields，直到单独 migration 移除。",
+      "tag": "兼容",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "Existing `energy` and embedded `taskResults` remain compatibility fields until a separate migration removes them."
+        }
+      ]
+    },
+    {
+      "id": "S-197",
+      "statement": "新的 workload-based Review 可省略 legacy energy；兼容视图可用 display fallback，但不得将该 fallback 持久化为用户事实。",
+      "tag": "兼容",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "A new workload-based Review may omit legacy `energy`; compatibility views may use a display fallback but must not persist that fallback as a user fact."
+        }
+      ]
+    },
+    {
+      "id": "S-198",
+      "statement": "DailyReview draft 可包含客观 TaskResult summaries，但不得虚构 workload feedback 或 note。",
+      "tag": "禁止推断",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "A DailyReview draft may contain objective TaskResult summaries but must not invent workload feedback or a note."
+        }
+      ]
+    },
+    {
+      "id": "S-199",
+      "statement": "DailyReview 是历史事实。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "DailyReview is historical fact."
+        }
+      ]
+    },
+    {
+      "id": "S-200",
+      "statement": "Replanning 可读取 DailyReview，但不得静默重写它。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "Replanning may read DailyReview but must not silently rewrite it."
+        }
+      ]
+    },
+    {
+      "id": "S-201",
+      "statement": "Review notes 是私有用户数据，默认不得被记录日志或上传。",
+      "tag": "隐私",
+      "sources": [
+        {
+          "sectionRef": "§DailyReview",
+          "lines": "L652",
+          "quote": "Review notes are private user data and must not be logged or uploaded by default."
+        }
+      ]
+    },
+    {
+      "id": "S-202",
+      "statement": "DailyReviewPromptDismissal 是 UI prompt history，不是 execution 或 review truth。",
+      "tag": "概念边界",
+      "sources": [
+        {
+          "sectionRef": "§DailyReviewPromptDismissal",
+          "lines": "L693",
+          "quote": "`DailyReviewPromptDismissal` is UI prompt history, not execution or review truth."
+        }
+      ]
+    },
+    {
+      "id": "S-203",
+      "statement": "DailyReviewPromptDismissal 形状包含 goalId、planId、executionDate、dismissedAt。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§DailyReviewPromptDismissal",
+          "lines": "L693",
+          "quote": "export interface DailyReviewPromptDismissal {\n  goalId: string\n  planId: string\n  executionDate: string\n  dismissedAt: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-204",
+      "statement": "一个 Goal/Plan/executionDate 至多有一个 dismissal。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§DailyReviewPromptDismissal",
+          "lines": "L693",
+          "quote": "One Goal/Plan/executionDate has at most one dismissal."
+        }
+      ]
+    },
+    {
+      "id": "S-205",
+      "statement": "Dismissal 表示用户显式跳过那个 Yesterday Summary prompt；不得创建空 DailyReview 或推断 workload/note。",
+      "tag": "语义",
+      "sources": [
+        {
+          "sectionRef": "§DailyReviewPromptDismissal",
+          "lines": "L693",
+          "quote": "A dismissal means the user explicitly skipped that Yesterday Summary prompt; it must not create an empty DailyReview or infer workload/note."
+        }
+      ]
+    },
+    {
+      "id": "S-206",
+      "statement": "Eligibility 限定为当前 Goal/当前 Plan 在 today 之前最近的 TaskResult date。",
+      "tag": "资格",
+      "sources": [
+        {
+          "sectionRef": "§DailyReviewPromptDismissal",
+          "lines": "L693",
+          "quote": "Eligibility is limited to the current Goal/current Plan's most recent TaskResult date before today."
+        }
+      ]
+    },
+    {
+      "id": "S-207",
+      "statement": "历史 dismissals 不能授权、编辑或抑制不同的 Goal/Plan/executionDate。",
+      "tag": "历史边界",
+      "sources": [
+        {
+          "sectionRef": "§DailyReviewPromptDismissal",
+          "lines": "L693",
+          "quote": "Historical dismissals cannot authorize, edit or suppress a different Goal/Plan/executionDate."
+        }
+      ]
+    },
+    {
+      "id": "S-208",
+      "statement": "Goal deletion 会移除 Goal-scoped dismissal collection。",
+      "tag": "级联",
+      "sources": [
+        {
+          "sectionRef": "§DailyReviewPromptDismissal",
+          "lines": "L693",
+          "quote": "Goal deletion removes the Goal-scoped dismissal collection."
+        }
+      ]
+    },
+    {
+      "id": "S-209",
+      "statement": "PlanChangeSummary 是解释一次 deterministic adjustment 的持久化 receipt，不是第二个 Plan truth source。",
+      "tag": "概念边界",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "`PlanChangeSummary` is a persisted receipt explaining one deterministic adjustment; it is not a second Plan truth source."
+        }
+      ]
+    },
+    {
+      "id": "S-210",
+      "statement": "PlanChangeSummary 形状包含 id、goalId、planId、triggerType、triggerId、triggerFingerprint、reason、completedEarlyTaskIds、movedTasks、retainedTaskIds、satisfiedTaskIds、deadlineImpact、message、createdAt、acknowledgedAt?。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "interface PlanChangeSummary {\n  id: string\n  goalId: string\n  planId: string\n  triggerType: 'task_result' | 'daily_review'\n  triggerId: string\n  triggerFingerprint: string\n  reason: 'progress_recorded' | 'workload_reviewed'\n  completedEarlyTaskIds: string[]\n  movedTasks: Array<{ taskId: string; fromDate: string; toDate: string }>\n  retainedTaskIds: string[]\n  satisfiedTaskIds: string[]\n  deadlineImpact: 'none' | 'risk' | 'infeasible'\n  message: string\n  createdAt: string\n  acknowledgedAt?: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-211",
+      "statement": "一个 Goal/Plan/trigger fingerprint 至多有一个 summary；重复重试返回已有 receipt，且不触发 replan。",
+      "tag": "幂等",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "One Goal/Plan/trigger fingerprint has at most one summary; a duplicate retry returns the existing receipt and does not replan."
+        }
+      ]
+    },
+    {
+      "id": "S-212",
+      "statement": "summary 引用稳定 Task ids 与 dates，但绝不复制私有 TaskResult/DailyReview notes。",
+      "tag": "隐私",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "The summary references stable Task ids and dates but never copies private TaskResult/DailyReview notes."
+        }
+      ]
+    },
+    {
+      "id": "S-213",
+      "statement": "satisfiedTaskIds 仍是 Plan history 中已完成的 Tasks；“satisfied”不表示物理删除。",
+      "tag": "语义",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "`satisfiedTaskIds` remain completed Tasks in Plan history; “satisfied” does not mean physical deletion."
+        }
+      ]
+    },
+    {
+      "id": "S-214",
+      "statement": "retainedTaskIds 显式保留未改变且未完成的工作，使其不能被静默丢失。",
+      "tag": "不变量",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "`retainedTaskIds` make unchanged unfinished work explicit so it cannot be silently lost."
+        }
+      ]
+    },
+    {
+      "id": "S-215",
+      "statement": "acknowledgedAt 表示用户消费了 Today notice；确认不会删除历史或改变 Plan facts。",
+      "tag": "语义",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "`acknowledgedAt` means the user consumed the Today notice. Acknowledgement does not delete history or change Plan facts."
+        }
+      ]
+    },
+    {
+      "id": "S-216",
+      "statement": "TaskResult trigger 只能调整其当前 Plan 的未完成工作。",
+      "tag": "权限边界",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "A TaskResult trigger may adjust only its current Plan's unfinished work."
+        }
+      ]
+    },
+    {
+      "id": "S-217",
+      "statement": "DailyReview trigger 只能使用显式 workload rating。",
+      "tag": "权限边界",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "A DailyReview trigger may use only the explicit workload rating."
+        }
+      ]
+    },
+    {
+      "id": "S-218",
+      "statement": "PlanBundle + summary persistence 是 atomic。",
+      "tag": "事务",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "PlanBundle + summary persistence is atomic."
+        }
+      ]
+    },
+    {
+      "id": "S-219",
+      "statement": "DailyReview-triggered persistence 额外将 Review 包含在同一 transaction 中。",
+      "tag": "事务",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "DailyReview-triggered persistence additionally includes the Review in the same transaction."
+        }
+      ]
+    },
+    {
+      "id": "S-220",
+      "statement": "Replanner 保持 pure 与 deterministic；storage/orchestration 属于 replanner.ts 之外的 services。",
+      "tag": "职责边界",
+      "sources": [
+        {
+          "sectionRef": "§PlanChangeSummary",
+          "lines": "L714",
+          "quote": "Replanner remains pure and deterministic; storage/orchestration belongs to services outside `replanner.ts`."
+        }
+      ]
+    },
+    {
+      "id": "S-221",
+      "statement": "DailyPlan[] 不属于未来核心领域模型。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "`DailyPlan[]` does not belong to the future core domain model."
+        }
+      ]
+    },
+    {
+      "id": "S-222",
+      "statement": "DailyPlan[] 当前角色是 legacy persisted daily plan shape。",
+      "tag": "当前角色",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "legacy persisted daily plan shape;"
+        }
+      ]
+    },
+    {
+      "id": "S-223",
+      "statement": "DailyPlan[] 当前是现有页面或旧数据的兼容读/写表面。",
+      "tag": "当前角色",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "compatibility read/write surface for existing pages or older data;"
+        }
+      ]
+    },
+    {
+      "id": "S-224",
+      "statement": "DailyPlan[] 在迁移未完成时作为 adapter input/output。",
+      "tag": "当前角色",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "adapter input/output while migration is incomplete."
+        }
+      ]
+    },
+    {
+      "id": "S-225",
+      "statement": "DailyPlan[] 未来角色是在 service 与 page consumers 不再需要后，由单独 breaking migration / repair feature 删除。",
+      "tag": "未来角色",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "deleted by a separate breaking migration / repair feature after service and page consumers no longer need it."
+        }
+      ]
+    },
+    {
+      "id": "S-226",
+      "statement": "F40 只记录删除方向。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "F40 records the deletion direction only."
+        }
+      ]
+    },
+    {
+      "id": "S-227",
+      "statement": "F40 不删除 DailyPlan[] code。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "F40 does not delete `DailyPlan[]` code."
+        }
+      ]
+    },
+    {
+      "id": "S-228",
+      "statement": "F40 不修改 daily-plans:{goalId} storage key。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "F40 does not change `daily-plans:{goalId}` storage key."
+        }
+      ]
+    },
+    {
+      "id": "S-229",
+      "statement": "F40 不修改 compatibility reads 或 adapters。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "F40 does not change compatibility reads or adapters."
+        }
+      ]
+    },
+    {
+      "id": "S-230",
+      "statement": "新 features 不得把 DailyPlan[] 扩展为 truth source。",
+      "tag": "禁止扩展",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "New features must not expand `DailyPlan[]` as a truth source."
+        }
+      ]
+    },
+    {
+      "id": "S-231",
+      "statement": "已知迁移风险之一是 models/plan.ts 仍定义 DailyPlan 与 adapter functions。",
+      "tag": "迁移风险",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "`models/plan.ts` still defines `DailyPlan` and adapter functions."
+        }
+      ]
+    },
+    {
+      "id": "S-232",
+      "statement": "已知迁移风险之一是 planner 仍有 legacy DailyPlan output paths。",
+      "tag": "迁移风险",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "planner still has legacy DailyPlan output paths."
+        }
+      ]
+    },
+    {
+      "id": "S-233",
+      "statement": "已知迁移风险之一是 storage 仍读取/写入 daily-plans:{goalId}。",
+      "tag": "迁移风险",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "storage still reads/writes `daily-plans:{goalId}`."
+        }
+      ]
+    },
+    {
+      "id": "S-234",
+      "statement": "已知迁移风险之一是 plan-view 与部分页面仍消费 DailyPlan-compatible APIs。",
+      "tag": "迁移风险",
+      "sources": [
+        {
+          "sectionRef": "§DailyPlan legacy boundary",
+          "lines": "L751",
+          "quote": "plan-view and some pages still consume DailyPlan-compatible APIs."
+        }
+      ]
+    },
+    {
+      "id": "S-235",
+      "statement": "Computed views 不是 persistent truth。",
+      "tag": "分层",
+      "sources": [
+        {
+          "sectionRef": "§Computed views",
+          "lines": "L780",
+          "quote": "Computed views are not persistent truth."
+        }
+      ]
+    },
+    {
+      "id": "S-236",
+      "statement": "DailyTaskView 形状包含 date、goalId、planId、tasks、totalEstimatedMinutes、statusSummary。",
+      "tag": "数据结构",
+      "sources": [
+        {
+          "sectionRef": "§Computed views",
+          "lines": "L780",
+          "quote": "export interface DailyTaskView {\n  date: string\n  goalId: string\n  planId: string\n  tasks: Task[]\n  totalEstimatedMinutes: number\n  statusSummary: string\n}"
+        }
+      ]
+    },
+    {
+      "id": "S-237",
+      "statement": "Page-facing data 应由 services/selectors 从 PlanBundle、DailyReview 与 UserProfile 生成。",
+      "tag": "消费边界",
+      "sources": [
+        {
+          "sectionRef": "§Computed views",
+          "lines": "L780",
+          "quote": "Page-facing data should be generated by services/selectors from `PlanBundle`, `DailyReview`, and `UserProfile`."
+        }
+      ]
+    },
+    {
+      "id": "S-238",
+      "statement": "Pages 不得从 raw storage 直接组装 long-term plan state。",
+      "tag": "禁止行为",
+      "sources": [
+        {
+          "sectionRef": "§Computed views",
+          "lines": "L780",
+          "quote": "Pages must not directly assemble long-term plan state from raw storage."
+        }
+      ]
+    },
+    {
+      "id": "S-239",
+      "statement": "Today suggestions 可改变 display priority 或 copy，但不改变 core plan facts。",
+      "tag": "边界",
+      "sources": [
+        {
+          "sectionRef": "§Computed views",
+          "lines": "L780",
+          "quote": "Today suggestions may alter display priority or copy, not core plan facts."
+        }
+      ]
+    },
+    {
+      "id": "S-240",
+      "statement": "F40 之后的 migration path 应拆分为后续 features。",
+      "tag": "迁移方向",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "The migration path after F40 should be split into later features:"
+        }
+      ]
+    },
+    {
+      "id": "S-241",
+      "statement": "迁移步骤 1：为 Goal、Plan、Stage、Task 扩展 F40 target fields 的 model code。",
+      "tag": "迁移步骤",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "Extend model code for F40 target fields on `Goal`, `Plan`, `Stage`, and `Task`."
+        }
+      ]
+    },
+    {
+      "id": "S-242",
+      "statement": "迁移步骤 2：从 InitialPlanContext 定义 DeepSeek initial planner input/output schemas。",
+      "tag": "迁移步骤",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "Define DeepSeek initial planner input/output schemas from `InitialPlanContext`."
+        }
+      ]
+    },
+    {
+      "id": "S-243",
+      "statement": "迁移步骤 3：从 ReplanContext 定义 replanner input/output schemas。",
+      "tag": "迁移步骤",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "Define replanner input/output schemas from `ReplanContext`."
+        }
+      ]
+    },
+    {
+      "id": "S-244",
+      "statement": "迁移步骤 4：更新 deterministic planner，使其作为 fallback 产出更丰富的 PlanBundle。",
+      "tag": "迁移步骤",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "Update deterministic planner to produce richer `PlanBundle` as fallback."
+        }
+      ]
+    },
+    {
+      "id": "S-245",
+      "statement": "迁移步骤 5：将 service/view/page 对 DailyPlan[] 的依赖替换为 PlanBundle-derived views。",
+      "tag": "迁移步骤",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "Replace service/view/page dependencies on `DailyPlan[]` with `PlanBundle`-derived views."
+        }
+      ]
+    },
+    {
+      "id": "S-246",
+      "statement": "迁移步骤 6：在 consumers 迁移后，增加 breaking migration / repair feature 以移除 DailyPlan[] 与旧 storage key。",
+      "tag": "迁移步骤",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "Add a breaking migration / repair feature to remove `DailyPlan[]` and old storage key after consumers are migrated."
+        }
+      ]
+    },
+    {
+      "id": "S-247",
+      "statement": "这些后续步骤不得被视为 F40 的一部分。",
+      "tag": "非目标",
+      "sources": [
+        {
+          "sectionRef": "§Migration direction",
+          "lines": "L803",
+          "quote": "Do not treat these later steps as part of F40."
+        }
+      ]
+    },
+    {
+      "id": "S-248",
+      "statement": "F16 为 Task 增加可选 reschedule tracking fields：rescheduledFromDate、rescheduledFromStatus、rescheduleReason。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-05-26 F16",
+          "lines": "L818",
+          "quote": "Task added optional reschedule tracking fields: `rescheduledFromDate`, `rescheduledFromStatus`, `rescheduleReason`."
+        }
+      ]
+    },
+    {
+      "id": "S-249",
+      "statement": "Partial/skipped follow-up 通过更新同一 task 的 scheduledDate 表示；历史事实保留在 DailyReview.taskResults。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-05-26 F16",
+          "lines": "L818",
+          "quote": "Partial/skipped follow-up is represented by updating the same task's `scheduledDate`; historical facts remain in `DailyReview.taskResults`."
+        }
+      ]
+    },
+    {
+      "id": "S-250",
+      "statement": "F39 在 compatibility normalizers 之外增加了 strict model validation functions。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-06-26 F39",
+          "lines": "L823",
+          "quote": "F39 added strict model validation functions alongside compatibility normalizers."
+        }
+      ]
+    },
+    {
+      "id": "S-251",
+      "statement": "F39 没有回答模型在规划语义上是否足够。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-06-26 F39",
+          "lines": "L823",
+          "quote": "F39 did not answer whether the model was semantically sufficient for planning."
+        }
+      ]
+    },
+    {
+      "id": "S-252",
+      "statement": "F40 对 future model and migration direction 取代 F39 的窄 validation focus。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-06-26 F39",
+          "lines": "L823",
+          "quote": "F40 supersedes F39's narrow validation focus for future model and migration direction."
+        }
+      ]
+    },
+    {
+      "id": "S-253",
+      "statement": "F41 后 Goal、Plan、Stage、Task validation 与 normalization 已在 pure model layer 覆盖 F40 target additions。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-06-27 F41",
+          "lines": "L829",
+          "quote": "Goal, Plan, Stage, Task validation and normalization now cover the F40 target additions in the pure model layer."
+        }
+      ]
+    },
+    {
+      "id": "S-254",
+      "statement": "InitialPlanContext、ReplanContext、ReplanReason 与 UserPlanFeedback 已作为 model-layer runtime input types 存在。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-06-27 F41",
+          "lines": "L829",
+          "quote": "`InitialPlanContext`, `ReplanContext`, `ReplanReason`, and `UserPlanFeedback` now exist as model-layer runtime input types."
+        }
+      ]
+    },
+    {
+      "id": "S-255",
+      "statement": "F41 后 DailyPlan[]、Task.date、legacy review id arrays、storage keys 与 compatibility adapters 仍保留。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-06-27 F41",
+          "lines": "L829",
+          "quote": "`DailyPlan[]`, `Task.date`, legacy review id arrays, storage keys, and compatibility adapters remain in place."
+        }
+      ]
+    },
+    {
+      "id": "S-256",
+      "statement": "F56 将 Goal.taskType 实现为 optional model field，用于 preview-first goal creation。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-07-03 F56",
+          "lines": "L835",
+          "quote": "`Goal.taskType` is implemented as an optional model field for preview-first goal creation."
+        }
+      ]
+    },
+    {
+      "id": "S-257",
+      "statement": "F56 creation UI 要求 taskType、successCriteria、startingPoint，但旧存储 goals 没有它们仍有效。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-07-03 F56",
+          "lines": "L835",
+          "quote": "F56 creation UI requires `taskType`, `successCriteria`, and `startingPoint`, but old stored goals remain valid without them."
+        }
+      ]
+    },
+    {
+      "id": "S-258",
+      "statement": "Initial plan preview candidates 是瞬态 service/session data，不是 persistent truth，且在确认前不得影响 Today 或 Calendar。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-07-03 F56",
+          "lines": "L835",
+          "quote": "Initial plan preview candidates are transient service/session data. They are not persistent truth and must not affect Today or Calendar before confirmation."
+        }
+      ]
+    },
+    {
+      "id": "S-259",
+      "statement": "F58 后首个 creation screen 只要求 goal wording、deadline 与 daily planning budget。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-07-09 F58",
+          "lines": "L841",
+          "quote": "The first creation screen now requires only goal wording, deadline, and daily planning budget."
+        }
+      ]
+    },
+    {
+      "id": "S-260",
+      "statement": "Intent questions、answers 与 assumptions 是瞬态 planner input，不是 persistent domain truth。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-07-09 F58",
+          "lines": "L841",
+          "quote": "Intent questions, answers, and assumptions are transient planner input, not persistent domain truth."
+        }
+      ]
+    },
+    {
+      "id": "S-261",
+      "statement": "已确认 answers 可在 preview generation 前丰富临时 Goal candidate。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-07-09 F58",
+          "lines": "L841",
+          "quote": "Confirmed answers may enrich the temporary Goal candidate before preview generation."
+        }
+      ]
+    },
+    {
+      "id": "S-262",
+      "statement": "当前正式确认路径写入 Goal、UserProfile 与 PlanBundle；它不再输出新的 legacy daily-plan copy。",
+      "tag": "历史",
+      "sources": [
+        {
+          "sectionRef": "§2026-07-09 F58",
+          "lines": "L841",
+          "quote": "The current formal confirmation path writes `Goal`, `UserProfile`, and `PlanBundle`; it no longer emits a new legacy daily-plan copy."
+        }
+      ]
+    }
+  ]
+}
