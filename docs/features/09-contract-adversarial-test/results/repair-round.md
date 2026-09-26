@@ -19,7 +19,7 @@
 | R6 | `W4` → INFO；新增「关系缺口密度」聚合 Warning；明细挪到 detail 段 | ✅ 已执行 | `I6` · `W8`（公式见下） |
 | R7 | 登记 Structured Constraint Gap，不阻塞 Gate | ✅ 已执行 | `framework-map-contract.md` §5.4 |
 | R8 | 更新 Gate | ✅ 已执行 | `Gate = PASS` |
-| R9 | Feature 07 保持 Blocked | ✅ 未动 | — |
+| R9 | 修复轮内不动 Feature 07 | ✅ 修复轮内未动；**关闭裁决后 07 → Ready**（见 §7） | — |
 
 **明确没做的事**（本轮范围外）：第 7 类 element · 一批新关系动词 · `constraint` 参数 DSL · 主轴规则 · 泳道 · 改 `12` 预算 · Feature 07。
 
@@ -162,3 +162,69 @@ Mutation    14/14 = 100%
 ## 6. 一句话
 
 > **修复的不是"规则太松"，而是三处"看的地方不对"：parser 看错标题层、关系只看动词不看结构属性、告警把单点形态当缺陷。**
+
+---
+
+## 7. 关闭裁决（用户确认，Feature 09 = Closed）
+
+用户复核修复轮后给出裁决：**F09 可以正式结束；Feature 07 解除 Blocked。**
+
+### 7.1 三条边界判断被确认
+
+| # | 判断 | 裁决 | 理由（用户原话要点） |
+|---|---|---|---|
+| 1 | `relationGap` 保留 2，不追求归零 | ✅ 正确 | 剩余 2 条本质不是"缺少一个关系动词"，而是**关系上的不变量**（一组 `depends-on` 边整体必须无环 / 某字段值落在关联对象定义的区间内）。追求 `relationGap = 0` 必然走向 `acyclic-depends-on` / `date-within` / `at-most-one-per-key` 这种**关系词爆炸** |
+| 2 | "每 Goal/date 至多一条 DailyReview"不进 `relationGap` | ✅ 正确 | 它约束的是**实体集合在复合键上的 cardinality invariant**，不是两元素间缺了一种关系；造 `DailyReview ──???──> DailyReview` 自环反而误导 L0 图。正式归 **Structured Constraint Gap**；`constraint.qualifiers` / `uniqueBy` / `scope` / `predicate` / `threshold` **现在不要提前做** |
+| 3 | `W8` 不为 D 触发（0.40 / 0.15 都不触发） | ✅ 正确 | `W8` 的目标不是"发现几个 relationGap"（`W5` 已负责），而是表达"**这张图整体上有相当大比例的关系无法被当前 relation model 表达**"。D 修完 qualifiers 后明显不属于"整体关系模型失效" → **不要为了 D 触发它去调阈值** |
+
+### 7.2 由此冻结的 Contract 原则（写 AI prompt 时逐字带上）
+
+> **Edge 描述基础关系，qualifier 描述关系结构属性，constraint 描述不能自然还原为一条边属性的业务不变量。**
+> **不要为了消灭 gap，把约束塞进 relation vocabulary。**
+
+已写入 `docs/framework-map-contract.md` **§0**。理由：否则 AI 很容易"为了通过 validator"把 `Task dependency must be acyclic` 发明成某种 edge type。
+
+**对 F07 的直接后果（要盯的失败模式）：** schema 的 `type` 是封闭 enum，表外词 = HARD，所以 AI 发明不出新词；它只能**误用**已有动词（把"引用"写成 `contains`、把一切塞进 `relates-to`）。这是 F07 的观察点，**不是** Contract 需要继续加词的理由。
+
+### 7.3 另外两条被确认的纪律
+
+| 议题 | 裁决 |
+|---|---|
+| **Parser 的容忍度 ≠ 正确性** | ✅ 值得长期保留。"看到 `#` 就当标题"表面更通用，却把 fenced code 里的 `# expected output` 认成文档结构。正确方向是 Markdown syntax-aware + fence-aware + hierarchy-aware；**不要用文本 regex 假装自己在解析 Markdown**。对 table / code block / JSON example / Mermaid / quoted Markdown 同样适用 → 已写入契约 §10.1 |
+| **B / C 没有重表达** | ✅ 处理正确。**不能因为 Contract 已具备 `contains + ownership`，就回头在结果里说"所以 B/C 的旧 relationGap 已解决"。** 正确说法是"机制上可能已能表达，但原 candidate map 尚未按新 Contract 重表达，因此不能算实测关闭"。→ 列为单独一轮 `F06 contract migration regression`，不阻塞任何 feature |
+
+### 7.4 `contains ≠ references`
+
+`contains` 放宽到 structural containment / composition 后，**唯一要守住的是 `contains ≠ references`**：
+
+```text
+Goal → UserProfile（只是引用）
+    → relates-to + ownership: shared / reference      ✅
+    → contains                                        ❌
+```
+
+如果将来 `relates-to` 的使用量越来越大，才值得重新审视"是否缺少一个非常基础的 references relation"。**现在不要因为 Fixture C 那个 follow-up 顺手加。**
+
+### 7.5 状态变更
+
+```text
+Feature 09  = Completed / Closed（Gate = PASS）
+Feature 07  = Ready（已解除 Blocked）
+Contract    = v1 定稿，可进入 AI 生成阶段
+```
+
+**下一阶段的重点已改变：**
+
+```text
+过去（F03~F09）：我们设计的表示模型对不对？
+接下来（F07）：  AI 能不能稳定地从任意技术文档生成这个表示模型？
+```
+
+> **继续打磨 Contract 的边际收益已经开始下降** —— 下一批真正有价值的信息来自 **AI generation 的稳定性测试**，而不是再多找一篇人工 candidate map。
+
+### 7.6 本轮不动的两个 feature
+
+```text
+Feature 07  状态改为 Ready，但**本轮不开始实现**（任务书尚待下发）
+Feature 08  保持 Blocked（未被本轮裁决涉及）
+```

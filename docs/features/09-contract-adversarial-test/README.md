@@ -2,7 +2,9 @@
 
 > **位置**：流程上位于 **Feature 06 之后、Feature 07 之前**。
 > `09` 只是创建顺序编号，不代表它排在 07 / 08 之后。
-> **Feature 07（生成链路）在本 feature 通过之前不应开始。**
+>
+> ✅ **状态：Completed / Closed（Gate = PASS，2026-09-26）**
+> **Feature 07（生成链路）已由本 feature 的 Gate 解冻 → `Ready`。**（裁决见 `results/repair-round.md` §7）
 
 ---
 
@@ -408,7 +410,8 @@ R8  Gate 更新为 PASS
 
 **修复前那两件"需先修的事"**：① 已修（parser）；② 已裁决并执行 **(b) 可选字段**版本（不是新增关系词）。
 
-**⚠️ Feature 07 仍保持 Blocked** —— 本轮**没有**为它解冻（它是生成链路，与本次修复的范围不同）。
+**⚠️ Feature 07 已解除 Blocked → `Ready`** —— 本 feature（09）的 Gate = PASS 就是它原来的开闸条件。
+（本轮修复的范围仍然不含生成链路本身；解冻是用户基于 Gate 结论的裁决。）
 
 **四条条件**：Semantic gap = 0 ✅ · Relation gap 可控 ❌（D 6 条）· Capacity 只是 heuristic ✅ · Validator 无明显误报 ⚠️（FP = 0，但有 1 处已确证覆盖缺口）
 
@@ -419,7 +422,8 @@ R8  Gate 更新为 PASS
 1. **扩展小节解析器**：`## <任意标题>` 都应被识别为小节锚点 → 修完 D 的 `N2/N3` 才能跑，M8 才能对 D 生效
 2. **决定对实体网络的词汇表回应**：(a) 接受 `relationGap` 为设计内逃逸口并把"实体网络会欠表达关系"写成已知限制；或 (b) 给 `edges[]` 增加**可选**基数/归属字段（不新增关系词）。**倾向 (b)，但属 Contract 改动，待裁决**
 
-**⚠️ Feature 07 仍保持 Blocked** —— 注意：修复轮已经把这两件修完并复测 D，**但 Feature 07 的解冻不由本轮决定**（它是生成链路，属另一条线）。
+**⚠️ Feature 07：已解除 Blocked → `Ready`** —— 上面两件已修完并复测 D，且用户裁决 `F09 = Closed / Gate = PASS`。
+（下一阶段的重点已从"表示模型对不对"转为"AI 能不能稳定生成它"，见 `results/repair-round.md` §7。）
 
 ### 交付物
 
@@ -433,16 +437,53 @@ results/repair-round.md                             ★ 修复轮执行记录（
 results/verification-output.txt · mutation-output.txt
 ```
 
-### 留到下一轮（Phase 2c / Feature 09 v2）再讨论的问题
+### 关闭（Feature 09 = Completed / Closed）
 
-- 本轮已把"代理指标"与"测试目标"分开（§3.0 的两句话）。下一轮可继续追问：
-  多实体关系网络的**难度分级**（几种 cardinality 才算够难？），以及 runbook 的**有界失败形态**是否需要更细的分类（retry-bound vs lease-expiry vs circuit-break）。
+**关闭依据（用户裁决）：**
+
+```text
+A / B / C / D / E      五篇 HARD = 0 · 全部 PASS
+Mutation               14/14 可检测项全部拦截
+Semantic gap           0
+Navigation coverage    D / E 均真正执行，不再 SKIPPED
+ER-heavy relation      通过 qualifiers 从 6 gaps 降至 2 structured constraints
+Capacity               13 elements 仅 Warning，没有被硬卡
+Topology               chain / DAG / star-DAG 均可表达
+```
+
+**结论的确切含义：**
+
+```text
+✅ 支持   Framework Map Contract v1 可以进入下一阶段（AI 自动生成）
+❌ 不意味着 ontology 永远不会变
+```
+
+**三条被确认的边界判断（F09 关闭时冻结）：**
+
+| 判断 | 裁决 |
+|---|---|
+| `relationGap` 保留 2（不追求归零） | ✅ 正确。剩余 2 条是**关系上的不变量**，不是 relation vocabulary gap |
+| "每 Goal/date 至多一条 DailyReview"不进 `relationGap` | ✅ 正确。它约束的是**复合键上的 cardinality invariant**，正式归 **Structured Constraint Gap**；造 `DailyReview ──???──> DailyReview` 自环会误导 L0 图 |
+| `W8` 不为 D 触发 | ✅ 正确。`W8` 表达的是"整体关系模型可能失效"，不是"发现了几条 gap"（那是 `W5`）；**不为触发它调阈值** |
+
+**并且解冻 Feature 07：`07 = Ready`**（原本的阻塞原因就是等待本 feature 的 Gate）。
+
+### 关闭时记录、留给后续的问题（不阻塞任何东西）
+
+- **F06 contract migration regression（可选，单独一轮）**：A / B / C 的 candidate map 按最新 Contract 重表达。
+  注意纪律：**"机制上已能表达"不等于"实测关闭"** —— 典型例子是 Fixture C 的"持有 / 存储"。
+- 多实体关系网络的**难度分级**（几种 cardinality 才算够难？），以及 runbook 的**有界失败形态**是否需要更细的分类（retry-bound vs lease-expiry vs circuit-break）。
+- 语义验收标准的重写（现用 1:1 语义 proxy 度量）。
 
 ### 本轮方法学案例（建议长期保留）
 
 > **Selection criteria can fail because the corpus does not contain the phenomenon being tested.**
 > This is not evidence that the criterion is wrong,
 > and it is not permission to relax the criterion post hoc.
+
+> **Parser 的容忍度 ≠ Parser 的正确性。**
+> "看到 `#` 就当标题"表面更通用，却把 fenced code 里的 `# expected output` 认成了文档结构。
+> 不要用文本 regex 假装自己在解析 Markdown。（详见 `docs/framework-map-contract.md` §10.1）
 
 以及它的**正确收尾方式**：
 

@@ -61,10 +61,10 @@ XX-feature-name/
 | 03 | hierarchical-architecture | Completed（架构规格） | DSH agent | 用户 | 2026-09-26 |
 | 04 | l0-framework-map | Technical Pass / UX Validation Pending | DSH agent | 用户 | - |
 | 05 | l0-generalization-gate | Executed（Gate = PASS，待验收） | DSH agent | 用户 | - |
-| 06 | contract-and-validators | Executed（待验收） | DSH agent | 用户 | - |
-| 07 | generation-pipeline | Blocked（等 09 的 Gate） | TBD | TBD | - |
+| 06 | contract-and-validators | Executed（待验收；含 F09 修复：H8/W7/W8、W4→I6、heading tree） | DSH agent | 用户 | - |
+| 07 | generation-pipeline | **Ready**（09 Gate = PASS → 已解除 Blocked） | TBD | TBD | - |
 | 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |
-| 09 | contract-adversarial-test | Executed（Gate = PARTIAL PASS，待验收） | DSH agent | 用户 | - |
+| 09 | contract-adversarial-test | **Completed / Closed**（Gate = PASS） | DSH agent | 用户 | 2026-09-26 |
 
 ## 创建新 Feature
 

@@ -10,8 +10,36 @@
 > "文档没有声明依赖，就不要为了图漂亮强行串链"
 > ```
 
+## 0. ❄️ 已冻结的核心原则（写 AI prompt 时逐字带上）
+
+> **Edge 描述基础关系，qualifier 描述关系结构属性，constraint 描述不能自然还原为一条边属性的业务不变量。**
+> **不要为了消灭 gap，把约束塞进 relation vocabulary。**
+
+**为什么必须冻结（F09 关闭时的裁决）：** 只要"消灭 gap"成为目标，词表一定会长成这样 ——
+
+```text
+acyclic-depends-on / date-within / at-most-one-per-key / ...
+```
+
+也就是把**业务不变量**伪装成**关系类型**。这类词无法泛化到下一篇文档，且会让 `check-map` 的封闭词表失效。
+
+**由此推出的三条操作性规则：**
+
+```text
+1. 不追求 relationGap = 0。
+   relationGap 只用于「基础关系本身无法忠实表达」的情况；
+   复杂 invariant **不要求**被 edge 吞掉。
+2. 复杂 invariant 的分层：
+   成对锚定的（无环、区间包含）→ 可留在 relationGap；
+   单实体槽位唯一性（uniqueBy 复合键）→ 只登记为 Structured Constraint Gap（§5.4）。
+3. 无环性、区间包含、条件唯一不是 relation vocabulary gap，
+   它们是 relation / entity 上的不变量。
+```
+
+**⚠️ 对 AI 生成链路（Feature 07）的直接后果：** AI 为了通过 validator 而发明 edge type 的第一反应必须被堵死 —— schema 的 `type` 是封闭 enum（表外词 = HARD），所以它只能**误用**已有动词（例如把"引用"写成 `contains`、把一切塞进 `relates-to`）。这是 F07 要盯的主要失败模式，**不是** Contract 需要继续加词。
+
 规格来源：`docs/features/03-hierarchical-architecture/README.md`（架构文档）
-验证来源：`docs/features/04-l0-framework-map/`（Fixture A）· `docs/features/05-l0-generalization-gate/`（A / B / C）
+验证来源：`docs/features/04-l0-framework-map/`（Fixture A）· `docs/features/05-l0-generalization-gate/`（A / B / C）· `docs/features/09-contract-adversarial-test/`（D / E，Gate = PASS）
 
 ---
 
@@ -198,12 +226,23 @@ relationGapCount / (relationGapCount + edges.length) ≥ 0.5   且   relationGap
 
 这比允许 `type: "custom"` 健康得多 —— 后者等于悄悄把词表废掉。它既保持 vocabulary 封闭，又**不逼 AI 用错误的词硬套**。
 
+**`relationGap` 的适用范围（冻结）：** 它只用于**基础关系本身无法忠实表达**的情况。**不追求 `relationGap = 0`** —— 复杂 invariant 不要求被 edge 吞掉（§0）。
+
+**`W8` 的定位（冻结）：** 它表达的不是"发现了几条 gap"（那是 `W5` 的职责），而是「**这张图整体上有相当大比例的关系无法被当前 relation model 表达，Contract 的表达能力可能存在系统性问题**」。
+
+```text
+不触发 W8  ≠  "没有缺口"
+不触发 W8  =  "缺口是个别现象，不是关系模型整体失效"
+```
+
+**所以不要为了让某个 Fixture 触发 `W8` 去调阈值。** Fixture D 修复前 0.40、修复后 0.15 —— 两次都不触发，两次都是**正确**结果：它本来就有相当多关系能被正常表达，不属于"整体失效"。
+
 **已登记的关系缺口：**
 
 | 关系 | 出现处 | 为什么 `type + qualifiers` 表达不了 |
 |---|---|---|
 | 跨语言一致性 | Fixture B | `depends-on` 只表示依赖，表达不了"必须一致" |
-| 持有 / 存储 | Fixture C | §5.2 放宽 `contains` 后**已可表达**（`contains` + `ownership: owned`）；B / C 的 map 尚未重表达（本轮范围只到 D）→ 列为 follow-up，不静默当作仍缺 |
+| 持有 / 存储 | Fixture C | §5.2 放宽 `contains` 后**机制上已可表达**（`contains` + `ownership: owned`）；**但原 candidate map 尚未按新 Contract 重表达 → 不能算实测关闭**。列为 follow-up（§11），不静默当作已解决 |
 | 通过 / 放行 | Fixture C | `validates` 只表达"谁校验谁"，缺"通过"语义 |
 | Task 依赖图无环 + 满足条件 | Fixture D（重表达后保留） | 基本关系（`depends-on`，两端 zero-or-many）已能表达；缺的是**关系自身的图级不变量** |
 | Stage 区间包含 `scheduledDate` | Fixture D（重表达后保留） | 归属已由 `contains + owned + one/one-or-many` 表达；缺的是**跨实体区间包含不变量** |
@@ -211,6 +250,18 @@ relationGapCount / (relationGapCount + edges.length) ≥ 0.5   且   relationGap
 ### 5.4 Structured Constraint Gap（已登记，不阻塞 Gate）
 
 第 3 层（`constraint`）目前**只有元素位置，没有参数表达面** —— `schema` 里没有 `constraint.parameters`，所以"无环""区间包含""条件唯一"这类不变量只能说成一句话，不能结构化。
+
+**分流规则（F09 关闭时冻结）：**
+
+```text
+成对锚定的不变量（涉及两个元素的相对定位）
+    → 可以留在 relationGap
+      例：Task 依赖无环（Task—Task）· scheduledDate 落在 Stage 区间（Stage—Task）
+
+单实体槽位唯一性（约束的是实体集合在复合键上的 cardinality）
+    → 只登记为 Structured Constraint Gap，**不进 relationGap**
+      例：(goalId, date) 唯一 / 每 fingerprint 至多一条
+```
 
 **登记项（Fixture D 暴露，Feature 09 记录）：**
 
@@ -220,9 +271,19 @@ relationGapCount / (relationGapCount + edges.length) ≥ 0.5   且   relationGap
 | 跨实体区间包含 | `Task.scheduledDate ∈ Stage.[startDate, endDate]` | 留在 `relationGap`（成对锚定） |
 | 条件唯一（单实体槽位） | 每 Goal/date 至多一条 `DailyReview`（L605）；每 Goal/Plan/date 至多一条选择（L643）；每 Goal/Plan/date 至多一条 dismissal（L708）；每 fingerprint 至多一条 summary（L742）；同一时刻至多一条 active Plan（L262） | **仅登记**：槽位唯一性不是"两个元素之间的关系"，塞进 `relationGap` 会把它变成杂物袋 |
 
-**为什么条件唯一不进 `relationGap`：** `relationGap` 的形状是"两个元素之间的一条关系"，而"每 Goal/date 至多一条 DailyReview"约束的是**单个实体的槽位键**。为它造一条自环边只会污染关系层。
+**为什么条件唯一不进 `relationGap`（F09 关闭时的裁决）：** `relationGap` 的形状是"两个元素之间的一条关系"，而"每 Goal/date 至多一条 DailyReview"约束的是**单个实体的槽位键**。为它造一条 `DailyReview ──???──> DailyReview` 自环边只会**误导 L0 图**。
 
-**这是记录，不是放行：** 它说明"关系层已能表达基本语义 + 结构属性，复杂不变量仍属 Constraint 语义"，并在 `constraint.parameters` 出现之前保持可见。**不阻塞 Gate**。
+正确的分层是：
+
+```text
+Goal ↔ DailyReview        基础实体关系（一条普通边）
+        +
+Constraint: (goalId, date) unique / at-most-one     ← Structured Constraint Gap
+```
+
+**明确推迟（现在不要提前做）：** 即使这类情况将来大量出现，也只讨论 `constraint.qualifiers` / `uniqueBy` / `scope` / `predicate` / `threshold` 之类的**结构化表达**，而不是把 `at-most-one-per-key` 变成关系词。
+
+**这是记录，不是放行：** 它说明"关系层已能表达基本语义 + 结构属性，复杂不变量仍属 Constraint 语义"，并在 `constraint.parameters` 出现之前保持可见。**不阻塞 Gate。**
 
 ---
 
@@ -302,7 +363,11 @@ relationGapCount / (relationGapCount + edges.length) ≥ 0.5   且   relationGap
 - 第 7 类 element
 - 第 9 / 10 / 11 个 relation 词（先问"是不是缺结构属性"，见 §5）
 - constraint 的参数 DSL（constraint.parameters）—— 先只登记 Structured Constraint Gap
+- constraint.qualifiers / uniqueBy / scope / predicate / threshold —— 同上，推迟
 - 把"条件唯一"这类单实体槽位约束塞进 relationGap
+- 追求 relationGap = 0（复杂 invariant 不要求被 edge 吞掉，见 §0）
+- 为了让某个 Fixture 触发 W8 而调阈值（见 §5.3 的 W8 定位）
+- 因为 Fixture C 的 follow-up 就顺手加一个 references 关系词（先看 relates-to 的使用量）
 - 固定主轴
 - 固定泳道
 - 强制六类都出现
@@ -390,12 +455,91 @@ INFO   只是形态差异   → component = 0 / state = 0 / 没有主轴 / 非�
 
 所以：**跳过检查必须显式可见**，而且 parser 的正确性要和 validator 的严格性一起验证。
 
----
+### 10.1 长期原则：Parser 的容忍度 ≠ Parser 的正确性
 
-## 11. 下一步（本轮不做）
+**"看到 `#` 就当标题"表面更通用，实际更错** —— 它把 fenced code 里的 `# expected output` 认成了文档结构。
 
 ```text
-1. B / C 的 map 用新的 qualifiers 重表达（§5.2 放宽 contains 后 C 的"持有 / 存储"应可消除）
-2. constraint.parameters 表达面（第 3 层的结构化）—— 先保持登记
-3. 语义验收标准的重写（现用 1:1 语义 proxy 度量，需要真正的语义覆盖判据）
+容忍度宽松（认得多）  ≠  正确（认得对）
 ```
+
+正确的方向永远是三件套：
+
+```text
+Markdown syntax-aware        按 Markdown 语法解析，不是按行首字符
+fence-aware                  围栏内的内容不是文档结构
+hierarchy-aware              标题是树，不是一组平铺的字符串
+```
+
+> **操作规则：不要用文本 regex 假装自己在解析 Markdown。**
+
+这条原则对以下场景同样适用（F07 生成链路会全部碰到）：
+
+```text
+table parsing          | 表格里的 | 与代码块里的 |
+code block parsing     | 语言标注 / 缩进 / 嵌套围栏
+JSON example parsing   | 文档里的示例 JSON 不是真实数据
+Mermaid                | ```mermaid 里的 graph/sequence 是图，不是标题或列表
+quoted Markdown        | 引用块里出现的 ## 是否算小节
+```
+
+**判据（写完 parser 必问的一句）：** 这个 parser 是"认得多"，还是"认得对"？它有没有**知道自己跳过了什么**？
+
+---
+
+## 11. 下一步（本轮不做，且**不阻塞 Feature 07**）
+
+```text
+1. F06 contract migration regression（可选，单独一轮）
+   A / B / C 的 candidate map → 按最新 Contract 重表达
+   验收方式：重表达后 relationGap 的变化必须是**实测**，不能因为"机制上已能表达"就宣布关闭
+   （典型例子：Fixture C 的"持有 / 存储"—— 机制上 contains + owned 已可表达，
+     但原 map 未重表达，因此现在只能记为 follow-up）
+
+2. constraint.parameters 表达面（第 3 层的结构化）—— 先保持登记（§5.4）
+
+3. 语义验收标准的重写（现用 1:1 语义 proxy 度量，需要真正的语义覆盖判据）
+
+4. AI 生成链路（Feature 07）—— 已是下一阶段主线，见 docs/features/07-generation-pipeline/
+```
+
+---
+
+## 12. Feature 09 关闭裁决（Contract v1 定稿）
+
+**Feature 09 = 完成；Gate = PASS。** 支撑证据：
+
+```text
+A / B / C / D / E      五篇 HARD = 0 · 全部 PASS
+Mutation               14/14 可检测项全部拦截
+Semantic gap           0
+Navigation coverage    D / E 均真正执行，不再 SKIPPED
+ER-heavy relation      通过 qualifiers 从 6 gaps 降至 2 structured constraints
+Capacity               13 elements 仅 Warning，没有被硬卡
+Topology               chain / DAG / star-DAG 均可表达
+```
+
+**结论的确切含义（不要读过头）：**
+
+```text
+✅ 支持   Framework Map Contract v1 可以进入下一阶段（让 AI 自动生成）
+❌ 不意味着 ontology 永远不会变
+```
+
+**下一步重心已经改变：**
+
+```text
+过去（F03~F09）：我们设计的表示模型对不对？
+接下来（F07）：  AI 能不能稳定地从任意技术文档生成这个表示模型？
+```
+
+```text
+Document
+   ↓  AI Framework Map Generation
+framework-map.json
+   ↓  schema
+   ↓  check-map
+renderer
+```
+
+**并且：继续打磨 Contract 的边际收益已经开始下降** —— 下一批真正有价值的信息来自 **AI generation 的稳定性测试**，而不是再多找一篇人工 candidate map。

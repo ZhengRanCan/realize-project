@@ -283,6 +283,7 @@ A / B / C / D / E  五篇 HARD = 0，状态均为 PASS
 
 - **判定**：待 reviewer 按 `validation-checklist.md` 验证
 - **配套文档**：`execution-prompt.md` · `validation-checklist.md` · `results/notes.md`
-- **下一步**：**Feature 09（Contract 对抗测试 / Phase 2b）** —— 用 Fixture D（真 ER-heavy）与 E（纯 runbook）去打 schema 与 validator。
-  任务书：`docs/features/09-contract-adversarial-test/`。
-  **Feature 07（生成链路）在 09 的 Gate 通过之前不应开始。**
+- **下一步**：~~Feature 09（Contract 对抗测试 / Phase 2b）~~ → **09 已完成：`Gate = PASS`**（2026-09-26）。
+  它对本 feature 的回写：`schema` 增补 edge 可选 `id` / `label` / `qualifiers`；`check-map` 增加 H8 / W7 / W8、`W4 → I6`、原文小节按 Markdown heading tree 解析。
+  任务书：`docs/features/09-contract-adversarial-test/`（结果见其 `results/repair-round.md`）。
+  **Feature 07（生成链路）已随之解除 Blocked → `Ready`。**
