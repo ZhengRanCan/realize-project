@@ -93,24 +93,40 @@ invariant      ≥ 1        不变量 / at most one / 不得 …
 
 v1 时本候选唯一 FAIL 的就是 `timeout`。v2 要求改为"**有明确边界**的等待 / 失败规则"，且必须是**有界 + 有后续**。
 
-### 2.2 有界失败证据（回到原文 + 实现层交叉验证）
+### 2.2 有界失败证据 ⚠️ **已按 §3.6 单文档口径更正**
 
-| 证据 | 位置 | 说明 |
+> **更正记录**：本节初版引用了 `F15-.../verification.md` 与实现代码 `MAX_RETRY_COUNT` 作为边界证据。
+> 那违反 §3.6（资格与建模必须使用同一信息面；**代码不得补文档语义**）。
+> **那些外部证据已全部撤回**，改用 fixture **自身**可证的规则。
+> 完整复核见 `fixture-e-single-document-reverification.md`。
+
+**✅ 合格证据（全部来自 `F13-F16-runbook.md` 自身）：**
+
+| 证据 | 位置 | 满足什么 |
 |---|---|---|
-| 「`retryAfterSalesCompensation` 定时任务：扫描 `refundCompensationError` 非空 + 状态非 `REFUNDED` 的订单；成功清除错误，**失败累加重试次数**」 | `F15-after-sales-stock-rollback/verification.md` L26 | 有**计数器** |
-| **「重试超过 5 次 → 写 `refundCompensationFailed = true`；详情页红条提示」** | 同文件 **L27** | **边界明确（5 次）+ 越界后有明确后续状态** |
-| 「重试日志（成功 + 失败 + **超过上限**）」 | `F13-F16-runbook.md` L356 | runbook 自身也承认该边界 |
-| `MAX_RETRY_COUNT` / `if (retryCount >= MAX_RETRY_COUNT)` → `{ failed: true, final: failed }` | `cloudfunctions/retryAfterSalesCompensation/index.js` L10/L26/L43/L69 | **实现层常量与判定** |
-| **§4.8「强制补偿」`forceRestockAndAssets`：「仅管理员可调用」** | `F13-F16-runbook.md` L316–325 | **越界后的人工处置路径** |
+| **「连续 10 次查单失败置 `REFUND_FAILED`」** | **L418** | **有界失败规则 + 明确边界（10 次）+ 明确中止状态** —— 即 `max polling count` + `explicit abort state` |
+| 「失败场景：`refundCompensationError` 被写入，订单状态保持 `REFUND_PENDING / APPROVED`」 | L354 | 失败状态明确 |
+| 「详情页红条 + 强制补偿按钮」 | L355 | 面向人的失败信号 |
+| §4.8「强制补偿」`forceRestockAndAssets`：「**仅管理员可调用**」 | L316–325 | **人工处置路径** |
+| 「`retryAfterSalesCompensation` `failed` 递增 → 检查 `products / coupons / users`」 | L475 | 人介入的排查动作 |
 
-按 v2 的判据：
+对照 v2 的判据：
 
 ```text
-「失败后重试」                              ❌ 不够（无边界）
-「最多重试 5 次，之后进入人工处置」          ✅ 够
+「失败后重试」                        ❌ 不够（无边界）
+「连续 10 次失败 → 置 REFUND_FAILED」  ✅ 够（有界 + 明确中止状态）
 ```
 
-本候选满足**后者**：边界 = 5 次（`MAX_RETRY_COUNT`），后续 = `refundCompensationFailed` + 红条提示 + **仅管理员**的强制补偿。
+**❌ 已撤回、不得用于资格的（来自 fixture 之外）：**
+
+| 证据 | 位置 | 撤回原因 |
+|---|---|---|
+| 「重试超过 **5 次** → `refundCompensationFailed = true`」 | `F15-.../verification.md` L27 | 属 supporting 文档（§3 未允许 bundle） |
+| `MAX_RETRY_COUNT` / `retryCount >= MAX_RETRY_COUNT` | `cloudfunctions/retryAfterSalesCompensation/index.js` | **代码不得补文档语义**（属 Source Verification） |
+
+> 顺带说明：文档内**确实没有**时间型 `timeout`/`deadline`（v1 的判定仍成立）。
+> E 之所以在 v2 下合格，是因为判据从「时间型 timeout」改成了「**有明确边界**的等待 / 失败规则」，
+> 而 L418 正落在新判据内 —— **变化的是证据引用，不是标准。**
 
 ### 2.3 11 要素 + 3 路径（v2 口径）
 

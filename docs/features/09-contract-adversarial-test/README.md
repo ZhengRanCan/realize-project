@@ -181,6 +181,27 @@ Phase 2b v2 **在同一批候选池上重跑**。因此：
 - 选定后先把**选择依据逐条对照 §3.2 打勾**，再开始建模
 - 若某条硬要求找不到文档满足，**记录缺口**，不要降低标准去凑
 
+### 3.6 口径规则：资格审查与建模必须使用**同一信息面**
+
+> **资格审查只能使用 fixture 自身可证的信息。**
+> candidate map 只能从该 fixture 生成 —— 资格阶段能看到的东西，建模阶段也必须能看到。
+
+否则会出现：
+
+```text
+资格判断：看了 A + B + code   → QUALIFIED
+实际建模：只能看 A            → 边界未知
+```
+
+两类越界及其处置：
+
+| 越界来源 | 处置 |
+|---|---|
+| **supporting 文档**（另一篇 verification / design） | 不得默认借用。要借用就必须**把 Fixture 显式定义成 bundle**（primary + supporting），并在标准里写明"本 Fixture 测试的是一组紧密关联的文档，不再是 single-document fixture" —— 这会引入新变量，需显式授权 |
+| **实现代码** | **绝不可**用于补文档语义。那属于 **Source Verification**，不属于 **Document Modeling**；用它补足等于把 `document claim` 与 `source-verified fact` 混起来（违反 Current / Target / Evidence 的区分） |
+
+**这条规则是 Feature 09 v2 复跑 E 时补上的**（见 `results/fixture-e-single-document-reverification.md`）。
+
 ---
 
 ## 4. 执行流程
@@ -318,18 +339,31 @@ E  QUALIFIED   uni-app/YUSHI/docs/harness/features/individual_feature/F13-F16-ru
 ```
 
 - D：v2 硬门槛通过 14 篇，**第 1 名分数 153 是第 2 名（74）的两倍以上**；挑战者逐一回原文判定，全是决策记录 / 数据流型设计笔记
-- E：`bounded failure` 证据充分 —— 「**重试超过 5 次** → `refundCompensationFailed = true`」（F15 `verification.md` L27）+ 实现层 `MAX_RETRY_COUNT` + runbook §4.8「**仅管理员**可调用」的强制补偿
+- E：`bounded failure` 由 **fixture 自身**证明 —— **`F13-F16-runbook.md` L418「连续 10 次查单失败置 `REFUND_FAILED`」**（有界 + 明确中止状态），配套 L354/355/§4.8 的失败信号与仅管理员强制补偿
 
 > ⚠️ **声明**：候选池在 v1 阶段已被观察过 → v2 是 **engineering validation**，
 > **不宣称具有完全独立的 fixture selection**（§3.4）。将来若需更强证据，另加**外部 holdout fixture**。
 
+### 用户确认与口径复核
+
+| Fixture | 状态 |
+|---|---|
+| **D** | ✅ **CONFIRMED**（用户确认）<br>`uni-app/tempo/docs/architecture/goal-plan-task-state-model.md`<br>SHA256 `6F2C5F47258E4F8442EDB1FBEBE658CDB8557A6DC6CE40BECEB2DC367CEB8236` |
+| **E** | ⚠️ 初判 CONDITIONALLY CONFIRMED（用户要求：**不得引用实现代码补足缺失语义**）<br>→ 已按 §3.6 单文档口径复核：**L418 单篇可证 → QUALIFIED**<br>`uni-app/YUSHI/docs/harness/features/individual_feature/F13-F16-runbook.md`<br>SHA256 `C55F2F55F851DDC79194AF9A90023D78A38376553ABA1E567228DDAF0ED67D97`<br>复核记录：`results/fixture-e-single-document-reverification.md` |
+
+**E 复核的关键更正**：v2 初版引用的外部证据（F15 `verification.md` L27「超过 5 次」+ 实现层 `MAX_RETRY_COUNT`）**已全部撤回** —— 那既越过了 single-document 口径，也犯了"用代码补文档语义"的错（属 Source Verification，不属 Document Modeling）。
+
 ### 当前 Gate
 
 ```text
-待用户确认 D / E → 进入 Task 2（生成 candidate map）
+D / E 均已 QUALIFIED（单文档口径）→ 待用户对 E 的复核结论确认
+   ↓
+复制进 测试文档/ + 登记来源与 SHA256
+   ↓
+Task 2：生成 candidate map（**不是 Gold**）
 ```
 
-（`BLOCKED` 已解除；但**尚未**开始建模 —— 按 §3.5，选定后需先由用户确认并登记 SHA256。）
+（**尚未**开始建模 —— 按 §3.5，选定后需先确认并登记 SHA256。）
 
 ### 留到下一轮（Phase 2c / Feature 09 v2）再讨论的问题
 
