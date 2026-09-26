@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://realize-project.local/schema/map-selection.schema.json",
+  "title": "map-selection（Feature 10 · Stage B 选择轨迹）",
+  "description": "对 Semantic Inventory 每一条的选择交代：它进了 L0、侧挂、被某条边表达，还是只在 Topic 里 / 被省略。**这是 generation evidence，不是 Framework Map Contract 的一部分**；check-map 不读它，契约也不描述它。它的唯一用途是让『AI 为什么把某个语义放进图、为什么没放』第一次可审计。",
+  "type": "object",
+  "required": ["selectionVersion", "document", "inventoryRef", "decisions"],
+  "additionalProperties": false,
+
+  "properties": {
+    "selectionVersion": { "type": "integer", "const": 1 },
+    "document": { "$ref": "#/$defs/document" },
+    "inventoryRef": { "$ref": "#/$defs/inventoryRef" },
+    "decisions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Inventory 里每一条必须**恰好出现一次**（由 harness 校验完整性；缺一条 = 该 run 失败，不自动补）",
+      "items": { "$ref": "#/$defs/decision" }
+    }
+  },
+
+  "$defs": {
+    "document": {
+      "type": "object",
+      "required": ["title", "sourcePath"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "sourcePath": { "type": "string", "minLength": 1 }
+      }
+    },
+
+    "inventoryRef": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "minLength": 16 },
+        "itemCount": { "type": "integer", "minimum": 1 }
+      }
+    },
+
+    "decision": {
+      "type": "object",
+      "required": ["semanticId", "decision", "target", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "semanticId": {
+          "type": "string",
+          "pattern": "^S-[0-9]{2,3}$"
+        },
+        "decision": {
+          "enum": ["element", "attachment", "edge", "topic-only", "omitted"],
+          "description": "element=成为 L0 element；attachment=作为 concept/constraint/state 侧挂；edge=由一条边正经表达；topic-only=只在 Topic 命题/导航里（图上不可导航）；omitted=未表达（reason 必填，且不得用于失败路径/权限边界/阈值上限/不变量/非目标五类）"
+        },
+        "target": {
+          "type": ["string", "null"],
+          "description": "element→element id；attachment→该 attachment 的 elementId；edge→\"E-03 --contains--> E-05\"；topic-only→topic id；omitted→null。**由 harness 校验：omitted 必须为 null，其余必须非空。**"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 4,
+          "description": "必须写具体（引用原文机制），不要写『已涵盖』这类空话"
+        }
+      }
+    }
+  }
+}

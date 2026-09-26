@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://realize-project.local/schema/semantic-inventory.schema.json",
+  "title": "semantic-inventory（Feature 10 · Stage A 产物）",
+  "description": "原文重要设计语义的穷举清单。**这是 generation evidence，不是 framework-map 契约的一部分。** 它刻意不含 element / relation / attachment / Topic / budget 的任何概念 —— 那些属于 Stage B。本 schema 只约束「一条语义 + 出处」这件事本身。",
+  "type": "object",
+  "required": ["inventoryVersion", "document", "items"],
+  "additionalProperties": false,
+
+  "properties": {
+    "inventoryVersion": { "type": "integer", "const": 1 },
+    "document": { "$ref": "#/$defs/document" },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "description": "一条 = 一个可判断真假的设计陈述。宁可多列，不可漏机制；但不许编造。",
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+
+  "$defs": {
+    "document": {
+      "type": "object",
+      "required": ["title", "sourcePath"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "role": { "enum": ["current", "target"] }
+      }
+    },
+
+    "item": {
+      "type": "object",
+      "required": ["id", "statement", "sources"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^S-[0-9]{2,3}$",
+          "description": "S-01、S-02… 连续编号、不重复"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 8,
+          "description": "一句可判断真假的设计陈述（不是目录、不是抄写）"
+        },
+        "tag": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 24,
+          "description": "可选。≤3 词的自由标签（如 权限 / 阈值 / 非目标）。**不是类型判定** —— 本阶段禁止做 concept/state/process 判定。"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/source" }
+        },
+        "notes": {
+          "type": "string",
+          "description": "可选。为什么它重要 / 与哪条语义成对"
+        }
+      }
+    },
+
+    "source": {
+      "type": "object",
+      "required": ["sectionRef"],
+      "additionalProperties": false,
+      "properties": {
+        "sectionRef": {
+          "type": "string",
+          "pattern": "^§\\S+$",
+          "description": "必须取自该文档 heading tree 的 §key，不得编造"
+        },
+        "lines": {
+          "type": "string",
+          "description": "原文行号范围（如 L418-L422）；不确定可写单行"
+        },
+        "quote": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "≤200 字的原文片段，供人工核对"
+        }
+      }
+    }
+  }
+}
