@@ -80,7 +80,9 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (!token.startsWith('--')) continue;
-    const key = token.slice(2);
+    // kebab-case → camelCase：`--max-tokens` 必须真的落到 args.maxTokens。
+    // （这里曾经只做了 slice(2)，导致 --max-tokens 被静默忽略、实际用了默认值。）
+    const key = token.slice(2).replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
     const value = argv[i + 1];
     if (value === undefined || value.startsWith('--')) args[key] = true;
     else { args[key] = value; i += 1; }
@@ -90,7 +92,7 @@ function parseArgs(argv) {
 
 const args = parseArgs(process.argv.slice(2));
 const fixtureId = typeof args.fixture === 'string' ? args.fixture.toLowerCase() : null;
-const isStub = !!(args['stub-content'] || args['stub-http'] || args['stub-transport-error']);
+const isStub = !!(args.stubContent || args.stubHttp || args.stubTransportError);
 
 function usage(msg) {
   console.error(`✗ ${msg}`);
@@ -121,7 +123,8 @@ const writeText = (file, text) => fs.writeFileSync(file, text, 'utf8');
 
 /**
  * run 目录分配：每次运行一个独立目录，**永不覆盖已存在的目录**。
- * 失败重跑会自动落到下一个编号，绝不会碰到上一份产物。
+ * 编号取 max+1（而不是"第一个空位"）—— 这样即使某个 run 目录被删除，
+ * 编号也不会被复用，run 号与时间顺序始终一致。失败重跑自动落到下一个编号。
  */
 function allocateRunDir() {
   const base = path.join(outBase, `fixture-${fixtureId}`);
@@ -135,9 +138,14 @@ function allocateRunDir() {
     }
     return dir;
   }
-  let n = 1;
-  while (fs.existsSync(path.join(base, `run-${String(n).padStart(2, '0')}`))) n += 1;
-  return path.join(base, `run-${String(n).padStart(2, '0')}`);
+  let max = 0;
+  if (fs.existsSync(base)) {
+    for (const name of fs.readdirSync(base)) {
+      const m = name.match(/^run-(\d+)$/);
+      if (m) max = Math.max(max, Number(m[1]));
+    }
+  }
+  return path.join(base, `run-${String(max + 1).padStart(2, '0')}`);
 }
 
 /**
@@ -207,17 +215,52 @@ function readSettings() {
   return { baseURL: url && url[1], apiKey: key && key[1] };
 }
 
+/** 脱敏：只保留 protocol + host + path，去掉 userinfo 与任何 query（凭据绝不落盘）。 */
+function redactUrl(u) {
+  try {
+    const x = new URL(u);
+    return `${x.protocol}//${x.host}${x.pathname.replace(/\/$/, '')}`;
+  } catch { return '(unparsable)'; }
+}
+
+/** provider 由 endpoint 主机名推导（不靠人工声明，避免记录与实际不符）。 */
+function providerOf(u) {
+  try {
+    const h = new URL(u).hostname;
+    if (/(^|\.)deepseek\.com$/i.test(h)) return 'deepseek';
+    if (/^(localhost|127\.0\.0\.1)$/i.test(h)) return 'local';
+    return h;
+  } catch { return 'unknown'; }
+}
+
 function resolveCredentials() {
   const settings = readSettings();
+  const explicit = !!(process.env.FRAMEWORK_MAP_BASE_URL && process.env.FRAMEWORK_MAP_API_KEY);
   const baseURL = process.env.FRAMEWORK_MAP_BASE_URL || process.env.OVERVIEW_PLAN_BASE_URL || settings.baseURL;
   const apiKey = process.env.FRAMEWORK_MAP_API_KEY || process.env.OVERVIEW_PLAN_API_KEY
     || process.env.OPENAI_API_KEY || settings.apiKey;
   const model = process.env.FRAMEWORK_MAP_MODEL || process.env.OVERVIEW_PLAN_MODEL || String(args.model);
-  if (!baseURL || !apiKey) {
-    console.error('✗ 找不到可用的 API 凭据（设置 FRAMEWORK_MAP_BASE_URL / FRAMEWORK_MAP_API_KEY，或 ~/.dsh/settings.yaml）。');
+
+  // 实验可比性保险：没有显式给出 FRAMEWORK_MAP_BASE_URL / FRAMEWORK_MAP_API_KEY 时，
+  // **拒绝**静默回落到 ~/.dsh/settings.yaml（那是中转网关）。否则一次漏传环境变量
+  // 就会让 15 次 run 里的某几次换了 endpoint，而实验对比失去意义。
+  if (!explicit && !args.allowSettingsFallback) {
+    console.error('✗ 未显式提供 FRAMEWORK_MAP_BASE_URL / FRAMEWORK_MAP_API_KEY。');
+    console.error('  live 模式默认**拒绝**回落到 ~/.dsh/settings.yaml 的凭据（避免 endpoint 在实验期间被悄悄换掉）。');
+    console.error('  确需回落请显式加 --allow-settings-fallback。');
     process.exit(EXIT.USAGE);
   }
-  return { baseURL: baseURL.replace(/\/$/, ''), apiKey, model };
+  if (!baseURL || !apiKey) {
+    console.error('✗ 找不到可用的 API 凭据（设置 FRAMEWORK_MAP_BASE_URL / FRAMEWORK_MAP_API_KEY）。');
+    process.exit(EXIT.USAGE);
+  }
+  return {
+    baseURL: baseURL.replace(/\/$/, ''),
+    apiKey,
+    model,
+    provider: providerOf(baseURL),
+    baseUrlRedacted: redactUrl(baseURL),
+  };
 }
 
 /* ------------------------------------------------------------------ *
@@ -233,6 +276,7 @@ function loadPromptTemplates() {
     system: raw.slice(sysIdx + '## SYSTEM'.length, userIdx).trim(),
     user: raw.slice(userIdx + '## USER TEMPLATE'.length).trim(),
     fingerprint: sha256(raw).slice(0, 16),
+    sha256: sha256(raw),
   };
 }
 
@@ -263,8 +307,8 @@ async function callModel(creds, system, user) {
     max_tokens: Number(args.maxTokens),
     messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
   });
-  const maxAttempts = Math.max(1, Number(args['max-attempts']) || DEFAULTS.maxAttempts);
-  const timeoutMs = Number(args['timeout-ms']) || DEFAULTS.timeoutMs;
+  const maxAttempts = Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts);
+  const timeoutMs = Number(args.timeoutMs) || DEFAULTS.timeoutMs;
   const started = Date.now();
   let lastError = null;
 
@@ -340,17 +384,17 @@ function preflight(map) {
  *  它必须与 live 传输层**同形**：先取 API 信封里的 choices[0].message.content。
  *  若文件不是信封（例如故意给一段散文），则整段作为 content —— 这样"返回非 JSON"也能被真实复现。 */
 function stubCall() {
-  if (args['stub-transport-error']) {
-    const e = new Error(`模拟传输层失败：${args['stub-transport-error']}`);
+  if (args.stubTransportError) {
+    const e = new Error(`模拟传输层失败：${args.stubTransportError}`);
     e.isTransport = true;
     return { error: e };
   }
-  if (args['stub-http']) {
-    const status = Number(args['stub-http']);
+  if (args.stubHttp) {
+    const status = Number(args.stubHttp);
     return { error: new Error(`HTTP ${status}：模拟网关错误（stub）`) };
   }
-  const file = path.resolve(ROOT, String(args['stub-content']));
-  if (!fs.existsSync(file)) usage(`--stub-content 文件不存在：${args['stub-content']}`);
+  const file = path.resolve(ROOT, String(args.stubContent));
+  if (!fs.existsSync(file)) usage(`--stub-content 文件不存在：${args.stubContent}`);
   const text = fs.readFileSync(file, 'utf8');
   let content = text;
   try {
@@ -372,10 +416,15 @@ async function main() {
 
   const templates = loadPromptTemplates();
   const userMessage = buildUserMessage(templates.user);
+
+  // 凭据 / 用法检查必须在**创建 run 目录之前**完成 ——
+  // 否则一次被拒绝的调用（例如漏传环境变量）会留下一个空 run 目录，污染编号序列。
+  const creds = isStub
+    ? { baseURL: '(stub)', apiKey: '(stub)', model: `stub:${String(args.model)}`, provider: 'stub', baseUrlRedacted: '(stub)' }
+    : resolveCredentials();
+
   const runDir = allocateRunDir();
   fs.mkdirSync(runDir, { recursive: true });
-
-  const creds = isStub ? { baseURL: '(stub)', apiKey: '(stub)', model: `stub:${String(args.model)}` } : resolveCredentials();
   const docText = fs.readFileSync(docPath, 'utf8');
 
   const protocol = {
@@ -383,31 +432,44 @@ async function main() {
     tempWrite: false, readBackVerified: false, atomicRename: false, checkMapExecuted: false,
   };
 
+  // 实验可比性字段：Phase 3 的 15 次 run 要比较稳定性，
+  // 因此 provider / baseUrl / model / prompt hash / 文档 hash / 生成参数必须固定记录。
+  const generationParams = {
+    temperature: Number(args.temperature),
+    max_tokens: Number(args.maxTokens),
+    timeout_ms: Number(args.timeoutMs) || DEFAULTS.timeoutMs,
+    max_attempts: Math.max(1, Number(args.maxAttempts) || DEFAULTS.maxAttempts),
+  };
+
   const requestRecord = {
     fixture: fixtureId,
     fixtureLabel: fixture.label,
     runDir: rel(runDir),
     mode: isStub ? 'stub' : 'live',
+    provider: creds.provider,
+    baseUrl: creds.baseUrlRedacted, // 脱敏：绝不落盘 key / query
     model: creds.model,
-    endpoint: isStub ? '(stub)' : creds.baseURL, // 不含 key
+    generationParams,
     docPath: fixture.doc,
     docSha256: sha256(docText),
+    documentSha256: sha256(docText),
     promptPath: rel(promptPath),
     promptFingerprint: templates.fingerprint,
+    promptSha256: templates.sha256,
     userMessageSha256: sha256(userMessage),
     systemPromptChars: templates.system.length,
     userMessageChars: userMessage.length,
-    temperature: Number(args.temperature),
-    maxTokens: Number(args.maxTokens),
     startedAt: nowIso(),
   };
   writeText(path.join(runDir, 'request.json'), `${JSON.stringify(requestRecord, null, 2)}\n`);
 
   console.log('=== F07 framework-map generation ===');
   console.log(`fixture    ${fixtureId}（${fixture.label}）`);
-  console.log(`document   ${fixture.doc}`);
-  console.log(`prompt     ${rel(promptPath)}（指纹 ${templates.fingerprint}）`);
+  console.log(`document   ${fixture.doc}  sha ${requestRecord.documentSha256.slice(0, 12)}`);
+  console.log(`prompt     ${rel(promptPath)}（指纹 ${templates.fingerprint} / sha ${templates.sha256.slice(0, 12)}）`);
+  console.log(`provider   ${creds.provider}  ${creds.baseUrlRedacted}`);
   console.log(`model      ${creds.model}${isStub ? '   [STUB —— 不联网，仅验证产物安全协议]' : ''}`);
+  console.log(`params     temp ${generationParams.temperature} · max_tokens ${generationParams.max_tokens} · timeout ${generationParams.timeout_ms}ms · max_attempts ${generationParams.max_attempts}`);
   console.log(`run dir    ${rel(runDir)}`);
   console.log(`user msg   ${(userMessage.length / 1024).toFixed(1)} KB`);
 
@@ -416,7 +478,16 @@ async function main() {
     fixtureLabel: fixture.label,
     runDir: rel(runDir),
     mode: isStub ? 'stub' : 'live',
+    provider: creds.provider,
+    baseUrl: creds.baseUrlRedacted,
     model: creds.model,
+    generationParams,
+    documentPath: fixture.doc,
+    documentSha256: requestRecord.documentSha256,
+    promptPath: rel(promptPath),
+    promptFingerprint: templates.fingerprint,
+    promptSha256: templates.sha256,
+    userMessageSha256: requestRecord.userMessageSha256,
     startedAt: requestRecord.startedAt,
     finishedAt: null,
     status: null,

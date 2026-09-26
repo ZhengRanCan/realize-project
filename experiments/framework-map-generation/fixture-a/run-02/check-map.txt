@@ -1,0 +1,26 @@
+===== check-map: experiments/framework-map-generation/fixture-a/run-02/framework-map.json =====
+document      Pre-class Fusion Context Consumption 语义模型
+granularity   section (provisional)   ⚠️ provisional — 不得与 sourceUnit 粒度混算
+stats         elements 15 · edges 9 · attachments 4 · topics 5 · relationGap 1 · gapDensity 0.1
+coverage      15/15 有路径（本粒度内）
+
+HARD ERROR (0)
+  （无）
+
+WARNING (2)
+  ! W1 element 总数 15 > preferred budget 12（认知容量 heuristic，非 semantic validity）；内容都有 L1/L2 入口 → 只需检查 Navigation invariant
+  ! W5 relationGap[0] context-consumption ⇢ output-alignment：「两条链彼此独立且不互相吞并，但在 outline revision 与 context lineage 处衔接，共同支持同一条 context-grounded generation narrative。」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）
+
+INFORMATIONAL (3)
+  i I1 component = 0（正常形态差异，不是缺陷）
+  i I2 state = 0（正常形态差异，不是缺陷）
+  i I4 非单链拓扑：收敛节点 outline-generation-attempt, generated-lesson（按 consumes 归一化后的多入边）—— 形态差异，不是异常
+
+SKIPPED (0)
+  （无 —— 本次全部检查都已执行）
+
+════════════════════════════════
+结果: HARD 0 · WARN 2 · INFO 3
+状态: PASS
+注: element budget / 单点 Topic / 某类元素为 0 / 无主轴 / DAG 是 Warning 或 Informational，不是语义缺陷。relationGap 少而散时逐条列 W5，多而密时聚合成一条 W8 + detail 段。
+════════════════════════════════

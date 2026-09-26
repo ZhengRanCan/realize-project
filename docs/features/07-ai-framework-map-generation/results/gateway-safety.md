@@ -95,3 +95,20 @@ validator FAIL 的产物：✅ 完整保留
 
 **可以进入 Phase 2（单 Fixture Smoke Test，1 次真实调用）。**
 Phase 2 若发现 Gateway / IO 仍不稳定，按 README §14 记 `BLOCKED` 并在此文件追加实际故障记录。
+
+---
+
+## 6. Phase 2 实跑补充（2026-09-26）
+
+Phase 2 已执行：**工程链 PASS**，但暴露了三个 harness 缺陷（凭据检查晚于建目录、
+`--max-tokens` 被静默忽略、run 编号会复用空位），**已全部修复并回归 33/33**。
+完整记录见 `phase2-smoke-test.md`。
+
+本轮安全协议的实战表现：
+
+```text
+[✓] 被保险拦截的调用没有覆盖任何产物（但当时留下了一个空 run 目录 → 已修 + 已删除）
+[✓] 真实调用一次成功，五件产物齐全，无 .tmp.json 残留
+[✓] validator PASS（HARD 0）—— 但按纪律，这不是 Phase 2 的判据
+[✓] repair = none，产物与 raw response 逐字节一致
+```

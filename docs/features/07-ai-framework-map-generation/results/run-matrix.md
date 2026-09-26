@@ -1,9 +1,21 @@
 # Run Matrix（F07 · Phase 3 填）
 
-> 状态：⏳ **未开始**（Phase 2 smoke test 通过后填写）
+> 状态：🟡 **Phase 2 已记入（fixture a / run-02）**；其余等 Phase 3
 > 每个 run 一行，数据**只从产物文件读**（`run-meta.json` / `check-map.txt`），不靠记忆。
 
-## 1. 逐 run
+## 0. Phase 2 smoke test（不计入 15 runs）
+
+| Fixture | Run | 状态 | HARD | WARN | INFO | validator | elements | edges | attach | topics | relationGap | gapDensity | topology class |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| a | run-02 | success | 0 | 2 | 3 | PASS | 15 | 9 | 4 | 5 | 1 | 0.10 | 待 Phase 3 统一判定 |
+
+参数偏差（**必须记录**）：该 run 因 harness 的 `--max-tokens` flag bug，实际使用 `max_tokens = 32000`（约定值 8000 未生效）。
+详见 `phase2-smoke-test.md` §4.1 与 §5。
+
+> `fixture-a/run-01` 曾由一个被保险拦截的调用创建为空目录（0 文件），**已删除**；
+> 按新规则 run 编号单调递增（max+1），故本次真实调用为 **run-02**，下一个 A run 将从 run-03 开始。
+
+## 1. 逐 run（Phase 3）
 
 | Fixture | Run | 状态 | HARD | WARN | INFO | validator | elements | edges | attach | topics | relationGap | gapDensity | topology class |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
