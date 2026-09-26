@@ -421,7 +421,7 @@ BLOCKED       仅限 Gateway / IO 导致实验无法执行
 | Runbook anchors（E 侧） | ✅ 稳定改善（F07 的 0–1/3 → 4/4 有承载；manual intervention 在 run-06 显式为「仅管理员强制补偿」） |
 | **Regression：D core relation resolution** | ⚠️ **未关闭** —— `Task --depends-on--> Task` 被降级成只剩 constraint 层（判定 E3 Encoding Distortion，见 `results/d1-regression.md` §3） |
 | **Known representation gap** | 📌 **已升级登记**：**Constraint Composition / Compression Gap**（原 Structured Constraint Gap；见 `results/d1-regression.md` §4.1） |
-| Cost efficiency | ✅ 已测：`reasoning_effort=low` 省 Stage A 80% / Stage B 61%，5/5 anchor 保留；⚠️ 但本次丢了 `state` 元素 → 记为**候选优化，暂不设为默认**（`results/cost-experiment.md`） |
+| Cost efficiency | ✅ 已测且已判决：`reasoning_effort=low` 省 Stage A 80% / Stage B 61%，但**两个 low 样本各自复现** ontology + structural 退化（`state` 2/2 消失、状态机被压平），run-11 还**静默丢掉 bounded failure**（标记 represented 但图上无承载） → **low 不设为默认，仅作显式成本模式**（`results/low-effort-verdict.md`） |
 
 **Gate 倾向**：`PARTIAL PASS`（E 侧成立、D 侧有一条基础关系未关闭）。
 最终判定需在 Phase 3 人工审计（`results/inventory-review.md` 等）完成后给出。
@@ -431,7 +431,8 @@ BLOCKED       仅限 Gateway / IO 导致实验无法执行
 ```text
 未关闭 ①  D 的 Task --depends-on--> Task（基础关系层）—— 不用 prompt 打补丁，留给下一阶段
 已登记 ②  Constraint Composition / Compression Gap（constraint 缺组成语句表达面）
-已登记 ③  low effort 下的类型保真度（state 元素消失）—— 需 1–2 次补样才决定是否采用 low
+已判决 ③  low effort **不设为默认**（成本模式）：成本优势真实，但 ontology/structural 退化可复现，
+          且会出现「标记 represented 但图上无承载」的静默丢失 → 新增审计启发式 false-represented
 待审计 ④  run-08 的 S-40 被 omitted 但疑似属于「不可以砍」五类
 ```
 

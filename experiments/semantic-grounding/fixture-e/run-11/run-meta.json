@@ -1,0 +1,159 @@
+{
+  "feature": "F10-semantic-grounding",
+  "fixture": "e",
+  "fixtureLabel": "E · Operational Runbook",
+  "runDir": "experiments/semantic-grounding/fixture-e/run-11",
+  "stage": "b",
+  "mode": "live",
+  "provider": "deepseek",
+  "baseUrl": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "generationParams": {
+    "temperature": 1,
+    "max_tokens_stage_a": 65536,
+    "max_tokens_stage_b": 131072,
+    "reasoning_effort_stage_a": "(provider default)",
+    "reasoning_effort_stage_b": "low",
+    "timeout_ms": 900000,
+    "max_attempts": 1
+  },
+  "documentPath": "测试文档/fixture-e-f13-f16-runbook.md",
+  "documentSha256": "c55f2f55f851ddc79194af9a90023d78a38376553aba1e567228ddaf0ed67d97",
+  "promptA": {
+    "path": "ai/semantic-inventory.prompt.md",
+    "sha256": "f94e6c00da1e61b4bc129e632d2e170a6726676c3864d9c55d6133f516483272",
+    "fingerprint": "f94e6c00da1e61b4"
+  },
+  "promptB": {
+    "path": "ai/framework-map-synthesis.prompt.md",
+    "sha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540",
+    "fingerprint": "8c3f0be2f6768912"
+  },
+  "frozen": {
+    "model": "deepseek-flash",
+    "generationParams": {
+      "temperature": 1,
+      "max_tokens_stage_a": 65536,
+      "max_tokens_stage_b": 131072,
+      "reasoning_effort_stage_a": "(provider default)",
+      "reasoning_effort_stage_b": "low",
+      "timeout_ms": 900000,
+      "max_attempts": 1
+    },
+    "document": {
+      "path": "测试文档/fixture-e-f13-f16-runbook.md",
+      "sha256": "c55f2f55f851ddc79194af9a90023d78a38376553aba1e567228ddaf0ed67d97"
+    },
+    "promptA": {
+      "path": "ai/semantic-inventory.prompt.md",
+      "sha256": "f94e6c00da1e61b4bc129e632d2e170a6726676c3864d9c55d6133f516483272"
+    },
+    "promptB": {
+      "path": "ai/framework-map-synthesis.prompt.md",
+      "sha256": "8c3f0be2f6768912882c19159d46445f0e5b665f5fe4023eef7335b698979540"
+    },
+    "schemas": {
+      "semanticInventory": {
+        "path": "schema/semantic-inventory.schema.json",
+        "sha256": "f277419d25424c2da9721db1ad765af033881dba6e27f8124be5a0dd27f65eff"
+      },
+      "frameworkMap": {
+        "path": "schema/framework-map.schema.json",
+        "sha256": "56e66faabcd8ca7ea15dcb8925dc559368a8695a6bb9ca60b0a826ef9dcd8c22"
+      },
+      "mapSelection": {
+        "path": "schema/map-selection.schema.json",
+        "sha256": "eaa6a58f0f935b63faf236e91244d17d270b2389e713a83f8f0efad371ed84c8"
+      }
+    },
+    "contract": {
+      "path": "docs/framework-map-contract.md",
+      "sha256": "a70443517c1a0cb37a185f3d949710c00f9a104f8efc758da16516c40f6716da"
+    },
+    "validator": {
+      "path": "scripts/check-map.js",
+      "sha256": "1c1dbe45281d373ae6e86edff1785b4241d94d0512d46005e4e22e4dee565c7f"
+    }
+  },
+  "startedAt": "2026-09-26T15:49:39.550Z",
+  "finishedAt": "2026-09-26T15:51:17.144Z",
+  "status": "success",
+  "error": null,
+  "stages": {
+    "a": {
+      "status": null,
+      "attempts": 0,
+      "latencyMs": null,
+      "finishReason": null,
+      "usage": null,
+      "protocol": {
+        "rawResponseSaved": false,
+        "jsonExtracted": false,
+        "tempWrite": false,
+        "readBackVerified": false,
+        "atomicRename": false
+      }
+    },
+    "b": {
+      "status": "success",
+      "attempts": 1,
+      "latencyMs": 97582,
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 14246,
+        "completion_tokens": 27945,
+        "total_tokens": 42191,
+        "prompt_tokens_details": {
+          "cached_tokens": 14080
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 20560
+        },
+        "prompt_cache_hit_tokens": 14080,
+        "prompt_cache_miss_tokens": 166
+      },
+      "protocol": {
+        "rawResponseSaved": true,
+        "jsonExtracted": true,
+        "tempWrite": true,
+        "readBackVerified": true,
+        "atomicRename": true,
+        "checkMapExecuted": true
+      }
+    }
+  },
+  "repair": "none",
+  "artifactSha256": {
+    "framework-map.json": "e7a29d375d70db93811937241f54885955644c6d92d051d8f190de2552383dad",
+    "map-selection.json": "979288ca51f17eb1acda33e951b25adf1e1767260ffe55cb59b6e4ce5acc899e"
+  },
+  "integrity": {
+    "inventory": {
+      "blocking": [],
+      "advisory": [],
+      "problems": [],
+      "itemCount": 51,
+      "reusedFrom": "experiments/semantic-grounding/fixture-e/run-09/semantic-inventory.json",
+      "sha256": "36f99102b7d525bb662c5afe78e6fac1c190063998bbe339fd94447604d0fabb"
+    },
+    "selection": {
+      "problems": [],
+      "softNotes": [],
+      "stats": {
+        "inventoryItems": 51,
+        "dispositions": 51,
+        "represented": 44,
+        "topic-only": 3,
+        "omitted": 4,
+        "missing": 0
+      }
+    }
+  },
+  "validator": {
+    "exitCode": 0,
+    "hard": 0,
+    "warn": 1,
+    "info": 10,
+    "status": "PASS"
+  }
+}
