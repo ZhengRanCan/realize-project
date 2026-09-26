@@ -1,0 +1,65 @@
+Feature 05 · B / C 结构自查（section 粒度 · provisional）
+
+═══ Fixture B · Data Model heavy ═══
+  map  docs/features/05-l0-generalization-gate/drafts/fixture-b.map.json
+  doc  测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md  （顶层 §1~§13，子节 22 个）
+
+  A. Framework Map invariant
+    PASS  F1 全部 12 个元素的 sectionRefs 非空且指向真实小节
+    PASS  F2 元素总数 12 ≤ 12
+    PASS  type 分布 {"artifact":5,"constraint":2,"process":3,"component":1,"concept":1}（六类是 allowed vocabulary，不要求凑齐）
+    PASS  edge 词表封闭（用到 consumes, produces）
+    PASS  未使用兜底词 relates-to
+    PASS  主轴只有 process / artifact
+    PASS  判据 B：12/12 元素至少参与一条 edge 或 attachment
+    PASS  判据 F：12 个 label 唯一
+    PASS  侧挂完整（5 条，覆盖 4 个非主轴元素）
+    WARN  constraint 2 条，超出 3~5 区间
+
+  B. Navigation invariant（section 粒度 · provisional）
+    PASS  N1 T-01 为什么不能直接 hash 原始 JSON: elements=0 · sections=1  ← 只有内容、没有 element（合法）
+    PASS  N1 T-02 唯一处理流水线: elements=7 · sections=2
+    PASS  N1 T-03 三个 Digest Profile 与字段白名单: elements=2 · sections=3
+    PASS  N1 T-04 版本、错误语义与实施门禁: elements=2 · sections=4
+    PASS  N1 T-05 跨语言实现与 Golden Fixtures: elements=4 · sections=2
+    PASS  每个元素都有 topic 归属
+    NOTE  section 粒度下 N2（每个 block 有入口）与 N3（每条语义有路径）合并为同一件事：每一节都要有入口
+    PASS  N2/N3 顶层 §1~§13 全部有入口（文档级 1 节 + Topic 12 节）
+    PASS  meta.validationGranularity = "section (provisional)"
+
+  → B: 元素 12 · 边 6 · 侧挂 5 · topics 5 · 无 element 的 topic T-01
+
+═══ Fixture C · Process / Operational heavy ═══
+  map  docs/features/05-l0-generalization-gate/drafts/fixture-c.map.json
+  doc  测试文档/fixture-c-candidate-inbox-driven-profile-pipeline.md  （顶层 §1~§19，子节 16 个）
+
+  A. Framework Map invariant
+    PASS  F1 全部 12 个元素的 sectionRefs 非空且指向真实小节
+    PASS  F2 元素总数 12 ≤ 12
+    PASS  type 分布 {"artifact":6,"process":3,"state":1,"constraint":2}（六类是 allowed vocabulary，不要求凑齐）
+    PASS  edge 词表封闭（用到 contains, consumes, produces, depends-on, validates）
+    PASS  未使用兜底词 relates-to
+    PASS  主轴只有 process / artifact
+    PASS  判据 B：12/12 元素至少参与一条 edge 或 attachment
+    PASS  判据 F：12 个 label 唯一
+    PASS  侧挂完整（4 条，覆盖 3 个非主轴元素）
+    WARN  constraint 2 条，超出 3~5 区间
+
+  B. Navigation invariant（section 粒度 · provisional）
+    PASS  N1 T-01 接收事务、幂等与持久模型: elements=3 · sections=3
+    PASS  N1 T-02 事件驱动架构与后台处理: elements=4 · sections=5
+    PASS  N1 T-03 事实语义、Confidence 与 Mastery: elements=2 · sections=3
+    PASS  N1 T-04 受限 Agent 与 Memory Consolidation: elements=4 · sections=2
+    PASS  N1 T-05 身份作用域、生命周期与可观测性: elements=1 · sections=3
+    PASS  N1 T-06 实施切片与待定项: elements=0 · sections=2  ← 只有内容、没有 element（合法）
+    PASS  每个元素都有 topic 归属
+    NOTE  section 粒度下 N2（每个 block 有入口）与 N3（每条语义有路径）合并为同一件事：每一节都要有入口
+    PASS  N2/N3 顶层 §1~§19 全部有入口（文档级 1 节 + Topic 18 节）
+    PASS  meta.validationGranularity = "section (provisional)"
+
+  → C: 元素 12 · 边 8 · 侧挂 4 · topics 6 · 无 element 的 topic T-06
+
+════════════════════════════════
+结果: Hard Error 0 · Warning 2
+说明: 本脚本的 coverage 为 section 粒度（provisional），与 Fixture A 的 sourceUnit 粒度不可混算。
+════════════════════════════════

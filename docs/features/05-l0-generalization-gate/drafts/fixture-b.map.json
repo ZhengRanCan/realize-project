@@ -1,0 +1,175 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+
+  "document": {
+    "id": "DESIGN-FUSION-C14N-V1",
+    "title": "Canonical Hash / Digest 与完整性规范（fusion-c14n-v1）",
+    "sourcePath": "测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md",
+    "role": "target",
+    "scope": {
+      "text": "本文定稿 OpenMAIC（TypeScript）与 DeepTutor（Python）计算 semanticRequestDigest / factSetDigest / canonicalPayloadHash 三个值时共同使用的规范；它不表示两个 Fork 已经实现该算法。",
+      "sectionRefs": ["§1"]
+    }
+  },
+
+  "thesis": "同一语义必须得到同一指纹：领域对象先被 Digest Profile 白名单投影、再语义规范化、包进 Domain Separation Envelope，经 RFC 8785 JCS 序列化为唯一 UTF-8 字节，最后 SHA-256；两端靠同一份 Golden Fixtures 保证逐字节一致。",
+
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "严格解析的领域对象",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-02"],
+      "sectionRefs": ["§3", "§4.1"]
+    },
+    {
+      "id": "E-02",
+      "label": "Digest Profile 字段白名单（先投影后 hash）",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-03"],
+      "sectionRefs": ["§3", "§5.2", "§6.2", "§7.2", "§12"]
+    },
+    {
+      "id": "E-03",
+      "label": "Fusion 语义规范化",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-02"],
+      "sectionRefs": ["§3", "§4.1", "§4.2", "§4.3", "§4.4", "§4.5", "§4.6", "§4.7"]
+    },
+    {
+      "id": "E-04",
+      "label": "CanonicalDigestEnvelope",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-02", "T-04"],
+      "sectionRefs": ["§3.1", "§8"]
+    },
+    {
+      "id": "E-05",
+      "label": "RFC 8785 JCS 序列化 + UTF-8 编码",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-02"],
+      "sectionRefs": ["§3", "§4.8"]
+    },
+    {
+      "id": "E-06",
+      "label": "canonical UTF-8 bytes",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-02", "T-05"],
+      "sectionRefs": ["§4.8", "§12"]
+    },
+    {
+      "id": "E-07",
+      "label": "SHA-256",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-02"],
+      "sectionRefs": ["§3", "§4.8"]
+    },
+    {
+      "id": "E-08",
+      "label": "wire digest（sha256:<64 hex>）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-02", "T-05"],
+      "sectionRefs": ["§3", "§4.8"]
+    },
+    {
+      "id": "E-09",
+      "label": "Golden Fixtures（canonical-digest-v1.json）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-05"],
+      "sectionRefs": ["§10", "§12"]
+    },
+    {
+      "id": "E-10",
+      "label": "TypeScript / Python 两端实现",
+      "type": "component",
+      "role": "producer",
+      "topics": ["T-05"],
+      "sectionRefs": ["§1", "§9.1", "§9.2", "§9.3", "§9.4"]
+    },
+    {
+      "id": "E-11",
+      "label": "三类 Digest Profile（semantic-request / lesson-fact-set / profile-update-candidate）",
+      "type": "concept",
+      "role": "output",
+      "topics": ["T-03"],
+      "sectionRefs": ["§5.1", "§5.3", "§6.1", "§6.3", "§7.1", "§7.3"]
+    },
+    {
+      "id": "E-12",
+      "label": "失败关闭：未知版本 / 歧义数组 / 无效 Unicode / 数字 / 时间一律拒绝",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-04"],
+      "sectionRefs": ["§4.1", "§11", "§12"]
+    }
+  ],
+
+  "edges": [
+    { "from": "E-03", "to": "E-01", "type": "consumes" },
+    { "from": "E-03", "to": "E-04", "type": "produces" },
+    { "from": "E-05", "to": "E-04", "type": "consumes" },
+    { "from": "E-05", "to": "E-06", "type": "produces" },
+    { "from": "E-07", "to": "E-06", "type": "consumes" },
+    { "from": "E-07", "to": "E-08", "type": "produces" }
+  ],
+
+  "attachments": [
+    { "elementId": "E-02", "attachedTo": ["E-01", "E-03"] },
+    { "elementId": "E-11", "attachedTo": ["E-04"] },
+    { "elementId": "E-09", "attachedTo": ["E-06", "E-08"] },
+    { "elementId": "E-10", "attachedTo": ["E-08"] },
+    { "elementId": "E-12", "attachedTo": ["E-03", "E-07"] }
+  ],
+
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "为什么不能直接 hash 原始 JSON",
+      "proposition": "两段字节不同但语义相同的 JSON 必须得到同一个指纹，所以不能对收到的文本直接计算 hash。",
+      "sectionRefs": ["§2"]
+    },
+    {
+      "id": "T-02",
+      "title": "唯一处理流水线",
+      "proposition": "投影 → 规范化 → 信封 → JCS → UTF-8 → SHA-256；任何一步不满足规范都必须拒绝计算，不得回退到 JSON.stringify / json.dumps。",
+      "sectionRefs": ["§3", "§4"]
+    },
+    {
+      "id": "T-03",
+      "title": "三个 Digest Profile 与字段白名单",
+      "proposition": "只有 Profile 明确列出的字段受保护；purpose 进入 Envelope，防止同一组字段在不同用途下产生可互换的 digest。",
+      "sectionRefs": ["§5", "§6", "§7"]
+    },
+    {
+      "id": "T-04",
+      "title": "版本、错误语义与实施门禁",
+      "proposition": "版本由 canonicalization + purpose + valueSchemaVersion 共同决定；不认识任一版本时失败关闭，不猜测兼容。",
+      "sectionRefs": ["§8", "§11", "§12", "§13"]
+    },
+    {
+      "id": "T-05",
+      "title": "跨语言实现与 Golden Fixtures",
+      "proposition": "两端必须消费同一份 fixture 文件并产生逐字节相同的结果 —— 比较 canonical bytes，而不只是最终 hex。",
+      "sectionRefs": ["§9", "§10"]
+    }
+  ],
+
+  "meta": {
+    "elementCount": 12,
+    "topicCount": 5,
+    "edgeCount": 6,
+    "attachmentCount": 5,
+    "validationGranularity": "section (provisional)",
+    "note": "B 没有 sourceUnits（未跑过 Stage 1），溯源为原文小节。N3 按小节粒度检查，不得与 Fixture A 的 sourceUnit 粒度混算。"
+  }
+}

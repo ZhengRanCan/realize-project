@@ -24,6 +24,8 @@ Fixture C  Process / Operational heavy    → 测试文档/fixture-c-*
 
 Feature 04 的成果里，有 8 条是**从一篇文档**推出来的。每一条都要在 A / B / C 上单独给结论。
 
+> **执行结论已产出 → `results/rule-matrix.md`**（下表"结论"列为空是设计如此，实际结论在规则矩阵里逐条附证据。）
+
 | # | 规则 | 出处 | 结论（执行时填） |
 |---|---|---|---|
 | **R1** | 六类 element vocabulary（concept / component / process / artifact / state / constraint） | 03 §5.1 | 成立 / 有条件成立 / 不成立 |
@@ -159,4 +161,16 @@ FAIL  → 回头修改 03 的 §3~§6；不得继续往下做契约
 
 - **创建时间**：2026-09-26
 - **前置**：Fixture B / C 已就绪（`测试文档/`）；Feature 04 的 Fixture A 图已产出
-- **状态**：待开始
+- **执行**：完成（Task 2.1 ~ 2.6；Task 2.7 可选探针未做）
+- **结果**：
+
+```text
+Gate = PASS
+R1 R3 R6 R7 成立 · R2 R4 R5 R8 有条件成立 · 无一不成立
+Semantic gap = 0（三篇 36 个元素都不需要第 7 类）
+B / C 结构自查 Hard Error 0
+```
+
+- **带进 Feature 03 的修正**（已回写）：Capacity gap 补为第 5 类 · §3.3 补"分叉 DAG"实测形态与"不要默认串成链"的教训 · §5.3 补容量偏紧 · §5.5 标注"3~5 条"是 Fixture A 经验值
+- **带进 Feature 06 的输入**：3 处 Relation gap · Capacity gap 在 `check-map` 里的分级处理
+- **建议的 Phase 2b**（不阻塞 Feature 06）：真正的实体关系型文档 · 纯运维 runbook 式文档 · 决策记录格式探针

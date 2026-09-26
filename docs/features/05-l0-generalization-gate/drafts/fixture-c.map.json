@@ -1,0 +1,182 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+
+  "document": {
+    "id": "DESIGN-DEEPTUTOR-CANDIDATE-PIPELINE",
+    "title": "DeepTutor 自动画像与学习状态流水线",
+    "sourcePath": "测试文档/fixture-c-candidate-inbox-driven-profile-pipeline.md",
+    "role": "target",
+    "scope": {
+      "text": "本文统合「没有人类主动对话时，DeepTutor 如何由 OpenMAIC Candidate 事件驱动自动更新学习状态」的处理规范；它定义逻辑职责、处理语义与推荐物理选型，不把示例字段视为最终 DDL、API 或 Agent prompt。",
+      "sectionRefs": ["§1"]
+    }
+  },
+
+  "thesis": "Candidate 是外部候选观察，不是内部事实、更不是写入命令：它先被可靠接收进 Inbox，再由后台 Worker 转成不可变的 Fusion Learning Fact，此后 Mastery 与 Memory 各自独立投影；Agent 只提议，确定性服务负责校验与提交。",
+
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "OpenMAIC Candidate",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-01", "T-02"],
+      "sectionRefs": ["§1", "§2", "§5.1"]
+    },
+    {
+      "id": "E-02",
+      "label": "Candidate Inbox",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-01", "T-02"],
+      "sectionRefs": ["§5.1", "§5.2", "§6", "§7.2"]
+    },
+    {
+      "id": "E-03",
+      "label": "Inbox Worker",
+      "type": "process",
+      "role": "consumer",
+      "topics": ["T-02"],
+      "sectionRefs": ["§3", "§8", "§14"]
+    },
+    {
+      "id": "E-04",
+      "label": "Fusion Learning Fact",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-03"],
+      "sectionRefs": ["§2", "§7.5", "§10"]
+    },
+    {
+      "id": "E-05",
+      "label": "MasteryEvidenceProjector",
+      "type": "process",
+      "role": "producer",
+      "topics": ["T-03"],
+      "sectionRefs": ["§2", "§11", "§14"]
+    },
+    {
+      "id": "E-06",
+      "label": "ProfileFactProposal（受限 Agent 输出）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-04"],
+      "sectionRefs": ["§12"]
+    },
+    {
+      "id": "E-07",
+      "label": "Proposal Validator",
+      "type": "process",
+      "role": "intermediate",
+      "topics": ["T-04"],
+      "sectionRefs": ["§12", "§14"]
+    },
+    {
+      "id": "E-08",
+      "label": "Fusion Memory Surface（L2 / L3）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-04"],
+      "sectionRefs": ["§13"]
+    },
+    {
+      "id": "E-09",
+      "label": "FusionLessonBinding",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-05"],
+      "sectionRefs": ["§5.1", "§7.1", "§9"]
+    },
+    {
+      "id": "E-10",
+      "label": "Inbox 处理状态机（pending → processing → processed / retry_scheduled / dead_letter / discarded）",
+      "type": "state",
+      "role": "intermediate",
+      "topics": ["T-02"],
+      "sectionRefs": ["§7.3", "§8", "§14"]
+    },
+    {
+      "id": "E-11",
+      "label": "接收事务与后台计算分离",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-01"],
+      "sectionRefs": ["§2", "§3", "§5.1", "§5.3"]
+    },
+    {
+      "id": "E-12",
+      "label": "Agent 只提议，确定性服务负责校验与提交",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": ["T-04"],
+      "sectionRefs": ["§3", "§12"]
+    }
+  ],
+
+  "edges": [
+    { "from": "E-02", "to": "E-01", "type": "contains" },
+    { "from": "E-03", "to": "E-02", "type": "consumes" },
+    { "from": "E-03", "to": "E-04", "type": "produces" },
+    { "from": "E-05", "to": "E-04", "type": "consumes" },
+    { "from": "E-06", "to": "E-04", "type": "depends-on" },
+    { "from": "E-07", "to": "E-06", "type": "validates" },
+    { "from": "E-08", "to": "E-06", "type": "consumes" },
+    { "from": "E-08", "to": "E-04", "type": "consumes" }
+  ],
+
+  "attachments": [
+    { "elementId": "E-09", "attachedTo": ["E-02", "E-03"] },
+    { "elementId": "E-10", "attachedTo": ["E-02", "E-03"] },
+    { "elementId": "E-11", "attachedTo": ["E-02", "E-03"] },
+    { "elementId": "E-12", "attachedTo": ["E-06", "E-07"] }
+  ],
+
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "接收事务、幂等与持久模型",
+      "proposition": "接收只做短事务：验身份、校验 schema、解析 Binding、算 payloadHash、按幂等键唯一写入，然后返回 Receipt。",
+      "sectionRefs": ["§5", "§6", "§7"]
+    },
+    {
+      "id": "T-02",
+      "title": "事件驱动架构与后台处理",
+      "proposition": "课堂结束不等待 Agent 或 L3 更新；后台步骤先恢复 Learner 身份并安装用户作用域，再按 lease 与状态机推进，可恢复、可重放、可审计。",
+      "sectionRefs": ["§2", "§3", "§8", "§14", "§15"]
+    },
+    {
+      "id": "T-03",
+      "title": "事实语义、Confidence 与 Mastery",
+      "proposition": "四类 confidence 不相乘成一个总分；外部 Candidate 必须重新校验并转成不可变 Fusion Learning Fact，Mastery 由确定性领域服务投影。",
+      "sectionRefs": ["§4", "§10", "§11"]
+    },
+    {
+      "id": "T-04",
+      "title": "受限 Agent 与 Memory Consolidation",
+      "proposition": "Agent 只返回结构化候选，Validator 负责 schema 与证据门槛；验证失败的 Proposal 不进入 Memory，且不得直接写 mastery 或覆盖 L2/L3。",
+      "sectionRefs": ["§12", "§13"]
+    },
+    {
+      "id": "T-05",
+      "title": "身份作用域、生命周期与可观测性",
+      "proposition": "一律使用 Binding 冻结的 learner，不信任 Candidate 自报身份；删除沿引用链执行，人工恢复必须留审计记录。",
+      "sectionRefs": ["§9", "§16", "§17"]
+    },
+    {
+      "id": "T-06",
+      "title": "实施切片与待定项",
+      "proposition": "按依赖顺序拆成 7 个切片，每个切片都要有失败注入、重启恢复、跨 learner 隔离、幂等重放与删除测试。",
+      "sectionRefs": ["§18", "§19"]
+    }
+  ],
+
+  "meta": {
+    "elementCount": 12,
+    "topicCount": 6,
+    "edgeCount": 8,
+    "attachmentCount": 4,
+    "validationGranularity": "section (provisional)",
+    "note": "C 没有 sourceUnits（未跑过 Stage 1），溯源为原文小节。N3 按小节粒度检查，不得与 Fixture A 的 sourceUnit 粒度混算。"
+  }
+}
