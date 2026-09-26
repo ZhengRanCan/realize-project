@@ -1,0 +1,133 @@
+{
+  "topicId": "T-02",
+  "title": "生成链路与消费点",
+  "level": "L1",
+  "keyQuestion": "为什么把消费点放在 Outline Generation，而不是 Scene？",
+  "structure": {
+    "type": "flow-with-rationale",
+    "overview": {
+      "current": {
+        "label": "Current",
+        "problem": "Scene 仍然直接读取 Formal Context",
+        "nodes": [
+          "Frozen Context",
+          "→ Outline Generation",
+          "→ Outline",
+          "→ Scene Generation",
+          "← Formal Context (直接读取)"
+        ]
+      },
+      "target": {
+        "label": "Target",
+        "solution": "只在 Outline 消费，Scene 读 Outline",
+        "nodes": [
+          "Frozen Context",
+          "→ Outline Generation (消费点)",
+          "→ Context-shaped Outline",
+          "→ Scene Generation",
+          "→ Scene"
+        ]
+      }
+    },
+    "rationale": {
+      "title": "为什么 Outline 是消费点？",
+      "reasons": [
+        {
+          "text": "避免重复解释同一份 guidance",
+          "importance": "high"
+        },
+        {
+          "text": "避免 scene 之间 revision 分叉",
+          "importance": "high"
+        },
+        {
+          "text": "减少 token 成本",
+          "importance": "medium"
+        },
+        {
+          "text": "realized alignment 归因更清晰",
+          "importance": "medium"
+        }
+      ]
+    },
+    "mapping": {
+      "title": "三个产品层级 → 代码职责",
+      "layers": [
+        {
+          "conceptual": "Receipt",
+          "production": "Context Receipt",
+          "entry": "Request / Session lineage"
+        },
+        {
+          "conceptual": "Availability",
+          "production": "Context Availability",
+          "entry": "Generation-facing Projection"
+        },
+        {
+          "conceptual": "Consumption",
+          "production": "Actual Consumption",
+          "entry": "Outline Generation Attempt"
+        }
+      ]
+    }
+  },
+  "entryPoints": [
+    {
+      "id": "EP-02-01",
+      "label": "当前 vs 目标链路",
+      "blockId": "O-04",
+      "description": "系统骨架：消费点放在哪一层",
+      "shape": "current-target-flow"
+    },
+    {
+      "id": "EP-02-02",
+      "label": "为什么 Outline 是消费点",
+      "blockId": "O-04b",
+      "description": "为什么不把消费点放在 scene",
+      "shape": "checklist"
+    },
+    {
+      "id": "EP-02-03",
+      "label": "代码职责映射",
+      "blockId": "O-04c",
+      "description": "三个产品层级 → 现有生产职责映射",
+      "shape": "matrix"
+    },
+    {
+      "id": "EP-02-04",
+      "label": "两条链如何流转",
+      "blockId": "O-05",
+      "description": "Context-side 与 Output-side",
+      "shape": "flow"
+    },
+    {
+      "id": "EP-02-05",
+      "label": "Consumption 的对象",
+      "blockId": "O-06",
+      "description": "什么东西被消费",
+      "shape": "two-column-comparison"
+    }
+  ],
+  "relatedTopics": [
+    {
+      "topicId": "T-01",
+      "relation": "defined-by",
+      "label": "三级模型定义了这条链路的职责边界"
+    },
+    {
+      "topicId": "T-03",
+      "relation": "produces-evidence-for",
+      "label": "这条链路产生 Consumption 的证据"
+    },
+    {
+      "topicId": "T-04",
+      "relation": "separates-from",
+      "label": "与 Output-side 分离"
+    }
+  ],
+  "meta": {
+    "blockCount": 5,
+    "entryPointCount": 5,
+    "estimatedReadTime": "8-12 分钟"
+  }
+}

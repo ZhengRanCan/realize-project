@@ -1,0 +1,84 @@
+{
+  "documentId": "DESIGN-CONTEXT-CONSUMPTION",
+  "title": "Context Consumption 语义模型",
+  "level": "L0",
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "三级语义模型",
+      "summary": "Receipt → Availability → Consumption 的递进关系",
+      "importance": "core",
+      "blockIds": ["O-01", "O-02", "O-09"],
+      "keyQuestion": "什么是 Consumption？它和 Receipt、Availability 的区别是什么？"
+    },
+    {
+      "id": "T-02",
+      "title": "生成链路与消费点",
+      "summary": "Outline 为主消费点，Scene 不重复消费 Frozen Context",
+      "importance": "core",
+      "blockIds": ["O-04", "O-04b", "O-04c", "O-05", "O-06"],
+      "keyQuestion": "为什么把消费点放在 Outline Generation，而不是 Scene？"
+    },
+    {
+      "id": "T-03",
+      "title": "Consumption Evidence",
+      "summary": "怎么判定 Consumption 发生了、需要什么证据、哪些不能证明",
+      "importance": "core",
+      "blockIds": ["O-10", "O-10b", "O-10c", "O-11", "O-11b", "O-16"],
+      "keyQuestion": "怎么算 Consumption 发生了？最低证据是什么？"
+    },
+    {
+      "id": "T-04",
+      "title": "两条链的边界",
+      "summary": "Context-side 与 Output-side 的职责分离",
+      "importance": "core",
+      "blockIds": ["O-03", "O-07", "O-08"],
+      "keyQuestion": "Consumption 和 Output Alignment 是什么关系？"
+    },
+    {
+      "id": "T-05",
+      "title": "产品边界与非主张",
+      "summary": "明确不做什么、不承诺什么、状态组合的产品解释",
+      "importance": "supporting",
+      "blockIds": ["O-12", "O-13", "O-14", "O-15"],
+      "keyQuestion": "这个语义模型明确不主张什么？"
+    }
+  ],
+  "relations": [
+    {
+      "from": "T-01",
+      "to": "T-02",
+      "type": "defines",
+      "label": "三级模型定义了生成链路的职责边界",
+      "strength": "strong"
+    },
+    {
+      "from": "T-02",
+      "to": "T-03",
+      "type": "produces-evidence-for",
+      "label": "生成链路产生 Consumption 的证据",
+      "strength": "strong"
+    },
+    {
+      "from": "T-01",
+      "to": "T-04",
+      "type": "separates",
+      "label": "三级模型分离 Context-side 与 Output-side",
+      "strength": "medium"
+    },
+    {
+      "from": "T-03",
+      "to": "T-05",
+      "type": "constrains",
+      "label": "证据体系约束了产品边界",
+      "strength": "weak"
+    }
+  ],
+  "meta": {
+    "totalBlocks": 21,
+    "topicCount": 5,
+    "coreTopics": 4,
+    "supportingTopics": 1,
+    "note": "手工划分，未使用 AI。基于现有 21 个 blocks 的语义归属。"
+  }
+}
