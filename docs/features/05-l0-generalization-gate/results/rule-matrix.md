@@ -4,6 +4,11 @@
 >
 > 被攻击的规则来自 Feature 04（`docs/features/03-hierarchical-architecture/README.md` §3~§6）。
 > 结论只有三种：**成立 / 有条件成立 / 不成立**。
+>
+> ⚠️ **证据范围声明**：本矩阵的结论只覆盖 **当前 3 个 Fixtures（A / B / C）**。
+> "成立"一律读作 **Supported across current A/B/C fixtures**，**不是** "universal / 已证明完备"。
+> 尚未测试的形态（真正的 Entity-Relationship heavy、纯 Operational Runbook、决策记录）见 `phase2-generalization.md` 的 Phase 2b。
+> 如果 Phase 2b 打出第 7 类元素，那是**扩大证据范围**，不是推翻本矩阵。
 
 ```text
 A  Concept / Architecture heavy   测试文档/18-context-consumption-semantic-model.md     (540 行)
@@ -18,7 +23,10 @@ B / C 的粒度 = 原文小节（**provisional**，二者不可混算）
 
 ## R1 · 六类 element vocabulary
 
-**结论：成立**
+**结论：成立（Supported across current A/B/C fixtures）**
+
+> 措辞注意：**不是** "六类 ontology 已证明完备"。
+> 只能说：**在当前 3 个 Fixtures 中，未观察到 Semantic gap。**
 
 | Fixture | 实际用到的 type | 缺失 |
 |---|---|---|
@@ -235,7 +243,7 @@ OpenMAIC Candidate → Candidate Inbox → Inbox Worker → Fusion Learning Fact
 
 | # | 规则 | 结论 |
 |---|---|---|
-| R1 | 六类 element vocabulary | **成立** |
+| R1 | 六类 element vocabulary | **成立**（Supported across current A/B/C fixtures —— 非"已证明完备"） |
 | R2 | type + role 两层机制 | **成立**（2 处拉伸） |
 | R3 | edge / attachment 区分 | **成立** |
 | R4 | relation vocabulary（8 词） | **有条件成立**（3 处 Relation gap） |
@@ -245,3 +253,5 @@ OpenMAIC Candidate → Candidate Inbox → Inbox Worker → Fusion Learning Fact
 | R8 | framework-map 表达模型 | **有条件成立**（"单一主轴"不成立 → 分叉 DAG） |
 
 **没有任何一条判为"不成立"，也没有任何一处需要新增第 7 类元素或第 9 个关系词。**
+
+以上结论的范围**仅限 A / B / C 三篇**。哪些是"稳定到可以进契约"，哪些只是"目前没被打破"，见 Feature 06 的三级冻结清单。

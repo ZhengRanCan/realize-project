@@ -10,13 +10,13 @@
 ## 0. 结论先行
 
 ```text
-Semantic gap   0 条   ← 没有任何一项需要第 7 类元素
+Semantic gap   0 条   ← 在当前 3 个 Fixtures 中未观察到（≠ 已证明六类完备）
 Relation gap   3 条
 Navigation gap 1 条（Fixture A，已在 Feature 04 修复）
 Layout gap     1 条
 Capacity gap   5 条   ← ⚠️ 现有 4 类装不下，见 §2
 
-建议扩 ontology 的项：0 条
+建议扩 ontology 的项：0 条（同样只针对当前 3 个 Fixtures）
 ```
 
 > **三篇文档、36 个元素、跨三种文档类型，没有出现一次"类型不够用"。**
