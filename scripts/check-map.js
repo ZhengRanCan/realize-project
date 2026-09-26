@@ -77,12 +77,16 @@ function checkMap(map, opts = {}) {
   const plan = opts.plan;
   let validUnits = null, universe = [], blockById = null, allBlocks = null;
   let sec = null, sectionUnresolved = false;
+  const skipped = [];
   if (!isSection) {
     if (plan) {
       validUnits = new Set(plan.sourceUnits.map((u) => u.id));
       universe = plan.sourceUnits.map((u) => u.id);
       allBlocks = plan.blocks;
       blockById = new Map(allBlocks.map((b) => [b.id, b]));
+    } else {
+      skipped.push('引用可解析性与 N2 / N3（sourceUnit 粒度但未提供 --plan）');
+      warn.push('W0 未提供 --plan → 无法建立 sourceUnit 全集，跳过引用解析与 N2 / N3 导航校验，避免误报 HARD');
     }
   } else {
     sec = opts.docSections || readDocSections(map.document.sourcePath);
@@ -90,6 +94,7 @@ function checkMap(map, opts = {}) {
       // 原文小节标题不是数字形式（例如 Fixture A 用「## 一、」）→ 无法建立"位置全集"。
       // 此时**不能**把每个引用都判成悬空引用 —— 那会把格式差异误报成契约违反。
       sectionUnresolved = true;
+      skipped.push('引用可解析性与 N2 / N3（原文小节无法解析）');
       warn.push('W0 无法从原文解析出小节标题（文档可能使用非数字标题）→ 跳过 section 粒度的引用 / 导航校验，避免误报 HARD');
     } else {
       validUnits = new Set([...sec.top.map((n) => '§' + n), ...sec.sub.map((n) => '§' + n)]);
@@ -235,7 +240,10 @@ function checkMap(map, opts = {}) {
   });
 
   return {
-    hard, warn, info, granularity,
+    hard, warn, info, granularity, skipped,
+    // 状态必须区分 PASS 与 PASS WITH INCOMPLETE VALIDATION ——
+    // 一旦 N1~N3 根本没执行，就不能让人误以为 Navigation invariant 已验证通过
+    status: hard.length > 0 ? 'FAIL' : (skipped.length > 0 ? 'PASS WITH INCOMPLETE VALIDATION' : 'PASS'),
     stats: { elements: els.length, edges: edges.length, attachments: atts.length, topics: topics.length, relationGap: gaps.length, universe: universe.length, unreachable: unreachable.length },
   };
 }
@@ -262,7 +270,7 @@ function main() {
   L.push(`document      ${map.document.title}`);
   L.push(`granularity   ${r.granularity}${/provisional/i.test(r.granularity) ? '   ⚠️ provisional — 不得与 sourceUnit 粒度混算' : ''}`);
   L.push(`stats         elements ${r.stats.elements} · edges ${r.stats.edges} · attachments ${r.stats.attachments} · topics ${r.stats.topics} · relationGap ${r.stats.relationGap}`);
-  L.push(`coverage      ${r.stats.universe - r.stats.unreachable}/${r.stats.universe} 有路径（本粒度内）`);
+  L.push(`coverage      ${r.skipped.length ? 'SKIPPED（未执行，见 W0 与下方 skipped 段）' : `${r.stats.universe - r.stats.unreachable}/${r.stats.universe} 有路径（本粒度内）`}`);
   L.push('');
   L.push(`HARD ERROR (${r.hard.length})`);
   r.hard.forEach((m) => L.push('  ✗ ' + m));
@@ -276,9 +284,16 @@ function main() {
   r.info.forEach((m) => L.push('  i ' + m));
   if (!r.info.length) L.push('  （无）');
   L.push('');
+  L.push(`SKIPPED (${r.skipped.length})`);
+  r.skipped.forEach((m) => L.push('  – ' + m));
+  if (!r.skipped.length) L.push('  （无 —— 本次全部检查都已执行）');
+  L.push('');
   L.push('════════════════════════════════');
   L.push(`结果: HARD ${r.hard.length} · WARN ${r.warn.length} · INFO ${r.info.length}`);
-  L.push(r.hard.length === 0 ? 'PASS（无契约违反）' : 'FAIL（存在契约违反）');
+  L.push(`状态: ${r.status}`);
+  if (r.status === 'PASS WITH INCOMPLETE VALIDATION') {
+    L.push('⚠️ 有检查未执行 —— **不得**据此认为 Navigation invariant 已验证通过。');
+  }
   L.push('注: element budget 是 Warning；某类元素为 0 / 无主轴 / DAG / Topic 无 element 是 Informational，不是异常。');
   L.push('════════════════════════════════');
   console.log(L.join('\n'));

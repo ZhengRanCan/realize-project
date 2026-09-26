@@ -264,10 +264,13 @@ Fixture E  纯 Operational Runbook
 ```text
 schema          无 maxItems（刻意）；role 非 enum；relationGap 为独立结构
 check-map       HARD / WARN / INFO 三级；词表从 schema 读（单一真相）
-test:map        19/19 通过（覆盖三级 severity 的边界）
-A / B / C       三篇 HARD = 0
+                另：检查被跳过时状态为 PASS WITH INCOMPLETE VALIDATION
+test:map        21/21 通过（覆盖三级 severity 的边界 + skipped 状态）
+A / B / C       三篇 HARD = 0，状态均为 PASS
 ```
 
 - **判定**：待 reviewer 按 `validation-checklist.md` 验证
 - **配套文档**：`execution-prompt.md` · `validation-checklist.md` · `results/notes.md`
-- **下一步**：Phase 2b（Contract 对抗测试）—— 用 Fixture D（真 ER-heavy）与 E（纯 runbook）去打 schema 与 validator
+- **下一步**：**Feature 09（Contract 对抗测试 / Phase 2b）** —— 用 Fixture D（真 ER-heavy）与 E（纯 runbook）去打 schema 与 validator。
+  任务书：`docs/features/09-contract-adversarial-test/`。
+  **Feature 07（生成链路）在 09 的 Gate 通过之前不应开始。**

@@ -18,8 +18,9 @@ docs/features/
 ├── 04-l0-framework-map/         # Phase 1 / Track A：手工框架图 + 交互假设
 ├── 05-l0-generalization-gate/   # Phase 2 / Track B：跨文档类型 Gate
 ├── 06-contract-and-validators/  # Phase 3：契约与校验器（等 05 的 Gate）
-├── 07-generation-pipeline/      # Phase 4：Stage 1a/1b（等 Gate + 06）
-└── 08-l0-ui/                    # Phase 5：L0 一屏两区（等 06）
+├── 07-generation-pipeline/      # Phase 4：Stage 1a/1b（等 09 的 Gate）
+├── 08-l0-ui/                    # Phase 5：L0 一屏两区（等 06）
+└── 09-contract-adversarial-test/ # Phase 2b：Contract 对抗测试（流程上在 06 之后 / 07 之前）
 ```
 
 ## Feature 命名规范
@@ -61,8 +62,9 @@ XX-feature-name/
 | 04 | l0-framework-map | Technical Pass / UX Validation Pending | DSH agent | 用户 | - |
 | 05 | l0-generalization-gate | Executed（Gate = PASS，待验收） | DSH agent | 用户 | - |
 | 06 | contract-and-validators | Executed（待验收） | DSH agent | 用户 | - |
-| 07 | generation-pipeline | Ready（建议先做 Phase 2b 对抗测试） | TBD | TBD | - |
+| 07 | generation-pipeline | Blocked（等 09 的 Gate） | TBD | TBD | - |
 | 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |
+| 09 | contract-adversarial-test | Ready（等用户提供 Fixture D / E） | DSH agent | 用户 | - |
 
 ## 创建新 Feature
 

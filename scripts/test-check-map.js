@@ -105,6 +105,17 @@ t('原文小节无法解析 → 只 WARNING，不误报 HARD', () => {
   return has(r.warn, /W0 无法从原文解析出小节标题/) || r.warn.join(' | ');
 });
 
+t('检查被跳过时 → 状态是 PASS WITH INCOMPLETE VALIDATION（不是 PASS）', () => {
+  const r = run(baseMap(), { top: [], sub: [] });
+  if (r.status !== 'PASS WITH INCOMPLETE VALIDATION') return 'status=' + r.status;
+  return r.skipped.length > 0 || 'skipped 为空';
+});
+
+t('检查全部执行时 → 状态是 PASS', () => {
+  const r = run(baseMap());
+  return r.status === 'PASS' || 'status=' + r.status;
+});
+
 t('element id 重复 → HARD', () => {
   const m = baseMap();
   m.elements.push({ ...m.elements[0], label: 'A2' });
