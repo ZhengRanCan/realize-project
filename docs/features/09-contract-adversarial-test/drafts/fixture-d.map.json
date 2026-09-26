@@ -1,0 +1,234 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+
+  "document": {
+    "id": "DESIGN-TEMPO-PLANNING-DOMAIN-MODEL",
+    "title": "Goal / Plan / Stage / Task target model contract",
+    "sourcePath": "测试文档/fixture-d-goal-plan-task-state-model.md",
+    "role": "target",
+    "scope": {
+      "text": "本文是 planning domain 的 F40 target data model contract；未来数据模型迁移应以本文为 source of truth。F40 只记录模型与迁移方向，不删 DailyPlan[]、不改存储键、不实现 AI 或 planner 重写。",
+      "sectionRefs": ["§Purpose"]
+    }
+  },
+
+  "thesis": "planning 域是一张实体网络：Goal 与跨 goal 的 UserProfile 经 transient planning context 产出 PlanBundle（Plan + Stage[] + Task[]）；执行侧再派生 FocusSession / TaskResult / DailyReview / TodayTaskSelection，并由 PlanChangeSummary 记录确定性的调整回执。",
+
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "Goal（原始意图与 goal 级硬约束）",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-02"],
+      "sectionRefs": ["§Goal", "§F40 conclusion"]
+    },
+    {
+      "id": "E-02",
+      "label": "UserProfile（跨 goal 复用上下文）",
+      "type": "artifact",
+      "role": "input",
+      "topics": ["T-02"],
+      "sectionRefs": ["§UserProfile", "§F40 conclusion"]
+    },
+    {
+      "id": "E-03",
+      "label": "PlanBundle（核心持久化聚合）",
+      "type": "artifact",
+      "role": "output",
+      "topics": ["T-01"],
+      "sectionRefs": ["§PlanBundle", "§Model layers"]
+    },
+    {
+      "id": "E-04",
+      "label": "Plan（计划的元数据与策略，含 feasibility / adjustmentRisk）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-01"],
+      "sectionRefs": ["§Plan"]
+    },
+    {
+      "id": "E-05",
+      "label": "Stage（长周期阶段）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-03"],
+      "sectionRefs": ["§Stage"]
+    },
+    {
+      "id": "E-06",
+      "label": "Task（最小可执行单元，含显式依赖）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-03"],
+      "sectionRefs": ["§Task", "§Task Card computed contract"]
+    },
+    {
+      "id": "E-07",
+      "label": "TaskResult（某次执行对某个 Task 实际发生了什么）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-04"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-08",
+      "label": "FocusSession（一次聚焦过程，含 running/paused/completed 状态机）",
+      "type": "process",
+      "role": "instance",
+      "topics": ["T-04"],
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-09",
+      "label": "DailyReview（day-scoped 执行历史，每 Goal/date 至多一条）",
+      "type": "artifact",
+      "role": "authority",
+      "topics": ["T-04"],
+      "sectionRefs": ["§DailyReview", "§FocusSession, TaskResult and DailyReview"]
+    },
+    {
+      "id": "E-10",
+      "label": "TodayTaskSelection（某日决定执行哪个 Task，每 Goal/Plan/date 至多一条）",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": ["T-05"],
+      "sectionRefs": ["§TodayTaskSelection"]
+    },
+    {
+      "id": "E-11",
+      "label": "PlanChangeSummary（一次确定性调整的回执，每 fingerprint 至多一条）",
+      "type": "artifact",
+      "role": "boundary",
+      "topics": ["T-05"],
+      "sectionRefs": ["§PlanChangeSummary"]
+    },
+    {
+      "id": "E-12",
+      "label": "生命周期状态集合（GoalStatus / PlanStatus / StageStatus / TaskStatus / TaskCardAvailability）",
+      "type": "state",
+      "role": "intermediate",
+      "topics": ["T-06"],
+      "sectionRefs": ["§Goal", "§Plan", "§Stage", "§Task", "§Task Card computed contract"]
+    }
+  ],
+
+  "edges": [
+    { "from": "E-03", "to": "E-04", "type": "contains" },
+    { "from": "E-03", "to": "E-05", "type": "contains" },
+    { "from": "E-05", "to": "E-06", "type": "contains" },
+    { "from": "E-04", "to": "E-01", "type": "depends-on" },
+    { "from": "E-06", "to": "E-06", "type": "depends-on" },
+    { "from": "E-07", "to": "E-06", "type": "depends-on" },
+    { "from": "E-08", "to": "E-06", "type": "depends-on" },
+    { "from": "E-10", "to": "E-06", "type": "depends-on" },
+    { "from": "E-11", "to": "E-06", "type": "depends-on" }
+  ],
+
+  "attachments": [
+    { "elementId": "E-02", "attachedTo": ["E-03"] },
+    { "elementId": "E-09", "attachedTo": ["E-07"] },
+    { "elementId": "E-12", "attachedTo": ["E-01", "E-04", "E-05", "E-06", "E-08"] }
+  ],
+
+  "relationGap": [
+    {
+      "from": "E-03",
+      "to": "E-04",
+      "intendedMeaning": "PlanBundle 是聚合根：PlanBundle = Plan + Stage[] + Task[]（组合关系）",
+      "reason": "existing vocabulary cannot express this without distortion：contains 的既定语义是「component 嵌套 process」，用于领域聚合组合是拉伸",
+      "fixture": "D"
+    },
+    {
+      "from": "E-05",
+      "to": "E-06",
+      "intendedMeaning": "Every initial Task belongs to one Stage，且 scheduledDate 必须落在该 Stage 区间内（ownership + 跨实体约束）",
+      "reason": "existing vocabulary cannot express this without distortion：这是归属（belongs-to）而不是依赖，也说不出「恰好一个」与日期区间约束",
+      "fixture": "D"
+    },
+    {
+      "from": "E-06",
+      "to": "E-06",
+      "intendedMeaning": "Task 之间的显式依赖图：同一 PlanBundle 内、无环、只有引用 Task 为 done 才算满足",
+      "reason": "existing vocabulary cannot express this without distortion：自环无法表达基数与无环性，也没有「满足条件」语义",
+      "fixture": "D"
+    },
+    {
+      "from": "E-09",
+      "to": "E-07",
+      "intendedMeaning": "一天可以有多条 Task result，但每个 Goal/date 只有一条 DailyReview；DailyReview 引用/汇总 TaskResult",
+      "reason": "existing vocabulary cannot express this without distortion：没有 reference / summarize 关系词，且「每 Goal/date 至多一条」这类基数无处表达",
+      "fixture": "D"
+    },
+    {
+      "from": "E-02",
+      "to": "E-01",
+      "intendedMeaning": "UserProfile 是跨 goal 复用上下文，被规划引用，但不属于任何单个 Goal",
+      "reason": "existing vocabulary cannot express this without distortion：没有「被引用但不被拥有」的关系词",
+      "fixture": "D"
+    },
+    {
+      "from": "E-01",
+      "to": "E-04",
+      "intendedMeaning": "一个 Goal 可以有多条历史 Plan 版本，但同一时刻至多一条 active plan",
+      "reason": "existing vocabulary cannot express this without distortion：关系词没有基数（1:N 与 at-most-one），也没有「active」这一条件",
+      "fixture": "D"
+    }
+  ],
+
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "规划产出与核心聚合",
+      "proposition": "规划把 Goal 与 UserProfile 通过 transient context 变成 PlanBundle；PlanBundle 是唯一的核心持久化聚合。",
+      "sectionRefs": ["§F40 conclusion", "§Model layers", "§Initial planning flow", "§Replanning flow", "§PlanBundle", "§Plan"]
+    },
+    {
+      "id": "T-02",
+      "title": "目标与跨目标上下文",
+      "proposition": "Goal 是原始意图与硬约束；UserProfile 是跨 goal 的表达与排程偏好，两者边界不得互相渗透。",
+      "sectionRefs": ["§Goal", "§UserProfile"]
+    },
+    {
+      "id": "T-03",
+      "title": "阶段与任务执行单元",
+      "proposition": "Stage 管长周期方向，Task 是最小可执行单元；Task 归属唯一 Stage，且同一天任务总分钟不得超过计划的每日预算。",
+      "sectionRefs": ["§Stage", "§Task", "§Task Card computed contract"]
+    },
+    {
+      "id": "T-04",
+      "title": "执行事实：聚焦、结果与日回顾",
+      "proposition": "FocusSession、TaskResult、DailyReview 是三个不同概念；TaskResult 与 DailyReview 都不是对方的替身。",
+      "sectionRefs": ["§FocusSession, TaskResult and DailyReview", "§DailyReview"]
+    },
+    {
+      "id": "T-05",
+      "title": "当日选择与变更回执",
+      "proposition": "TodayTaskSelection 记录当天要执行哪个 Task；PlanChangeSummary 是确定性调整的回执，不是第二个 Plan 真相源。",
+      "sectionRefs": ["§TodayTaskSelection", "§DailyReviewPromptDismissal", "§PlanChangeSummary"]
+    },
+    {
+      "id": "T-06",
+      "title": "状态与生命周期",
+      "proposition": "Goal / Plan / Stage / Task 各有独立状态机；Plan 的 infeasible 与 adjustmentRisk 必须显式。",
+      "sectionRefs": ["§Goal", "§Plan", "§Stage", "§Task"]
+    },
+    {
+      "id": "T-07",
+      "title": "视图、遗留与迁移方向",
+      "proposition": "Computed views 不是持久真相；DailyPlan[] 只是兼容面，将由单独的破坏性迁移移除。",
+      "sectionRefs": ["§Computed views", "§DailyPlan legacy boundary", "§Migration direction", "§Historical notes"]
+    }
+  ],
+
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 12,
+    "topicCount": 7,
+    "edgeCount": 9,
+    "attachmentCount": 3,
+    "relationGapCount": 6,
+    "note": "D 没有 sourceUnits；溯源为原文小节。小节标题为英文词形（## Goal / ## PlanBundle…），非数字编号。"
+  }
+}

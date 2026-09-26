@@ -353,17 +353,47 @@ E  QUALIFIED   uni-app/YUSHI/docs/harness/features/individual_feature/F13-F16-ru
 
 **E 复核的关键更正**：v2 初版引用的外部证据（F15 `verification.md` L27「超过 5 次」+ 实现层 `MAX_RETRY_COUNT`）**已全部撤回** —— 那既越过了 single-document 口径，也犯了"用代码补文档语义"的错（属 Source Verification，不属 Document Modeling）。
 
+### Task 2 ~ 6：已执行完成
+
+```text
+输入面冻结    D/E 复制进 测试文档/ 并登记 SHA256（副本与源一致，原文未改）
+候选 map      drafts/fixture-d.map.json（12 元素 / 9 边 / 6 relationGap）
+              drafts/fixture-e.map.json（13 元素 / 9 边 / 2 relationGap）
+check-map     两篇 HARD = 0
+              D = PASS WITH INCOMPLETE VALIDATION（W0：小节无法解析 → N2/N3 跳过）
+              E = PASS（W1：13 > 12）
+mutation      M1~M8 × 2 篇 → 拦截率 13/14；唯一漏网 = D 的 M8（正是上面那条覆盖缺口）
+```
+
+**执行纪律的落实**：建模只读各自 primary document；**没有**查阅 `verification.md` 或实现代码；**没有**给 D 人为造主轴；**没有**把 E 压成 happy-path。
+
 ### 当前 Gate
 
 ```text
-D / E 均已 QUALIFIED（单文档口径）→ 待用户对 E 的复核结论确认
-   ↓
-复制进 测试文档/ + 登记来源与 SHA256
-   ↓
-Task 2：生成 candidate map（**不是 Gold**）
+Gate = PARTIAL PASS
+两篇 Fixture 均已 QUALIFIED、建模并跑通；
+ER-heavy 一侧的 Navigation 覆盖仍待 validator 修复后复测。
 ```
 
-（**尚未**开始建模 —— 按 §3.5，选定后需先确认并登记 SHA256。）
+**四条条件**：Semantic gap = 0 ✅ · Relation gap 可控 ❌（D 6 条）· Capacity 只是 heuristic ✅ · Validator 无明显误报 ⚠️（FP = 0，但有 1 处已确证覆盖缺口）
+
+**两件需先修的事**（详见 `results/rule-adjustments.md`）：
+
+1. **扩展小节解析器**：`## <任意标题>` 都应被识别为小节锚点 → 修完 D 的 `N2/N3` 才能跑，M8 才能对 D 生效
+2. **决定对实体网络的词汇表回应**：(a) 接受 `relationGap` 为设计内逃逸口并把"实体网络会欠表达关系"写成已知限制；或 (b) 给 `edges[]` 增加**可选**基数/归属字段（不新增关系词）。**倾向 (b)，但属 Contract 改动，待裁决**
+
+**⚠️ Feature 07 仍保持 Blocked** —— 直到上面两件修完并复测 D。
+
+### 交付物
+
+```text
+drafts/fixture-d.map.json · fixture-e.map.json      candidate map（非 Gold）
+drafts/build-mutations.js                           可复现的 mutation 运行器
+results/fixture-selection-{d,e}.md · -v2.md · -e-single-document-reverification.md
+results/adversarial-report.md                       ★ 四类观察 + mutation + topology + Gate
+results/rule-adjustments.md                         ★ 规则升降级建议
+results/verification-output.txt · mutation-output.txt
+```
 
 ### 留到下一轮（Phase 2c / Feature 09 v2）再讨论的问题
 

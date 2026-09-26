@@ -64,7 +64,7 @@ XX-feature-name/
 | 06 | contract-and-validators | Executed（待验收） | DSH agent | 用户 | - |
 | 07 | generation-pipeline | Blocked（等 09 的 Gate） | TBD | TBD | - |
 | 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |
-| 09 | contract-adversarial-test | Ready（等用户提供 Fixture D / E） | DSH agent | 用户 | - |
+| 09 | contract-adversarial-test | Executed（Gate = PARTIAL PASS，待验收） | DSH agent | 用户 | - |
 
 ## 创建新 Feature
 
