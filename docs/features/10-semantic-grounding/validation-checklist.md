@@ -29,24 +29,39 @@
 
 ## 3. Phase 2 · 实验有效性
 
-- [ ] D × 3 + E × 3 = 6 个新臂 run，每个 run 目录里两阶段产物齐全
+- [ ] D × 3 + E × 3 = 6 个新臂 run，每个 run 目录里**两阶段产物齐全**
 - [ ] 参数 / provider / model 与旧臂一致（逐项比对 `run-meta.json`）
-- [ ] prompt 指纹在 6 个 run 内一致（有变化 → 必须标出分界）
+- [ ] prompt 指纹（A 与 B 两个）在 6 个 run 内一致（有变化 → 必须标出分界）
 - [ ] 失败产物未被删除、未被"重跑到好看"替换
 - [ ] 没有读取人工 candidate map / 其它 run 的痕迹（Stage B 的输入只有原文 + heading tree + inventory）
-- [ ] **混杂已登记**：新臂同时改了"两步"与"prompt parity"
+- [ ] **混杂 ① 已登记**：新臂同时改了"两步"与"prompt parity"
+- [ ] **混杂 ② 已登记（模型漂移声明）**：
+      `Historical control from F07. Same declared model / provider / generation params, but backend model version may not be independently pinned.`
 
 ---
 
-## 4. Phase 3 · 四类失败归因（**本 Feature 的核心产出**）
+## 3.1 Integrity 判据（**Identity consistency > numbering aesthetics**）
 
-- [ ] 每个丢失的 anchor 都能落到 `Extraction Miss / Selection Miss / Encoding Distortion / Escape-hatch Misuse` 之一
-- [ ] 判定链写清楚了：`Inventory 有？→ Map 有？→ 是否在 label/gap 里？`
-- [ ] `map-selection.json` 逐条核过：**声称 covered 但图上没有**的条目被单独列出（这是最易 gaming 的一步）
+- [ ] `run-meta.json.integrity` 记录了：duplicate id / unknown referenced id / selection missing inventory id /
+      selection references nonexistent map target / same item twice / target.kind 与真实 type 不符
+- [ ] **没有**把"id 必须连续"当作完整性条件（跳号不是语义错误）
+- [ ] integrity FAIL 时**产物原样保留**，且**没有**自动补 disposition
+
+---
+
+## 4. Phase 3 · 四段归因 E1–E4（**本 Feature 的核心产出**）
+
+- [ ] 每个丢失的 anchor 都能落到 `E1 Extraction Miss / E2 Selection Miss / E3 Encoding Distortion / E4 Escape-hatch Misuse` 之一
+- [ ] 判定链写清楚了：`Inventory 有？→ 有合法 disposition？→ 最终真的落在该结构上？`
+- [ ] **Stage A 是独立评价的**：先打开 `semantic-inventory.json`，**没有**用 Stage B 的成功/失败倒推
+- [ ] Stage A 四项都评了：Recall / Precision / Granularity / Provenance quality（人工记录，不自动评分）
+- [ ] 反向审查过四种病：重复拆分 · 只抽名词不抽机制 · 把 example 当 invariant · 把实现细节提升为设计语义
+- [ ] **没有**因为 Inventory 抽得多就判 Stage A 好（数量 ≠ 质量）
+- [ ] `map-selection.json` 逐条核过：**声称 represented 但图上没有**的条目被单独列出
 - [ ] `omitted` 的条目里，**没有**属于"不可以砍"五类（失败路径/权限边界/阈值上限/不变量/非目标）的
-- [ ] Inventory 反向检查过：**没有**抄写式穷举 / 不可判断真假的 statement / 同义重复拆条
+- [ ] 「不可以砍 ≠ 必须成为 element」被遵守：constraint attachment / edge 都算合法归宿
 - [ ] E 的 4 个机制 anchor 给出了**新旧同表对比**
-- [ ] D 的 7 个 anchor 给出了**新旧同表对比**（确认没有退化）
+- [ ] D 的 7 个 anchor + 四项退化检查（entity recall / invented relation / 方向错 / 是否变啰嗦）给出**新旧同表对比**
 
 ---
 

@@ -167,12 +167,17 @@ N2 要求：heading tree 里每一个顶层小节都必须有入口
 ### 补丁 3 · 补进 §三（结构要求）
 
 ```text
-**`edge.label` 的使用边界：**
+**`edge.label` 的使用边界（职责分离）：**
 
-- `label` 只能说明**这条边在原文里怎么说的**（可以是原文用词或简短改写）。
-- **禁止**在 `label` 里引入**图上不存在的元素/主体**（例如写"某某 Worker 取得…"，而图上没有这个 Worker）。
-- **禁止**把一条规则、阈值、例外整段塞进 `label`。规则属于 `constraint`，阈值属于 `constraint` 的 label，
-  不属于边的 label。
+- edge structure（from / type / to + qualifiers）= **语义声明**：这条关系到底是什么。
+- edge.label = **human-readable 解释**：它只能说清"这条边在原文里怎么说的"。
+
+因此 label **只能解释已经由 from/type/to 建立的关系**：
+- **禁止**引入新的**主体**（例如写"某某 Worker 取得…"，而图上没有这个 Worker）。
+- **禁止**引入新的**条件 / 阈值 / 结果**（例如把"连续 10 次失败置 REFUND_FAILED"整段塞进 label）。
+- 这些内容属于 `constraint` 元素（或其 label），不属于边的 label。
+
+不能反过来：不能用 label 去补 structure 没说的话。
 ```
 
 ### 补丁 4 · 补进 §三（结构要求）

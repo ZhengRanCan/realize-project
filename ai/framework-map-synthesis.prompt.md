@@ -88,12 +88,16 @@ budget         element 数量的 preferred budget = 12。超过是 Warning（不
   例：一条"输入不得包含敏感正文"的约束，应挂到**输入端**的产物，而不是输出端。
 ```
 
-**`edge.label` 的使用边界：**
+**`edge.label` 的使用边界（职责分离）：**
 
 ```text
-· label 只能说明这条边在原文里怎么说的（原文用词或简短改写）。
-· 禁止在 label 里引入**图上不存在的元素/主体**（例如写"某某 Worker 取得…"，而图上没有这个 Worker）。
-· 禁止把一条规则、阈值、例外整段塞进 label。规则属于 constraint，阈值属于 constraint 的 label。
+· edge structure（from / type / to + qualifiers）= **语义声明**：这条关系到底是什么。
+· edge.label = **human-readable 解释**：它只能说清"这条边在原文里怎么说的"。
+
+因此 label 只能解释**已经由 from/type/to 建立的关系**：
+· 禁止引入**新的主体**（例如写"某某 Worker 取得…"，而图上没有这个 Worker）
+· 禁止引入新的**条件 / 阈值 / 结果**（例如把"连续 10 次失败置 REFUND_FAILED"整段塞进 label）
+· 这些内容属于 `constraint` 元素（或其 label），不属于边的 label。
 ```
 
 **什么可以不上 L0（取舍判据）：**
@@ -170,34 +174,49 @@ G8  不把语义"藏进自由位"。清单里的一条语义，只有三种合�
 
 ### 七、选择轨迹 `map-selection.json`（**必须对清单每一条给出交代**）
 
-对 Semantic Inventory 里的**每一条** `S-xx`，给出恰好一条 decision：
+对 Semantic Inventory 里的**每一条** `S-xx`，给出恰好一条 disposition：
 
 ```json
-{ "semanticId": "S-02",
-  "decision": "attachment",
-  "target": "C-02",
-  "reason": "连续 10 次失败 → REFUND_FAILED 是有界失败规则，作为 constraint 挂在查单流程上" }
+{ "semanticId": "S-014",
+  "disposition": "represented",
+  "target": { "kind": "element", "id": "E-05" },
+  "reason": "……" }
 ```
 
-`decision` 取值与含义（**封闭枚举**）：
+**`disposition`（封闭枚举）：**
 
 ```text
-element      成为 L0 element                    → target = element id
-attachment   作为 concept / constraint / state 侧挂 → target = 该 attachment 的 elementId
-edge         由一条 edge 正经表达                → target = "E-03 --contains--> E-05"
-topic-only   只在 Topic 命题 / 导航里出现（图上不可导航）→ target = topic id
-omitted      未表达                              → target = null，**reason 必填**
+represented   由某个 semantic-bearing 结构承载（必须给 target）
+topic-only    只在 Topic 命题 / 导航里出现（图上不可导航）→ target = {"kind":"topic","id":"T-03"}
+omitted       未表达 → target = null，**reason 必填**
 ```
+
+**`target` 是强类型引用：**
+
+```text
+{"kind":"element",    "id":"E-05"}    → L0 element
+{"kind":"constraint", "id":"C-02"}    → type=constraint 的 element
+{"kind":"attachment", "id":"C-02"}    → 侧挂（id 用该 attachment 的 elementId；attachments[] 没有独立 id）
+{"kind":"edge",       "id":"E-03 --contains--> E-05"}   → 边（有 id 就用边的 id）
+{"kind":"topic",      "id":"T-03"}    → Topic
+null                                  → 仅当 disposition = "omitted"
+```
+
+> `kind` 必须**如实**：声称 `element` 但只在 label 里提过，就是**逃避**（这正是审计要抓的 E4）。
 
 **硬约束：**
 
 ```text
-① 清单里每一条都必须出现且只出现一次（漏掉一条 = 失败）。
+① 清单里每一条都必须出现且**只出现一次**（漏一条 / 重复一条都是失败）。
 ② §四 的"不可以砍"五类（失败路径 / 权限边界 / 阈值上限 / 不变量 / 非目标）
-   **不允许 decision = "omitted"**；至少要有 element / attachment / edge 承载。
-   若确实只能 topic-only，必须在 reason 里说明原因。
-③ reason 必须写具体（引用原文机制），不要写"已涵盖"这种空话。
-④ 同一个 target 可以承载多条语义；但**不要为了好交代**把多条语义塞进同一个 element 而丢掉区别。
+   **不允许 disposition = "omitted"**。
+③ 但"不允许 omitted" ≠ "必须成为 element"：这三条归宿都合法 ——
+      · 成为 element（或 type=constraint 的元素）
+      · 作为 attachment 侧挂到宿主
+      · 被一条 edge 正经表达（type + qualifiers）
+   `topic-only` 是弱归宿：只有确实不适合进图时才用，且必须在 reason 里说明。
+④ reason 必须写具体（引用原文机制），不要写"已涵盖"这类空话。
+⑤ 同一个 target 可以承载多条语义；但不要为了好交代把多条语义塞进同一个 element 而丢掉区别。
 ```
 
 ---
