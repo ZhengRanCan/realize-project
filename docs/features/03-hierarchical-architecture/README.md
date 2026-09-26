@@ -12,6 +12,8 @@
 
 把"标题目录 + 从头读到尾"改造成**一张能下钻的设计地图**：
 
+> 本文件是 Feature 03 的**架构规格**。各阶段的具体任务书与验收清单见 Feature 04 ~ 08（§12）。
+
 ```text
 Markdown（一次只解析一篇文档）
       ↓  Semantic Compilation
@@ -111,6 +113,8 @@ Topic 标题 · Summary · Key Question · 相关 Blocks · 相关 Topic Relatio
 
 乙方案下，topic 类型不统一的问题自动消失 —— 它们不需要在图上共处一个平面。
 
+**Topic 与 L0 element 是解耦的**（Feature 04 修正）：Topic 不要求必须有 L0 element，它可以只挂 L2 blocks。详见 §7.1。
+
 ### 3.3 Framework Map 的定义（不要退化成"一条主链"）
 
 > **Framework Map 是少量核心元素与重要关系形成的认知图；"主轴 + 侧挂"只是其中一种布局策略。**
@@ -141,6 +145,16 @@ Frozen Context → Projection → Outline Generation → Outline → Scene
 | 元素与关系的语义约束（§5 / §6） | 属于规格 |
 | L0 的交互职责（§3.1） | 属于规格 |
 
+**关于"主轴"的措辞**（Feature 04 修正）：不要写成"process 与 artifact **交替**"——那是对当前这一条机制链的过拟合。正确说法是：
+
+> 主路径**通常**由 process / artifact 等核心元素组成；**允许同类型元素连续出现**，只要中间的关系具有独立设计意义。
+
+```text
+Raw Schema
+   ↓ transforms-to
+Normalized Schema      ← 两个 artifact 连续，完全合理
+```
+
 Phase 2 必须专门回答：**"Framework Map 是否一定存在单一主轴？"**（§11 / §16）
 
 ---
@@ -149,17 +163,19 @@ Phase 2 必须专门回答：**"Framework Map 是否一定存在单一主轴？"
 
 ```json
 {
-  "mapVersion": 1,
+  "mapVersion": 2,
   "level": "L0",
 
   "document": {
     "id": "DESIGN-CONTEXT-CONSUMPTION",
     "title": "Context Consumption 语义模型",
     "sourcePath": "测试文档/18-context-consumption-semantic-model.md",
-    "role": "target"
+    "role": "target",
+    "scope": { "text": "本文只讨论……不是 Feature 合同、架构 SSOT 或实现授权。", "sourceUnitIds": ["SU-001"] },
+    "nonGoalSummary": { "text": "不采用第四级 Context Influence；不承诺因果。", "sourceUnitIds": ["SU-007", "SU-034"] }
   },
 
-  "thesis": "上下文消费只发生在 Outline Generation，且它保留 Receipt → Availability → Consumption 的三级递进语义。",
+  "thesis": "上下文消费只发生在 Outline Generation Attempt，且它保留 Receipt → Availability → Consumption 的三级递进语义。",
 
   "elements": [
     {
@@ -167,7 +183,7 @@ Phase 2 必须专门回答：**"Framework Map 是否一定存在单一主轴？"
       "label": "Frozen Context",
       "type": "artifact",
       "role": "input",
-      "topics": ["T-01"],
+      "topics": ["T-02"],
       "sourceUnitIds": ["SU-XXX"]
     }
   ],
@@ -181,10 +197,15 @@ Phase 2 必须专门回答：**"Framework Map 是否一定存在单一主轴？"
   ],
 
   "topics": [
-    { "id": "T-01", "title": "三级语义模型", "proposition": "上下文消费有三段递进" }
+    {
+      "id": "T-01",
+      "title": "三级递进语义",
+      "proposition": "Receipt / Availability / Consumption 是三个可以同时为真、但不能互相替代的语义层级。",
+      "blockIds": ["O-02", "O-09"]
+    }
   ],
 
-  "meta": { "elementCount": 10, "topicCount": 5, "edgeCount": 8 }
+  "meta": { "elementCount": 12, "topicCount": 5, "edgeCount": 4 }
 }
 ```
 
@@ -193,8 +214,9 @@ Phase 2 必须专门回答：**"Framework Map 是否一定存在单一主轴？"
 | `elements[]` | 图上所有的框，每个必须带 `type` / `role` / `topics` / `sourceUnitIds` |
 | `edges[]` | **只放主轴机制关系**，受控 8 词（§6），越界即 FAIL |
 | `attachments[]` | concept / constraint / state / 反例的侧挂，**不是边**，不进词表 |
-| `topics[]` | 只是标签集（`title` 短标题 + `proposition` 一句命题），**不是容器** |
+| `topics[]` | `title`（短标题）+ `proposition`（一句命题）+ `blockIds`（该 Topic 下钻的 L2 blocks）。**Topic 不要求有 element**（§7） |
 | `document.role` | `current` / `target`；本次只做 `target`（§9） |
+| `document.scope` / `document.nonGoalSummary` | **文档级入口**：承载不属于任何 Topic 的文档定位语义（如 SU-001）。它是一种**合法的导航入口**（§7），不需要为它造一个 Topic |
 | `thesis` | **可选字段**（见下） |
 
 **关于 `thesis`（可选）：**
@@ -245,6 +267,17 @@ Phase 2 必须专门回答：**"Framework Map 是否一定存在单一主轴？"
 
 **`Frozen Context` 归入 `artifact`，不是 `entity`。** `entity` 太模糊（数据库对象、系统组件、领域概念都能叫 entity），AI 很容易乱用；`artifact` 的语义明确：**某个流程产生、持有、传递、读取或消费的东西**。
 
+> ⚠️ **六类是 allowed vocabulary，不是"每张图必须凑齐的 checklist"。**
+>
+> validator 应检查 `type ∈ 允许词表`，**不得**检查"六类都必须出现"。
+>
+> ```text
+> 一篇文档里 component = 0    → 完全正常，不是缺陷
+> 一篇文档里 constraint = 0   → 也正常（虽然少见）
+> ```
+>
+> 反过来，如果校验器要求"每类至少一个"，就会逼着使用者为了凑数往图上塞无意义的节点。
+
 ### 5.2 两层：`type` + `role`
 
 `type` 是稳定的通用 ontology（上面 6 个）；`role` 是上下文相关的：
@@ -252,7 +285,10 @@ Phase 2 必须专门回答：**"Framework Map 是否一定存在单一主轴？"
 ```text
 input  output  intermediate  authority  consumer  producer
 boundary  target  current  instance  excluded  anti-pattern
+semantic-level
 ```
+
+`semantic-level` 用于"某个语义模型的递进层级 / 谓词"（如 Receipt / Availability / Consumption）—— 它们**可以同时为真**，不是互斥状态（判别规则见 §5.4）。
 
 有 `role`，AI 就不需要为了表达"Frozen Context 是输入"去发明 `input-artifact` 这种新类型。
 
@@ -269,7 +305,7 @@ boundary  target  current  instance  excluded  anti-pattern
 | | 判据 | 反例 |
 |---|---|---|
 | **A** | 它是**稳定的可指称对象** | "为了避免重复解释"、"生成器应该注意……"、"目前来看……" 都是说明，不是元素 |
-| **B** | 它至少参与**一条重要关系** | 孤零零存在、不与其他核心对象产生关系的名词，不值得进 L0 |
+| **B** | 它至少参与**一条重要的 edge 或 attachment 关系** | 孤零零存在、不与其他核心对象产生关系的名词，不值得进 L0。<br>⚠️ 注意：concept / constraint / state 只能走 `attachments`（§6.4），**attachment 也是关系** —— 否则侧挂这一整类永远无法满足 B |
 | **C** | **删掉它会破坏对架构的理解** | 删掉后用户仍能正确理解核心设计 → 不要放 L0 |
 | **D** | 它**不是另一个元素的低层细节** | `attemptId` / `retryCount` / `createdAt` 属于 L2/L3 |
 | **E** | **硬闸门：元素总数 ≤ 10~12** | 超出说明 C 判据没执行到位，需要重新抽象 |
@@ -280,6 +316,17 @@ boundary  target  current  instance  excluded  anti-pattern
 判据 A~D 会漏一种情况：`Frozen` / `Available` 这类词可指称、也有关系、删了也影响理解，但它们常常只是某个 artifact 的**属性标注**。放成独立框，图上会出现一堆孤立的"Frozen / Pending / Failed"，读者不知道它们在说谁。
 
 > **`state` 只有在"状态迁移或状态组合本身就是设计要点"时才画成节点；否则作为所属元素的 badge 标注。**
+
+**判别规则（concept vs state）—— 已登记为 ontology regression case：**
+
+> **如果多个值能够在同一时刻同时成立，它们通常不是同一个 state machine 的互斥 state。**
+
+| 案例 | 结论 | 理由 |
+|---|---|---|
+| Receipt / Availability / Consumption | **concept**，`role: "semantic-level"` | 三者**可以同时为真**（`Receipt = yes` 且 `Availability = yes` 且 `Consumption = yes`）；文档 §7 的"5 种状态组合"正是三个 boolean 语义条件的组合，而不是一个对象在互斥状态间迁移。且 Consumption 的 Subject 是 `Frozen Context × Outline Generation Attempt`，不是 Frozen Context 自身的生命周期状态 |
+| Frozen / Pending / Failed / Available | **state** | 同一个对象在同一时刻只能处于其中一个 |
+
+> 这条规则值得在后续所有文档上重复检验；每遇到一次新案例，就追加到上表。
 
 具体画法（badge 还是节点）留到 Phase 2 之后再定（§16）。
 
@@ -343,23 +390,91 @@ boundary  target  current  instance  excluded  anti-pattern
 
 ---
 
-## 7. Coverage 不变量
+## 7. 三种 coverage（**不要混成一个数字**）
 
-"L0 不承载全文、L2 承载全文"必须是两条**可自动校验**的线：
+这是 Feature 04 得出的核心架构原则。系统里有**三种不同的 coverage**，各自回答不同的问题、各自有独立的不变量，**绝不能用一个 "coverage = 100%" 混起来**：
 
-| 层 | 不变量 | 可验证性 |
-|---|---|---|
-| **L0** | ① 每个 Topic 至少有一个元素<br>② 每个元素的 `topics` 非空<br>③ 每条 edge 的两个端点都在 `elements[]` 里<br>④ 元素总数 ≤ 12（判据 E）<br>⑤ 每个元素都有非空 `sourceUnitIds` | 可自动 check |
-| **L2** | 每条 sourceUnit **至少被覆盖一次** | 现有 check 改阈值即可 |
+```text
+A. Framework Coverage     L0 图有没有表达出主要机制？        不要求所有语义都进图
+B. Navigation Coverage    所有值得保留的内容是否都有入口？     ← 最容易失败的一种
+C. Semantic Coverage      进入 L2 后，原文语义有没有被表达？  既有 Stage 1/2 负责
+```
 
-L2 的措辞从"**恰好一次**"放宽为"**至少一次**"：
+```text
+Framework Coverage  ≠  Navigation Coverage  ≠  Semantic Coverage
+```
+
+### 7.1 Framework Map invariant（对应 A）
+
+```text
+F1  每个 L0 element 必须有 provenance（sourceUnitIds 或等价锚点）
+F2  L0 element 总数受容量限制（≤ 12）
+F3  **不要求**每个 Topic 都在 Framework Map 上有 element
+```
+
+外加受控词表检查（§5 / §6）：`type` 在允许词表内、`role` 在受控取值内、`edges[].type` 在 8 词内、主轴只放 process / artifact、同一概念只有一个节点。
+
+> F3 是 Feature 04 修正出来的。原先它写作"每个 Topic 至少有一个元素"，结果：**L0 图上没有元素的那类内容就不可能有 Topic，整块语义从导航上消失**（Fixture A 实测有 8 条语义因此完全无路径）。原因在于把两件不同的事当成了同一件：
+
+```text
+Framework Map       解决：这套设计的核心机制是什么？      → 允许裁掉大部分内容
+Topic Navigation    解决：这篇文档还有哪些内容值得下钻？  → 允许挂"图上没有"的内容
+```
+
+所以 Topic 可以有两种形态：
+
+```text
+Topic A  ├── 有 L0 element
+         └── 有 L2 blocks
+
+Topic B  ├── 没有 L0 element      ← 合法
+         └── 有 L2 blocks
+```
+
+### 7.2 Navigation invariant（对应 B）
+
+```text
+N1  每个 Topic 至少关联一个 L0 element 或一个 L2 block
+N2  每个需要保留的 L2 block 必须至少能从一个 Topic 进入
+    （文档级入口除外，见下）
+N3  每个 Semantic Unit 必须存在至少一条 Document → Topic/L0 → L2 的可达路径
+```
+
+**N3 是最重要的一条 —— Semantic Reachability。** 最终的导航入口有三类，都合法：
+
+```text
+Document
+   ├── document metadata（title / thesis / scope / non-goal summary）
+   ├── L0 element
+   └── Topic → L2 Block
+```
+
+也就是说：**不是所有东西都必须塞进 Topic。** 文档定位这类内容（Fixture A 的 SU-001）由 `document.scope` 承担，就不该为它造一个「文档定位」Topic —— 那等于"哪里漏了一块，就创建一个 Topic 来装它"。
+
+### 7.3 Semantic Coverage（对应 C）
+
+```text
+L2  每条 sourceUnit 至少被覆盖一次
+```
+
+从"**恰好一次**"放宽为"**至少一次**"：
 
 | 情况 | 旧规则 | 新规则 |
 |---|---|---|
 | 一条语义被 3 个 block 讲到 | 报警，要求登记 `duplicatesMerged` | 合法，不报 |
 | 一条语义**没有任何 block** 讲到 | 报警 | **报警** |
 
-原因：L2 的 block 不再复用旧的 21 块，而是**按 topic 现生成**，同一份内容会故意出现在多个 topic 里（各讲各的侧面）。新规则不关心切到哪，只关心**有没有人讲它** —— 而"漏"才是唯一不可接受的。
+原因：L2 的 block 不再复用旧的 21 块，而是**按 topic 现生成**，同一份内容会故意出现在多个 topic 里。新规则不关心切到哪，只关心**有没有人讲它** —— 而"漏"才是唯一不可接受的。
+
+### 7.4 三者必须分别检查
+
+| 检查 | 由谁负责 |
+|---|---|
+| Framework Coverage | `check-map`（F1~F3 + 受控词表） |
+| Navigation Coverage | `check-map`（N1~N3） |
+| Semantic Coverage | `check-overview`（既有） |
+
+**不要**把它们合成一个"coverage 100%"的结论。
 
 ---
 
@@ -395,6 +510,38 @@ L2 的措辞从"**恰好一次**"放宽为"**至少一次**"：
 ### 10.1 定位
 
 > Topic 是**一组围绕同一个核心设计问题、设计对象或设计责任形成的高内聚语义集合**，在 L0 上以**标签 + 侧栏导航**的形式存在。
+
+**Topic 不要求有 L0 element**（§7.1）；它至少要挂一个 L2 block 或一个 element（N1）。
+
+#### Topic 的推导顺序（顺序错了就会退化）
+
+```text
+✅ 正确
+   1. 先重新判断整篇文档有哪些认知 Topic
+   2. 再把所有 Block 分配进去
+   3. 最后检查 Semantic Reachability（N3）
+
+❌ 错误
+   发现 orphan block
+        ↓
+   为它创建一个 Topic
+```
+
+后者会让 Topic 退化成"**哪里漏了一个 block，我就创建一个 Topic 来装它**"。**Topic 应由语义内聚决定，不能由 coverage repair 决定。**
+
+举例：Fixture A 的 `O-13`《状态组合》不该因为它没有入口就新建一个「状态组合」Topic —— 它完全可以并进已有的「两条链的边界与状态组合」；`O-11` 也可以并进「语义边界与非主张」。
+
+**也绝不能把旧的 block 分组直接改名当成 Topic：**
+
+```text
+旧 Reading View 的 block group
+        ↓  改名
+     Topics                    ← ❌ 这就是原地打转
+```
+
+Topic 必须按当前的认知模型重新推导。
+
+#### 短标题与命题
 
 - **短标题与命题并存**，两者解决的是**不同**的问题：
 
@@ -491,6 +638,32 @@ Context Consumption 是 Fixture A，只能当 **Gold Topic Decomposition Example
 
 **不能用 Track A 的结果给 Track B 背书**，也不要用 Track B 阻塞 Track A。
 
+#### ⚠️ Structural Reachability Test 不是 Track A 的胜负指标
+
+Feature 04 引入了一个**自动化结构检查**：对一批问题，算从入口走到答案要几层（0 跳 = 首屏可见 / 1 跳 = 点元素看 L3 / 2 跳 = 经 Topic 跳 L2 / ∞ = 无路径）。
+
+它**只能**回答两个问题：
+
+```text
+1) 有没有"完全无路径"的内容？     ← 这是它真正的价值（Fixture A 用它发现了 8 条 orphan）
+2) 到达一条语义需要几层？
+```
+
+**不能**把它读成"新产物输给了旧产物"。因为 baseline 的"0 跳"意味着 **21 个 block 已经全部摊在首屏 scroll 里** —— 拿它和"先导航再点进去"比跳数，等于比较"书翻页 vs 网站点击"，技术上没错，但与"认知负担是否更低"这个问题无关。
+
+#### 真正的 Track A 要测这六项（人工）
+
+| 指标 | 真正回答什么 |
+|---|---|
+| 找到答案耗时 | 导航是不是更有效 |
+| **不打开原 Markdown 的答题正确率** | Map 是否真的帮助理解 |
+| 首屏同时出现的信息单元数 | 有没有降低认知负担 |
+| 错误进入 Topic 的次数 | Topic 命名 / 结构是否清楚 |
+| 返回 / 重选次数 | 用户是否容易迷路 |
+| 主观负担 | 看完之后是不是仍然觉得累 |
+
+**`Time to answer` 比 hop count 有意义得多。**
+
 ### 11.4 判定方式
 
 多次运行**不要**要求 topic id / 数量 / 标题完全一致（不现实）。重点比较：
@@ -521,7 +694,19 @@ Context Consumption 是 Fixture A，只能当 **Gold Topic Decomposition Example
 
 ## 12. 阶段计划
 
-### Phase 1 — 手工验证（单文档，不做 UI）
+> **各阶段已拆成独立 feature**，本文件只保留规格：
+>
+> | 阶段 | Feature |
+> |---|---|
+> | Phase 1 手工验证（Track A · 交互假设） | `docs/features/04-l0-framework-map/` |
+> | Phase 2 跨文档类型验证（Track B · 生成模型假设，**Gate**） | `docs/features/05-l0-generalization-gate/` |
+> | Phase 3 契约落地 | `docs/features/06-contract-and-validators/` |
+> | Phase 4 生成链路 | `docs/features/07-generation-pipeline/` |
+> | Phase 5 UI | `docs/features/08-l0-ui/` |
+>
+> 任务书（`execution-prompt.md`）与验收清单（`validation-checklist.md`）放在各 feature 目录下，**不在本目录**。
+
+### Phase 1 — 手工验证（单文档，不做 UI）→ Feature 04
 
 **目标**：只手工画一版目标态 `framework-map` + L0 一屏两区，验证"图是否真的比现状更容易理解"。
 
@@ -543,13 +728,13 @@ Task 1.5  Track A 测量
 
 **本阶段明确不做**：不改 renderer、不改 AI、不动一行 schema。图用静态 HTML 或纸面验证即可。
 
-### Phase 2 — 跨文档类型验证（**Gate**）
+### Phase 2 — 跨文档类型验证（**Gate**）→ Feature 05
 
 用 A / B / C 三类文档各跑一遍 Phase 1 的手工流程，回答 §11.1 的三个疑问（含"是否存在单一主轴"）。
 
 > **未通过此 Gate 不得进入 Phase 3。** 若失败，需要修改的是 §3~§6（L0 形态与元素 ontology），而不是继续往下做契约。
 
-### Phase 3 — 契约落地
+### Phase 3 — 契约落地 → Feature 06
 
 ```text
 schema/framework-map.schema.json    L0 契约（§4）
@@ -560,7 +745,7 @@ topic-map 契约 + check-topic-map     Topic 质量判据（§10.3）的 Warning
 
 本阶段**不修改 Renderer**。
 
-### Phase 4 — 生成链路
+### Phase 4 — 生成链路 → Feature 07
 
 ```text
 Stage 1a「理解」  读完整篇 → sourceUnits + framework-map + topics
@@ -572,7 +757,7 @@ Stage 2          单块生成（现有能力，基本不变）
 
 > Stage 1a / 1b 的 prompt **不在本文件范围**，等 Phase 2 通过后再写。
 
-### Phase 5 — UI
+### Phase 5 — UI → Feature 08
 
 在契约稳定后实现 L0 一屏两区、L1 Topic、Breadcrumb、Map/Read 切换、新增 `content.type: map`。Context Consumption 仍是第一个 UI Fixture。
 
@@ -657,5 +842,5 @@ Stage 2          单块生成（现有能力，基本不变）
 ## 当前状态
 
 - **重写时间**：2026-09-26
-- **Phase 1 状态**：待开始
-- **配套文档**：`execution-prompt.md`（执行任务）· `validation-checklist.md`（验收清单）
+- **本文件定位**：**架构规格**（架构文档）。执行任务与验收清单已拆到 Feature 04 ~ 08，不在本目录
+- **Phase 1 状态**：待开始（见 `docs/features/04-l0-framework-map/`）

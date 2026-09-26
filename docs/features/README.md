@@ -13,12 +13,13 @@ docs/features/
 │   ├── validation-checklist.md
 │   └── results/
 ├── 02-xxx/                      # 未来的 feature
-└── 03-hierarchical-architecture/ # Feature 03: 层级式文档模型（L0→L3）
-    ├── README.md                # 现行规格
-    ├── execution-prompt.md
-    ├── validation-checklist.md
-    ├── drafts/                  # Phase 1/2 的手工框架图
-    └── _archive/                # 被取代的旧草案
+├── 03-hierarchical-architecture/ # 架构规格（L0→L3），只有 README.md
+│   └── _archive/                # 被取代的旧草案
+├── 04-l0-framework-map/         # Phase 1 / Track A：手工框架图 + 交互假设
+├── 05-l0-generalization-gate/   # Phase 2 / Track B：跨文档类型 Gate
+├── 06-contract-and-validators/  # Phase 3：契约与校验器（等 05 的 Gate）
+├── 07-generation-pipeline/      # Phase 4：Stage 1a/1b（等 Gate + 06）
+└── 08-l0-ui/                    # Phase 5：L0 一屏两区（等 06）
 ```
 
 ## Feature 命名规范
@@ -56,7 +57,12 @@ XX-feature-name/
 | ID | Name | Status | Executor | Reviewer | Completed |
 |----|------|--------|----------|----------|-----------|
 | 01 | human-review-repair | Completed | DSH agent | 用户 | 2026-09-26 |
-| 03 | hierarchical-architecture | In Progress | TBD | TBD | - |
+| 03 | hierarchical-architecture | Completed（架构规格） | DSH agent | 用户 | 2026-09-26 |
+| 04 | l0-framework-map | Technical Pass / UX Validation Pending | DSH agent | 用户 | - |
+| 05 | l0-generalization-gate | Ready（可立即开始） | TBD | TBD | - |
+| 06 | contract-and-validators | Blocked（等 05 的 Gate） | TBD | TBD | - |
+| 07 | generation-pipeline | Blocked（等 Gate + 06） | TBD | TBD | - |
+| 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |
 
 ## 创建新 Feature
 
