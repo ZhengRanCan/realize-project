@@ -8,12 +8,14 @@
 ## 0. 结论
 
 ```text
-D = NO QUALIFIED FIXTURE
+D = NO QUALIFIED FIXTURE under the frozen Phase 2b selection criteria
 ```
 
-**在冻结标准下，没有候选同时满足全部 7 条强制条件。**
+措辞刻意精确：这**不等于**"现有材料不存在 N:M 设计"。
 
-最接近的一份（`uni-app/tempo` 的 goal-plan-task-state-model.md）**6/7 PASS，仅 N:M 一条 FAIL**。
+本次扫描 1262 篇 markdown、所有常见 N:M **文本记号**命中为 0，是很强的筛选证据；但它仍不能严格证明不存在用 **ER 图、双向引用、membership model** 等其它方式表达、却没有这些字面记号的 N:M。对本次资格审查而言已经足够，**不再扩大搜索**。
+
+**在冻结标准下，没有候选同时满足全部 7 条强制条件。** 最接近的一份（`uni-app/tempo` 的 goal-plan-task-state-model.md）**6/7 PASS，仅 N:M 一条 FAIL** —— 它已被按其独立身份保留，见 §4。
 
 并且有一项**决定性证据**：
 
@@ -143,9 +145,15 @@ Events
 
 ---
 
-## 3. 两个必须由你裁决的读法
+## 3. 裁决结果：坚持冻结标准（读法 A）
 
-**读法 A：这是材料缺口（坚持冻结标准）**
+**裁决：不改 §3.1、不让 tempo 顶替 D。** `D = NO QUALIFIED FIXTURE` 保持。
+
+理由不是"N:M 天生就必须是 ER-heavy 的定义条件"，而是：**Phase 2b 的实验设计已经提前把 N:M 写成了 Gate。**
+
+现在因为最接近的候选刚好缺这一项再改标准，会**污染这次测试的可信度**。
+
+**读法 A（采纳）：这是材料缺口**
 
 现有磁盘材料里确实缺乏"多实体 + 三种基数 + 生命周期 + 演进 + 跨实体不变量"的设计文档。已有的多是**子系统规格**（session）、**事件目录**（persistence-catalog）、**存储 seam 提案**（domain-kv）、**路线图**（migration roadmap）、**包说明**（dsl）。
 
@@ -167,9 +175,30 @@ Events
 3. 或者干脆把 D 标为"材料不可得"，转而用 E 先做对抗测试
 ```
 
+> **裁决：不采纳读法 B。**
+> N:M 这条标准本身**留到本轮 Phase 2b 结束后**，作为下一版实验设计问题单独讨论：
+> 「我们真正想攻击的是 N:M 本身，还是想攻击**无单一主轴的多实体关系网络**？」（见 `fixture-selection-e.md` §8）
+
 ---
 
-## 4. 按指令停止
+## 4. Fixture D-near-miss / ER-lite candidate（tempo 那份的处理）
+
+**不废掉，也不升级为 Fixture D。** 给它一个明确身份：
+
+```text
+Fixture D-near-miss / ER-lite candidate
+文件：uni-app/tempo/docs/architecture/goal-plan-task-state-model.md（29.2KB · 847 行）
+```
+
+它已具备 6/7：多实体 · 明确 cardinality（1:1 / 1:N）· ownership/reference · lifecycle · schema evolution · 跨实体 invariant。
+
+**用途**：将来可作为 **supplementary test**，用于验证"**无 N:M，但多平级实体 + 无单一 processing pipeline**"这一类文档 —— 这恰好是下一轮想攻击的要点（见 `fixture-selection-e.md` §8）。
+
+**不能替代**这次被冻结的 D。否则就等于偷偷改了实验标准。
+
+---
+
+## 5. 按指令停止
 
 ```text
 ✅ 只做了资格审查

@@ -165,6 +165,14 @@ M7 作为「人工审计项」：检查审计者能否仅凭 map + 原文发现�
 
 ## 6. Gate
 
+**Gate 有三种形态，不是简单的 PASS / FAIL：**
+
+```text
+PASS         两篇 Fixture 都合格并完成对抗测试；四条通过条件全部满足
+PARTIAL PASS Fixture E completed; ER-heavy contract coverage pending qualified Fixture D.
+BLOCKED      没有可用的 Fixture（**当前状态**，见 results/fixture-selection-{d,e}.md）
+```
+
 **通过条件（四条同时成立）：**
 
 ```text
@@ -213,6 +221,40 @@ M7 作为「人工审计项」：检查审计者能否仅凭 map + 原文发现�
 ## 9. 状态
 
 - **创建时间**：2026-09-26
-- **前置**：F06 完成（schema + check-map + 21 个单元测试可用）；用户提供 Fixture D / E
+- **前置**：F06 完成（schema + check-map + 21 个单元测试可用）
 - **配套文档**：`execution-prompt.md` · `validation-checklist.md`
-- **状态**：待开始（等待按 §3 的标准挑选 D / E）
+
+### Task 1（资格审查）：已完成 —— **两篇均为 NO QUALIFIED FIXTURE**
+
+```text
+D  6/7   缺 N:M        → results/fixture-selection-d.md
+         近失候选保留为 Fixture D-near-miss / ER-lite candidate（tempo 那份），不替代 D
+E  10/11 缺 timeout    → results/fixture-selection-e.md
+         近失候选 F13-F16-runbook.md（10/11 + 3/3 路径）
+```
+
+判定一律按**冻结标准**：全部强制条件 PASS 才入选。**没有为了让实验跑起来而降标准。**
+
+**当前 Gate：`BLOCKED — no qualified fixture`**
+（不是 `PARTIAL PASS` —— 那要求 Fixture E 完成。）
+
+### 继续的两条路径
+
+1. 由用户**外部提供** D / E 文档（按 §3 标准挑，逐条打勾）
+2. 由用户明确授权**修订 §3.1 / §3.2 的某条标准**
+   → 按"**记录为标准修订 + 在同一批候选上重跑完整流程**"处理，**不沿用本次结论**
+
+### 留到下一轮（Phase 2c / Feature 09 v2）再讨论的标准问题
+
+前者是**结论**，不是"本次改标准的理由"。
+
+- **N:M 到底是不是要点？** 真正想攻击的可能是「**多平级实体 + 多方向关系 + ownership/reference + 生命周期 + 跨实体 invariant + 没有天然 processing pipeline**」——即"**Framework Map 会不会又被错误地画成一条链？**"
+- **`timeout` 是否应作为 E 的强制项？** 若 E 的使命是打 `process / state / constraint` 的边界与**升级路径**，真正必要的是"**有界等待 → 升级**"这条链，而不是孤立的 timeout 字段。
+
+### 本轮方法学案例（建议长期保留）
+
+> **Selection criteria can fail because the corpus does not contain the phenomenon being tested.**
+> This is not evidence that the criterion is wrong,
+> and it is not permission to relax the criterion post hoc.
+
+两次独立实例：`D` 在 1262 篇中含 N:M 类记号的文档 = 0；`E` 在 3666 篇中同时满足 11 要素的文档 = 0。
