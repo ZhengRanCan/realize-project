@@ -14,7 +14,7 @@
 | 独立审查记录 | 无 | 由非执行方 reviewer 复核 view model / layout / preview / selftest 四层证据与范围红线 |
 | 人工 UX 验证 | 只有 Round 0 定性第一印象（用户本人） | 正式计时 Track A（D + E），5 个数据 + 1 句主观，写入 `results/track-a-round1.md` |
 | Phase 状态口径 | `brief.md` 与 git 记录显示 Phase 3/4 第一版已完成；`validation-checklist.md` §5–§6 仍标「待做」 | 关闭前由 reviewer 统一口径，再决定 `knownUnverified` 的最终内容 |
-| 断言数口径 | 34+42+119（`brief.md`）对 34+51（`validation-checklist.md`） | 关闭前重跑 `npm run test:l0` 并以输出为准 |
+| 断言数口径 | **已解决（2026-09-27）**：统一为执行断言数 —— View Model 34/34 · Layout 42/42 · Preview 130/130（7 份预览）· selftest 13 条 L0 集成断言（总计 66 条）。早期 51 / 119 / 127 / 「56 处调用点」是更早轮次的真实值或静态数法 | 无需再重跑；口径定义见 `verification-summary.md`「断言口径」，`feature.md` / `verification.md` / `validation-checklist.md` 已同步 |
 
 ## 事后可复核的证据
 
@@ -22,7 +22,7 @@
 | --- | --- |
 | 范围冻结与硬约束（不改 schema / contract / check-map、不调模型） | `execution-prompt.md` §硬约束、`validation-checklist.md` §1 |
 | 输入边界与 sha 一致性 | `validation-checklist.md` §2、`execution-prompt.md` §Phase 1（入口/出口 sha 比较，输入被改就抛错） |
-| View model / Preview 断言口径 | `validation-checklist.md` §3–§4、`execution-prompt.md` §Phase 1–2 |
+| View model / Preview 断言口径 | `verification-summary.md`「断言口径」（唯一口径）、`validation-checklist.md` §3–§4、`execution-prompt.md` §Phase 1–2（历史任务书的数字保留不改） |
 | 人工 Round 0 三条发现与 Phase 4.1 动作 | `results/track-a-round1.md` §0.1（含用户原话） |
 | 三个实现坑（静默失败 / 预览未加载 renderer / 布局丢元素） | `brief.md` §3、`results/track-a-round1.md`「这一轮顺带暴露的三个实现问题」 |
 | 命令记录与已知偏差 | `verification-summary.md` |

@@ -44,7 +44,8 @@ Harness gate: 9 features, 0 errors.
 | `scripts/test-semantic-grounding.js` | 48/48（离线 stub，零模型调用） |
 | `scripts/test-l0-view-model.js` | 34/34（28 份 map） |
 | `scripts/test-l0-layout.js` | 42/42 |
-| `scripts/test-l0-preview.js` | 127/127（7 份预览；材料里记为 51/51 与 119，两个旧值仍保留在证据文件里） |
+| `scripts/test-l0-preview.js` | 130/130（7 份预览）—— 早期材料的 51/119/127 已按「执行断言数」口径统一 |
+| `npm run selftest` | PASSED（L0 集成 13 条断言；selftest 总计 66 条 ✓） |
 | `npm run verify:harness` | 9 features, 0 errors |
 | `npm run check:docs` | 69 markdown files checked, 0 broken |
 | `npm run check:experiments` | 66 units + 17 artifacts, up to date |

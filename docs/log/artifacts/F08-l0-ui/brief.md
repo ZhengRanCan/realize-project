@@ -93,7 +93,7 @@ Phase 1  framework-map → view-model adapter            ✅ 完成（scripts/l0
 Phase 2  standalone HTML preview（Fixture D + E）      ✅ 完成（scripts/build-l0-preview.js）
 Phase 3  Electron L0 screen integration（一屏两区）     ✅ 第一版完成（第三个一级页面 · L0 框架图）
 Phase 4  交互：element / edge / topic / provenance     ✅ 第一版完成（selection / focus / Focused Relations）
-Phase 5  A–E regression（自动化 ✅ 34+42+119 + Electron 集成 selftest ✅）· 人工 Track A ⬜ 待做
+Phase 5  A–E regression（自动化 ✅ 34+42+130 + Electron 集成 selftest ✅）· 人工 Track A ⬜ 待做
 Phase 4.1 Relationship-first Reading View ✅ 完成（Track A Round 0 裁决后插入）
 ```
 
@@ -223,7 +223,7 @@ Phase 4.1 Relationship-first Reading View ✅ 完成（Track A Round 0 裁决后
 **Reading 把关系画成了线**（线数 == edge 数）、**Reading 不含机器 ID 且 Topic 默认折叠**、
 默认 Reading View（Review 整块隐藏但数据仍在 DOM）、点 Reading 节点 → 焦点态 + Focused Relations、
 从下钻面板点 provenance → `openSource()` 打开 Source 面板、以及 **L0 可独立打开**
-（无 `design-review.json` 时切向总览/决策被挡住）。共 10 条断言。
+（无 `design-review.json` 时切向总览/决策被挡住）。共 **13 条** L0 集成断言（selftest 总计 66 条 ✓）。
 
 > **只测集成缝（integration seam）**，不做视觉回归。而且它必须调**真实入口** `loadL0(path)` ——
 > 这条规矩是踩出来的：selftest 第一版手抄了一遍"注入 view model + 切视图"的状态切换，
@@ -281,7 +281,7 @@ scripts/test-l0-view-model.js     回归：不丢 / 不裁 / 不改 / 不造 / �
 app/renderer/l0-layout.js         Phase 4.1 · 确定性图布局（破环 / 分层 / 排交叉 / 自环 / 多分量）
 scripts/test-l0-layout.js         回归：不丢 / 不造线 / 不重叠 / 方向贴边 / 排序减少交叉 / 逐字节确定（42 断言 · 28 份 map）
 scripts/inspect-l0-layout.js      Phase 4.1 · 用文字看布局（`npm run l0:layout`，不开 GUI 核对第一眼）
-scripts/test-l0-preview.js        验收：对生成的 HTML 断言（119 断言 · 6 份预览 + 1 份合成 0-edge 样本）
+scripts/test-l0-preview.js        验收：对生成的 HTML 断言（130 断言 · 7 份预览 = 6 份产物 + 1 份合成 0-edge 样本）
 app/main/main.js 的 selftest 块    集成：Electron 里 L0 页面真能加载 / 默认 Reading / 线 == edge / 焦点与 provenance 可达
 docs/log/artifacts/F08-l0-ui/results/track-a-round1.md   人工 Track A 记录表（D + E · Round 0 已记）
 app/renderer/l0-map.js            deterministic renderer（双模）

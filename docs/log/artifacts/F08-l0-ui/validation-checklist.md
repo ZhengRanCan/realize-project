@@ -39,7 +39,7 @@
 
 ## 4. 预览（Phase 2）
 
-- [ ] `scripts/test-l0-preview.js` 全绿（当前 **51/51**，6 份预览）
+- [ ] `scripts/test-l0-preview.js` 全绿（当前 **130/130**，**7 份预览** = 6 份提交产物 + 1 份合成 0-edge 样本；口径见 `verification-summary.md` 的「断言口径」）
 - [ ] 每份预览的元素/边/侧挂/Topic 渲染数与输入一致
 - [ ] **方向显式**：每条边都有一行 `A —type→ B`（不靠位置）
 - [ ] `qualifiers` 可见（`cardinality` / `ownership`）
