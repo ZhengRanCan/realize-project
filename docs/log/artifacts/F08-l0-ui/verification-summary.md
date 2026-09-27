@@ -20,6 +20,23 @@
 | 手工 smoke：点「打开 framework-map.json」 | 2026-09-27 | failed → 已修 | `track-a-round1.md` §0：信息行显示已加载但界面无变化（真实入口调不存在的 `enterReview()` 并静默抛错）；修为 `loadL0(path)` 唯一入口，补「真的切屏了」「无 model 导航守卫」2 条断言 |
 | `npm run verify:harness` | 2026-09-27 | passed | harness 层证据；结果同步在 `docs/progress.md` 的 "Latest harness gate" 一行 |
 
+### 第二轮 · 选中行为修正（2026-09-27）
+
+用户实测反馈：①点区块应只高光相关项、不要把其他内容压暗/隐藏；②点约束时区块被压暗而约束自己没有高光。
+改动：删掉 `.is-dim` 压暗机制（连同 CSS 规则）、给约束角标补 `.node-attach.is-hit > summary` /
+`.attach-item.is-hit` 高光、角标新增 `data-host-ids` 让"约束 ↔ 宿主"双向点亮。
+未改 layout 算法、Contract、view model 语义、F10、validator。
+
+| Command | Date | Result | Note |
+| --- | --- | --- | --- |
+| `node scripts/test-l0-layout.js` | 2026-09-27 | passed | 42/42（28 份 map）—— 坐标与算法未变，逐字节确定 |
+| `node scripts/test-l0-preview.js` | 2026-09-27 | passed | **130/130（7 份预览）**；新增"CSS 里没有任何压暗规则""角标带 data-host-ids 且宿主都是节点""角标高光样式在位" |
+| `npm run selftest` | 2026-09-27 | passed | **13 条 L0 集成断言**；点节点 → 命中 13 处且 `dim=0`；点约束 → 角标自身 + 2 个宿主一起点亮，不压暗任何东西 |
+| `npm run test:all` | 2026-09-27 | passed | 22 + 31 + 29 + 33 + 48 + 34 + 42 + 130 |
+
+> 口径更新：`test-l0-preview.js` 的断言数在本轮为 **130**（此前材料里的 51 / 119 / 127 都是更早轮次的真实值）。
+> `npm run selftest` 的 L0 断言数在本轮为 **13**（此前记为 10）。
+
 > 结果值口径：材料写 `PASSED` 记 `passed`，写 `PASS WITH WARNINGS` 记 `passed-with-warnings`，无记录记 `not_recorded`。
 
 ## 关键指标（材料记录的当前口径）

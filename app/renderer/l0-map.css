@@ -164,12 +164,17 @@
 .focus-list li { margin: 1px 0; }
 .focus-prov { font-size: 12px; }
 
-/* 选择态：命中的清晰，其余降噪（不是隐藏） */
-.l0-root.has-focus .is-dim { opacity: .32; }
-.is-hit { background: #eff6ff !important; }
+/* 选择态：**只高光相关的东西，不压暗/不隐藏其余的**（用户裁决）
+   之前是 `.l0-root.has-focus .is-dim { opacity: .32 }` —— 读起来就是"其他内容被隐藏了"。
+   现在只做加法：命中的加 .is-hit，其余保持原样。 */
+.is-hit { background: #dbeafe !important; }
 .card.is-hit { outline: 2px solid var(--accent); }
-.edge-row.is-hit { background: #eff6ff; }
-.topic-entry.is-hit { background: #eff6ff; }
+.l0-node.is-hit { outline: 2px solid var(--accent); outline-offset: 1px; background: #eff6ff !important; }
+.edge-row.is-hit { background: #dbeafe; }
+.topic-entry.is-hit { background: #dbeafe; }
+/* 约束角标被选中时必须有明显高光（它自己有底色，所以要点到 summary / li 上） */
+.node-attach.is-hit > summary { background: #fde68a; border-color: #d97706; color: #7c2d12; font-weight: 600; box-shadow: 0 0 0 2px rgba(217, 119, 6, .28); }
+.attach-item.is-hit { background: #fde68a; color: #7c2d12; font-weight: 600; border-radius: 3px; }
 .tab.ghost { color: var(--muted); }
 
 /* Electron 集成：L0 模式下左栏 TOC 让位（L0 自己带"核心机制 + 完整入口"两区） */
@@ -217,7 +222,6 @@
 .l0-node .node-sub { margin: 0; font-size: 11px; line-height: 1.35; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: break-word; word-break: normal; }
 .l0-node[data-has-edges="0"] { border-style: dashed; }      /* 不在任何 edge 上：虚线是事实标注 */
 .l0-node.type-constraint { border-color: #fcd34d; }
-.l0-node.is-dim { opacity: .3; }
 .l0-node.is-hit { background: #eff6ff !important; outline: 2px solid var(--accent); }
 
 /* 约束角标：不占节点位，但仍在页面上、仍可点 */

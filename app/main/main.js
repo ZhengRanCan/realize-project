@@ -529,7 +529,26 @@ async function runSelfTest() {
           const slot = document.getElementById('l0-focus-slot');
           out.focusSlotFilled = !!(slot && slot.children.length > 0);
           out.visibleFocusPanels = [...document.querySelectorAll('.focus-panel')].filter((p) => !p.hidden).length;
-          out.dimmed = document.querySelectorAll('.is-dim').length;
+          // 用户裁决：选中只做加法 —— 高光相关的，**不压暗/不隐藏**其余的
+          out.hits = document.querySelectorAll('.is-hit').length;
+          out.dims = document.querySelectorAll('.is-dim').length;
+          out.nodeSelfHit = card.classList.contains('is-hit');
+          out.edgeHitWithNode = [...document.querySelectorAll('#l0-reading path.l0-edge.is-hit')].length;
+          // ③c 点约束角标 → 角标自己 + 它挂靠的宿主一起高光（attachment 是双向的）
+          const badge = document.querySelector('#l0-reading .node-attach[data-host-ids]');
+          out.badgeExists = !!badge;
+          if (badge) {
+            out.badgeHostIds = (badge.getAttribute('data-host-ids') || '').split(',').filter(Boolean);
+            badge.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            out.badgeHit = badge.classList.contains('is-hit');
+            out.badgeItemsHit = document.querySelectorAll('#l0-reading .attach-item.is-hit').length;
+            out.badgeHostsHit = out.badgeHostIds.filter((h) => {
+              const node = document.querySelector('#l0-reading .l0-node[data-element-id="' + h + '"]');
+              return node && node.classList.contains('is-hit');
+            }).length;
+            out.dimsAfterBadge = document.querySelectorAll('.is-dim').length;
+            out.panelsAfterBadge = [...document.querySelectorAll('.focus-panel')].filter((p) => !p.hidden).length;
+          }
           // ③b Phase 4.1 polish：下钻面板在 Reading 下必须是中文术语（Review 仍是英文原词）
           out.slotZhVisible = !!slot && !!slot.querySelector('.lbl-zh') && getComputedStyle(slot.querySelector('.lbl-zh')).display !== 'none';
           out.slotEnHidden = !!slot && !!slot.querySelector('.lbl-en') && getComputedStyle(slot.querySelector('.lbl-en')).display === 'none';
@@ -620,10 +639,17 @@ async function runSelfTest() {
         } else {
           fail(`L0 集成：默认视图异常（data-view=${seam.dataView} reviewHidden=${seam.reviewHiddenInReading}）`);
         }
-        if (seam.firstTargetIsNode && seam.hasFocusClass && seam.focusSlotFilled && seam.visibleFocusPanels >= 1 && seam.dimmed > 0) {
-          ok(`L0 集成：点 Reading 节点 → 焦点态 + Focused Relations 出现（dim 降噪 ${seam.dimmed} 项）`);
+        if (seam.firstTargetIsNode && seam.hasFocusClass && seam.focusSlotFilled && seam.visibleFocusPanels >= 1
+            && seam.nodeSelfHit && seam.hits > 0 && seam.dims === 0) {
+          ok(`L0 集成：点 Reading 节点 → 只高光相关项（命中 ${seam.hits} 处 · 含 ${seam.edgeHitWithNode} 条线），其余不压暗（dim=${seam.dims}）`);
         } else {
-          fail(`L0 集成：焦点交互异常（firstIsNode=${seam.firstTargetIsNode} focus=${seam.hasFocusClass} slot=${seam.focusSlotFilled} panels=${seam.visibleFocusPanels} dim=${seam.dimmed}）`);
+          fail(`L0 集成：选中行为异常（firstIsNode=${seam.firstTargetIsNode} focus=${seam.hasFocusClass} self=${seam.nodeSelfHit} hits=${seam.hits} dims=${seam.dims} slot=${seam.focusSlotFilled}）`);
+        }
+        if (seam.badgeExists && seam.badgeHit && seam.badgeHostsHit === seam.badgeHostIds.length
+            && seam.badgeHostIds.length > 0 && seam.dimsAfterBadge === 0) {
+          ok(`L0 集成：点约束 → 角标自身有高光 + ${seam.badgeHostsHit} 个宿主一起点亮（不压暗任何东西）`);
+        } else {
+          fail(`L0 集成：约束高光异常（exists=${seam.badgeExists} hit=${seam.badgeHit} hosts=${seam.badgeHostsHit}/${(seam.badgeHostIds || []).length} dims=${seam.dimsAfterBadge}）`);
         }
         if (seam.sourcePanelOpen && seam.ref && seam.sourceHeadText.includes(seam.ref)) {
           ok(`L0 集成：从下钻面板点 provenance「${seam.ref}」→ 走到已有 openSource() 并打开 Source 面板`);

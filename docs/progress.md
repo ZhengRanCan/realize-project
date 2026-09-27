@@ -85,6 +85,20 @@ Source-verified Evidence
 
 ## Shared module changes
 
+### 2026-09-27 — L0 选中行为：只高光，不压暗；约束角标可高光
+
+- Reason: 用户实测两条反馈 —— ①点区块时其余内容被降到 `opacity .3`，读起来就是"被隐藏了"；
+  ②点约束时区块被压暗，而约束角标自己被自身底色盖住、看不出任何反应。
+- Impact: 只动 `app/renderer/{l0-map.js,l0-map.css}` 与 `scripts/test-l0-preview.js`：
+  删掉 `.is-dim` 压暗机制（含 CSS 规则），选中改为"只做加法"；约束角标补
+  `.node-attach.is-hit > summary` / `.attach-item.is-hit` 高光；角标新增 `data-host-ids`，
+  使"约束 ↔ 宿主"双向点亮（点线时两端节点连同其角标一起亮）。
+  layout 算法与坐标、Contract、view model 语义、F10、validator 均未变。
+- Verification: `test-l0-layout` 42/42（坐标逐字节未变）· `test-l0-preview` **130/130** ·
+  `npm run selftest` PASSED（**13 条** L0 集成断言，含"命中 13 处且 dim=0"与"约束 + 2 个宿主一起点亮"）·
+  `test:all` 全绿 22+31+29+33+48+34+42+130。
+- Evidence: `docs/log/artifacts/F08-l0-ui/verification-summary.md` 的「第二轮 · 选中行为修正」一节。
+
 ### 2026-09-27 — 清理指向 `agent.md` 章节号的失效引用
 
 - Reason: `agent.md` 改为"文档路由 + 协作规则"后不再有编号小节，但仓库里仍有 13 处代码/文档注释与

@@ -272,6 +272,33 @@ check('标题/副标题的行数规则写死在 CSS（标题 1 行、副标题 2
   const sub = /\.l0-node \.node-sub \{[^}]*?-webkit-line-clamp: 2[^}]*\}/.test(css);
   return (title && sub) || `title1=${title} sub2=${sub}`;
 });
+check('选中只做加法：CSS 里没有任何"压暗其余内容"的规则（只高光，不隐藏）', () => {
+  const rawCss = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  const css = rawCss.replace(/\/\*[\s\S]*?\*\//g, ''); // 注释里提到旧规则不算规则
+  const dimRule = /\.is-dim\s*\{[^}]*opacity/.test(css) || /has-focus[^{]*\.is-dim/.test(css);
+  if (dimRule) return 'CSS 里仍有 is-dim 的压暗规则';
+  if (!css.includes('.l0-node.is-hit')) return 'CSS 缺少节点高光规则';
+  return true;
+});
+check('约束角标带 data-host-ids（点约束时能把宿主一起点亮）', () => {
+  const b = byName('d');
+  const badges = [...b.reading.matchAll(/class="node-attach" data-element-id="([^"]+)" data-host-ids="([^"]+)"/g)];
+  if (!badges.length) return '角标没有 data-host-ids';
+  const nodeIds = new Set([...b.reading.matchAll(/<article class="l0-node[^>]*?data-element-id="([^"]+)"/g)].map((m) => m[1]));
+  for (const [, id, hosts] of badges) {
+    if (!id) return '角标缺 id';
+    if (!hosts) return `角标 ${id} 的宿主列表为空`;
+    for (const h of hosts.split(',')) if (!nodeIds.has(h)) return `角标 ${id} 的宿主 ${h} 不是节点`;
+  }
+  const items = [...b.reading.matchAll(/class="attach-item" data-element-id="([^"]+)" data-host-ids="([^"]*)"/g)];
+  if (items.length < badges.length) return '展开项缺 data-host-ids';
+  return true;
+});
+check('约束被点亮时有明确样式（点的是 summary / li，不是被自己的底色盖住）', () => {
+  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  return (css.includes('.node-attach.is-hit > summary') && css.includes('.attach-item.is-hit'))
+    || 'CSS 缺少角标高光规则（约束会看起来"没反应"）';
+});
 check('Reading 隐藏一切机器 ID（.eid 在 reading 视图不显示）', () => {
   const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
   if (!css.includes('.l0-root[data-view="reading"] .eid { display: none; }')) return 'CSS 缺少 Reading 隐藏 eid 的规则';

@@ -81,9 +81,9 @@
         <h3 class="node-title" title="部署流程">部署流程</h3>
         <p class="node-sub" title="node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署">node --check → npm 构建（h5 / mp-wei…</p>
         
-    <details class="node-attach" data-element-id="C-03" data-badge-only="1" data-focus-target="C-03">
+    <details class="node-attach" data-element-id="C-03" data-host-ids="E-01,E-03" data-badge-only="1" data-focus-target="C-03">
       <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
-      <ul class="attach-pop"><li class="attach-item" data-element-id="C-03" data-focus-target="C-03" title="环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退">⚑ 环境与凭据约束</li></ul>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-03" data-host-ids="E-01,E-03" data-focus-target="C-03" title="环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退">⚑ 环境与凭据约束</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-02" data-focus-target="E-02" data-has-edges="1" data-layer="2" style="left:24px;top:384px;width:236px;height:96px" tabindex="0" title="F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）">
@@ -91,9 +91,9 @@
         <h3 class="node-title" title="售后/退款云函数集">售后/退款云函数集</h3>
         <p class="node-sub" title="submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib">submitAfterSales、cancelAfterSales … 共 10 项</p>
         
-    <details class="node-attach" data-element-id="E-06" data-badge-only="1" data-focus-target="E-06">
+    <details class="node-attach" data-element-id="E-06" data-host-ids="E-02" data-badge-only="1" data-focus-target="E-06">
       <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> 条约束</summary>
-      <ul class="attach-pop"><li class="attach-item" data-element-id="E-06" data-focus-target="E-06" title="售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED">⚑ 售后单状态机 afterSalesStatus</li><li class="attach-item" data-element-id="C-01" data-focus-target="C-01" title="权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝">⚑ 权限与越权边界</li></ul>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="E-06" data-host-ids="E-02" data-focus-target="E-06" title="售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED">⚑ 售后单状态机 afterSalesStatus</li><li class="attach-item" data-element-id="C-01" data-host-ids="E-02,E-05" data-focus-target="C-01" title="权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝">⚑ 权限与越权边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-03" data-focus-target="E-03" data-has-edges="1" data-layer="1" style="left:24px;top:204px;width:236px;height:96px" tabindex="0" title="云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量">
@@ -101,9 +101,9 @@
         <h3 class="node-title" title="云函数运行时配置">云函数运行时配置</h3>
         <p class="node-sub" title="定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量">定时触发器（retryAfterSalesCompensation…</p>
         
-    <details class="node-attach" data-element-id="C-03" data-badge-only="1" data-focus-target="C-03">
+    <details class="node-attach" data-element-id="C-03" data-host-ids="E-01,E-03" data-badge-only="1" data-focus-target="C-03">
       <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
-      <ul class="attach-pop"><li class="attach-item" data-element-id="C-03" data-focus-target="C-03" title="环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退">⚑ 环境与凭据约束</li></ul>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-03" data-host-ids="E-01,E-03" data-focus-target="C-03" title="环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退">⚑ 环境与凭据约束</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-04" data-focus-target="E-04" data-has-edges="1" data-layer="1" style="left:336px;top:204px;width:236px;height:96px" tabindex="0" title="沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron">
@@ -117,9 +117,9 @@
         <h3 class="node-title" title="资产补偿与重试机制">资产补偿与重试机制</h3>
         <p class="node-sub" title="runCompensation / retryAfterSalesCompensation / forceRestockAndAssets ：回补库存、优惠券、积分">runCompensation、retryAfterSalesCompensation … 共 5 项</p>
         
-    <details class="node-attach" data-element-id="E-09" data-badge-only="1" data-focus-target="E-09">
+    <details class="node-attach" data-element-id="E-09" data-host-ids="E-05" data-badge-only="1" data-focus-target="E-09">
       <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">3</span> 条约束</summary>
-      <ul class="attach-pop"><li class="attach-item" data-element-id="E-09" data-focus-target="E-09" title="未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）">⚑ 未发货仅退款库存释放时机决策项</li><li class="attach-item" data-element-id="C-01" data-focus-target="C-01" title="权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝">⚑ 权限与越权边界</li><li class="attach-item" data-element-id="C-02" data-focus-target="C-02" title="补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED">⚑ 补偿 / 退款的幂等、有界重试与业务不变量</li></ul>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="E-09" data-host-ids="E-05" data-focus-target="E-09" title="未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）">⚑ 未发货仅退款库存释放时机决策项</li><li class="attach-item" data-element-id="C-01" data-host-ids="E-02,E-05" data-focus-target="C-01" title="权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝">⚑ 权限与越权边界</li><li class="attach-item" data-element-id="C-02" data-host-ids="E-05" data-focus-target="C-02" title="补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED">⚑ 补偿 / 退款的幂等、有界重试与业务不变量</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-07" data-focus-target="E-07" data-has-edges="1" data-layer="2" style="left:336px;top:384px;width:236px;height:96px" tabindex="0" title="证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist">

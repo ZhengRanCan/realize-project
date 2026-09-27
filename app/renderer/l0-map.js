@@ -139,13 +139,18 @@ function renderFocusPanel(e) {
 
 /** 一个节点：标题（1 行）+ 副标题（最多 2 行）+ 约束角标。**不显示机器 ID / type / role**。 */
 function renderGraphNode(n, vm) {
+  // 角标要能反向告诉交互"我挂靠在谁身上"，否则点约束时无法把宿主一起点亮
+  const hostIdsOf = (id) => {
+    const a = (vm.attachments || []).find((x) => x.elementId === id);
+    return a ? (a.hosts || []).join(',') : '';
+  };
   const badgeItems = n.badgeIds.map((id, i) => {
     const el = vm.elements.find((x) => x.id === id);
     const df = L0Layout.displayFields(el || { id, label: n.badgeLabels[i] });
-    return `<li class="attach-item" data-element-id="${esc(id)}" data-focus-target="${esc(id)}" title="${esc(n.badgeLabels[i] || '')}">⚑ ${esc(df.title)}</li>`;
+    return `<li class="attach-item" data-element-id="${esc(id)}" data-host-ids="${esc(hostIdsOf(id))}" data-focus-target="${esc(id)}" title="${esc(n.badgeLabels[i] || '')}">⚑ ${esc(df.title)}</li>`;
   }).join('');
   const badgeBlock = n.badgeIds.length ? `
-    <details class="node-attach" data-element-id="${esc(n.badgeIds[0])}" data-badge-only="1" data-focus-target="${esc(n.badgeIds[0])}">
+    <details class="node-attach" data-element-id="${esc(n.badgeIds[0])}" data-host-ids="${esc(hostIdsOf(n.badgeIds[0]))}" data-badge-only="1" data-focus-target="${esc(n.badgeIds[0])}">
       <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">${n.badgeIds.length}</span> 条约束</summary>
       <ul class="attach-pop">${badgeItems}</ul>
     </details>` : '';
@@ -459,27 +464,44 @@ function bindInteractions(root, opts = {}) {
   const clear = () => {
     stateRoot.classList.remove('has-focus', 'focus-element', 'focus-edge', 'focus-topic');
     root.querySelectorAll('[data-focus-for]').forEach((p) => { p.hidden = true; });
-    root.querySelectorAll('.is-dim,.is-hit,.is-open').forEach((n) => n.classList.remove('is-dim', 'is-hit', 'is-open'));
+    root.querySelectorAll('.is-hit,.is-open').forEach((n) => n.classList.remove('is-hit', 'is-open'));
     const slot = root.querySelector('#l0-focus-slot');
     if (slot) slot.innerHTML = '';
     if (opts.onClear) opts.onClear();
   };
-  const DIM_SEL = '.card,.edge-row,.attach-row,.topic-entry,.l0-node,.l0-edge,.l0-edge-label';
-  const dimAll = () => root.querySelectorAll(DIM_SEL).forEach((n) => n.classList.add('is-dim'));
-  const hit = (sel) => root.querySelectorAll(sel).forEach((n) => { n.classList.remove('is-dim'); n.classList.add('is-hit'); });
-  const hitNode = (n) => { if (n) { n.classList.remove('is-dim'); n.classList.add('is-hit'); } };
+  /**
+   * 选中 = **只高光相关的东西，不压暗/不隐藏其余的**（用户裁决）。
+   * 之前的做法是把其他节点降到 opacity .3 —— 用户读起来就是"其他内容被隐藏了"，
+   * 而该被高光的约束又没有任何高光。所以现在只做加法：命中就加 `.is-hit`。
+   */
+  const hitNode = (n) => { if (n) n.classList.add('is-hit'); };
+  const hitAll = (sel) => root.querySelectorAll(sel).forEach(hitNode);
   /** 两个视图里同一条 edge 的所有表现（SVG 线 / 线上标签 / Review 行）一起处理 */
   const edgeNodes = (id) => [...root.querySelectorAll('[data-edge-id]')].filter((n) => n.dataset.edgeId === id);
+  /** 角标（约束）↔ 宿主：attachment 是双向的，点任一端都该把另一端一起点亮 */
+  const hostIdsOf = (n) => (n.getAttribute('data-host-ids') || '').split(',').filter(Boolean);
+  const hitBadgesHostedBy = (id) => {
+    root.querySelectorAll('[data-host-ids]').forEach((n) => {
+      if (hostIdsOf(n).includes(id)) hitNode(n);
+    });
+  };
 
   function focusElement(id) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-element');
-    dimAll();
-    // 同一 element 在两个视图 / 角标里的所有表现一起命中
-    root.querySelectorAll(`[data-element-id="${id}"]`).forEach(hitNode);
+    // ① 这个 element 在两个视图 / 角标里的所有表现
+    root.querySelectorAll(`[data-element-id="${id}"]`).forEach((n) => {
+      hitNode(n);
+      // ② 如果它是个角标（约束），把它挂靠的宿主一起点亮 —— 附件关系就是它的"链接"
+      hostIdsOf(n).forEach((h) => hitAll(`[data-element-id="${h}"]`));
+    });
+    // ③ 反过来：宿主被点时，挂在它上面的约束角标也一起亮
+    hitBadgesHostedBy(id);
+    // ④ 与它直接相连的线（含线标签）
     root.querySelectorAll('[data-edge-id]').forEach((n) => {
       if (n.dataset.from === id || n.dataset.to === id) hitNode(n);
     });
+    // ⑤ Review 里的 attachment 行；Topic 入口
     root.querySelectorAll('.attach-row').forEach((r) => {
       if (r.dataset.attachElement === id) hitNode(r);
     });
@@ -497,11 +519,11 @@ function bindInteractions(root, opts = {}) {
   function focusEdge(el) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-edge');
-    dimAll();
     const id = el.dataset.edgeId;
     edgeNodes(id).forEach(hitNode);
     [el.dataset.from, el.dataset.to].forEach((eid) => {
-      root.querySelectorAll(`[data-element-id="${eid}"]`).forEach(hitNode);
+      hitAll(`[data-element-id="${eid}"]`);
+      hitBadgesHostedBy(eid);
     });
     el.classList.add('is-open'); // Review 行会因此展开 qualifier / provenance
   }
@@ -509,10 +531,10 @@ function bindInteractions(root, opts = {}) {
   function focusTopic(row) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-topic');
-    dimAll();
     hitNode(row);
     (row.dataset.elementIds || '').split(',').filter(Boolean).forEach((id) => {
-      root.querySelectorAll(`[data-element-id="${id}"]`).forEach(hitNode);
+      hitAll(`[data-element-id="${id}"]`);
+      hitBadgesHostedBy(id);
     });
   }
 

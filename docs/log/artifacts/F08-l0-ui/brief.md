@@ -159,6 +159,25 @@ Phase 4.1 Relationship-first Reading View ✅ 完成（Track A Round 0 裁决后
 中英切换靠 CSS 双标签（`.lbl-en/.lbl-zh`、`.rel-en/.rel-zh` + `[data-view]`），
 **不复制面板、不加交互**；`.l0-root[data-view="reading"] .eid { display: none }` 让 Reading 里任何机器 ID 都不出现。
 
+### 4.1.2 选中行为修正（用户实测反馈）
+
+```text
+用户反馈 1：点击区块之后，只高光相应的链接和区块即可，不要把其他内容隐藏。
+用户反馈 2：点约束之后区块会直接"隐藏"，而约束自己却没有任何高光。
+```
+
+根因：选中时把其他节点统一降到 `opacity .3`（`.is-dim`）—— 用户读起来就是"其他内容被隐藏了"；
+而约束角标自己的底色（琥珀色 summary）把父级的 `.is-hit` 背景盖住了，所以它看起来毫无反应。
+
+改法：
+
+```text
+1. **删掉压暗机制**（CSS 规则一起删，测试盯着"不许再出现压暗规则"）→ 选中只做加法：命中的加 .is-hit
+2. 约束角标补高光：`.node-attach.is-hit > summary` 与 `.attach-item.is-hit`（点到 summary / li 本身）
+3. attachment 是双向的：角标带 data-host-ids
+   点约束 → 它的宿主节点一起点亮；点宿主 → 它身上的约束角标一起点亮；点线 → 两端节点连同其角标一起亮
+```
+
 ### 冻结清单（UI polish 之后不再动）
 
 ```text
