@@ -1,20 +1,72 @@
 # F08 · Track A 第一轮（人手阅读测试 · D + E）
 
-> 状态：⬜ **待进行**（代码在本轮提交后**冻结**；本轮不再改 UI）
+> 状态：⬜ **待进行**（正式计时的人在 Phase 4.1 之后跑）
+> **Round 0（定性第一印象）已完成 → 见 §0.1**，它直接触发了一次小改版（Phase 4.1）。
 > 目的：让**真实阅读行为**决定下一刀切哪里 —— 不是"UI 好不好看"，而是"能不能靠 L0 回答问题"。
 > 记录原则：**只记 5 个数据 + 1 句主观**，不做量表。
+
+---
+
+## 0.1 Round 0 · First-impression observation（已完成 · 用户本人）
+
+第一次打开真实界面（Reading View）后，用户给出的三条感受：
+
+```text
+Finding 1（核心）
+  核心结构以 card 集合呈现，关系不可一眼感知；
+  用户需要自行从卡片内的关系文字重建架构。
+  → 原文：「一股脑地给出好几个 block，但没有讲明他们之间的关系是什么，
+           我不能第一时间就看清楚当前文档的架构。」
+
+Finding 2
+  process / artifact 等 ontology metadata 对普通阅读者认知帮助低，并增加理解成本。
+  → 原文：「给出了一个 process、artifact 什么的，感觉表示起来也不够直接。」
+
+Finding 3
+  machine ID 与标题竞争空间，产生 `E-UserProfile` 这种不自然换行，降低可读性。
+  → 原文：「E-UserProfile 这种，会把标题过长的移动到下一行去」。
+```
+
+**判定**：`Navigation / visual hierarchy redesign required before timed Track A.`
+
+**不违反"不要在人测前打磨 UI"**：这不是"没测就改"，而是**已经做了人测** ——
+第一位真实使用者给出了明确的行为反馈（"第一眼看不懂架构"）。继续用已知有问题的版本计时，信息增益很低。
+
+**对应动作（Phase 4.1 · Relationship-first Reading View）**：
+
+| Finding | 动作 |
+|---|---|
+| 1 关系不可一眼感知 | Reading 改成 node-edge 图：节点 = element，线 = edge（箭头画在节点之间） |
+| 2 ontology metadata 抢认知 | Reading 隐藏 type / role / 机器 ID；只留切开的短标题 + 副标题（`◇▶⚑` 只做极轻的角标） |
+| 3 机器 ID 与标题冲突 | Reading 不显示 ID；标题按最先出现的分隔符切开（`UserProfile` ／ `跨目标用户上下文…`） |
+| （用户第 6 条）约束抢重量 | 约束降级为宿主节点上的 `⚑ N constraints` 角标，展开才列出 |
+
+> 关键结论（用户的话）：**当前界面把 Framework Map 的数据完整展示出来了，
+> 却没有把 Framework Map 的"关系结构"作为主视觉展示出来。**
+> 所以这一刀切的是 Reading 的主视觉，而不是继续加图形或修样式。
+
+### 这一轮顺带暴露的三个实现问题（都不是"样式问题"）
+
+```text
+① 打开按钮静默失败（真实入口调了不存在的 enterReview()）→ selftest 全绿但按钮没用
+   根因：selftest 手抄了一遍状态切换，通过的是副本。→ loadL0(path) 成为唯一入口。
+② 静态预览从未加载 renderer（bindInteractions 直接抛错）→ 断言只检查了那行文字。
+   → 预览真的引 layout.js + map.js，断言盯脚本顺序。
+③ 布局丢元素（约束挂到另一个约束上时消失）→ 定点检查后升为节点，宁可多一个虚线节点。
+```
 
 ---
 
 ## 0. 冻结与准备
 
 ```text
-代码状态   F08 Phase 3/4 第一版 + Electron 集成 selftest 通过后冻结
+代码状态   Phase 4.1（Relationship-first Reading View）之后的版本
 启动       npm start
 加载      首屏 →「打开 framework-map.json」
   D 用    experiments/semantic-grounding/fixture-d/run-04/framework-map.json
   E 用    experiments/semantic-grounding/fixture-e/run-08/framework-map.json
-默认视图   Reading（Review 需要手动切）
+默认视图   Reading（= 关系图；工程明细切 Review View）
+不开 GUI 先自查：npm run l0:layout   # 用文字打印层 / 线 / 角标
 手工 smoke（自动化刻意不做）：原生文件选择器、Source 面板的完整阅读
 
 > **2026-09-27 手工 smoke 记录（Track A 前置）**：第一次点「打开 framework-map.json」时，

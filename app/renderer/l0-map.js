@@ -3,26 +3,43 @@
 /**
  * Feature 08 · L0 Framework Map Renderer（deterministic · SSR + 交互增强）
  *
- * 输入 = `scripts/l0-view-model.js` 产出的 **view model**（纯投影）。
+ * 输入 = `scripts/l0-view-model.js` 产出的 **view model**（纯投影）+ `l0-layout.js` 的坐标。
  * 输出 = HTML 字符串（构建期 SSR）／`mount()`（Electron 复用同一份）。
  *
- * ## 设计原则（用户冻结）
- *   1. **Layout organizes space; it does not create semantics.**
- *      → 不做图布局；按 `element.type`（契约字段）分区，并在界面上显式声明"分组依据是 type，不是关系"。
- *   2. 只有 `edge` / `attachment` / `qualifier` 是正式语义 —— 每条边用一行 `A —type→ B` 显式写方向。
- *   3. `relationGap` / 校验告警只在 **Review View** 出现，并标注「不是 edge」。
- *   4. 不因 `>budget` 隐藏节点；不造主轴；无 element 的 Topic 照样是入口。
- *   5. **Reading 是默认视图**：第一眼回答"这篇设计在讲什么核心东西 / 我从哪里进去"；
- *      工程事实（element/edge/budget/warn）与审阅信息收进 Review View。**隐藏，不删数据。**
+ * ## Phase 4.1 · Relationship-first Reading View（用户 Track A Round 0 裁决）
  *
- * ## 交互（Phase 4）：interaction-based graph reading（**不靠二维坐标**）
- *   点 element   → 高亮它 + 直接相邻的 edge / attachment，其余降噪；展开 **Focused Relations**
- *   点 edge      → 同时聚焦 from / to，并展开 qualifier 与两端 provenance
- *   点 topic     → 高亮其关联 L0 elements；无 element 时仍进入 Topic 内容
- *   点 provenance→ 交给宿主打开对应原文位置（`opts.onSourceRef`）
- *   清除选择     → 回到完整 Overview（按钮 / Esc）
+ * 用户作为第一位真实读者的原话是：「不能第一时间看清楚当前文档的架构」——
+ * 旧版 Reading 是"按 type 分组的 card 集合 + 卡片内关系文字"，读者必须自己在脑中重建关系图。
+ * 现在两个视图分工明确：
+ *
+ *   **Reading View（默认）= 关系优先**
+ *     节点 = element，线 = edge（箭头直接画在节点之间），侧挂 = attachment/constraint（角标）。
+ *     第一眼看到的是结构，不是卡片；点节点 / 线 / Topic 才下钻（Focused Relations 面板）。
+ *     工程 metadata（机器 ID / type / role / 校验）**不在** Reading 出现 —— 它们不帮第一眼理解。
+ *     约束不跟核心节点抢视觉重量：降级为 `⚑ N` 角标，展开才列出（仍是正式语义，只是低一级）。
+ *
+ *   **Review View = 审阅优先（旧版结构板原样保留）**
+ *     按 `element.type` 分区看全部 element · 查 provenance · 查完整 edge 与 qualifier ·
+ *     查 relationGap / validator warning · 查生成物有没有问题。
+ *
+ * ## 冻结原则（Phase 4.1 修正后的理解）
+ *   「布局不能创造原数据没有的语义；但布局完全可以利用已有 edge 帮用户看懂语义。」
+ *   → 允许自动图布局：节点 = elements，线 = edges，位置只用于减少交叉、提高可读性。
+ *   → 不允许：因为两个节点摆得近就暗示它们相关。**语义来自线，不来自坐标。**
+ *   → 没有 edge 就不画线；没有主轴就不发明主轴；自环就画自环。
+ *
+ * ## 交互：interaction-based graph reading
+ *   点节点   → 高亮它 + 直接相连的线，其余降噪；展开 Focused Relations（Incoming/Outgoing/Attached/Provenance）
+ *   点线     → 同时聚焦 from / to，并展开 qualifier 与两端 provenance
+ *   点 Topic → 高亮其关联 elements；展开详情（proposition / elements / source）
+ *   点 provenance → 交给宿主打开对应原文位置（`opts.onSourceRef`）
+ *   清除选择 → 回到完整 Overview（按钮 / Esc）
  *   实现方式：所有焦点面板**预渲染**（可静态断言），交互只切换 class 与 hidden。
  */
+
+const L0Layout = (typeof window !== 'undefined' && window.L0Layout)
+  ? window.L0Layout
+  : require('./l0-layout.js');
 
 const TYPE_LABEL = {
   concept: 'concept', component: 'component', process: 'process',
@@ -57,20 +74,16 @@ const qualifierLine = (q) => {
 };
 
 /* ------------------------------------------------------------------ *
- * 元素卡片（含预渲染的 Focused Relations 面板）
+ * Reading View · Relationship-first graph（Phase 4.1）
  * ------------------------------------------------------------------ */
-function renderElementCard(e, vm) {
-  const topicChips = e.topics.map((t) => {
-    const tp = vm.topics.find((x) => x.id === t);
-    return `<button class="chip link" data-topic-focus="${esc(t)}">${esc(tp ? tp.title : t)}</button>`;
-  }).join('') || '<span class="muted">（无 Topic）</span>';
 
+/** 焦点面板（预渲染在 Review 的卡片里；Reading 选中时拷进 #l0-focus-slot） */
+function renderFocusPanel(e) {
   const outRows = e.outgoing.map((r) => `<li data-edge-ref="${esc(r.id || '')}"><span class="rel">—${esc(r.type)}→</span> <span class="node">${esc(r.peerLabel)}</span>${r.selfLoop ? '<span class="flag self">自环</span>' : ''}</li>`).join('');
   const inRows = e.incoming.map((r) => (r.selfLoop ? '' : `<li data-edge-ref="${esc(r.id || '')}"><span class="rel">←${esc(r.type)}—</span> <span class="node">${esc(r.peerLabel)}</span></li>`)).join('');
   const attRows = e.attachmentAsElement.map((a) => `<li><span class="rel">⇢ 挂到</span> ${a.hostLabels.map((l) => `<span class="node">${esc(l)}</span>`).join(' · ')}</li>`).join('')
     + e.attachmentAsHost.map((a) => `<li><span class="rel">⇐ 挂靠</span> <span class="node">${esc(a.elementLabel)}</span></li>`).join('');
-
-  const focusPanel = `
+  return `
 <section class="focus-panel" data-focus-for="${esc(e.id)}" hidden>
   <header class="focus-head">
     <span class="focus-title">Focused Relations · <span class="eid">${esc(e.id)}</span> ${esc(e.label)}</span>
@@ -83,6 +96,86 @@ function renderElementCard(e, vm) {
     <div class="focus-col"><h4>Provenance</h4><div class="focus-prov">${refChips([...e.provenance.sectionRefs, ...e.provenance.sourceUnitIds])}</div></div>
   </div>
 </section>`;
+}
+
+/** 一个节点：标题 + 副标题 + 约束角标。**不显示机器 ID / type / role**（副标题来自原始 label）。 */
+function renderGraphNode(n, vm) {
+  const badgeItems = n.badgeIds.map((id, i) => {
+    const el = vm.elements.find((x) => x.id === id);
+    const df = L0Layout.displayFields(el || { id, label: n.badgeLabels[i] });
+    return `<li class="attach-item" data-element-id="${esc(id)}" data-focus-target="${esc(id)}" title="${esc(n.badgeLabels[i] || '')}">⚑ ${esc(df.title)}</li>`;
+  }).join('');
+  const badgeBlock = n.badgeIds.length ? `
+    <details class="node-attach" data-element-id="${esc(n.badgeIds[0])}" data-badge-only="1" data-focus-target="${esc(n.badgeIds[0])}">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">${n.badgeIds.length}</span> constraints</summary>
+      <ul class="attach-pop">${badgeItems}</ul>
+    </details>` : '';
+  return `
+      <article class="l0-node type-${esc(n.type)}" data-element-id="${esc(n.id)}" data-focus-target="${esc(n.id)}" data-has-edges="${n.hasEdges ? '1' : '0'}" data-layer="${n.layer}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;height:${n.h}px" tabindex="0" title="${esc(n.label)}">
+        <span class="node-glyph" data-glyph="${esc(n.type)}" title="${esc(n.type)}">${esc(n.glyph)}</span>
+        <h3 class="node-title">${esc(n.title)}</h3>
+        ${n.subtitle ? `<p class="node-sub">${esc(n.subtitle)}</p>` : ''}
+        ${badgeBlock}
+      </article>`;
+}
+
+/** 图的图例：只用 map 里真出现过的 type（不发明词汇） */
+function renderLegend(vm) {
+  const types = [...new Set(vm.elements.map((e) => e.type))];
+  return types.map((t) => `<span class="legend-item"><span class="node-glyph" data-glyph="${esc(t)}">${esc(L0Layout.TYPE_GLYPH[t] || '·')}</span> ${esc(L0Layout.TYPE_GLYPH_LABEL[t] || t)}</span>`).join('');
+}
+
+function renderReading(vm, layout) {
+  const noEdge = layout.edges.length === 0;
+  const edgePaths = layout.edges.map((p) => `
+          <path class="l0-edge kind-${esc(p.kind)}${p.selfLoop ? ' is-selfloop' : ''}" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}" data-kind="${esc(p.kind)}" d="${esc(p.d)}" marker-end="url(#l0-arrow)"><title>${esc(`${p.from} —${p.type}→ ${p.to}${p.label ? '：' + p.label : ''}`)}</title></path>`).join('');
+  const edgeLabels = layout.edges.map((p) => `
+          <text class="l0-edge-label" x="${p.labelX}" y="${p.labelY}" text-anchor="middle" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}">${esc(p.type)}${p.selfLoop ? ' ↺' : ''}</text>`).join('');
+  const nodes = layout.nodes.map((n) => renderGraphNode(n, vm)).join('');
+  const orphanNote = layout.orphanBand
+    ? `<div class="l0-orphan-note" style="top:${layout.orphanBand.y}px">不在任何 edge 上（${layout.orphanBand.count}）</div>`
+    : '';
+
+  return `
+  <section class="l0-reading" id="l0-reading">
+    <div class="l0-graph-wrap">
+      <div class="l0-graph" id="l0-graph" style="width:${layout.bounds.width}px;height:${layout.bounds.height}px">
+        <svg class="l0-lines" width="${layout.bounds.width}" height="${layout.bounds.height}" viewBox="0 0 ${layout.bounds.width} ${layout.bounds.height}" aria-hidden="true">
+          <defs>
+            <marker id="l0-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
+            <marker id="l0-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
+          </defs>
+          <g class="l0-edge-layer">${edgePaths}</g>
+          <g class="l0-label-layer">${edgeLabels}</g>
+        </svg>
+        <div class="l0-nodes">${nodes}</div>
+        ${orphanNote}
+      </div>
+    </div>
+    ${noEdge ? '<p class="l0-no-edge">这份 map 没有任何 <code>edge</code> —— <b>没有主轴就不发明主轴</b>，所以这里不画任何线。</p>' : ''}
+    <div class="l0-legend">
+      <span class="legend-key"><b>节点</b> = element</span>
+      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
+      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
+      ${renderLegend(vm)}
+    </div>
+    <div class="l0-focus-slot" id="l0-focus-slot"></div>
+  </section>`;
+}
+
+/* ------------------------------------------------------------------ *
+ * Review View · 旧版结构板（Phase 4.1：整体移到 Review，代码复用不删）
+ * ------------------------------------------------------------------ */
+function renderElementCard(e, vm) {
+  const topicChips = e.topics.map((t) => {
+    const tp = vm.topics.find((x) => x.id === t);
+    return `<button class="chip link" data-topic-focus="${esc(t)}">${esc(tp ? tp.title : t)}</button>`;
+  }).join('') || '<span class="muted">（无 Topic）</span>';
+
+  const outRows = e.outgoing.map((r) => `<li data-edge-ref="${esc(r.id || '')}"><span class="rel">—${esc(r.type)}→</span> <span class="node">${esc(r.peerLabel)}</span>${r.selfLoop ? '<span class="flag self">自环</span>' : ''}</li>`).join('');
+  const inRows = e.incoming.map((r) => (r.selfLoop ? '' : `<li data-edge-ref="${esc(r.id || '')}"><span class="rel">←${esc(r.type)}—</span> <span class="node">${esc(r.peerLabel)}</span></li>`)).join('');
+  const attRows = e.attachmentAsElement.map((a) => `<li><span class="rel">⇢ 挂到</span> ${a.hostLabels.map((l) => `<span class="node">${esc(l)}</span>`).join(' · ')}</li>`).join('')
+    + e.attachmentAsHost.map((a) => `<li><span class="rel">⇐ 挂靠</span> <span class="node">${esc(a.elementLabel)}</span></li>`).join('');
 
   return `
 <article class="card type-${esc(e.type)}" id="element-${esc(e.id)}" data-element-id="${esc(e.id)}" data-focus-target="${esc(e.id)}" tabindex="0">
@@ -100,13 +193,10 @@ function renderElementCard(e, vm) {
   <div class="card-row"><span class="k">出处</span><span class="v">${refChips([...e.provenance.sectionRefs, ...e.provenance.sourceUnitIds])}</span></div>
   ${(outRows || inRows) ? `<div class="card-row"><span class="k">关系</span><ul class="rel-list">${outRows}${inRows}</ul></div>` : '<div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>'}
   ${attRows ? `<div class="card-row"><span class="k">侧挂</span><ul class="rel-list">${attRows}</ul></div>` : ''}
-  ${focusPanel}
+  ${renderFocusPanel(e)}
 </article>`;
 }
 
-/* ------------------------------------------------------------------ *
- * 关系行 / 侧挂行 / Topic 条目
- * ------------------------------------------------------------------ */
 function renderEdgeRow(ed, vm) {
   const endpoints = [ed.from, ed.to].filter((v, i, a) => a.indexOf(v) === i);
   const prov = endpoints.map((id) => {
@@ -144,23 +234,6 @@ function renderAttachmentRow(a, vm) {
 </li>`;
 }
 
-function renderTopicEntry(t) {
-  return `
-<li class="topic-entry ${t.hasElements ? '' : 'no-element'}" id="topic-${esc(t.id)}" data-topic-id="${esc(t.id)}" data-topic-focus="${esc(t.id)}" data-element-ids="${esc(t.elementIds.join(','))}">
-  <div class="topic-head">
-    <span class="eid">${esc(t.id)}</span>
-    <span class="topic-title">${esc(t.title)}</span>
-    ${t.hasElements ? '' : '<span class="flag info">无 L0 element —— 仍是导航入口</span>'}
-  </div>
-  <div class="topic-prop">${esc(t.proposition)}</div>
-  <div class="card-row"><span class="k">elements</span><span class="v">${t.elementIds.length ? t.elementIds.map((id, i) => `<button class="chip link" data-focus-target="${esc(id)}">${esc(t.elementLabels[i])}</button>`).join('') : '<span class="muted">（该 Topic 没有 L0 element）</span>'}</span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v">${refChips(t.sectionRefs)}${t.blockIds.length ? `<span class="muted">· L2 blocks: ${esc(t.blockIds.join(', '))}</span>` : ''}</span></div>
-</li>`;
-}
-
-/* ------------------------------------------------------------------ *
- * Review View（默认隐藏）
- * ------------------------------------------------------------------ */
 function renderReview(vm) {
   const r = vm.review;
   const c = r.checkMap;
@@ -212,14 +285,69 @@ function renderReview(vm) {
 </section>`;
 }
 
+/** 旧版结构板：按 element.type 分区 —— 现在只在 Review View 出现 */
+function renderReviewBoard(vm, layout) {
+  const grouped = TYPE_ORDER.concat(vm.facts.elementTypes.filter((t) => !TYPE_ORDER.includes(t)))
+    .map((t) => ({ type: t, items: vm.elements.filter((e) => e.type === t) }))
+    .filter((g) => g.items.length);
+  const f = vm.facts;
+  return `
+  <section class="l0-review-board" id="l0-review-board">
+    <section class="block">
+      <h2>核心结构（按 element.type 分区 · ${f.elementCount} 个）</h2>
+      <p class="note">这里的分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系 ——
+        关系只在 Reading View 用线画出来。同一张图的两种读法：Reading 看结构，Review 看明细。</p>
+      ${grouped.map((g) => `
+        <div class="type-group">
+          <div class="type-head">${esc(TYPE_LABEL[g.type] || g.type)} <span class="muted">×${g.items.length}</span></div>
+          <div class="cards">${g.items.map((e) => renderElementCard(e, vm)).join('')}</div>
+        </div>`).join('')}
+    </section>
+
+    <section class="block" id="relations">
+      <h2>关系（edge · ${f.edgeCount} 条${f.selfLoopCount ? ` · 含 ${f.selfLoopCount} 条自环` : ''}）</h2>
+      <ul class="edge-list">${vm.edges.map((e) => renderEdgeRow(e, vm)).join('') || '<li class="muted">（这份 map 没有任何 edge —— 没有主轴就没有主轴，不造）</li>'}</ul>
+    </section>
+
+    <section class="block" id="attachments">
+      <h2>侧挂 / 约束（attachments · ${f.attachmentCount} 条）</h2>
+      <ul class="attach-list">${vm.attachments.map((a) => renderAttachmentRow(a, vm)).join('') || '<li class="muted">（无 attachment）</li>'}</ul>
+    </section>
+
+    ${layout && layout.stats.backEdges ? `<p class="note">布局观察：这张图有 <b>${layout.stats.backEdges}</b> 条回边（Reading 里画成向上返回的箭头）——
+      这是生成物的结构事实，不是渲染器造的。</p>` : ''}
+
+    <div class="review-slot">${renderReview(vm)}</div>
+  </section>`;
+}
+
+/* ------------------------------------------------------------------ *
+ * Topic Navigation（Phase 4.1：默认只显示轻量入口，details 按需展开）
+ * ------------------------------------------------------------------ */
+function renderTopicEntry(t) {
+  return `
+<li class="topic-entry ${t.hasElements ? '' : 'no-element'}" id="topic-${esc(t.id)}" data-topic-id="${esc(t.id)}" data-topic-focus="${esc(t.id)}" data-element-ids="${esc(t.elementIds.join(','))}">
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">${esc(t.id)}</span>
+      <span class="topic-title">${esc(t.title)}</span>
+      ${t.hasElements ? `<span class="topic-count">${t.elementIds.length}</span>` : '<span class="flag info">无 L0 element —— 仍是导航入口</span>'}
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">${esc(t.proposition)}</div>
+      <div class="card-row"><span class="k">elements</span><span class="v">${t.elementIds.length ? t.elementIds.map((id, i) => `<button class="chip link" data-focus-target="${esc(id)}">${esc(t.elementLabels[i])}</button>`).join('') : '<span class="muted">（该 Topic 没有 L0 element）</span>'}</span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v">${refChips(t.sectionRefs)}${t.blockIds.length ? `<span class="muted">· L2 blocks: ${esc(t.blockIds.join(', '))}</span>` : ''}</span></div>
+    </div>
+  </details>
+</li>`;
+}
+
 /* ------------------------------------------------------------------ *
  * 主渲染
  * ------------------------------------------------------------------ */
 function renderL0MapHTML(vm, opts = {}) {
   const view = opts.view || 'reading'; // **默认 Reading**（用户裁决）
-  const grouped = TYPE_ORDER.concat(vm.facts.elementTypes.filter((t) => !TYPE_ORDER.includes(t)))
-    .map((t) => ({ type: t, items: vm.elements.filter((e) => e.type === t) }))
-    .filter((g) => g.items.length);
+  const layout = opts.layout || L0Layout.computeL0Layout(vm);
   const f = vm.facts;
 
   const scope = (vm.document.entries.find((d) => d.key === 'scope') || {}).text || '';
@@ -243,41 +371,24 @@ function renderL0MapHTML(vm, opts = {}) {
   ${nonGoal ? `<details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>${esc(nonGoal)}</div></details>` : ''}
 
   <p class="l0-principle">
+    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
+    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
     <b>Layout organizes space; it does not create semantics.</b>
-    分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系；唯一正式的语义是
-    <code>edge</code> / <code>attachment</code> / <code>qualifier</code> —— 每条边都在「关系」区显式写出方向。
-    点任意元素 / 边 / Topic 可以聚焦并追关系。
+    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
+    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
   </p>
-
-  <div class="l0-focus-slot" id="l0-focus-slot"></div>
 
   <div class="l0-body">
     <main class="l0-main">
-      <section class="block">
-        <h2>核心结构（按 element.type 分区 · ${f.elementCount} 个）</h2>
-        ${grouped.map((g) => `
-          <div class="type-group">
-            <div class="type-head">${esc(TYPE_LABEL[g.type] || g.type)} <span class="muted">×${g.items.length}</span></div>
-            <div class="cards">${g.items.map((e) => renderElementCard(e, vm)).join('')}</div>
-          </div>`).join('')}
-      </section>
-
-      <section class="block" id="relations">
-        <h2>关系（edge · ${f.edgeCount} 条${f.selfLoopCount ? ` · 含 ${f.selfLoopCount} 条自环` : ''}）</h2>
-        <ul class="edge-list">${vm.edges.map((e) => renderEdgeRow(e, vm)).join('') || '<li class="muted">（这份 map 没有任何 edge —— 没有主轴就没有主轴，不造）</li>'}</ul>
-      </section>
-
-      <section class="block" id="attachments">
-        <h2>侧挂 / 约束（attachments · ${f.attachmentCount} 条）</h2>
-        <ul class="attach-list">${vm.attachments.map((a) => renderAttachmentRow(a, vm)).join('') || '<li class="muted">（无 attachment）</li>'}</ul>
-      </section>
-
-      <div class="review-slot">${renderReview(vm)}</div>
+      ${renderReading(vm, layout)}
+      ${renderReviewBoard(vm, layout)}
     </main>
 
     <aside class="l0-nav" id="topic-nav">
       <h2>Topic Navigation（完整入口索引 · ${f.topicCount}）</h2>
-      <p class="note">这里与左侧不是一一对应的：左边是<b>核心机制</b>，这里是<b>完整入口</b>。没有 L0 element 的 Topic 也照样能进入。</p>
+      <p class="note">这里与左边的图不是一一对应的：图中是<b>有关系的核心机制</b>，这里是<b>完整入口</b>。
+        没有 L0 element 的 Topic 也照样能进入。默认只给标题，展开才看命题与出处。</p>
       <ul class="topic-list">${vm.topics.map(renderTopicEntry).join('')}</ul>
       <div class="doc-entries">
         <h3>文档级入口</h3>
@@ -297,61 +408,64 @@ function bindInteractions(root, opts = {}) {
   // mount() 的宿主可能是 #main（Electron），而状态 class 的 CSS 作用域是 `.l0-root`：
   // 必须把 class 加到真正的 .l0-root 上，否则降噪/命中样式在 Electron 下不生效。
   const stateRoot = root.classList && root.classList.contains('l0-root') ? root : (root.querySelector('.l0-root') || root);
+
   const clear = () => {
     stateRoot.classList.remove('has-focus', 'focus-element', 'focus-edge', 'focus-topic');
     root.querySelectorAll('[data-focus-for]').forEach((p) => { p.hidden = true; });
-    root.querySelectorAll('.is-dim,.is-hit').forEach((n) => n.classList.remove('is-dim', 'is-hit'));
+    root.querySelectorAll('.is-dim,.is-hit,.is-open').forEach((n) => n.classList.remove('is-dim', 'is-hit', 'is-open'));
     const slot = root.querySelector('#l0-focus-slot');
     if (slot) slot.innerHTML = '';
     if (opts.onClear) opts.onClear();
   };
-  const dimAll = () => root.querySelectorAll('.card,.edge-row,.attach-row,.topic-entry').forEach((n) => n.classList.add('is-dim'));
+  const DIM_SEL = '.card,.edge-row,.attach-row,.topic-entry,.l0-node,.l0-edge,.l0-edge-label';
+  const dimAll = () => root.querySelectorAll(DIM_SEL).forEach((n) => n.classList.add('is-dim'));
   const hit = (sel) => root.querySelectorAll(sel).forEach((n) => { n.classList.remove('is-dim'); n.classList.add('is-hit'); });
+  const hitNode = (n) => { if (n) { n.classList.remove('is-dim'); n.classList.add('is-hit'); } };
+  /** 两个视图里同一条 edge 的所有表现（SVG 线 / 线上标签 / Review 行）一起处理 */
+  const edgeNodes = (id) => [...root.querySelectorAll('[data-edge-id]')].filter((n) => n.dataset.edgeId === id);
 
   function focusElement(id) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-element');
     dimAll();
-    const card = root.querySelector(`[data-focus-target="${id}"][data-element-id]`);
+    // 同一 element 在两个视图 / 角标里的所有表现一起命中
+    root.querySelectorAll(`[data-element-id="${id}"]`).forEach(hitNode);
+    root.querySelectorAll('[data-edge-id]').forEach((n) => {
+      if (n.dataset.from === id || n.dataset.to === id) hitNode(n);
+    });
+    root.querySelectorAll('.attach-row').forEach((r) => {
+      if (r.dataset.attachElement === id) hitNode(r);
+    });
+    root.querySelectorAll('.topic-entry').forEach((r) => {
+      if ((r.dataset.elementIds || '').split(',').includes(id)) hitNode(r);
+    });
     const panel = root.querySelector(`[data-focus-for="${id}"]`);
-    if (card) { card.classList.remove('is-dim'); card.classList.add('is-hit'); }
     if (panel) {
       panel.hidden = false;
       const slot = root.querySelector('#l0-focus-slot');
       if (slot) slot.innerHTML = panel.outerHTML.replace(' hidden', '').replace('<section class="focus-panel"', '<section class="focus-panel focus-inline"');
     }
-    // 直接相邻：edge 端点 / attachment 两端 / 该元素所在的 topic
-    root.querySelectorAll('.edge-row').forEach((r) => {
-      if (r.dataset.from === id || r.dataset.to === id) { r.classList.remove('is-dim'); r.classList.add('is-hit'); }
-    });
-    root.querySelectorAll('.attach-row').forEach((r) => {
-      if (r.dataset.attachElement === id) { r.classList.remove('is-dim'); r.classList.add('is-hit'); }
-    });
-    root.querySelectorAll('.topic-entry').forEach((r) => {
-      if ((r.dataset.elementIds || '').split(',').includes(id)) { r.classList.remove('is-dim'); r.classList.add('is-hit'); }
-    });
   }
 
-  function focusEdge(row) {
+  function focusEdge(el) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-edge');
     dimAll();
-    row.classList.remove('is-dim'); row.classList.add('is-hit');
-    row.classList.add('is-open');
-    [row.dataset.from, row.dataset.to].forEach((id) => {
-      const card = root.querySelector(`[data-focus-target="${id}"][data-element-id]`);
-      if (card) { card.classList.remove('is-dim'); card.classList.add('is-hit'); }
+    const id = el.dataset.edgeId;
+    edgeNodes(id).forEach(hitNode);
+    [el.dataset.from, el.dataset.to].forEach((eid) => {
+      root.querySelectorAll(`[data-element-id="${eid}"]`).forEach(hitNode);
     });
+    el.classList.add('is-open'); // Review 行会因此展开 qualifier / provenance
   }
 
   function focusTopic(row) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-topic');
     dimAll();
-    row.classList.remove('is-dim'); row.classList.add('is-hit');
+    hitNode(row);
     (row.dataset.elementIds || '').split(',').filter(Boolean).forEach((id) => {
-      const card = root.querySelector(`[data-focus-target="${id}"][data-element-id]`);
-      if (card) { card.classList.remove('is-dim'); card.classList.add('is-hit'); }
+      root.querySelectorAll(`[data-element-id="${id}"]`).forEach(hitNode);
     });
   }
 
@@ -359,21 +473,38 @@ function bindInteractions(root, opts = {}) {
     const src = ev.target.closest('[data-source-ref]');
     if (src) { ev.preventDefault(); if (opts.onSourceRef) opts.onSourceRef(src.getAttribute('data-source-ref')); else src.classList.add('is-hit'); return; }
     if (ev.target.closest('[data-focus-clear]')) { ev.preventDefault(); clear(); return; }
-    const edgeRow = ev.target.closest('[data-focus-edge]');
-    if (edgeRow) { ev.preventDefault(); focusEdge(edgeRow); return; }
+    // 原生 <details> 的展开/收起不能被 preventDefault 吃掉
+    const inSummary = !!ev.target.closest('summary');
+    const edgeEl = ev.target.closest('[data-focus-edge]');
+    if (edgeEl) { ev.preventDefault(); focusEdge(edgeEl); return; }
     const topicRow = ev.target.closest('[data-topic-focus]');
-    if (topicRow && !ev.target.closest('[data-focus-target][data-element-id]')) { ev.preventDefault(); focusTopic(topicRow); return; }
+    if (topicRow && !ev.target.closest('[data-focus-target][data-element-id]')) {
+      if (!inSummary) ev.preventDefault();
+      focusTopic(topicRow);
+      return;
+    }
     const card = ev.target.closest('[data-focus-target][data-element-id]');
-    if (card) { ev.preventDefault(); focusElement(card.getAttribute('data-focus-target')); return; }
+    if (card) {
+      if (!inSummary) ev.preventDefault();
+      focusElement(card.getAttribute('data-focus-target'));
+      return;
+    }
     const chipEl = ev.target.closest('[data-focus-target]');
     if (chipEl) { ev.preventDefault(); focusElement(chipEl.getAttribute('data-focus-target')); }
   });
 
-  root.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') clear(); });
+  root.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') clear();
+    // 键盘可达：Enter / Space 也能选中当前节点（tabindex=0 已在节点上）
+    if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList && ev.target.classList.contains('l0-node')) {
+      ev.preventDefault();
+      focusElement(ev.target.getAttribute('data-focus-target'));
+    }
+  });
 }
 
 /* 双模：Node（构建期 SSR）与浏览器（Electron / 预览） */
-if (typeof module !== 'undefined' && module.exports) module.exports = { renderL0MapHTML, bindInteractions };
+if (typeof module !== 'undefined' && module.exports) module.exports = { renderL0MapHTML, bindInteractions, L0Layout };
 if (typeof window !== 'undefined') {
   window.L0Map = {
     renderL0MapHTML, bindInteractions,

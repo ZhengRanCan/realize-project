@@ -63,6 +63,8 @@ function buildOne({ map, check, out, view = 'reading', note = '' }) {
   <span id="preview-source-hit" class="mono" style="display:none"></span>
 </div>
 ${body}
+<script src="${rel}/app/renderer/l0-layout.js"></script>
+<script src="${rel}/app/renderer/l0-map.js"></script>
 <script>
   // 视图切换（Reading 默认）+ 交互绑定（selection / focus / provenance hook）
   document.addEventListener('click', (ev) => {

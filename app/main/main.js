@@ -499,25 +499,35 @@ async function runSelfTest() {
           out.dataView = root ? root.getAttribute('data-view') : null;
           out.title = root && root.querySelector('h1') ? root.querySelector('h1').textContent.trim() : null;
           out.expectedTitle = res.viewModel.document.title;
-          out.elements = document.querySelectorAll('[data-element-id]').length;
+          // 两个视图都在 DOM 里（隐藏 ≠ 删除）→ 计数必须按视图作用域，并且去重
+          const uniqIn = (sel) => new Set([...document.querySelectorAll(sel)].map((n) => n.getAttribute('data-element-id'))).size;
+          out.uniqueElements = uniqIn('[data-element-id]');
+          out.readingElements = uniqIn('#l0-reading [data-element-id]');
+          out.reviewElements = uniqIn('#l0-review-board [data-element-id]');
+          out.readingNodes = document.querySelectorAll('#l0-reading article.l0-node').length;
+          out.readingEdges = document.querySelectorAll('#l0-reading path.l0-edge').length;
+          out.readingLabels = document.querySelectorAll('#l0-reading text.l0-edge-label').length;
+          out.readingEids = document.querySelectorAll('#l0-reading .eid').length; // Phase 4.1：工程 metadata 不进 Reading
           out.edges = document.querySelectorAll('[data-focus-edge]').length;
           out.topics = document.querySelectorAll('.topic-entry').length;
           out.hasTopicNav = !!document.getElementById('topic-nav');
+          out.topicsOpen = document.querySelectorAll('.topic-fold[open]').length; // 默认不展开
           out.focusPanels = document.querySelectorAll('.focus-panel').length;
           out.factsElementCount = res.viewModel.facts.elementCount;
           out.factsEdgeCount = res.viewModel.facts.edgeCount;
           out.factsTopicCount = res.viewModel.facts.topicCount;
-          out.reviewHiddenInReading = getComputedStyle(document.querySelector('.review-slot')).display === 'none';
-          // ③ 点一个 element → 焦点态 + Focused Relations
-          const card = document.querySelector('[data-element-id][data-focus-target]');
+          out.reviewHiddenInReading = getComputedStyle(document.querySelector('.l0-review-board')).display === 'none';
+          // ③ 点一个 Reading 节点 → 焦点态 + Focused Relations（第一屏就是图，第一个可点元素就是节点）
+          const card = document.querySelector('#l0-reading article.l0-node[data-focus-target]');
+          out.firstTargetIsNode = !!card;
           card.dispatchEvent(new MouseEvent('click', { bubbles: true }));
           out.hasFocusClass = root.classList.contains('has-focus');
           const slot = document.getElementById('l0-focus-slot');
           out.focusSlotFilled = !!(slot && slot.children.length > 0);
           out.visibleFocusPanels = [...document.querySelectorAll('.focus-panel')].filter((p) => !p.hidden).length;
           out.dimmed = document.querySelectorAll('.is-dim').length;
-          // ④ 点 provenance → openSource(ref)（只确认调用到已有接口 + ref 正确，不测 Source 面板本身）
-          const refBtn = document.querySelector('[data-source-ref]');
+          // ④ 从下钻面板里点 provenance → openSource(ref)（节点 → details → 原文，这才是新设计的链路）
+          const refBtn = (slot && slot.querySelector('[data-source-ref]')) || document.querySelector('[data-source-ref]');
           out.ref = refBtn ? refBtn.getAttribute('data-source-ref') : null;
           if (refBtn) refBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
           await new Promise((r) => setTimeout(r, 150));
@@ -562,23 +572,34 @@ async function runSelfTest() {
         } else {
           fail(`L0 集成：mount 异常（mounted=${seam.mounted} title=${seam.title} nav=${seam.hasTopicNav}）`);
         }
-        if (seam.elements === f.elementCount && seam.edges === f.edgeCount && seam.topics === f.topicCount && seam.focusPanels === f.elementCount) {
-          ok(`L0 集成：DOM 计数与 view model 一致（${seam.elements} elements / ${seam.edges} edges / ${seam.topics} topics / ${seam.focusPanels} focus panels）`);
+        if (seam.uniqueElements === f.elementCount && seam.readingElements === f.elementCount
+            && seam.reviewElements === f.elementCount && seam.topics === f.topicCount && seam.focusPanels === f.elementCount) {
+          ok(`L0 集成：两个视图各自覆盖全部 element（Reading ${seam.readingElements} / Review ${seam.reviewElements} / 共 ${seam.uniqueElements} · topics ${seam.topics} · focus panels ${seam.focusPanels}）`);
         } else {
-          fail(`L0 集成：DOM 计数不符（${seam.elements}/${seam.edges}/${seam.topics}/${seam.focusPanels} vs ${f.elementCount}/${f.edgeCount}/${f.topicCount}/${f.elementCount}）`);
+          fail(`L0 集成：DOM 计数不符（uniq=${seam.uniqueElements} reading=${seam.readingElements} review=${seam.reviewElements} topics=${seam.topics} panels=${seam.focusPanels} vs ${f.elementCount}/${f.elementCount}/${f.elementCount}/${f.topicCount}/${f.elementCount}）`);
+        }
+        if (seam.readingEdges === f.edgeCount && seam.readingLabels === f.edgeCount) {
+          ok(`L0 集成：Reading 把关系画成了线（${seam.readingEdges} 条线 + ${seam.readingLabels} 个类型标签 == edge 数）`);
+        } else {
+          fail(`L0 集成：线的数量不对（${seam.readingEdges} 条线 / ${seam.readingLabels} 个标签 vs edge ${f.edgeCount}）`);
+        }
+        if (seam.readingEids === 0 && seam.topicsOpen === 0) {
+          ok(`L0 集成：Reading 不显示机器 ID（${seam.readingEids} 个 .eid）· Topic 默认折叠（${seam.topicsOpen} 个展开）`);
+        } else {
+          fail(`L0 集成：Reading 混入了工程 metadata（eid=${seam.readingEids}）或 Topic 默认展开了 ${seam.topicsOpen} 个`);
         }
         if (seam.dataView === 'reading' && seam.reviewHiddenInReading) {
-          ok('L0 集成：默认 Reading View，且 Review 区在 Reading 下被隐藏（数据仍在 DOM）');
+          ok('L0 集成：默认 Reading View，且 Review 整块在 Reading 下被隐藏（数据仍在 DOM）');
         } else {
           fail(`L0 集成：默认视图异常（data-view=${seam.dataView} reviewHidden=${seam.reviewHiddenInReading}）`);
         }
-        if (seam.hasFocusClass && seam.focusSlotFilled && seam.visibleFocusPanels >= 1 && seam.dimmed > 0) {
-          ok(`L0 集成：点 element → 焦点态 + Focused Relations 出现（dim 降噪 ${seam.dimmed} 项）`);
+        if (seam.firstTargetIsNode && seam.hasFocusClass && seam.focusSlotFilled && seam.visibleFocusPanels >= 1 && seam.dimmed > 0) {
+          ok(`L0 集成：点 Reading 节点 → 焦点态 + Focused Relations 出现（dim 降噪 ${seam.dimmed} 项）`);
         } else {
-          fail(`L0 集成：焦点交互异常（focus=${seam.hasFocusClass} slot=${seam.focusSlotFilled} panels=${seam.visibleFocusPanels} dim=${seam.dimmed}）`);
+          fail(`L0 集成：焦点交互异常（firstIsNode=${seam.firstTargetIsNode} focus=${seam.hasFocusClass} slot=${seam.focusSlotFilled} panels=${seam.visibleFocusPanels} dim=${seam.dimmed}）`);
         }
         if (seam.sourcePanelOpen && seam.ref && seam.sourceHeadText.includes(seam.ref)) {
-          ok(`L0 集成：点 provenance「${seam.ref}」→ 走到已有 openSource() 并打开 Source 面板`);
+          ok(`L0 集成：从下钻面板点 provenance「${seam.ref}」→ 走到已有 openSource() 并打开 Source 面板`);
         } else {
           fail(`L0 集成：provenance 链路异常（open=${seam.sourcePanelOpen} ref=${seam.ref} head=${seam.sourceHeadText}）`);
         }

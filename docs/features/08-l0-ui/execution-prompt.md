@@ -13,6 +13,7 @@
 ✅ Phase 2  standalone HTML preview（D + E + 极端）   scripts/build-l0-preview.js
 ⬜ Phase 3  Electron L0 screen integration（一屏两区）
 ⬜ Phase 4  交互：element / edge / topic / provenance
+🟡 Phase 4.1  Relationship-first Reading View（Round 0 裁决后插入）✅ 已完成
 🟡 Phase 5  A–E regression（自动化 + Electron 集成 selftest 已完成）· 人工 Track A 待做
 ```
 

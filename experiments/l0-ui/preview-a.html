@@ -31,22 +31,127 @@
   <details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>不采用 Context Influence 作为第四级；不承诺输出变化严格由 DeepTutor 上下文导致。</div></details>
 
   <p class="l0-principle">
+    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
+    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
     <b>Layout organizes space; it does not create semantics.</b>
-    分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系；唯一正式的语义是
-    <code>edge</code> / <code>attachment</code> / <code>qualifier</code> —— 每条边都在「关系」区显式写出方向。
-    点任意元素 / 边 / Topic 可以聚焦并追关系。
+    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
+    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
   </p>
-
-  <div class="l0-focus-slot" id="l0-focus-slot"></div>
 
   <div class="l0-body">
     <main class="l0-main">
-      <section class="block">
-        <h2>核心结构（按 element.type 分区 · 12 个）</h2>
+      
+  <section class="l0-reading" id="l0-reading">
+    <div class="l0-graph-wrap">
+      <div class="l0-graph" id="l0-graph" style="width:908px;height:708px">
+        <svg class="l0-lines" width="908" height="708" viewBox="0 0 908 708" aria-hidden="true">
+          <defs>
+            <marker id="l0-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
+            <marker id="l0-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
+          </defs>
+          <g class="l0-edge-layer">
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-from="E-02" data-to="E-01" data-kind="forward" d="M 142 300 C 142 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>E-02 —depends-on→ E-01</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-02" data-from="E-03" data-to="E-02" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-03 —consumes→ E-02</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-04" data-from="E-03" data-to="E-04" data-kind="forward" d="M 142 120 C 142 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-03 —produces→ E-04</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-05-&gt;E-04" data-from="E-05" data-to="E-04" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-05 —consumes→ E-04</title></path></g>
+          <g class="l0-label-layer">
+          <text class="l0-edge-label" x="142" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-from="E-02" data-to="E-01">depends-on</text>
+          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-02" data-from="E-03" data-to="E-02">consumes</text>
+          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-04" data-from="E-03" data-to="E-04">produces</text>
+          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-05-&gt;E-04" data-from="E-05" data-to="E-04">consumes</text></g>
+        </svg>
+        <div class="l0-nodes">
+      <article class="l0-node type-artifact" data-element-id="E-01" data-focus-target="E-01" data-has-edges="1" data-layer="2" style="left:24px;top:384px;width:236px;height:96px" tabindex="0" title="Frozen Context">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">Frozen Context</h3>
         
-          <div class="type-group">
-            <div class="type-head">process <span class="muted">×2</span></div>
-            <div class="cards">
+        
+    <details class="node-attach" data-element-id="E-06" data-badge-only="1" data-focus-target="E-06">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="E-06" data-focus-target="E-06" title="Context Receipt">⚑ Context Receipt</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-02" data-focus-target="E-02" data-has-edges="1" data-layer="1" style="left:24px;top:204px;width:236px;height:96px" tabindex="0" title="Generation-facing Projection">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">Generation-facing Projection</h3>
+        
+        
+    <details class="node-attach" data-element-id="E-07" data-badge-only="1" data-focus-target="E-07">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="E-07" data-focus-target="E-07" title="Context Availability">⚑ Context Availability</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-process" data-element-id="E-03" data-focus-target="E-03" data-has-edges="1" data-layer="0" style="left:24px;top:24px;width:236px;height:96px" tabindex="0" title="Outline Generation Attempt">
+        <span class="node-glyph" data-glyph="process" title="process">▶</span>
+        <h3 class="node-title">Outline Generation Attempt</h3>
+        
+        
+    <details class="node-attach" data-element-id="E-08" data-badge-only="1" data-focus-target="E-08">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="E-08" data-focus-target="E-08" title="Context Consumption">⚑ Context Consumption</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-04" data-focus-target="E-04" data-has-edges="1" data-layer="1" style="left:336px;top:204px;width:236px;height:96px" tabindex="0" title="Context-shaped Outline Revision">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">Context-shaped Outline Revisi…</h3>
+        
+        
+    <details class="node-attach" data-element-id="E-09" data-badge-only="1" data-focus-target="E-09">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="E-09" data-focus-target="E-09" title="Output Alignment">⚑ Output Alignment</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-process" data-element-id="E-05" data-focus-target="E-05" data-has-edges="1" data-layer="0" style="left:336px;top:24px;width:236px;height:96px" tabindex="0" title="Scene Generation">
+        <span class="node-glyph" data-glyph="process" title="process">▶</span>
+        <h3 class="node-title">Scene Generation</h3>
+        
+        
+    <details class="node-attach" data-element-id="E-09" data-badge-only="1" data-focus-target="E-09">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="E-09" data-focus-target="E-09" title="Output Alignment">⚑ Output Alignment</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-constraint" data-element-id="E-10" data-focus-target="E-10" data-has-edges="0" data-layer="-1" style="left:24px;top:588px;width:236px;height:96px" tabindex="0" title="Consumption ≠ Output Alignment">
+        <span class="node-glyph" data-glyph="constraint" title="constraint">⚑</span>
+        <h3 class="node-title">Consumption ≠ Output Alignment</h3>
+        
+        
+      </article>
+      <article class="l0-node type-constraint" data-element-id="E-11" data-focus-target="E-11" data-has-edges="0" data-layer="-1" style="left:336px;top:588px;width:236px;height:96px" tabindex="0" title="Context Influence 不得作为第四级">
+        <span class="node-glyph" data-glyph="constraint" title="constraint">⚑</span>
+        <h3 class="node-title">Context Influence 不得作为第四级</h3>
+        
+        
+      </article>
+      <article class="l0-node type-constraint" data-element-id="E-12" data-focus-target="E-12" data-has-edges="0" data-layer="-1" style="left:648px;top:588px;width:236px;height:96px" tabindex="0" title="Receipt / Availability / Consumption 不能互相替代">
+        <span class="node-glyph" data-glyph="constraint" title="constraint">⚑</span>
+        <h3 class="node-title">Receipt / Availability / Cons…</h3>
+        
+        
+      </article></div>
+        <div class="l0-orphan-note" style="top:546px">不在任何 edge 上（3）</div>
+      </div>
+    </div>
+    
+    <div class="l0-legend">
+      <span class="legend-key"><b>节点</b> = element</span>
+      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
+      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
+      <span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="concept">○</span> 概念</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span>
+    </div>
+    <div class="l0-focus-slot" id="l0-focus-slot"></div>
+  </section>
+      
+  <section class="l0-review-board" id="l0-review-board">
+    <section class="block">
+      <h2>核心结构（按 element.type 分区 · 12 个）</h2>
+      <p class="note">这里的分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系 ——
+        关系只在 Reading View 用线画出来。同一张图的两种读法：Reading 看结构，Review 看明细。</p>
+      
+        <div class="type-group">
+          <div class="type-head">process <span class="muted">×2</span></div>
+          <div class="cards">
 <article class="card type-process" id="element-E-03" data-element-id="E-03" data-focus-target="E-03" tabindex="0">
   <header class="card-head">
     <span class="eid">E-03</span>
@@ -105,10 +210,10 @@
   </div>
 </section>
 </article></div>
-          </div>
-          <div class="type-group">
-            <div class="type-head">artifact <span class="muted">×3</span></div>
-            <div class="cards">
+        </div>
+        <div class="type-group">
+          <div class="type-head">artifact <span class="muted">×3</span></div>
+          <div class="cards">
 <article class="card type-artifact" id="element-E-01" data-element-id="E-01" data-focus-target="E-01" tabindex="0">
   <header class="card-head">
     <span class="eid">E-01</span>
@@ -196,10 +301,10 @@
   </div>
 </section>
 </article></div>
-          </div>
-          <div class="type-group">
-            <div class="type-head">concept <span class="muted">×4</span></div>
-            <div class="cards">
+        </div>
+        <div class="type-group">
+          <div class="type-head">concept <span class="muted">×4</span></div>
+          <div class="cards">
 <article class="card type-concept" id="element-E-06" data-element-id="E-06" data-focus-target="E-06" tabindex="0">
   <header class="card-head">
     <span class="eid">E-06</span>
@@ -316,10 +421,10 @@
   </div>
 </section>
 </article></div>
-          </div>
-          <div class="type-group">
-            <div class="type-head">constraint <span class="muted">×3</span></div>
-            <div class="cards">
+        </div>
+        <div class="type-group">
+          <div class="type-head">constraint <span class="muted">×3</span></div>
+          <div class="cards">
 <article class="card type-constraint" id="element-E-10" data-element-id="E-10" data-focus-target="E-10" tabindex="0">
   <header class="card-head">
     <span class="eid">E-10</span>
@@ -407,12 +512,12 @@
   </div>
 </section>
 </article></div>
-          </div>
-      </section>
+        </div>
+    </section>
 
-      <section class="block" id="relations">
-        <h2>关系（edge · 4 条）</h2>
-        <ul class="edge-list">
+    <section class="block" id="relations">
+      <h2>关系（edge · 4 条）</h2>
+      <ul class="edge-list">
 <li class="edge-row " id="edge-E-02-E-01" data-edge-id="" data-from="E-02" data-to="E-01" data-focus-edge="1">
   <span class="edge-line">
     <span class="node">Generation-facing Projection</span>
@@ -481,11 +586,11 @@
     <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-05</span> <button class="ref as-link" data-source-ref="SU-051" title="打开原文位置">SU-051</button><button class="ref as-link" data-source-ref="SU-055" title="打开原文位置">SU-055</button><button class="ref as-link" data-source-ref="SU-075" title="打开原文位置">SU-075</button><button class="ref as-link" data-source-ref="SU-076" title="打开原文位置">SU-076</button></span><span class="prov-group"><span class="eid">E-04</span> <button class="ref as-link" data-source-ref="SU-054" title="打开原文位置">SU-054</button><button class="ref as-link" data-source-ref="SU-056" title="打开原文位置">SU-056</button><button class="ref as-link" data-source-ref="SU-062" title="打开原文位置">SU-062</button><button class="ref as-link" data-source-ref="SU-079" title="打开原文位置">SU-079</button></span></div>
   </div>
 </li></ul>
-      </section>
+    </section>
 
-      <section class="block" id="attachments">
-        <h2>侧挂 / 约束（attachments · 7 条）</h2>
-        <ul class="attach-list">
+    <section class="block" id="attachments">
+      <h2>侧挂 / 约束（attachments · 7 条）</h2>
+      <ul class="attach-list">
 <li class="attach-row" id="attachment-E-06" data-attach-id="E-06" data-attach-element="E-06">
   <span class="node">Context Receipt</span>
   <span class="rel">⇢ 挂到</span>
@@ -528,9 +633,11 @@
   <span class="node">Context Receipt</span> · <span class="node">Context Availability</span> · <span class="node">Context Consumption</span>
   <span class="edge-meta"><span class="chip type">type: constraint</span></span>
 </li></ul>
-      </section>
+    </section>
 
-      <div class="review-slot">
+    
+
+    <div class="review-slot">
 <section class="review" id="review">
   <h2>Review View · 审阅信息</h2>
   <p class="note">这些是**审阅信息**，<b>不是</b>图上的语义。relationGap 不是 edge；告警不影响渲染，也不裁剪任何节点。</p>
@@ -566,61 +673,83 @@
     </div>
   </div>
 </section></div>
+  </section>
     </main>
 
     <aside class="l0-nav" id="topic-nav">
       <h2>Topic Navigation（完整入口索引 · 5）</h2>
-      <p class="note">这里与左侧不是一一对应的：左边是<b>核心机制</b>，这里是<b>完整入口</b>。没有 L0 element 的 Topic 也照样能进入。</p>
+      <p class="note">这里与左边的图不是一一对应的：图中是<b>有关系的核心机制</b>，这里是<b>完整入口</b>。
+        没有 L0 element 的 Topic 也照样能进入。默认只给标题，展开才看命题与出处。</p>
       <ul class="topic-list">
 <li class="topic-entry " id="topic-T-01" data-topic-id="T-01" data-topic-focus="T-01" data-element-ids="E-06,E-07,E-08,E-12">
-  <div class="topic-head">
-    <span class="eid">T-01</span>
-    <span class="topic-title">三级递进语义</span>
-    
-  </div>
-  <div class="topic-prop">Receipt、Availability、Consumption 是三个可以同时为真、但不能互相替代的语义层级 —— 上下文到了不等于可用，可用不等于被消费；被消费的是教学语义，不是实现控制对象。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-06">Context Receipt</button><button class="chip link" data-focus-target="E-07">Context Availability</button><button class="chip link" data-focus-target="E-08">Context Consumption</button><button class="chip link" data-focus-target="E-12">Receipt / Availability / Consumption 不能互相替代</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-02, O-07, O-08, O-09</span></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-01</span>
+      <span class="topic-title">三级递进语义</span>
+      <span class="topic-count">4</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">Receipt、Availability、Consumption 是三个可以同时为真、但不能互相替代的语义层级 —— 上下文到了不等于可用，可用不等于被消费；被消费的是教学语义，不是实现控制对象。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-06">Context Receipt</button><button class="chip link" data-focus-target="E-07">Context Availability</button><button class="chip link" data-focus-target="E-08">Context Consumption</button><button class="chip link" data-focus-target="E-12">Receipt / Availability / Consumption 不能互相替代</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-02, O-07, O-08, O-09</span></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-02" data-topic-id="T-02" data-topic-focus="T-02" data-element-ids="E-01,E-02,E-03,E-04,E-05">
-  <div class="topic-head">
-    <span class="eid">T-02</span>
-    <span class="topic-title">生成链路与消费点</span>
-    
-  </div>
-  <div class="topic-prop">消费点是 outline generation：Frozen Context 派生出的 projection 必须成为 outline 生成的真实输入，而不是被附加在 Prompt 里；scene 继承的是 context-shaped outline。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-01">Frozen Context</button><button class="chip link" data-focus-target="E-02">Generation-facing Projection</button><button class="chip link" data-focus-target="E-03">Outline Generation Attempt</button><button class="chip link" data-focus-target="E-04">Context-shaped Outline Revision</button><button class="chip link" data-focus-target="E-05">Scene Generation</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-04, O-04b, O-04c</span></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-02</span>
+      <span class="topic-title">生成链路与消费点</span>
+      <span class="topic-count">5</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">消费点是 outline generation：Frozen Context 派生出的 projection 必须成为 outline 生成的真实输入，而不是被附加在 Prompt 里；scene 继承的是 context-shaped outline。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-01">Frozen Context</button><button class="chip link" data-focus-target="E-02">Generation-facing Projection</button><button class="chip link" data-focus-target="E-03">Outline Generation Attempt</button><button class="chip link" data-focus-target="E-04">Context-shaped Outline Revision</button><button class="chip link" data-focus-target="E-05">Scene Generation</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-04, O-04b, O-04c</span></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-03" data-topic-id="T-03" data-topic-focus="T-03" data-element-ids="E-03,E-08">
-  <div class="topic-head">
-    <span class="eid">T-03</span>
-    <span class="topic-title">消费的证据与判定</span>
-    
-  </div>
-  <div class="topic-prop">判定消费的最低证据是「某一次 Outline Generation Attempt 实际使用了 generation-facing projection」；函数调用、Prompt 字符串、成功返回都不能升级为 Consumption。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-03">Outline Generation Attempt</button><button class="chip link" data-focus-target="E-08">Context Consumption</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-10, O-10b, O-16, O-14</span></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-03</span>
+      <span class="topic-title">消费的证据与判定</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">判定消费的最低证据是「某一次 Outline Generation Attempt 实际使用了 generation-facing projection」；函数调用、Prompt 字符串、成功返回都不能升级为 Consumption。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-03">Outline Generation Attempt</button><button class="chip link" data-focus-target="E-08">Context Consumption</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-10, O-10b, O-16, O-14</span></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-04" data-topic-id="T-04" data-topic-focus="T-04" data-element-ids="E-04,E-05,E-09,E-10">
-  <div class="topic-head">
-    <span class="eid">T-04</span>
-    <span class="topic-title">两条链的边界与状态组合</span>
-    
-  </div>
-  <div class="topic-prop">Consumption 管「这次生成用了什么」，Output Alignment 管「生成出来体现了什么」；两链在 outline revision 处衔接，五种状态组合各有产品解释。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-04">Context-shaped Outline Revision</button><button class="chip link" data-focus-target="E-05">Scene Generation</button><button class="chip link" data-focus-target="E-09">Output Alignment</button><button class="chip link" data-focus-target="E-10">Consumption ≠ Output Alignment</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-05, O-06, O-11b, O-13</span></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-04</span>
+      <span class="topic-title">两条链的边界与状态组合</span>
+      <span class="topic-count">4</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">Consumption 管「这次生成用了什么」，Output Alignment 管「生成出来体现了什么」；两链在 outline revision 处衔接，五种状态组合各有产品解释。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-04">Context-shaped Outline Revision</button><button class="chip link" data-focus-target="E-05">Scene Generation</button><button class="chip link" data-focus-target="E-09">Output Alignment</button><button class="chip link" data-focus-target="E-10">Consumption ≠ Output Alignment</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-05, O-06, O-11b, O-13</span></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-05" data-topic-id="T-05" data-topic-focus="T-05" data-element-ids="E-11">
-  <div class="topic-head">
-    <span class="eid">T-05</span>
-    <span class="topic-title">语义边界与非主张</span>
-    
-  </div>
-  <div class="topic-prop">消费不要求盲目服从，也不要求输出明显不同；本篇不采用第四级 Context Influence，也不承诺某个输出变化严格由上下文导致。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-11">Context Influence 不得作为第四级</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-03, O-10c, O-11, O-12, O-15</span></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-05</span>
+      <span class="topic-title">语义边界与非主张</span>
+      <span class="topic-count">1</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">消费不要求盲目服从，也不要求输出明显不同；本篇不采用第四级 Context Influence，也不承诺某个输出变化严格由上下文导致。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-11">Context Influence 不得作为第四级</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-03, O-10c, O-11, O-12, O-15</span></span></div>
+    </div>
+  </details>
 </li></ul>
       <div class="doc-entries">
         <h3>文档级入口</h3>
@@ -629,6 +758,8 @@
     </aside>
   </div>
 </div>
+<script src="../../app/renderer/l0-layout.js"></script>
+<script src="../../app/renderer/l0-map.js"></script>
 <script>
   // 视图切换（Reading 默认）+ 交互绑定（selection / focus / provenance hook）
   document.addEventListener('click', (ev) => {

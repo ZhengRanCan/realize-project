@@ -93,7 +93,69 @@ Phase 1  framework-map → view-model adapter            ✅ 完成（scripts/l0
 Phase 2  standalone HTML preview（Fixture D + E）      ✅ 完成（scripts/build-l0-preview.js）
 Phase 3  Electron L0 screen integration（一屏两区）     ✅ 第一版完成（第三个一级页面 · L0 框架图）
 Phase 4  交互：element / edge / topic / provenance     ✅ 第一版完成（selection / focus / Focused Relations）
-Phase 5  A–E regression（自动化 ✅ 34+60 + Electron 集成 selftest ✅）· 人工 Track A ⬜ 待做
+Phase 5  A–E regression（自动化 ✅ 34+42+119 + Electron 集成 selftest ✅）· 人工 Track A ⬜ 待做
+Phase 4.1 Relationship-first Reading View ✅ 完成（Track A Round 0 裁决后插入）
+```
+
+---
+
+## 3.1 Phase 4.1 · Relationship-first Reading View（用户 Track A Round 0 裁决）
+
+第一版做出来之后，用户作为**第一位真实读者**给出的第一条反馈是：
+
+> 「当前这个版本直接一股脑地给出好几个 block，但并没有讲明他们之间的关系是什么，
+>   我不能第一时间就看清楚当前文档的架构是怎么样。」
+
+结论（用户自己下的）：**作为"审阅器"成立，作为"L0 Framework Map"还没成立。**
+问题是 Reading View 把数据摊平成了 card 集合，读者必须自己在脑中重建关系图 —— 和"第一眼看清架构"正好相反。
+
+同时修正了对第一条原则的理解：
+
+```text
+旧：Layout organizes space; it does not create semantics.（走得太保守 → 于是不做图布局）
+新：布局**不能**创造原数据没有的语义；但布局**完全可以**用已有的 edge 帮用户看懂语义。
+    节点 = elements，线 = edges，侧挂 = attachments。
+    位置只用于减少交叉、提高可读性。
+    不允许的是：因为两个节点摆得近，就暗示它们相关。
+    语义来自线，不来自坐标。
+```
+
+### 改了什么（只做四件事）
+
+```text
+1. Reading View：type-card board → 显式 node-edge map（SVG 线 + 节点卡，箭头画在节点之间）
+   布局 = app/renderer/l0-layout.js（确定性：破环 → 最长路径分层 → 层内重心法排序 → 不重叠网格）
+2. 旧的 type-card board **整体移入 Review View**（代码复用，一行没删）
+3. Reading 隐藏工程 metadata：机器 ID / type / role / provenance 都不在第一眼出现
+   节点只显示：切开的短标题（`UserProfile`）+ 副标题（`跨目标用户上下文与表达/排期偏好`）
+4. Topic Navigation 默认只给标题（导航，不是第二篇文档），展开才看命题 / elements / 出处
+```
+
+另外（用户第 6 条）：**constraint 不再跟核心节点抢视觉重量** ——
+作为 attachment 且有宿主的约束降级为宿主节点上的 `⚑ N constraints` 角标，展开才列出。
+它仍然是正式语义，只是视觉低一级；这与 F10 已发现的 **Constraint Composition / Compression Gap** 一致。
+
+### 明确没改（硬约束）
+
+```text
+❌ Contract / schema / check-map        ❌ view model 语义（l0-view-model.js 未改）
+❌ F10 的 prompt / runner / 两阶段流程   ❌ validator
+❌ Focused Relations / provenance 能力（原地复用，成为 Reading 的下钻面板）
+```
+
+### 第一版实现里被抓到的三个真问题（都不是"样式问题"）
+
+```text
+① 真实入口静默失败：点「打开 framework-map.json」信息行显示已加载，界面却毫无变化
+   —— loadL0() 调了不存在的 enterReview()，被 ReferenceError 静默中断。
+   而 selftest 全绿，因为它**手抄了一遍**状态切换（副本是对的）。→ 现在 loadL0(path) 是唯一入口。
+
+② 静态预览从未加载 renderer：`window.L0Map.bindInteractions(...)` 直接抛错
+   —— 断言只检查了那行文字存在。→ 预览现在真的引 layout.js + map.js，断言也盯脚本顺序。
+
+③ 布局会把元素弄丢：约束挂到另一个约束上时（A→hosts[B]，B→hosts[E-01]），
+   A 因为宿主不占节点位而从 Reading 消失。→ 定点检查：宿主里必须有一个真正占位的节点，
+   否则它自己升为节点（宁可多一个虚线节点，也不丢语义）。
 ```
 
 > **Phase 3/4 第一版说明**：Electron 里新增第三个一级页面「L0 框架图」（与方案总览 / 决策清单并列），
@@ -104,10 +166,11 @@ Phase 5  A–E regression（自动化 ✅ 34+60 + Electron 集成 selftest ✅�
 
 ✅ **Electron L0 集成 selftest**（`npm run selftest`，E fixture · 走 `loadPath` 绕开原生选择器）：
 断言链路 `preload API → IPC → main.loadFrameworkMap → app.js mount → DOM`，并覆盖
-**加载后真的切屏**（首屏隐藏 → Review 屏显示）、DOM 计数与 view model 一致
-（12 elements / 8 edges / 9 topics / 12 focus panels）、默认 Reading View
-（Review 区隐藏但数据仍在 DOM）、点 element → 焦点态 + Focused Relations、点 provenance → `openSource()`
-打开 Source 面板、以及 **L0 可独立打开**（无 `design-review.json` 时切向总览/决策被挡住）。共 8 条断言。
+**加载后真的切屏**（首屏隐藏 → Review 屏显示）、**两个视图各自覆盖全部 element**（Reading / Review / 去重）、
+**Reading 把关系画成了线**（线数 == edge 数）、**Reading 不含机器 ID 且 Topic 默认折叠**、
+默认 Reading View（Review 整块隐藏但数据仍在 DOM）、点 Reading 节点 → 焦点态 + Focused Relations、
+从下钻面板点 provenance → `openSource()` 打开 Source 面板、以及 **L0 可独立打开**
+（无 `design-review.json` 时切向总览/决策被挡住）。共 10 条断言。
 
 > **只测集成缝（integration seam）**，不做视觉回归。而且它必须调**真实入口** `loadL0(path)` ——
 > 这条规矩是踩出来的：selftest 第一版手抄了一遍"注入 view model + 切视图"的状态切换，
@@ -162,11 +225,14 @@ Electron 只要算好 view model 并调用同一个 `renderL0MapHTML` / `mount` 
 scripts/l0-view-model.js          Phase 1 · 纯投影适配器（零推理）
 scripts/build-l0-preview.js       Phase 2 · 静态预览构建器（构建期 SSR）
 scripts/test-l0-view-model.js     回归：不丢 / 不裁 / 不改 / 不造 / 不崩（34 断言 · 28 份 map）
-scripts/test-l0-preview.js        验收：对生成的 HTML 断言（60 断言 · 6 份预览）
-app/main/main.js 的 selftest 块    集成：Electron 里 L0 页面真能加载 / 默认 Reading / 焦点与 provenance 可达
-docs/features/08-l0-ui/results/track-a-round1.md   人工 Track A 记录表（D + E · 待填）
+app/renderer/l0-layout.js         Phase 4.1 · 确定性图布局（破环 / 分层 / 排交叉 / 自环 / 多分量）
+scripts/test-l0-layout.js         回归：不丢 / 不造线 / 不重叠 / 方向贴边 / 排序减少交叉 / 逐字节确定（42 断言 · 28 份 map）
+scripts/inspect-l0-layout.js      Phase 4.1 · 用文字看布局（`npm run l0:layout`，不开 GUI 核对第一眼）
+scripts/test-l0-preview.js        验收：对生成的 HTML 断言（119 断言 · 6 份预览 + 1 份合成 0-edge 样本）
+app/main/main.js 的 selftest 块    集成：Electron 里 L0 页面真能加载 / 默认 Reading / 线 == edge / 焦点与 provenance 可达
+docs/features/08-l0-ui/results/track-a-round1.md   人工 Track A 记录表（D + E · Round 0 已记）
 app/renderer/l0-map.js            deterministic renderer（双模）
-app/renderer/l0-map.css           样式（只有分区/卡片/列表，无暗示性视觉语法）
+app/renderer/l0-map.css           样式（Reading = 图；Review = 明细；无暗示性视觉语法）
 experiments/l0-ui/preview-*.html  6 份预览（D / E / 自环 / 81元素 / A / E-human）
 ```
 

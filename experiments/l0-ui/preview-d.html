@@ -31,22 +31,171 @@
   <details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>F40 只做模型与迁移方向评审：不删除 DailyPlan[]、不改 daily-plans:{goalId} 存储键、不改兼容读取与 adapter、不实现 AI 或 planner 重写；F41 只在纯 models/ 层实现目标新增；扩展字段、DeepSeek/replanner schema、确定性 planner 改造、消费者迁移与破坏性删除均留作后续特性，不属于本文档。</div></details>
 
   <p class="l0-principle">
+    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
+    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
     <b>Layout organizes space; it does not create semantics.</b>
-    分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系；唯一正式的语义是
-    <code>edge</code> / <code>attachment</code> / <code>qualifier</code> —— 每条边都在「关系」区显式写出方向。
-    点任意元素 / 边 / Topic 可以聚焦并追关系。
+    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
+    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
   </p>
-
-  <div class="l0-focus-slot" id="l0-focus-slot"></div>
 
   <div class="l0-body">
     <main class="l0-main">
-      <section class="block">
-        <h2>核心结构（按 element.type 分区 · 13 个）</h2>
+      
+  <section class="l0-reading" id="l0-reading">
+    <div class="l0-graph-wrap">
+      <div class="l0-graph" id="l0-graph" style="width:1220px;height:504px">
+        <svg class="l0-lines" width="1220" height="504" viewBox="0 0 1220 504" aria-hidden="true">
+          <defs>
+            <marker id="l0-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
+            <marker id="l0-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
+          </defs>
+          <g class="l0-edge-layer">
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-01" data-from="E-PlannerInputs" data-to="E-Goal" data-kind="forward" d="M 142 300 C 142 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>E-PlannerInputs —consumes→ E-Goal：InitialPlanContext / ReplanContext 以 Goal 的目标意图与目标范围硬约束为输入</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-02" data-from="E-PlannerInputs" data-to="E-UserProfile" data-kind="forward" d="M 142 300 C 142 337.8, 454 346.2, 454 384" marker-end="url(#l0-arrow)"><title>E-PlannerInputs —consumes→ E-UserProfile：上下文纳入跨目标的表达与排期偏好</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-03" data-from="E-PlannerInputs" data-to="E-PlanBundle" data-kind="forward" d="M 142 300 C 142 337.8, 766 346.2, 766 384" marker-end="url(#l0-arrow)"><title>E-PlannerInputs —consumes→ E-PlanBundle：ReplanContext 注入由 service 从 storage 读出的 currentPlanBundle</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-04" data-from="E-InitialPlanning" data-to="E-PlannerInputs" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-InitialPlanning —consumes→ E-PlannerInputs：消费 service 运行时组装、不持久化的 InitialPlanContext</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-05" data-from="E-InitialPlanning" data-to="E-PlanBundle" data-kind="forward" d="M 142 120 C 142 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>E-InitialPlanning —produces→ E-PlanBundle：产出第一个 PlanBundle</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-06" data-from="E-Replanning" data-to="E-PlannerInputs" data-kind="forward" d="M 454 120 C 454 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-Replanning —consumes→ E-PlannerInputs：消费 ReplanContext（当前 PlanBundle、反馈、复盘与阶段进展）</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-07" data-from="E-Replanning" data-to="E-DailyReview" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-Replanning —consumes→ E-DailyReview：复盘与用户反馈作为重规划的触发与输入</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-08" data-from="E-Replanning" data-to="E-ExecutionEvidence" data-kind="forward" d="M 454 120 C 454 238.8, 1078 265.2, 1078 384" marker-end="url(#l0-arrow)"><title>E-Replanning —consumes→ E-ExecutionEvidence：重规划读取 FocusSession 与 TaskResult 并保留已提交执行历史</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-09" data-from="E-Replanning" data-to="E-PlanBundle" data-kind="forward" d="M 454 120 C 454 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>E-Replanning —produces→ E-PlanBundle：产出新计划版本</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-10" data-from="E-Replanning" data-to="E-PlanChangeSummary" data-kind="forward" d="M 454 120 C 454 157.8, 766 166.2, 766 204" marker-end="url(#l0-arrow)"><title>E-Replanning —produces→ E-PlanChangeSummary：产出解释本次确定性调整的持久收据</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-11" data-from="E-DailyReview" data-to="E-ExecutionEvidence" data-kind="forward" d="M 454 300 C 454 337.8, 1078 346.2, 1078 384" marker-end="url(#l0-arrow)"><title>E-DailyReview —relates-to→ E-ExecutionEvidence：Review 引用或汇总当日该 Goal 的 Task 结果</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-12" data-from="E-TodayTaskSelection" data-to="E-PlanBundle" data-kind="forward" d="M 766 120 C 766 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>E-TodayTaskSelection —relates-to→ E-PlanBundle：选择引用当前 active PlanBundle 中的 Task</title></path></g>
+          <g class="l0-label-layer">
+          <text class="l0-edge-label" x="142" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-01" data-from="E-PlannerInputs" data-to="E-Goal">consumes</text>
+          <text class="l0-edge-label" x="298" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-02" data-from="E-PlannerInputs" data-to="E-UserProfile">consumes</text>
+          <text class="l0-edge-label" x="454" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-03" data-from="E-PlannerInputs" data-to="E-PlanBundle">consumes</text>
+          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-04" data-from="E-InitialPlanning" data-to="E-PlannerInputs">consumes</text>
+          <text class="l0-edge-label" x="454" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-05" data-from="E-InitialPlanning" data-to="E-PlanBundle">produces</text>
+          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-06" data-from="E-Replanning" data-to="E-PlannerInputs">consumes</text>
+          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-07" data-from="E-Replanning" data-to="E-DailyReview">consumes</text>
+          <text class="l0-edge-label" x="766" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-08" data-from="E-Replanning" data-to="E-ExecutionEvidence">consumes</text>
+          <text class="l0-edge-label" x="610" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-09" data-from="E-Replanning" data-to="E-PlanBundle">produces</text>
+          <text class="l0-edge-label" x="610" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-10" data-from="E-Replanning" data-to="E-PlanChangeSummary">produces</text>
+          <text class="l0-edge-label" x="766" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-11" data-from="E-DailyReview" data-to="E-ExecutionEvidence">relates-to</text>
+          <text class="l0-edge-label" x="766" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-12" data-from="E-TodayTaskSelection" data-to="E-PlanBundle">relates-to</text></g>
+        </svg>
+        <div class="l0-nodes">
+      <article class="l0-node type-artifact" data-element-id="E-Goal" data-focus-target="E-Goal" data-has-edges="1" data-layer="2" style="left:24px;top:384px;width:236px;height:96px" tabindex="0" title="Goal（用户原始目标意图 + 目标范围硬约束）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">Goal</h3>
+        <p class="node-sub">用户原始目标意图 + 目标范围硬约束</p>
         
-          <div class="type-group">
-            <div class="type-head">process <span class="muted">×2</span></div>
-            <div class="cards">
+    <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-UserProfile" data-focus-target="E-UserProfile" data-has-edges="1" data-layer="2" style="left:336px;top:384px;width:236px;height:96px" tabindex="0" title="UserProfile（跨目标用户上下文与表达/排期偏好）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">UserProfile</h3>
+        <p class="node-sub">跨目标用户上下文与表达/排期偏好</p>
+        
+    <details class="node-attach" data-element-id="C-TruthAndConsumptionBoundary" data-badge-only="1" data-focus-target="C-TruthAndConsumptionBoundary">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-PlannerInputs" data-focus-target="E-PlannerInputs" data-has-edges="1" data-layer="1" style="left:24px;top:204px;width:236px;height:96px" tabindex="0" title="planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">planner 临时输入上下文</h3>
+        <p class="node-sub">InitialPlanContext / ReplanContext，含派生的 AI 输入 schema</p>
+        
+    <details class="node-attach" data-element-id="C-TruthAndConsumptionBoundary" data-badge-only="1" data-focus-target="C-TruthAndConsumptionBoundary">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-process" data-element-id="E-InitialPlanning" data-focus-target="E-InitialPlanning" data-has-edges="1" data-layer="0" style="left:24px;top:24px;width:236px;height:96px" tabindex="0" title="初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）">
+        <span class="node-glyph" data-glyph="process" title="process">▶</span>
+        <h3 class="node-title">初始规划流程</h3>
+        <p class="node-sub">由 Goal + UserProfile 产出首个 PlanBundle</p>
+        
+      </article>
+      <article class="l0-node type-process" data-element-id="E-Replanning" data-focus-target="E-Replanning" data-has-edges="1" data-layer="0" style="left:336px;top:24px;width:236px;height:96px" tabindex="0" title="重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）">
+        <span class="node-glyph" data-glyph="process" title="process">▶</span>
+        <h3 class="node-title">重规划流程</h3>
+        <p class="node-sub">现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible</p>
+        
+    <details class="node-attach" data-element-id="C-HistoryIntegrity" data-badge-only="1" data-focus-target="C-HistoryIntegrity">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-HistoryIntegrity" data-focus-target="C-HistoryIntegrity" title="执行历史不可改写、不得静默丢失与显式失败">⚑ 执行历史不可改写、不得静默丢失与显式失败</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-PlanBundle" data-focus-target="E-PlanBundle" data-has-edges="1" data-layer="2" style="left:648px;top:384px;width:236px;height:96px" tabindex="0" title="PlanBundle 聚合（Plan + Stage[] + Task[]）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">PlanBundle 聚合</h3>
+        <p class="node-sub">Plan + Stage[] + Task[]</p>
+        
+    <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-ExecutionEvidence" data-focus-target="E-ExecutionEvidence" data-has-edges="1" data-layer="2" style="left:960px;top:384px;width:236px;height:96px" tabindex="0" title="任务范围执行证据（FocusSession[] / TaskResult[]）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">任务范围执行证据</h3>
+        <p class="node-sub">FocusSession[] / TaskResult[]</p>
+        
+    <details class="node-attach" data-element-id="C-HistoryIntegrity" data-badge-only="1" data-focus-target="C-HistoryIntegrity">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-HistoryIntegrity" data-focus-target="C-HistoryIntegrity" title="执行历史不可改写、不得静默丢失与显式失败">⚑ 执行历史不可改写、不得静默丢失与显式失败</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-DailyReview" data-focus-target="E-DailyReview" data-has-edges="1" data-layer="1" style="left:336px;top:204px;width:236px;height:96px" tabindex="0" title="DailyReview[]（日范围执行历史事实，可读不可改写）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">DailyReview[]</h3>
+        <p class="node-sub">日范围执行历史事实，可读不可改写</p>
+        
+    <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">3</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-HistoryIntegrity" data-focus-target="C-HistoryIntegrity" title="执行历史不可改写、不得静默丢失与显式失败">⚑ 执行历史不可改写、不得静默丢失与显式失败</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-TodayTaskSelection" data-focus-target="E-TodayTaskSelection" data-has-edges="1" data-layer="0" style="left:648px;top:24px;width:236px;height:96px" tabindex="0" title="TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">TodayTaskSelection[] 与 Task Card 计算状态</h3>
+        <p class="node-sub">closed / locked / available、唯一推荐</p>
+        
+    <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
+    </details>
+      </article>
+      <article class="l0-node type-artifact" data-element-id="E-PlanChangeSummary" data-focus-target="E-PlanChangeSummary" data-has-edges="1" data-layer="1" style="left:648px;top:204px;width:236px;height:96px" tabindex="0" title="PlanChangeSummary[]（一次确定性调整的持久收据）">
+        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
+        <h3 class="node-title">PlanChangeSummary[]</h3>
+        <p class="node-sub">一次确定性调整的持久收据</p>
+        
+    <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
+    </details>
+      </article></div>
+        
+      </div>
+    </div>
+    
+    <div class="l0-legend">
+      <span class="legend-key"><b>节点</b> = element</span>
+      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
+      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
+      <span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span>
+    </div>
+    <div class="l0-focus-slot" id="l0-focus-slot"></div>
+  </section>
+      
+  <section class="l0-review-board" id="l0-review-board">
+    <section class="block">
+      <h2>核心结构（按 element.type 分区 · 13 个）</h2>
+      <p class="note">这里的分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系 ——
+        关系只在 Reading View 用线画出来。同一张图的两种读法：Reading 看结构，Review 看明细。</p>
+      
+        <div class="type-group">
+          <div class="type-head">process <span class="muted">×2</span></div>
+          <div class="cards">
 <article class="card type-process" id="element-E-InitialPlanning" data-element-id="E-InitialPlanning" data-focus-target="E-InitialPlanning" tabindex="0">
   <header class="card-head">
     <span class="eid">E-InitialPlanning</span>
@@ -105,10 +254,10 @@
   </div>
 </section>
 </article></div>
-          </div>
-          <div class="type-group">
-            <div class="type-head">artifact <span class="muted">×8</span></div>
-            <div class="cards">
+        </div>
+        <div class="type-group">
+          <div class="type-head">artifact <span class="muted">×8</span></div>
+          <div class="cards">
 <article class="card type-artifact" id="element-E-Goal" data-element-id="E-Goal" data-focus-target="E-Goal" tabindex="0">
   <header class="card-head">
     <span class="eid">E-Goal</span>
@@ -341,10 +490,10 @@
   </div>
 </section>
 </article></div>
-          </div>
-          <div class="type-group">
-            <div class="type-head">constraint <span class="muted">×3</span></div>
-            <div class="cards">
+        </div>
+        <div class="type-group">
+          <div class="type-head">constraint <span class="muted">×3</span></div>
+          <div class="cards">
 <article class="card type-constraint" id="element-C-PlanStructureAndState" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" tabindex="0">
   <header class="card-head">
     <span class="eid">C-PlanStructureAndState</span>
@@ -432,12 +581,12 @@
   </div>
 </section>
 </article></div>
-          </div>
-      </section>
+        </div>
+    </section>
 
-      <section class="block" id="relations">
-        <h2>关系（edge · 12 条）</h2>
-        <ul class="edge-list">
+    <section class="block" id="relations">
+      <h2>关系（edge · 12 条）</h2>
+      <ul class="edge-list">
 <li class="edge-row " id="edge-ED-01" data-edge-id="ED-01" data-from="E-PlannerInputs" data-to="E-Goal" data-focus-edge="1">
   <span class="edge-line">
     <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span>
@@ -642,11 +791,11 @@
     <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-TodayTaskSelection</span> <button class="ref as-link" data-source-ref="§TodayTaskSelection" title="打开原文位置">§TodayTaskSelection</button><button class="ref as-link" data-source-ref="§Task Card computed contract" title="打开原文位置">§Task Card computed contract</button></span><span class="prov-group"><span class="eid">E-PlanBundle</span> <button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button><button class="ref as-link" data-source-ref="§Task" title="打开原文位置">§Task</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></span></div>
   </div>
 </li></ul>
-      </section>
+    </section>
 
-      <section class="block" id="attachments">
-        <h2>侧挂 / 约束（attachments · 3 条）</h2>
-        <ul class="attach-list">
+    <section class="block" id="attachments">
+      <h2>侧挂 / 约束（attachments · 3 条）</h2>
+      <ul class="attach-list">
 <li class="attach-row" id="attachment-C-PlanStructureAndState" data-attach-id="C-PlanStructureAndState" data-attach-element="C-PlanStructureAndState">
   <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span>
   <span class="rel">⇢ 挂到</span>
@@ -665,9 +814,11 @@
   <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span> · <span class="node">Goal（用户原始目标意图 + 目标范围硬约束）</span> · <span class="node">UserProfile（跨目标用户上下文与表达/排期偏好）</span> · <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span> · <span class="node">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span> · <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span> · <span class="node">PlanChangeSummary[]（一次确定性调整的持久收据）</span>
   <span class="edge-meta"><span class="chip type">type: constraint</span><button class="ref as-link" data-source-ref="§Computed views" title="打开原文位置">§Computed views</button><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button><button class="ref as-link" data-source-ref="§UserProfile" title="打开原文位置">§UserProfile</button><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button><button class="ref as-link" data-source-ref="§DailyReviewPromptDismissal" title="打开原文位置">§DailyReviewPromptDismissal</button><button class="ref as-link" data-source-ref="§DailyPlan legacy boundary" title="打开原文位置">§DailyPlan legacy boundary</button><button class="ref as-link" data-source-ref="§Migration direction" title="打开原文位置">§Migration direction</button><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></span>
 </li></ul>
-      </section>
+    </section>
 
-      <div class="review-slot">
+    
+
+    <div class="review-slot">
 <section class="review" id="review">
   <h2>Review View · 审阅信息</h2>
   <p class="note">这些是**审阅信息**，<b>不是</b>图上的语义。relationGap 不是 edge；告警不影响渲染，也不裁剪任何节点。</p>
@@ -706,221 +857,307 @@
     </div>
   </div>
 </section></div>
+  </section>
     </main>
 
     <aside class="l0-nav" id="topic-nav">
       <h2>Topic Navigation（完整入口索引 · 21）</h2>
-      <p class="note">这里与左侧不是一一对应的：左边是<b>核心机制</b>，这里是<b>完整入口</b>。没有 L0 element 的 Topic 也照样能进入。</p>
+      <p class="note">这里与左边的图不是一一对应的：图中是<b>有关系的核心机制</b>，这里是<b>完整入口</b>。
+        没有 L0 element 的 Topic 也照样能进入。默认只给标题，展开才看命题与出处。</p>
       <ul class="topic-list">
 <li class="topic-entry no-element" id="topic-T-00" data-topic-id="T-00" data-topic-focus="T-00" data-element-ids="">
-  <div class="topic-head">
-    <span class="eid">T-00</span>
-    <span class="topic-title">文档范围与权威</span>
-    <span class="flag info">无 L0 element —— 仍是导航入口</span>
-  </div>
-  <div class="topic-prop">本文档是规划域 F40 的 target data model contract：只做模型与迁移方向评审，后续迁移以它为 source of truth。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Purpose" title="打开原文位置">§Purpose</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-00</span>
+      <span class="topic-title">文档范围与权威</span>
+      <span class="flag info">无 L0 element —— 仍是导航入口</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">本文档是规划域 F40 的 target data model contract：只做模型与迁移方向评审，后续迁移以它为 source of truth。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Purpose" title="打开原文位置">§Purpose</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-01" data-topic-id="T-01" data-topic-focus="T-01" data-element-ids="E-Goal,E-UserProfile,E-PlannerInputs,E-InitialPlanning,E-Replanning,E-PlanBundle">
-  <div class="topic-head">
-    <span class="eid">T-01</span>
-    <span class="topic-title">核心规划链与持久真相</span>
-    
-  </div>
-  <div class="topic-prop">目标域核心链是 Goal + UserProfile → 临时 planner 输入 → PlanBundle；重规划产出新 PlanBundle/受控变更集或显式 infeasible，DailyReview 是执行事实，DailyPlan[] 不是未来核心模型。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-Goal">Goal（用户原始目标意图 + 目标范围硬约束）</button><button class="chip link" data-focus-target="E-UserProfile">UserProfile（跨目标用户上下文与表达/排期偏好）</button><button class="chip link" data-focus-target="E-PlannerInputs">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</button><button class="chip link" data-focus-target="E-InitialPlanning">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</button><button class="chip link" data-focus-target="E-Replanning">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</button><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-01</span>
+      <span class="topic-title">核心规划链与持久真相</span>
+      <span class="topic-count">6</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">目标域核心链是 Goal + UserProfile → 临时 planner 输入 → PlanBundle；重规划产出新 PlanBundle/受控变更集或显式 infeasible，DailyReview 是执行事实，DailyPlan[] 不是未来核心模型。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-Goal">Goal（用户原始目标意图 + 目标范围硬约束）</button><button class="chip link" data-focus-target="E-UserProfile">UserProfile（跨目标用户上下文与表达/排期偏好）</button><button class="chip link" data-focus-target="E-PlannerInputs">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</button><button class="chip link" data-focus-target="E-InitialPlanning">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</button><button class="chip link" data-focus-target="E-Replanning">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</button><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-02" data-topic-id="T-02" data-topic-focus="T-02" data-element-ids="C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-02</span>
-    <span class="topic-title">模型分层</span>
-    
-  </div>
-  <div class="topic-prop">模型分四层：持久真相、临时 planner 输入、计算视图、遗留兼容；四层可同时成立，是判读维度而非互斥状态。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Model layers" title="打开原文位置">§Model layers</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-02</span>
+      <span class="topic-title">模型分层</span>
+      <span class="topic-count">1</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">模型分四层：持久真相、临时 planner 输入、计算视图、遗留兼容；四层可同时成立，是判读维度而非互斥状态。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Model layers" title="打开原文位置">§Model layers</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-03" data-topic-id="T-03" data-topic-focus="T-03" data-element-ids="E-PlannerInputs,E-InitialPlanning">
-  <div class="topic-head">
-    <span class="eid">T-03</span>
-    <span class="topic-title">初始规划流</span>
-    
-  </div>
-  <div class="topic-prop">初始规划在没有执行历史时从用户意图与可复用用户上下文组装临时上下文，AI 输出经校验后成为第一个 PlanBundle。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlannerInputs">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</button><button class="chip link" data-focus-target="E-InitialPlanning">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-03</span>
+      <span class="topic-title">初始规划流</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">初始规划在没有执行历史时从用户意图与可复用用户上下文组装临时上下文，AI 输出经校验后成为第一个 PlanBundle。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlannerInputs">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</button><button class="chip link" data-focus-target="E-InitialPlanning">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-04" data-topic-id="T-04" data-topic-focus="T-04" data-element-ids="E-PlannerInputs,E-Replanning,C-HistoryIntegrity">
-  <div class="topic-head">
-    <span class="eid">T-04</span>
-    <span class="topic-title">重规划流</span>
-    
-  </div>
-  <div class="topic-prop">现实偏离计划（拒绝/反馈/阶段完成/复盘部分或跳过/容量或截止变化/不可行）时重规划更新或替换计划，并保留执行历史。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlannerInputs">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</button><button class="chip link" data-focus-target="E-Replanning">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-04</span>
+      <span class="topic-title">重规划流</span>
+      <span class="topic-count">3</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">现实偏离计划（拒绝/反馈/阶段完成/复盘部分或跳过/容量或截止变化/不可行）时重规划更新或替换计划，并保留执行历史。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlannerInputs">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</button><button class="chip link" data-focus-target="E-Replanning">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-05" data-topic-id="T-05" data-topic-focus="T-05" data-element-ids="E-Goal,C-PlanStructureAndState,C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-05</span>
-    <span class="topic-title">Goal 语义与边界</span>
-    
-  </div>
-  <div class="topic-prop">Goal 承载用户原始目标意图与目标范围硬约束，不承载表达风格、执行反馈、计划策略或展示文案。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-Goal">Goal（用户原始目标意图 + 目标范围硬约束）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-05</span>
+      <span class="topic-title">Goal 语义与边界</span>
+      <span class="topic-count">3</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">Goal 承载用户原始目标意图与目标范围硬约束，不承载表达风格、执行反馈、计划策略或展示文案。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-Goal">Goal（用户原始目标意图 + 目标范围硬约束）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-06" data-topic-id="T-06" data-topic-focus="T-06" data-element-ids="E-UserProfile,C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-06</span>
-    <span class="topic-title">UserProfile 语义与边界</span>
-    
-  </div>
-  <div class="topic-prop">UserProfile 承载跨目标的排期偏好与表达偏好；MBTI/仪式偏好只影响表达与轻度排序，实际执行精力属 DailyReview。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-UserProfile">UserProfile（跨目标用户上下文与表达/排期偏好）</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§UserProfile" title="打开原文位置">§UserProfile</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-06</span>
+      <span class="topic-title">UserProfile 语义与边界</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">UserProfile 承载跨目标的排期偏好与表达偏好；MBTI/仪式偏好只影响表达与轻度排序，实际执行精力属 DailyReview。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-UserProfile">UserProfile（跨目标用户上下文与表达/排期偏好）</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§UserProfile" title="打开原文位置">§UserProfile</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-07" data-topic-id="T-07" data-topic-focus="T-07" data-element-ids="E-PlanBundle,C-PlanStructureAndState">
-  <div class="topic-head">
-    <span class="eid">T-07</span>
-    <span class="topic-title">PlanBundle 聚合</span>
-    
-  </div>
-  <div class="topic-prop">PlanBundle 是初始规划与重规划的主要持久输出，页面只消费由它派生的 service/view-model 输出。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-07</span>
+      <span class="topic-title">PlanBundle 聚合</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">PlanBundle 是初始规划与重规划的主要持久输出，页面只消费由它派生的 service/view-model 输出。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-08" data-topic-id="T-08" data-topic-focus="T-08" data-element-ids="E-PlanBundle,C-PlanStructureAndState">
-  <div class="topic-head">
-    <span class="eid">T-08</span>
-    <span class="topic-title">Plan 状态与 detailedThrough</span>
-    
-  </div>
-  <div class="topic-prop">Plan 用 structureType、detailedThrough、status 与 adjustmentRisk 表达计划窗口与可行性；infeasible 必须显式，未决风险不得被静默升降级。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-08</span>
+      <span class="topic-title">Plan 状态与 detailedThrough</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">Plan 用 structureType、detailedThrough、status 与 adjustmentRisk 表达计划窗口与可行性；infeasible 必须显式，未决风险不得被静默升降级。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-09" data-topic-id="T-09" data-topic-focus="T-09" data-element-ids="E-Replanning,E-PlanBundle,C-PlanStructureAndState">
-  <div class="topic-head">
-    <span class="eid">T-09</span>
-    <span class="topic-title">Stage 长程阶段</span>
-    
-  </div>
-  <div class="topic-prop">Stage 覆盖整个计划窗口、用于长程概览与细化，其日期必须落在父计划内，完成不自动完成 Goal。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-Replanning">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</button><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-09</span>
+      <span class="topic-title">Stage 长程阶段</span>
+      <span class="topic-count">3</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">Stage 覆盖整个计划窗口、用于长程概览与细化，其日期必须落在父计划内，完成不自动完成 Goal。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-Replanning">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</button><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-10" data-topic-id="T-10" data-topic-focus="T-10" data-element-ids="E-PlanBundle,C-PlanStructureAndState">
-  <div class="topic-head">
-    <span class="eid">T-10</span>
-    <span class="topic-title">Task 与依赖</span>
-    
-  </div>
-  <div class="topic-prop">Task 是 detailedThrough 之前的具体执行单元，依赖用 dependsOnTaskIds 显式表达且必须同属一个 PlanBundle、无环。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Task" title="打开原文位置">§Task</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-10</span>
+      <span class="topic-title">Task 与依赖</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">Task 是 detailedThrough 之前的具体执行单元，依赖用 dependsOnTaskIds 显式表达且必须同属一个 PlanBundle、无环。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanBundle">PlanBundle 聚合（Plan + Stage[] + Task[]）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Task" title="打开原文位置">§Task</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-11" data-topic-id="T-11" data-topic-focus="T-11" data-element-ids="E-TodayTaskSelection,C-PlanStructureAndState">
-  <div class="topic-head">
-    <span class="eid">T-11</span>
-    <span class="topic-title">Task Card 计算契约</span>
-    
-  </div>
-  <div class="topic-prop">卡片状态由计算得出（done→closed、存在未完成显式依赖→locked、其余→available），唯一推荐按 scheduledDate → priority → 稳定 id 确定性产生。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-TodayTaskSelection">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Task Card computed contract" title="打开原文位置">§Task Card computed contract</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-11</span>
+      <span class="topic-title">Task Card 计算契约</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">卡片状态由计算得出（done→closed、存在未完成显式依赖→locked、其余→available），唯一推荐按 scheduledDate → priority → 稳定 id 确定性产生。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-TodayTaskSelection">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Task Card computed contract" title="打开原文位置">§Task Card computed contract</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-12" data-topic-id="T-12" data-topic-focus="T-12" data-element-ids="E-ExecutionEvidence,E-DailyReview,C-HistoryIntegrity">
-  <div class="topic-head">
-    <span class="eid">T-12</span>
-    <span class="topic-title">执行事实与日复盘</span>
-    
-  </div>
-  <div class="topic-prop">FocusSession、TaskResult 与 DailyReview 是三个独立领域概念：前者提供任务范围执行证据，后者是该 Goal/date 的日范围事实。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-ExecutionEvidence">任务范围执行证据（FocusSession[] / TaskResult[]）</button><button class="chip link" data-focus-target="E-DailyReview">DailyReview[]（日范围执行历史事实，可读不可改写）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-12</span>
+      <span class="topic-title">执行事实与日复盘</span>
+      <span class="topic-count">3</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">FocusSession、TaskResult 与 DailyReview 是三个独立领域概念：前者提供任务范围执行证据，后者是该 Goal/date 的日范围事实。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-ExecutionEvidence">任务范围执行证据（FocusSession[] / TaskResult[]）</button><button class="chip link" data-focus-target="E-DailyReview">DailyReview[]（日范围执行历史事实，可读不可改写）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-13" data-topic-id="T-13" data-topic-focus="T-13" data-element-ids="E-TodayTaskSelection,C-PlanStructureAndState">
-  <div class="topic-head">
-    <span class="eid">T-13</span>
-    <span class="topic-title">今日任务选择</span>
-    
-  </div>
-  <div class="topic-prop">TodayTaskSelection 授权今日执行哪些 Task（每 Goal/Plan/date 一条、必须引用 active PlanBundle），它不是执行事实也不是排期变更。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-TodayTaskSelection">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§TodayTaskSelection" title="打开原文位置">§TodayTaskSelection</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-13</span>
+      <span class="topic-title">今日任务选择</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">TodayTaskSelection 授权今日执行哪些 Task（每 Goal/Plan/date 一条、必须引用 active PlanBundle），它不是执行事实也不是排期变更。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-TodayTaskSelection">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</button><button class="chip link" data-focus-target="C-PlanStructureAndState">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§TodayTaskSelection" title="打开原文位置">§TodayTaskSelection</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-14" data-topic-id="T-14" data-topic-focus="T-14" data-element-ids="E-DailyReview,C-HistoryIntegrity,C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-14</span>
-    <span class="topic-title">DailyReview 事实与隐私</span>
-    
-  </div>
-  <div class="topic-prop">DailyReview 是历史事实，重规划可读不可改写；备注是用户私密数据，默认不得日志或上传。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-DailyReview">DailyReview[]（日范围执行历史事实，可读不可改写）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-14</span>
+      <span class="topic-title">DailyReview 事实与隐私</span>
+      <span class="topic-count">3</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">DailyReview 是历史事实，重规划可读不可改写；备注是用户私密数据，默认不得日志或上传。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-DailyReview">DailyReview[]（日范围执行历史事实，可读不可改写）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-15" data-topic-id="T-15" data-topic-focus="T-15" data-element-ids="E-DailyReview,C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-15</span>
-    <span class="topic-title">复盘提示 dismissal</span>
-    
-  </div>
-  <div class="topic-prop">DailyReviewPromptDismissal 只是用户跳过复盘提示的 UI 历史，不构成执行或复盘真相，也不能授权其他日期或 Plan。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-DailyReview">DailyReview[]（日范围执行历史事实，可读不可改写）</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§DailyReviewPromptDismissal" title="打开原文位置">§DailyReviewPromptDismissal</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-15</span>
+      <span class="topic-title">复盘提示 dismissal</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">DailyReviewPromptDismissal 只是用户跳过复盘提示的 UI 历史，不构成执行或复盘真相，也不能授权其他日期或 Plan。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-DailyReview">DailyReview[]（日范围执行历史事实，可读不可改写）</button><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§DailyReviewPromptDismissal" title="打开原文位置">§DailyReviewPromptDismissal</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-16" data-topic-id="T-16" data-topic-focus="T-16" data-element-ids="E-PlanChangeSummary,C-HistoryIntegrity">
-  <div class="topic-head">
-    <span class="eid">T-16</span>
-    <span class="topic-title">PlanChangeSummary 收据</span>
-    
-  </div>
-  <div class="topic-prop">PlanChangeSummary 解释一次确定性调整的收据，引用稳定 Task id 与日期，不是第二个 Plan 真相源。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanChangeSummary">PlanChangeSummary[]（一次确定性调整的持久收据）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-16</span>
+      <span class="topic-title">PlanChangeSummary 收据</span>
+      <span class="topic-count">2</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">PlanChangeSummary 解释一次确定性调整的收据，引用稳定 Task id 与日期，不是第二个 Plan 真相源。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-PlanChangeSummary">PlanChangeSummary[]（一次确定性调整的持久收据）</button><button class="chip link" data-focus-target="C-HistoryIntegrity">执行历史不可改写、不得静默丢失与显式失败</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-17" data-topic-id="T-17" data-topic-focus="T-17" data-element-ids="C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-17</span>
-    <span class="topic-title">DailyPlan[] legacy 边界</span>
-    
-  </div>
-  <div class="topic-prop">DailyPlan[] 只是迁移未完成期间的遗留存储与兼容读写面（含已知风险），不属于未来核心模型，删除留待独立特性。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§DailyPlan legacy boundary" title="打开原文位置">§DailyPlan legacy boundary</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-17</span>
+      <span class="topic-title">DailyPlan[] legacy 边界</span>
+      <span class="topic-count">1</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">DailyPlan[] 只是迁移未完成期间的遗留存储与兼容读写面（含已知风险），不属于未来核心模型，删除留待独立特性。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§DailyPlan legacy boundary" title="打开原文位置">§DailyPlan legacy boundary</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-18" data-topic-id="T-18" data-topic-focus="T-18" data-element-ids="C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-18</span>
-    <span class="topic-title">计算视图</span>
-    
-  </div>
-  <div class="topic-prop">DailyTaskView / TodaySuggestionView / PlanBundleCalendarView 等计算视图由 services/selectors 从 PlanBundle、DailyReview、UserProfile 生成，不是持久真相。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Computed views" title="打开原文位置">§Computed views</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-18</span>
+      <span class="topic-title">计算视图</span>
+      <span class="topic-count">1</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">DailyTaskView / TodaySuggestionView / PlanBundleCalendarView 等计算视图由 services/selectors 从 PlanBundle、DailyReview、UserProfile 生成，不是持久真相。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Computed views" title="打开原文位置">§Computed views</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry " id="topic-T-19" data-topic-id="T-19" data-topic-focus="T-19" data-element-ids="C-TruthAndConsumptionBoundary">
-  <div class="topic-head">
-    <span class="eid">T-19</span>
-    <span class="topic-title">迁移方向</span>
-    
-  </div>
-  <div class="topic-prop">F40 之后的迁移拆分为若干后续特性（扩字段、定义 AI/replanner schema、改造确定性 planner、替换消费面、破坏性删除 DailyPlan[] 与旧存储键），都不属于 F40。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Migration direction" title="打开原文位置">§Migration direction</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-19</span>
+      <span class="topic-title">迁移方向</span>
+      <span class="topic-count">1</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">F40 之后的迁移拆分为若干后续特性（扩字段、定义 AI/replanner schema、改造确定性 planner、替换消费面、破坏性删除 DailyPlan[] 与旧存储键），都不属于 F40。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="C-TruthAndConsumptionBoundary">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</button></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Migration direction" title="打开原文位置">§Migration direction</button></span></div>
+    </div>
+  </details>
 </li>
 <li class="topic-entry no-element" id="topic-T-20" data-topic-id="T-20" data-topic-focus="T-20" data-element-ids="">
-  <div class="topic-head">
-    <span class="eid">T-20</span>
-    <span class="topic-title">历史沿革</span>
-    <span class="flag info">无 L0 element —— 仍是导航入口</span>
-  </div>
-  <div class="topic-prop">F16/F39/F41/F56/F58 记录了目标模型逐次成形的历史：校验、运行时输入类型、可选字段、创建屏与确认写入路径。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Historical notes" title="打开原文位置">§Historical notes</button><button class="ref as-link" data-source-ref="§2026-05-26 F16" title="打开原文位置">§2026-05-26 F16</button><button class="ref as-link" data-source-ref="§2026-06-26 F39" title="打开原文位置">§2026-06-26 F39</button><button class="ref as-link" data-source-ref="§2026-06-27 F41" title="打开原文位置">§2026-06-27 F41</button><button class="ref as-link" data-source-ref="§2026-07-03 F56" title="打开原文位置">§2026-07-03 F56</button><button class="ref as-link" data-source-ref="§2026-07-09 F58" title="打开原文位置">§2026-07-09 F58</button></span></div>
+  <details class="topic-fold">
+    <summary class="topic-head">
+      <span class="eid">T-20</span>
+      <span class="topic-title">历史沿革</span>
+      <span class="flag info">无 L0 element —— 仍是导航入口</span>
+    </summary>
+    <div class="topic-body">
+      <div class="topic-prop">F16/F39/F41/F56/F58 记录了目标模型逐次成形的历史：校验、运行时输入类型、可选字段、创建屏与确认写入路径。</div>
+      <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§Historical notes" title="打开原文位置">§Historical notes</button><button class="ref as-link" data-source-ref="§2026-05-26 F16" title="打开原文位置">§2026-05-26 F16</button><button class="ref as-link" data-source-ref="§2026-06-26 F39" title="打开原文位置">§2026-06-26 F39</button><button class="ref as-link" data-source-ref="§2026-06-27 F41" title="打开原文位置">§2026-06-27 F41</button><button class="ref as-link" data-source-ref="§2026-07-03 F56" title="打开原文位置">§2026-07-03 F56</button><button class="ref as-link" data-source-ref="§2026-07-09 F58" title="打开原文位置">§2026-07-09 F58</button></span></div>
+    </div>
+  </details>
 </li></ul>
       <div class="doc-entries">
         <h3>文档级入口</h3>
@@ -929,6 +1166,8 @@
     </aside>
   </div>
 </div>
+<script src="../../app/renderer/l0-layout.js"></script>
+<script src="../../app/renderer/l0-map.js"></script>
 <script>
   // 视图切换（Reading 默认）+ 交互绑定（selection / focus / provenance hook）
   document.addEventListener('click', (ev) => {
