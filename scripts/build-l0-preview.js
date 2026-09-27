@@ -31,8 +31,8 @@ const SET = [
   { name: 'e', map: 'experiments/semantic-grounding/fixture-e/run-08/framework-map.json', note: 'E · Runbook · 分叉 + constraint/attachment（F10 high）' },
   { name: 'd-selfloop', map: 'experiments/framework-map-generation/fixture-d/run-01/framework-map.json', note: 'D 旧臂 · 含 task→task 自环（F07）' },
   { name: 'd-overbudget', map: 'experiments/semantic-grounding/fixture-d/run-01/framework-map.json', note: 'E5 失败样本 · 81 elements（>budget 必须照常渲染）' },
-  { name: 'a', map: 'docs/features/04-l0-framework-map/drafts/context-consumption.map.json', note: 'A · sourceUnit 粒度 · 人类 candidate' },
-  { name: 'e-human', map: 'docs/features/09-contract-adversarial-test/drafts/fixture-e.map.json', note: 'E · 人类 candidate · 含 relationGap' },
+  { name: 'a', map: 'docs/log/artifacts/F04-l0-framework-map/drafts/context-consumption.map.json', note: 'A · sourceUnit 粒度 · 人类 candidate' },
+  { name: 'e-human', map: 'docs/log/artifacts/F09-contract-adversarial-test/drafts/fixture-e.map.json', note: 'E · 人类 candidate · 含 relationGap' },
 ];
 
 function buildOne({ map, check, out, view = 'reading', note = '' }) {

@@ -32,7 +32,7 @@ const DEFAULTS = {
   plan: path.join('fixtures', 'context-consumption.overview-plan.json'),
   design: path.join('fixtures', 'context-consumption.json'),
   prompt: path.join('ai', 'stage2-blocks.prompt.md'),
-  catalog: path.join('docs', 'shape-catalog.md'),
+  catalog: path.join('docs', 'specs', 'shape-catalog.md'),
   outDir: path.join('experiments', 'stage2'),
   model: 'gpt-5.6-sol',
   maxTokens: 16000,

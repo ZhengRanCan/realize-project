@@ -552,7 +552,7 @@ async function main() {
         frameworkMap: artifactRef(schemaBPath),
         mapSelection: artifactRef(selectionSchemaPath),
       },
-      contract: artifactRef(path.join(ROOT, 'docs', 'framework-map-contract.md')),
+      contract: artifactRef(path.join(ROOT, 'docs', 'specs', 'framework-map-contract.md')),
       validator: artifactRef(path.join(ROOT, 'scripts', 'check-map.js')),
     },
     startedAt: nowIso(),

@@ -34,4 +34,4 @@ node scripts/generate-framework-map.js --fixture a --run 2    # 指定编号（�
 node scripts/test-generate-framework-map.js                   # 离线安全验证（零模型调用）
 ```
 
-前置条件与执行顺序见 `docs/features/07-ai-framework-map-generation/`。
+前置条件与执行顺序见 `docs/log/artifacts/F07-ai-framework-map-generation/`。

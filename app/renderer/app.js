@@ -3,7 +3,7 @@
 /**
  * Renderer：Design Review（方案总览 + 决策清单）。
  *
- * 约束（agent.md 第二、二十二节）：
+ * 约束（docs/harness/CONSTRAINTS.md）：
  * - 不直接访问 Node.js fs；一切文件读写通过 window.designReview（preload IPC）；
  * - 不展示、不持有任何 API Key；
  * - AI 的 proposal 与人工审批状态严格分离：本文件只修改 humanReview 内存副本，
@@ -1088,7 +1088,7 @@ function showError(errors, stage) {
   const ul = el('ul', '');
   (errors || []).forEach((e) => ul.appendChild(el('li', '', e)));
   box.appendChild(ul);
-  box.appendChild(el('div', 'muted small', 'agent.md 第十四节：Schema 校验失败时先修复 JSON，不要进入 Review UI。'));
+  box.appendChild(el('div', 'muted small', 'Schema 校验失败时先修复 JSON，不要进入 Review UI。'));
 }
 
 function clearError() {

@@ -7,7 +7,7 @@
  * 支持的 keyword：type / required / properties / additionalProperties / items /
  * enum / const / minLength / minimum / pattern / $ref / definitions。
  *
- * agent.md 第十四节要求：Schema 校验失败时先修复 JSON，不要进入 Review UI。
+ * 约束（docs/harness/CONSTRAINTS.md）：Schema 校验失败时先修复 JSON，不要进入 Review UI。
  */
 
 function resolveRef(ref, root) {

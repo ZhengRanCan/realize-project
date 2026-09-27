@@ -148,7 +148,7 @@ Markdown
 
 - `covers`（sourceUnit id）是**语义覆盖的唯一声明**；`sourceRefs` 只负责"点开 Source 去哪"，不能替代覆盖。
 - `kind` 15 个枚举、`importance` 只有 core / supporting —— 不做复杂评分。
-- Shape 是**受控词汇表**，见 `docs/shape-catalog.md`（10 个形状 + `prose` 例外）。
+- Shape 是**受控词汇表**，见 `docs/specs/shape-catalog.md`（10 个形状 + `prose` 例外）。
 
 ### 3.1 design-review.json
 
@@ -214,7 +214,7 @@ Markdown
 | 不同意 | `rejected` | 方向不对，需要重新设计 |
 | 以后再说 | `needs-revision` | 暂时搁置：信息不足或时机未到，需要时再回到这条 |
 
-这三个动作覆盖 agent.md 第八节允许的状态集合，**没有新增状态类型**（`needs-evidence` 仍可由脚本或旧数据产生，Gate 同样按阻塞处理）。快捷键 `A` / `R` / `L` 作用于当前聚焦的决策卡片，`G` / `D` 切换两个页面。
+这三个动作覆盖 `app/shared/semantics.js` 允许的状态集合，**没有新增状态类型**（`needs-evidence` 仍可由脚本或旧数据产生，Gate 同样按阻塞处理）。快捷键 `A` / `R` / `L` 作用于当前聚焦的决策卡片，`G` / `D` 切换两个页面。
 
 ---
 
@@ -247,26 +247,32 @@ pending / rejected / needs-revision / needs-evidence 的 Decision → 阻塞
 
 ```text
 realize-project/
-├── agent.md
-├── 测试文档/18-context-consumption-semantic-model.md
-├── schema/design-review.schema.json       # 契约（含 1 主图 + 1 辅助图限制）
+├── agent.md                               # 项目与 agent 约定
+├── 测试文档/                              # 被审文档（Fixture A–E）
+├── schema/                                # 各阶段产物契约（design-review / overview-plan / stage2-block / framework-map / …）
 ├── fixtures/context-consumption.json      # 12 Decision / 6 Gap / 10 Open Question / 36 Evidence
 ├── app/
 │   ├── main/main.js                       # 主进程：文件访问、校验、保存、自检
 │   ├── main/preload.js                    # 最小 IPC API
-│   ├── renderer/index.html                # 两个导航项 + 首屏导入
-│   ├── renderer/app.js                    # 方案总览 + 决策清单
-│   ├── renderer/styles.css
-│   ├── renderer/vendor/mermaid.min.js     # 随包离线渲染
-│   └── shared/
-│       ├── semantics.js                   # 单一事实来源：Gate / reviewLevel / category / Evidence 级别
-│       ├── schema-validator.js            # 极简 draft-07 校验器（无额外依赖）
-│       ├── review-model.js                # 一致性检查
-│       └── gate.js                        # 转发 semantics
-├── ai/analysis-protocol.phase2.md         # Phase 2 协议草稿（未接入）
-├── scripts/{validate-fixture,simulate-review}.js
-└── docs/acceptance-phase1.md              # 验收记录与人工核对清单
+│   ├── renderer/                          # 确定性 renderer：两页 + L0 地图 + styles
+│   └── shared/                            # Gate / reviewLevel / category / Evidence 级别的单一事实来源
+├── ai/                                    # Stage A/B 与 Stage 1/2 的 prompt
+├── scripts/                               # 生成、校验、装配、报告与 harness gate
+├── experiments/                           # 原始 run 产物与报告（索引见 experiments/README.md）
+└── docs/
+    ├── README.md                          # 文档地图 + 规范化路径映射
+    ├── progress.md                        # 当前 dashboard（active feature / 风险 / 下一步）
+    ├── decisions.md                       # 跨 feature 的决策记录
+    ├── harness/                           # 产品·约束·架构·设计·初始化契约 + feature registry
+    ├── specs/                             # shape-catalog / framework-map-contract / overview-coverage
+    ├── notes/                             # 背景材料与改进建议
+    ├── prototypes/                        # 形状探索用的静态原型
+    ├── log/artifacts/Fxx-*/               # 每个 feature 的耐久证据与历史材料
+    └── source-sections.json               # npm run source 生成，被 app 与 scripts 直接读取
 ```
+
+文档从 `docs/README.md` 读起；feature 合同与状态见 `docs/harness/features/feature-index.json` 与
+`docs/progress.md`；harness 元数据自检用 `npm run verify:harness`。
 
 ---
 
@@ -302,18 +308,24 @@ npm run validate     # 校验 design-review fixture（Schema + 一致性）
 npm run audit        # 覆盖审计：原文每节被引用 / 每条 Decision 能关联
 npm run check-plan   # 闸门：overview-plan 是否合格（PASS / PASS WITH WARNINGS / FAIL）
 npm run test:plan    # check-plan 的自动测试（22 个用例，无 GUI / 无 AI）
+npm run test:all     # 全部离线单元测试（plan / block / map / ai-map / grounding / l0）
+npm run check-overview   # 装配后的 overview 是否合格（覆盖率 / provenance / 段落结构）
+npm run verify-preview   # 在真实 renderer 里渲染静态 Preview 并断言
 npm run source       # 从 Markdown 重新切分原文分段（供 Source 回查）
 npm run simulate     # 无 GUI 跑通 fixture → human-review.json → Gate
 npm run selftest     # 在真实 Electron 渲染进程内自检整条链路，然后退出
+npm run verify:harness   # 校验 feature 合同、状态机与证据元数据（harness gate）
+npm run check:docs       # 文档引用检查：markdown 里的仓库内路径是否真实存在
 ```
 
 `npm run selftest` 最适合新克隆下来先跑一次：它在真实 Electron 渲染进程里验完 import → 两页渲染 → 审批 → 保存 → Gate 整条链路后自动退出，不依赖 GUI 手工点击。
 
 ### 8.4 不需要任何凭据
 
-克隆后开箱即用。**AI 分析尚未接入**，因此不存在 API key 配置步骤 —— 应用只加载仓库里已有的结构化结果，不发起任何模型请求。
+克隆后开箱即用。**应用本身不发起任何模型请求** —— 它只加载仓库里已有的结构化结果；
+会调用模型的只有 `scripts/` 下显式执行的 `npm run ai:*` 与 `npm run f10:run`。
 
-`npm run ai:plan` 是唯一会调用外部模型的脚本，它是可选的、且**不参与上述任何流程**。如果你想用它，凭据按以下优先级解析，凭据不会进入仓库：
+这些命令是可选的、且**不参与任何标准验证流程**。如果你想用它们，凭据按以下优先级解析，凭据不会进入仓库：
 
 ```bash
 # 方式一：环境变量

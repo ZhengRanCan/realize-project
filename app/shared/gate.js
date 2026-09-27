@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Implementation Gate（agent.md 第十七节）。
+ * Implementation Gate（判定规则见 docs/harness/PRODUCT_SPEC.md 与 docs/harness/DESIGN.md）。
  *
  * 真正的判定逻辑在 app/shared/semantics.js —— 同一份代码被主进程和渲染进程共用，
  * 这里只做转发，避免出现两套口径。

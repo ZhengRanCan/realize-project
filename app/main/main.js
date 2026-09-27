@@ -3,7 +3,7 @@
 /**
  * 主进程：本地文件访问 + 结构化分析结果加载。
  *
- * 职责边界（agent.md 第二节）：
+ * 职责边界（docs/harness/ARCHITECTURE.md 的模块边界）：
  * - 打开 / 读取本地文件：仅在此进程完成；
  * - 不调用任何 AI / 网络服务（Phase 1 不接 AI）；
  * - 保存 design-review.json 与 human-review.json；
@@ -289,7 +289,7 @@ function registerIpc() {  ipcMain.handle('app:paths', () => ({
   /**
    * 保存人工审核结果。
    *
-   * 约束（agent.md 第六节）：
+   * 约束（docs/harness/CONSTRAINTS.md）：
    * - 只能由用户显式动作触发；AI 侧没有任何路径调用它；
    * - 重写时保留 AI 侧不可见但人工有意义的字段（例如人工备注之外的自定义键）；
    * - 绝不写入 design-review.json。

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Preload：向渲染进程暴露最小、安全的 IPC API（agent.md 第二节）。
+ * Preload：向渲染进程暴露最小、安全的 IPC API（见 docs/harness/ARCHITECTURE.md 的模块边界）。
  *
  * 渲染进程不接触 node fs，也不接触 API Key / 网络能力。
  */

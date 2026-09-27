@@ -1,7 +1,7 @@
 # Phase 2 AI 分析协议（草稿，尚未接入）
 
 > 状态：**未接入、未验证**。本文件描述的是「如果要用 AI 生成 `design-review.json`，它必须遵守什么」，
-> 不是已经跑通的能力。在 Review UI 的体验被人工确认之前，不应实现它（agent.md 第十九节 Milestone 顺序）。
+> 不是已经跑通的能力。在 Review UI 的体验被人工确认之前，不应实现它（里程碑顺序见 `docs/progress.md`）。
 >
 > **2026-09-25 补充**：Overview 的生成已拆成两级流水线，Stage 1 的中间格式与验收器已经先行定型：
 >
@@ -15,7 +15,7 @@
 >   ↓ Renderer
 > ```
 >
-> - 形状受控词汇表：`docs/shape-catalog.md`（10 个形状 + prose 例外）
+> - 形状受控词汇表：`docs/specs/shape-catalog.md`（10 个形状 + prose 例外）
 > - Gold Fixture：`fixtures/context-consumption.overview-plan.json`（84 个 sourceUnit / 21 个 block）
 > - 验收器测试：`npm run test:plan`（17 个用例）
 > - **Stage 1 / Stage 2 的正式 Prompt 尚未编写**，本轮刻意不做。
@@ -142,7 +142,7 @@ Phase 2 **不读取源码目录**。源码证据属于 Phase 3。
 
 反例：把「保留三级模型」和「不引入第四级」写成一个 Decision —— 两者可以被人分别否决，必须拆开。
 
-## 禁止事项（对应 agent.md 第二、二十二节）
+## 禁止事项（对应 docs/harness/CONSTRAINTS.md）
 
 - 把自己的 Proposal 标成 `approved`；
 - 替人关闭 Open Question；

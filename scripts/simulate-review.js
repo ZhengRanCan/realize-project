@@ -7,7 +7,7 @@
  * 它替代不了人工点击 UI，但可以确定地证明：
  *   1) fixture 能通过校验并进入 Review UI 所需的数据形态；
  *   2) human-review.json 的读写与 design-review.json 完全分离；
- *   3) Implementation Gate 的判定与 agent.md 第十七节一致。
+ *   3) Implementation Gate 的判定与 app/shared/semantics.js 一致。
  *
  * 用法：node scripts/simulate-review.js [--out path/to/human-review.sample.json]
  */

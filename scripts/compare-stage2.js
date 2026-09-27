@@ -13,7 +13,7 @@
  *
  * 刻意不做：embedding 评分、AI-as-Judge、文字相似度总分、文案一致性要求。
  *
- * 用法：node scripts/compare-stage2.js [--out docs/experiments/xxx.md]
+ * 用法：node scripts/compare-stage2.js [--out experiments/reports/xxx.md]
  */
 
 const fs = require('node:fs');

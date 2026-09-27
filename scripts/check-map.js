@@ -5,7 +5,7 @@
  * 用法:
  *   node scripts/check-map.js --map <map.json> [--plan <overview-plan.json>]
  *
- * 设计原则（见 docs/features/06-contract-and-validators/README.md）：
+ * 设计原则（见 docs/log/artifacts/F06-contract-and-validators/brief.md）：
  *   - 结构层的枚举**从 schema 读**，不在本文件里另写一份
  *   - 三级 severity：HARD（契约违反） / WARN（需要人看一眼） / INFO（只是形态差异）
  *   - 刻意**不**检查：element 数量上限（那是 Warning）、role 是否为已知值（Warning）、
@@ -37,7 +37,7 @@ const GAP_DENSITY_MIN_RATIO = 0.5;
 /**
  * 解析原文的 **Markdown Heading Tree**。
  *
- * 长期语义（见 docs/framework-map-contract.md）：原文的导航单位是 Markdown 标题层级，
+ * 长期语义（见 docs/specs/framework-map-contract.md）：原文的导航单位是 Markdown 标题层级，
  * **不是**数字章节编号。「## 4. 总览」与「## Goal」都是合法的小节标题；编号只是标题
  * 文本的一部分，不是语法。此处只做一件最小的事：把所有 heading 收进一棵树，并给每个
  * heading 一个稳定 key（有编号取编号 token，否则取标题文本），供 `§<key>` 引用解析。

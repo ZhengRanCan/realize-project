@@ -4,12 +4,12 @@
 /**
  * 为收缩版 MVP 的「方案总览」补上视觉层数据（overview）。
  *
- * 依据：docs/overview-coverage.md 的 O-01 ~ O-14 覆盖表。
+ * 依据：docs/specs/overview-coverage.md 的 O-01 ~ O-14 覆盖表。
  * 原则：重要语义不得因可视化重述而丢失；允许通过层级、折叠降低同时出现的信息量。
  *       验收标准 = 语义覆盖，不要求句子覆盖。
  *
  * 注意：区块里**不写"为什么这样设计 UI"的解释性文案** —— 那是开发说明，
- * 进入产品后只应留下内容本身（标题 + 内容）。解释留在 docs/overview-coverage.md。
+ * 进入产品后只应留下内容本身（标题 + 内容）。解释留在 docs/specs/overview-coverage.md。
  *
  * 幂等：重复运行会把 overview 覆盖成同一份内容。
  *

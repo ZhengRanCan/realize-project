@@ -1,0 +1,65 @@
+[
+  {
+    "id": "F01",
+    "title": "Human Review Repair",
+    "status": "passing",
+    "feature_folder": "docs/harness/features/individual_feature/F01-human-review-repair",
+    "version": "v0.1"
+  },
+  {
+    "id": "F03",
+    "title": "Hierarchical Architecture (L0-L3 document model spec)",
+    "status": "passing",
+    "feature_folder": "docs/harness/features/individual_feature/F03-hierarchical-architecture",
+    "version": "v0.1"
+  },
+  {
+    "id": "F04",
+    "title": "L0 Framework Map (manual map + interaction hypothesis)",
+    "status": "blocked",
+    "feature_folder": "docs/harness/features/individual_feature/F04-l0-framework-map",
+    "version": "v0.1"
+  },
+  {
+    "id": "F05",
+    "title": "L0 Generalization Gate (cross document-type gate)",
+    "status": "blocked",
+    "feature_folder": "docs/harness/features/individual_feature/F05-l0-generalization-gate",
+    "version": "v0.1"
+  },
+  {
+    "id": "F06",
+    "title": "Contract and Validators (schema + check-map + contract text)",
+    "status": "blocked",
+    "feature_folder": "docs/harness/features/individual_feature/F06-contract-and-validators",
+    "version": "v0.1"
+  },
+  {
+    "id": "F07",
+    "title": "AI Framework Map Generation (Stage 1/2 pipeline)",
+    "status": "blocked",
+    "feature_folder": "docs/harness/features/individual_feature/F07-ai-framework-map-generation",
+    "version": "v0.1"
+  },
+  {
+    "id": "F08",
+    "title": "L0 UI (framework map navigation screen)",
+    "status": "active",
+    "feature_folder": "docs/harness/features/individual_feature/F08-l0-ui",
+    "version": "v0.1"
+  },
+  {
+    "id": "F09",
+    "title": "Contract Adversarial Test (Phase 2b)",
+    "status": "passing",
+    "feature_folder": "docs/harness/features/individual_feature/F09-contract-adversarial-test",
+    "version": "v0.1"
+  },
+  {
+    "id": "F10",
+    "title": "Semantic Grounding (two-stage semantic landing)",
+    "status": "blocked",
+    "feature_folder": "docs/harness/features/individual_feature/F10-semantic-grounding",
+    "version": "v0.1"
+  }
+]

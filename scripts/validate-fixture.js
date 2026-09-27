@@ -73,7 +73,7 @@ for (const target of targets) {
 
 console.log('');
 if (failed) {
-  console.log('结果：FAILED —— 按 agent.md 第十四节，先修复 JSON，不要进入 Review UI。');
+  console.log('结果：FAILED —— 先修复 JSON，不要进入 Review UI（见 docs/harness/CONSTRAINTS.md）。');
   process.exit(1);
 }
 console.log('结果：PASSED');

@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * Overview 覆盖审计：把 docs/overview-coverage.md 的验收标准变成可重复执行的检查。
+ * Overview 覆盖审计：把 docs/specs/overview-coverage.md 的验收标准变成可重复执行的检查。
  *
  * 检查项：
  * 1. 每个区块都要有 stage / sources / defaultExpanded / reviewObjects；

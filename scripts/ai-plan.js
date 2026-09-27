@@ -35,7 +35,7 @@ const DEFAULTS = {
   design: path.join('fixtures', 'context-consumption.json'),
   prompt: path.join('ai', 'stage1-plan.prompt.md'),
   schema: path.join('schema', 'overview-plan.schema.json'),
-  catalog: path.join('docs', 'shape-catalog.md'),
+  catalog: path.join('docs', 'specs', 'shape-catalog.md'),
   sections: path.join('docs', 'source-sections.json'),
   outDir: 'tmp',
   model: 'gpt-5.6-sol',

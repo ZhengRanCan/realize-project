@@ -158,7 +158,7 @@ console.log('\n===== 矩阵（A–E + 极端样本）=====');
 console.log('| map | el | ed | attach | topics | gap | 自环 | 无element Topic | 超预算 | check-map HARD |');
 console.log('|---|---|---|---|---|---|---|---|---|---|');
 for (const m of matrix) {
-  console.log(`| ${m.rel.replace('experiments/', '').replace('docs/features/', '')} | ${m.el} | ${m.ed} | ${m.at} | ${m.tp} | ${m.gap} | ${m.self} | ${m.noEl} | ${m.over ? '⚠️' : ''} | ${m.hard === null ? '-' : m.hard} |`);
+  console.log(`| ${m.rel.replace('experiments/', '').replace('docs/log/artifacts/', '')} | ${m.el} | ${m.ed} | ${m.at} | ${m.tp} | ${m.gap} | ${m.self} | ${m.noEl} | ${m.over ? '⚠️' : ''} | ${m.hard === null ? '-' : m.hard} |`);
 }
 console.log('\n════════════════════════════════');
 console.log(`View Model 回归: ${results.length - failures}/${results.length} 通过（覆盖 ${maps.length} 份 map）`);

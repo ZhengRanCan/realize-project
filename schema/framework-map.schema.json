@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://realize-project.local/schema/framework-map.schema.json",
   "title": "framework-map（L0）",
-  "description": "Feature 03 定义的 L0 框架图契约。本文件只负责【结构层】：字段存在 / 数据类型 / 枚举 / ID 格式 / 引用完整性。语义判断（concept vs state、何时用 attachment、Capacity gap、Relation gap、不要强行串链）见 docs/framework-map-contract.md。注意：本契约刻意【不】限制 element 数量（没有 maxItems），也不把 role 做成 enum。",
+  "description": "Feature 03 定义的 L0 框架图契约。本文件只负责【结构层】：字段存在 / 数据类型 / 枚举 / ID 格式 / 引用完整性。语义判断（concept vs state、何时用 attachment、Capacity gap、Relation gap、不要强行串链）见 docs/specs/framework-map-contract.md。注意：本契约刻意【不】限制 element 数量（没有 maxItems），也不把 role 做成 enum。",
   "type": "object",
   "required": ["mapVersion", "level", "document", "elements", "edges", "attachments", "topics", "meta"],
   "additionalProperties": false,

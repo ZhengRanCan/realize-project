@@ -4,7 +4,7 @@
 /**
  * 手工建立 overview-plan 的 Gold Fixture。
  *
- * 依据：docs/overview-coverage.md（O-01 ~ O-14 覆盖表）+ 已人工确认的 fixtures/context-consumption.json。
+ * 依据：docs/specs/overview-coverage.md（O-01 ~ O-14 覆盖表）+ 已人工确认的 fixtures/context-consumption.json。
  * 不重新自由设计：sourceUnits 的切分依据现有 20 个区块实际承载的语义，逐条回推到原文。
  *
  * 产出的 fixture 用于：

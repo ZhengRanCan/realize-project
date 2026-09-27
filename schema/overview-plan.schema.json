@@ -153,7 +153,7 @@
           ]
         },
         "shape": {
-          "description": "受控词汇表，见 docs/shape-catalog.md。",
+          "description": "受控词汇表，见 docs/specs/shape-catalog.md。",
           "enum": [
             "flow",
             "current-target-flow",
@@ -251,7 +251,7 @@
     },
     "shapeVocabularyVersion": {
       "type": "string",
-      "description": "对应的 shape catalog 版本，见 docs/shape-catalog.md。",
+      "description": "对应的 shape catalog 版本，见 docs/specs/shape-catalog.md。",
       "minLength": 1
     },
     "sourceUnits": {

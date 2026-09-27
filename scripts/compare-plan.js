@@ -21,7 +21,7 @@ const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
 const GOLD = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
-const SHAPE_CATALOG = path.join(ROOT, 'docs', 'shape-catalog.md');
+const SHAPE_CATALOG = path.join(ROOT, 'docs', 'specs', 'shape-catalog.md');
 
 /* ================================================================== *
  * 阈值集中配置
