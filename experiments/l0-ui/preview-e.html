@@ -29,15 +29,21 @@
 
   <div class="l0-scope"><span class="k">这是什么文档</span> 本手册给出 F13–F16 售后链路的部署、沙箱运行验证、证据留存与沙箱→真实环境切换的可执行步骤。</div>
   <details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>不新增让用户选择库存释放时机的 preferredReleaseStock 字段（§10 决策 3 明确不推荐）；不改动 payOrder / payNotify 等支付核心文件，退款域只以 WX_PAY_* 作缺省回退。</div></details>
-
-  <p class="l0-principle">
-    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
-    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
-    <b>Layout organizes space; it does not create semantics.</b>
-    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
-    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
-    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
-  </p>
+  
+  <details class="l0-howto">
+    <summary>ⓘ 如何阅读这张图</summary>
+    <div class="howto-body">
+      <p><b>Reading View 是关系优先的</b>：<b>节点 = element</b>，<b>线 = edge</b>（箭头就是方向），
+        <code>⚑</code> = constraint / attachment（挂在宿主节点上）。</p>
+      <p><b>Layout organizes space; it does not create semantics.</b>
+        —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+        位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。</p>
+      <p>第一眼只给你骨架：<b>谁能从谁那里拿到什么</b>。完整标题／函数名／出处／机器 ID／type / role / 校验结论
+        都在 <b>Review View</b>，或者点节点、点线之后在下面的详情里看。</p>
+      <p class="mono">Reading View 的关系词是显示层翻译（使用 / 产出 / 依赖 …），
+        Contract 与 Review View 永远保留原词（consumes / produces / depends-on …）。</p>
+    </div>
+  </details>
 
   <div class="l0-body">
     <main class="l0-main">
@@ -51,80 +57,80 @@
             <marker id="l0-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
           </defs>
           <g class="l0-edge-layer">
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-01" data-from="E-01" data-to="E-02" data-kind="forward" d="M 142 120 C 142 238.8, 142 265.2, 142 384" marker-end="url(#l0-arrow)"><title>E-01 —produces→ E-02：node --check 与 npm 构建通过后，按 1–11 顺序部署云函数（refundCommon 作为 lib 不单独部署）</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-02" data-from="E-01" data-to="E-03" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-01 —produces→ E-03：部署阶段建立定时触发器、HTTP 网关路由与环境变量</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-03" data-from="E-04" data-to="E-02" data-kind="forward" d="M 454 300 C 454 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>E-04 —consumes→ E-02：用例 1–3 通过云函数调用驱动售后链路</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-04" data-from="E-04" data-to="E-07" data-kind="forward" d="M 454 300 C 454 337.8, 454 346.2, 454 384" marker-end="url(#l0-arrow)"><title>E-04 —produces→ E-07：验证运行产生截图 / 日志与 audit_logs 证据</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-05" data-from="E-05" data-to="E-02" data-kind="forward" d="M 454 120 C 454 238.8, 142 265.2, 142 384" marker-end="url(#l0-arrow)"><title>E-05 —depends-on→ E-02：补偿在退款成功回调之后执行，依赖已部署的退款与售后云函数</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-06" data-from="E-08" data-to="E-04" data-kind="forward" d="M 766 120 C 766 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-08 —depends-on→ E-04：沙箱 passing 之后才执行真实环境切换</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-07" data-from="E-08" data-to="E-03" data-kind="forward" d="M 766 120 C 766 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-08 —depends-on→ E-03：切换依赖控制台设置的真实模式变量与退款通知路由</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-08" data-from="E-08" data-to="E-07" data-kind="forward" d="M 766 120 C 766 238.8, 454 265.2, 454 384" marker-end="url(#l0-arrow)"><title>E-08 —produces→ E-07：切换后用真实小额退款与回归记录留存证据</title></path></g>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-01" data-edge-type="produces" data-from="E-01" data-to="E-02" data-kind="forward" d="M 142 120 C 142 238.8, 142 265.2, 142 384" marker-end="url(#l0-arrow)"><title>部署流程 产出→ 售后/退款云函数集：node --check 与 npm 构建通过后，按 1–11 顺序部署云函数（refundCommon 作为 lib 不单独部署）</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-02" data-edge-type="produces" data-from="E-01" data-to="E-03" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>部署流程 产出→ 云函数运行时配置：部署阶段建立定时触发器、HTTP 网关路由与环境变量</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-03" data-edge-type="consumes" data-from="E-04" data-to="E-02" data-kind="forward" d="M 454 300 C 454 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>沙箱端到端验证 使用→ 售后/退款云函数集：用例 1–3 通过云函数调用驱动售后链路</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-04" data-edge-type="produces" data-from="E-04" data-to="E-07" data-kind="forward" d="M 454 300 C 454 337.8, 454 346.2, 454 384" marker-end="url(#l0-arrow)"><title>沙箱端到端验证 产出→ 证据与独立审查留痕：验证运行产生截图 / 日志与 audit_logs 证据</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-05" data-edge-type="depends-on" data-from="E-05" data-to="E-02" data-kind="forward" d="M 454 120 C 454 238.8, 142 265.2, 142 384" marker-end="url(#l0-arrow)"><title>资产补偿与重试机制 依赖→ 售后/退款云函数集：补偿在退款成功回调之后执行，依赖已部署的退款与售后云函数</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-06" data-edge-type="depends-on" data-from="E-08" data-to="E-04" data-kind="forward" d="M 766 120 C 766 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>沙箱 → 真实环境切换与切换后回归 依赖→ 沙箱端到端验证：沙箱 passing 之后才执行真实环境切换</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-07" data-edge-type="depends-on" data-from="E-08" data-to="E-03" data-kind="forward" d="M 766 120 C 766 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>沙箱 → 真实环境切换与切换后回归 依赖→ 云函数运行时配置：切换依赖控制台设置的真实模式变量与退款通知路由</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-08" data-edge-type="produces" data-from="E-08" data-to="E-07" data-kind="forward" d="M 766 120 C 766 238.8, 454 265.2, 454 384" marker-end="url(#l0-arrow)"><title>沙箱 → 真实环境切换与切换后回归 产出→ 证据与独立审查留痕：切换后用真实小额退款与回归记录留存证据</title></path></g>
           <g class="l0-label-layer">
-          <text class="l0-edge-label" x="142" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-01" data-from="E-01" data-to="E-02">produces</text>
-          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-02" data-from="E-01" data-to="E-03">produces</text>
-          <text class="l0-edge-label" x="298" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-03" data-from="E-04" data-to="E-02">consumes</text>
-          <text class="l0-edge-label" x="454" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-04" data-from="E-04" data-to="E-07">produces</text>
-          <text class="l0-edge-label" x="298" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-05" data-from="E-05" data-to="E-02">depends-on</text>
-          <text class="l0-edge-label" x="610" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-06" data-from="E-08" data-to="E-04">depends-on</text>
-          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-07" data-from="E-08" data-to="E-03">depends-on</text>
-          <text class="l0-edge-label" x="610" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-08" data-from="E-08" data-to="E-07">produces</text></g>
+          <text class="l0-edge-label" x="142" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-01" data-edge-type="produces" data-from="E-01" data-to="E-02">产出</text>
+          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-02" data-edge-type="produces" data-from="E-01" data-to="E-03">产出</text>
+          <text class="l0-edge-label" x="298" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-03" data-edge-type="consumes" data-from="E-04" data-to="E-02">使用</text>
+          <text class="l0-edge-label" x="454" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-04" data-edge-type="produces" data-from="E-04" data-to="E-07">产出</text>
+          <text class="l0-edge-label" x="298" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-05" data-edge-type="depends-on" data-from="E-05" data-to="E-02">依赖</text>
+          <text class="l0-edge-label" x="610" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-06" data-edge-type="depends-on" data-from="E-08" data-to="E-04">依赖</text>
+          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-07" data-edge-type="depends-on" data-from="E-08" data-to="E-03">依赖</text>
+          <text class="l0-edge-label" x="610" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-08" data-edge-type="produces" data-from="E-08" data-to="E-07">产出</text></g>
         </svg>
         <div class="l0-nodes">
       <article class="l0-node type-process" data-element-id="E-01" data-focus-target="E-01" data-has-edges="1" data-layer="0" style="left:24px;top:24px;width:236px;height:96px" tabindex="0" title="部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">部署流程</h3>
-        <p class="node-sub">node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="部署流程">部署流程</h3>
+        <p class="node-sub" title="node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署">node --check → npm 构建（h5 / mp-wei…</p>
         
     <details class="node-attach" data-element-id="C-03" data-badge-only="1" data-focus-target="C-03">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-03" data-focus-target="C-03" title="环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退">⚑ 环境与凭据约束</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-02" data-focus-target="E-02" data-has-edges="1" data-layer="2" style="left:24px;top:384px;width:236px;height:96px" tabindex="0" title="F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">F13–F16 售后/退款云函数集</h3>
-        <p class="node-sub">submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="售后/退款云函数集">售后/退款云函数集</h3>
+        <p class="node-sub" title="submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib">submitAfterSales、cancelAfterSales … 共 10 项</p>
         
     <details class="node-attach" data-element-id="E-06" data-badge-only="1" data-focus-target="E-06">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-06" data-focus-target="E-06" title="售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED">⚑ 售后单状态机 afterSalesStatus</li><li class="attach-item" data-element-id="C-01" data-focus-target="C-01" title="权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝">⚑ 权限与越权边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-03" data-focus-target="E-03" data-has-edges="1" data-layer="1" style="left:24px;top:204px;width:236px;height:96px" tabindex="0" title="云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">云函数运行时配置</h3>
-        <p class="node-sub">定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="云函数运行时配置">云函数运行时配置</h3>
+        <p class="node-sub" title="定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量">定时触发器（retryAfterSalesCompensation *、10 … 共 7 项</p>
         
     <details class="node-attach" data-element-id="C-03" data-badge-only="1" data-focus-target="C-03">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-03" data-focus-target="C-03" title="环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退">⚑ 环境与凭据约束</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-04" data-focus-target="E-04" data-has-edges="1" data-layer="1" style="left:336px;top:204px;width:236px;height:96px" tabindex="0" title="沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">沙箱端到端验证</h3>
-        <p class="node-sub">预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="沙箱端到端验证">沙箱端到端验证</h3>
+        <p class="node-sub" title="预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron">预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）…</p>
         
       </article>
       <article class="l0-node type-process" data-element-id="E-05" data-focus-target="E-05" data-has-edges="1" data-layer="0" style="left:336px;top:24px;width:236px;height:96px" tabindex="0" title="资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">资产补偿与重试机制</h3>
-        <p class="node-sub">runCompensation / retryAfterSalesCompensation / forceRestockAndAssets ：回补库存、优惠券、积分</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="资产补偿与重试机制">资产补偿与重试机制</h3>
+        <p class="node-sub" title="runCompensation / retryAfterSalesCompensation / forceRestockAndAssets ：回补库存、优惠券、积分">runCompensation、retryAfterSalesCompensation … 共 5 项</p>
         
     <details class="node-attach" data-element-id="E-09" data-badge-only="1" data-focus-target="E-09">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">3</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">3</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-09" data-focus-target="E-09" title="未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）">⚑ 未发货仅退款库存释放时机决策项</li><li class="attach-item" data-element-id="C-01" data-focus-target="C-01" title="权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝">⚑ 权限与越权边界</li><li class="attach-item" data-element-id="C-02" data-focus-target="C-02" title="补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED">⚑ 补偿 / 退款的幂等、有界重试与业务不变量</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-07" data-focus-target="E-07" data-has-edges="1" data-layer="2" style="left:336px;top:384px;width:236px;height:96px" tabindex="0" title="证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">证据与独立审查留痕</h3>
-        <p class="node-sub">截图 / 日志证据、audit_logs、§6 独立审查 checklist</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="证据与独立审查留痕">证据与独立审查留痕</h3>
+        <p class="node-sub" title="截图 / 日志证据、audit_logs、§6 独立审查 checklist">截图、日志证据 … 共 4 项</p>
         
       </article>
       <article class="l0-node type-process" data-element-id="E-08" data-focus-target="E-08" data-has-edges="1" data-layer="0" style="left:648px;top:24px;width:236px;height:96px" tabindex="0" title="沙箱 → 真实环境切换与切换后回归">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">沙箱 → 真实环境切换与切换后回归</h3>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="沙箱 → 真实环境切换与切换后回归">沙箱 → 真实环境切换与切换后回归</h3>
         
         
       </article></div>
@@ -132,12 +138,7 @@
       </div>
     </div>
     
-    <div class="l0-legend">
-      <span class="legend-key"><b>节点</b> = element</span>
-      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
-      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
-      <span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="state">◆</span> 状态</span><span class="legend-item"><span class="node-glyph" data-glyph="concept">○</span> 概念</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span>
-    </div>
+    <div class="l0-legend"><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="state">◆</span> 状态</span><span class="legend-item"><span class="node-glyph" data-glyph="concept">○</span> 概念</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span></div>
     <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>
       
@@ -168,14 +169,14 @@
   
 <section class="focus-panel" data-focus-for="E-01" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-01</span> 部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-01</span> 部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel">—produces→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-02"><span class="rel">—produces→</span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§2" title="打开原文位置">§2</button><button class="ref as-link" data-source-ref="§2.1" title="打开原文位置">§2.1</button><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§3" title="打开原文位置">§3</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-02"><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§2" title="打开原文位置">§2</button><button class="ref as-link" data-source-ref="§2.1" title="打开原文位置">§2.1</button><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§3" title="打开原文位置">§3</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button></div></div>
   </div>
 </section>
 </article>
@@ -197,14 +198,14 @@
   
 <section class="focus-panel" data-focus-for="E-04" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-04</span> 沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-04</span> 沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel">←depends-on—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-03"><span class="rel">—consumes→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-04"><span class="rel">—produces→</span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel"><span class="rel-en">←depends-on—</span><span class="rel-zh">← 依赖</span></span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-03"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-04"><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button></div></div>
   </div>
 </section>
 </article>
@@ -226,14 +227,14 @@
   
 <section class="focus-panel" data-focus-for="E-05" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-05</span> 资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-05</span> 资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-05"><span class="rel">—depends-on→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-05"><span class="rel"><span class="rel-en">—depends-on→</span><span class="rel-zh">依赖 →</span></span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button></div></div>
   </div>
 </section>
 </article>
@@ -255,14 +256,14 @@
   
 <section class="focus-panel" data-focus-for="E-08" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-08</span> 沙箱 → 真实环境切换与切换后回归</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-08</span> 沙箱 → 真实环境切换与切换后回归</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel">—depends-on→</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-07"><span class="rel">—depends-on→</span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li><li data-edge-ref="ED-08"><span class="rel">—produces→</span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§7.2" title="打开原文位置">§7.2</button><button class="ref as-link" data-source-ref="§7.3" title="打开原文位置">§7.3</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel"><span class="rel-en">—depends-on→</span><span class="rel-zh">依赖 →</span></span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-07"><span class="rel"><span class="rel-en">—depends-on→</span><span class="rel-zh">依赖 →</span></span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li><li data-edge-ref="ED-08"><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§7.2" title="打开原文位置">§7.2</button><button class="ref as-link" data-source-ref="§7.3" title="打开原文位置">§7.3</button></div></div>
   </div>
 </section>
 </article></div>
@@ -288,14 +289,14 @@
   
 <section class="focus-panel" data-focus-for="E-02" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-02</span> F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-02</span> F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel">←produces—</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-03"><span class="rel">←consumes—</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-05"><span class="rel">←depends-on—</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-03"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-05"><span class="rel"><span class="rel-en">←depends-on—</span><span class="rel-zh">← 依赖</span></span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></div></div>
   </div>
 </section>
 </article>
@@ -317,14 +318,14 @@
   
 <section class="focus-panel" data-focus-for="E-03" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-03</span> 云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-03</span> 云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-02"><span class="rel">←produces—</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-07"><span class="rel">←depends-on—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§3.4" title="打开原文位置">§3.4</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-02"><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-07"><span class="rel"><span class="rel-en">←depends-on—</span><span class="rel-zh">← 依赖</span></span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§3.4" title="打开原文位置">§3.4</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button></div></div>
   </div>
 </section>
 </article>
@@ -346,14 +347,14 @@
   
 <section class="focus-panel" data-focus-for="E-07" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-07</span> 证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-07</span> 证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-04"><span class="rel">←produces—</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-08"><span class="rel">←produces—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-04"><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-08"><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button></div></div>
   </div>
 </section>
 </article></div>
@@ -379,14 +380,14 @@
   
 <section class="focus-panel" data-focus-for="E-09" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-09</span> 未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-09</span> 未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button><button class="ref as-link" data-source-ref="§现状对照表" title="打开原文位置">§现状对照表</button><button class="ref as-link" data-source-ref="§两种实现的风险" title="打开原文位置">§两种实现的风险</button><button class="ref as-link" data-source-ref="§Reviewer 决策项（必看）" title="打开原文位置">§Reviewer 决策项（必看）</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button><button class="ref as-link" data-source-ref="§现状对照表" title="打开原文位置">§现状对照表</button><button class="ref as-link" data-source-ref="§两种实现的风险" title="打开原文位置">§两种实现的风险</button><button class="ref as-link" data-source-ref="§Reviewer 决策项（必看）" title="打开原文位置">§Reviewer 决策项（必看）</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></div></div>
   </div>
 </section>
 </article></div>
@@ -412,14 +413,14 @@
   
 <section class="focus-panel" data-focus-for="E-06" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-06</span> 售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-06</span> 售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></div></div>
   </div>
 </section>
 </article></div>
@@ -445,14 +446,14 @@
   
 <section class="focus-panel" data-focus-for="C-01" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">C-01</span> 权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">C-01</span> 权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span> · <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.1" title="打开原文位置">§6.1</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span> · <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.1" title="打开原文位置">§6.1</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></div></div>
   </div>
 </section>
 </article>
@@ -474,14 +475,14 @@
   
 <section class="focus-panel" data-focus-for="C-02" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">C-02</span> 补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">C-02</span> 补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></div></div>
   </div>
 </section>
 </article>
@@ -503,14 +504,14 @@
   
 <section class="focus-panel" data-focus-for="C-03" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">C-03</span> 环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">C-03</span> 环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span> · <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§2.3" title="打开原文位置">§2.3</button><button class="ref as-link" data-source-ref="§5.5" title="打开原文位置">§5.5</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span> · <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§2.3" title="打开原文位置">§2.3</button><button class="ref as-link" data-source-ref="§5.5" title="打开原文位置">§5.5</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></div></div>
   </div>
 </section>
 </article></div>

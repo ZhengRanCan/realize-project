@@ -49,7 +49,20 @@ const TYPE_GLYPH_LABEL = {
  *   `执行历史不可改写、不得静默丢失与显式失败`          → 整句      ／ （空）
  *   `planner 临时输入上下文（…）`                      → planner 临时输入上下文 ／ …
  */
+/**
+ * Reading 标题的**显示前置收敛**：去掉开头的范围标签（`F13–F16 …` → `…`）。
+ * 只影响 Reading 的标题；副标题、hover 的完整 label、Review View 全部保留全称。
+ * （用户 Track A Round 0 明确要求：第一眼要 `售后/退款云函数集`，不要 `F13–F16 售后/退款云函数集`。）
+ */
+const SCOPE_PREFIX = /^F\d{1,3}(?:\s*[–—-]\s*F?\d{1,3})?\s+/;
+
 function displayFields(el) {
+  const d = displayFieldsRaw(el);
+  const stripped = d.title.replace(SCOPE_PREFIX, '').trim();
+  return { title: stripped || d.title, subtitle: d.subtitle };
+}
+
+function displayFieldsRaw(el) {
   const raw = String((el && el.label) == null ? '' : el.label).trim();
   if (!raw) return { title: String((el && el.id) || ''), subtitle: '' };
 

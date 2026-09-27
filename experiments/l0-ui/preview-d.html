@@ -29,15 +29,21 @@
 
   <div class="l0-scope"><span class="k">这是什么文档</span> 本文档是规划域 F40 的 target data model contract：定义 Goal / UserProfile / PlanBundle(Plan+Stage[]+Task[]) 目标核心链、planner 临时输入与执行事实的归属、DailyPlan[] 的 legacy 边界与迁移方向；改动 models/、planner、replanner、storage 或页面数据消费前以本文档为 source of truth。</div>
   <details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>F40 只做模型与迁移方向评审：不删除 DailyPlan[]、不改 daily-plans:{goalId} 存储键、不改兼容读取与 adapter、不实现 AI 或 planner 重写；F41 只在纯 models/ 层实现目标新增；扩展字段、DeepSeek/replanner schema、确定性 planner 改造、消费者迁移与破坏性删除均留作后续特性，不属于本文档。</div></details>
-
-  <p class="l0-principle">
-    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
-    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
-    <b>Layout organizes space; it does not create semantics.</b>
-    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
-    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
-    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
-  </p>
+  
+  <details class="l0-howto">
+    <summary>ⓘ 如何阅读这张图</summary>
+    <div class="howto-body">
+      <p><b>Reading View 是关系优先的</b>：<b>节点 = element</b>，<b>线 = edge</b>（箭头就是方向），
+        <code>⚑</code> = constraint / attachment（挂在宿主节点上）。</p>
+      <p><b>Layout organizes space; it does not create semantics.</b>
+        —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+        位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。</p>
+      <p>第一眼只给你骨架：<b>谁能从谁那里拿到什么</b>。完整标题／函数名／出处／机器 ID／type / role / 校验结论
+        都在 <b>Review View</b>，或者点节点、点线之后在下面的详情里看。</p>
+      <p class="mono">Reading View 的关系词是显示层翻译（使用 / 产出 / 依赖 …），
+        Contract 与 Review View 永远保留原词（consumes / produces / depends-on …）。</p>
+    </div>
+  </details>
 
   <div class="l0-body">
     <main class="l0-main">
@@ -51,126 +57,126 @@
             <marker id="l0-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
           </defs>
           <g class="l0-edge-layer">
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-01" data-from="E-PlannerInputs" data-to="E-Goal" data-kind="forward" d="M 142 300 C 142 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>E-PlannerInputs —consumes→ E-Goal：InitialPlanContext / ReplanContext 以 Goal 的目标意图与目标范围硬约束为输入</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-02" data-from="E-PlannerInputs" data-to="E-UserProfile" data-kind="forward" d="M 142 300 C 142 337.8, 454 346.2, 454 384" marker-end="url(#l0-arrow)"><title>E-PlannerInputs —consumes→ E-UserProfile：上下文纳入跨目标的表达与排期偏好</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-03" data-from="E-PlannerInputs" data-to="E-PlanBundle" data-kind="forward" d="M 142 300 C 142 337.8, 766 346.2, 766 384" marker-end="url(#l0-arrow)"><title>E-PlannerInputs —consumes→ E-PlanBundle：ReplanContext 注入由 service 从 storage 读出的 currentPlanBundle</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-04" data-from="E-InitialPlanning" data-to="E-PlannerInputs" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-InitialPlanning —consumes→ E-PlannerInputs：消费 service 运行时组装、不持久化的 InitialPlanContext</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-05" data-from="E-InitialPlanning" data-to="E-PlanBundle" data-kind="forward" d="M 142 120 C 142 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>E-InitialPlanning —produces→ E-PlanBundle：产出第一个 PlanBundle</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-06" data-from="E-Replanning" data-to="E-PlannerInputs" data-kind="forward" d="M 454 120 C 454 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-Replanning —consumes→ E-PlannerInputs：消费 ReplanContext（当前 PlanBundle、反馈、复盘与阶段进展）</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-07" data-from="E-Replanning" data-to="E-DailyReview" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-Replanning —consumes→ E-DailyReview：复盘与用户反馈作为重规划的触发与输入</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-08" data-from="E-Replanning" data-to="E-ExecutionEvidence" data-kind="forward" d="M 454 120 C 454 238.8, 1078 265.2, 1078 384" marker-end="url(#l0-arrow)"><title>E-Replanning —consumes→ E-ExecutionEvidence：重规划读取 FocusSession 与 TaskResult 并保留已提交执行历史</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-09" data-from="E-Replanning" data-to="E-PlanBundle" data-kind="forward" d="M 454 120 C 454 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>E-Replanning —produces→ E-PlanBundle：产出新计划版本</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-10" data-from="E-Replanning" data-to="E-PlanChangeSummary" data-kind="forward" d="M 454 120 C 454 157.8, 766 166.2, 766 204" marker-end="url(#l0-arrow)"><title>E-Replanning —produces→ E-PlanChangeSummary：产出解释本次确定性调整的持久收据</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-11" data-from="E-DailyReview" data-to="E-ExecutionEvidence" data-kind="forward" d="M 454 300 C 454 337.8, 1078 346.2, 1078 384" marker-end="url(#l0-arrow)"><title>E-DailyReview —relates-to→ E-ExecutionEvidence：Review 引用或汇总当日该 Goal 的 Task 结果</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-12" data-from="E-TodayTaskSelection" data-to="E-PlanBundle" data-kind="forward" d="M 766 120 C 766 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>E-TodayTaskSelection —relates-to→ E-PlanBundle：选择引用当前 active PlanBundle 中的 Task</title></path></g>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-01" data-edge-type="consumes" data-from="E-PlannerInputs" data-to="E-Goal" data-kind="forward" d="M 142 300 C 142 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>planner 临时输入上下文 使用→ Goal：InitialPlanContext / ReplanContext 以 Goal 的目标意图与目标范围硬约束为输入</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-02" data-edge-type="consumes" data-from="E-PlannerInputs" data-to="E-UserProfile" data-kind="forward" d="M 142 300 C 142 337.8, 454 346.2, 454 384" marker-end="url(#l0-arrow)"><title>planner 临时输入上下文 使用→ UserProfile：上下文纳入跨目标的表达与排期偏好</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-03" data-edge-type="consumes" data-from="E-PlannerInputs" data-to="E-PlanBundle" data-kind="forward" d="M 142 300 C 142 337.8, 766 346.2, 766 384" marker-end="url(#l0-arrow)"><title>planner 临时输入上下文 使用→ PlanBundle 聚合：ReplanContext 注入由 service 从 storage 读出的 currentPlanBundle</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-04" data-edge-type="consumes" data-from="E-InitialPlanning" data-to="E-PlannerInputs" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>初始规划流程 使用→ planner 临时输入上下文：消费 service 运行时组装、不持久化的 InitialPlanContext</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-05" data-edge-type="produces" data-from="E-InitialPlanning" data-to="E-PlanBundle" data-kind="forward" d="M 142 120 C 142 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>初始规划流程 产出→ PlanBundle 聚合：产出第一个 PlanBundle</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-06" data-edge-type="consumes" data-from="E-Replanning" data-to="E-PlannerInputs" data-kind="forward" d="M 454 120 C 454 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>重规划流程 使用→ planner 临时输入上下文：消费 ReplanContext（当前 PlanBundle、反馈、复盘与阶段进展）</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-07" data-edge-type="consumes" data-from="E-Replanning" data-to="E-DailyReview" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>重规划流程 使用→ DailyReview[]：复盘与用户反馈作为重规划的触发与输入</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-08" data-edge-type="consumes" data-from="E-Replanning" data-to="E-ExecutionEvidence" data-kind="forward" d="M 454 120 C 454 238.8, 1078 265.2, 1078 384" marker-end="url(#l0-arrow)"><title>重规划流程 使用→ 任务范围执行证据：重规划读取 FocusSession 与 TaskResult 并保留已提交执行历史</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-09" data-edge-type="produces" data-from="E-Replanning" data-to="E-PlanBundle" data-kind="forward" d="M 454 120 C 454 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>重规划流程 产出→ PlanBundle 聚合：产出新计划版本</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-10" data-edge-type="produces" data-from="E-Replanning" data-to="E-PlanChangeSummary" data-kind="forward" d="M 454 120 C 454 157.8, 766 166.2, 766 204" marker-end="url(#l0-arrow)"><title>重规划流程 产出→ PlanChangeSummary[]：产出解释本次确定性调整的持久收据</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-11" data-edge-type="relates-to" data-from="E-DailyReview" data-to="E-ExecutionEvidence" data-kind="forward" d="M 454 300 C 454 337.8, 1078 346.2, 1078 384" marker-end="url(#l0-arrow)"><title>DailyReview[] 关联→ 任务范围执行证据：Review 引用或汇总当日该 Goal 的 Task 结果</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="ED-12" data-edge-type="relates-to" data-from="E-TodayTaskSelection" data-to="E-PlanBundle" data-kind="forward" d="M 766 120 C 766 238.8, 766 265.2, 766 384" marker-end="url(#l0-arrow)"><title>TodayTaskSelection[] 与 Task Card 计算状态 关联→ PlanBundle 聚合：选择引用当前 active PlanBundle 中的 Task</title></path></g>
           <g class="l0-label-layer">
-          <text class="l0-edge-label" x="142" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-01" data-from="E-PlannerInputs" data-to="E-Goal">consumes</text>
-          <text class="l0-edge-label" x="298" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-02" data-from="E-PlannerInputs" data-to="E-UserProfile">consumes</text>
-          <text class="l0-edge-label" x="454" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-03" data-from="E-PlannerInputs" data-to="E-PlanBundle">consumes</text>
-          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-04" data-from="E-InitialPlanning" data-to="E-PlannerInputs">consumes</text>
-          <text class="l0-edge-label" x="454" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-05" data-from="E-InitialPlanning" data-to="E-PlanBundle">produces</text>
-          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-06" data-from="E-Replanning" data-to="E-PlannerInputs">consumes</text>
-          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-07" data-from="E-Replanning" data-to="E-DailyReview">consumes</text>
-          <text class="l0-edge-label" x="766" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-08" data-from="E-Replanning" data-to="E-ExecutionEvidence">consumes</text>
-          <text class="l0-edge-label" x="610" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-09" data-from="E-Replanning" data-to="E-PlanBundle">produces</text>
-          <text class="l0-edge-label" x="610" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-10" data-from="E-Replanning" data-to="E-PlanChangeSummary">produces</text>
-          <text class="l0-edge-label" x="766" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-11" data-from="E-DailyReview" data-to="E-ExecutionEvidence">relates-to</text>
-          <text class="l0-edge-label" x="766" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-12" data-from="E-TodayTaskSelection" data-to="E-PlanBundle">relates-to</text></g>
+          <text class="l0-edge-label" x="142" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-01" data-edge-type="consumes" data-from="E-PlannerInputs" data-to="E-Goal">使用</text>
+          <text class="l0-edge-label" x="298" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-02" data-edge-type="consumes" data-from="E-PlannerInputs" data-to="E-UserProfile">使用</text>
+          <text class="l0-edge-label" x="454" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-03" data-edge-type="consumes" data-from="E-PlannerInputs" data-to="E-PlanBundle">使用</text>
+          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-04" data-edge-type="consumes" data-from="E-InitialPlanning" data-to="E-PlannerInputs">使用</text>
+          <text class="l0-edge-label" x="454" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-05" data-edge-type="produces" data-from="E-InitialPlanning" data-to="E-PlanBundle">产出</text>
+          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-06" data-edge-type="consumes" data-from="E-Replanning" data-to="E-PlannerInputs">使用</text>
+          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-07" data-edge-type="consumes" data-from="E-Replanning" data-to="E-DailyReview">使用</text>
+          <text class="l0-edge-label" x="766" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-08" data-edge-type="consumes" data-from="E-Replanning" data-to="E-ExecutionEvidence">使用</text>
+          <text class="l0-edge-label" x="610" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-09" data-edge-type="produces" data-from="E-Replanning" data-to="E-PlanBundle">产出</text>
+          <text class="l0-edge-label" x="610" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-10" data-edge-type="produces" data-from="E-Replanning" data-to="E-PlanChangeSummary">产出</text>
+          <text class="l0-edge-label" x="766" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-11" data-edge-type="relates-to" data-from="E-DailyReview" data-to="E-ExecutionEvidence">关联</text>
+          <text class="l0-edge-label" x="766" y="252" text-anchor="middle" data-focus-edge="1" data-edge-id="ED-12" data-edge-type="relates-to" data-from="E-TodayTaskSelection" data-to="E-PlanBundle">关联</text></g>
         </svg>
         <div class="l0-nodes">
       <article class="l0-node type-artifact" data-element-id="E-Goal" data-focus-target="E-Goal" data-has-edges="1" data-layer="2" style="left:24px;top:384px;width:236px;height:96px" tabindex="0" title="Goal（用户原始目标意图 + 目标范围硬约束）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">Goal</h3>
-        <p class="node-sub">用户原始目标意图 + 目标范围硬约束</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="Goal">Goal</h3>
+        <p class="node-sub" title="用户原始目标意图 + 目标范围硬约束">用户原始目标意图 + 目标范围硬约束</p>
         
     <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-UserProfile" data-focus-target="E-UserProfile" data-has-edges="1" data-layer="2" style="left:336px;top:384px;width:236px;height:96px" tabindex="0" title="UserProfile（跨目标用户上下文与表达/排期偏好）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">UserProfile</h3>
-        <p class="node-sub">跨目标用户上下文与表达/排期偏好</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="UserProfile">UserProfile</h3>
+        <p class="node-sub" title="跨目标用户上下文与表达/排期偏好">跨目标用户上下文与表达/排期偏好</p>
         
     <details class="node-attach" data-element-id="C-TruthAndConsumptionBoundary" data-badge-only="1" data-focus-target="C-TruthAndConsumptionBoundary">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-PlannerInputs" data-focus-target="E-PlannerInputs" data-has-edges="1" data-layer="1" style="left:24px;top:204px;width:236px;height:96px" tabindex="0" title="planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">planner 临时输入上下文</h3>
-        <p class="node-sub">InitialPlanContext / ReplanContext，含派生的 AI 输入 schema</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="planner 临时输入上下文">planner 临时输入上下文</h3>
+        <p class="node-sub" title="InitialPlanContext / ReplanContext，含派生的 AI 输入 schema">InitialPlanContext / ReplanContex…</p>
         
     <details class="node-attach" data-element-id="C-TruthAndConsumptionBoundary" data-badge-only="1" data-focus-target="C-TruthAndConsumptionBoundary">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-InitialPlanning" data-focus-target="E-InitialPlanning" data-has-edges="1" data-layer="0" style="left:24px;top:24px;width:236px;height:96px" tabindex="0" title="初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">初始规划流程</h3>
-        <p class="node-sub">由 Goal + UserProfile 产出首个 PlanBundle</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="初始规划流程">初始规划流程</h3>
+        <p class="node-sub" title="由 Goal + UserProfile 产出首个 PlanBundle">由 Goal + UserProfile 产出首个 PlanBun…</p>
         
       </article>
       <article class="l0-node type-process" data-element-id="E-Replanning" data-focus-target="E-Replanning" data-has-edges="1" data-layer="0" style="left:336px;top:24px;width:236px;height:96px" tabindex="0" title="重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">重规划流程</h3>
-        <p class="node-sub">现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="重规划流程">重规划流程</h3>
+        <p class="node-sub" title="现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible">现实偏离计划时产出新 PlanBundle / 受控变更集，或显式…</p>
         
     <details class="node-attach" data-element-id="C-HistoryIntegrity" data-badge-only="1" data-focus-target="C-HistoryIntegrity">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-HistoryIntegrity" data-focus-target="C-HistoryIntegrity" title="执行历史不可改写、不得静默丢失与显式失败">⚑ 执行历史不可改写、不得静默丢失与显式失败</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-PlanBundle" data-focus-target="E-PlanBundle" data-has-edges="1" data-layer="2" style="left:648px;top:384px;width:236px;height:96px" tabindex="0" title="PlanBundle 聚合（Plan + Stage[] + Task[]）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">PlanBundle 聚合</h3>
-        <p class="node-sub">Plan + Stage[] + Task[]</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="PlanBundle 聚合">PlanBundle 聚合</h3>
+        <p class="node-sub" title="Plan + Stage[] + Task[]">Plan + Stage[] + Task[]</p>
         
     <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-ExecutionEvidence" data-focus-target="E-ExecutionEvidence" data-has-edges="1" data-layer="2" style="left:960px;top:384px;width:236px;height:96px" tabindex="0" title="任务范围执行证据（FocusSession[] / TaskResult[]）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">任务范围执行证据</h3>
-        <p class="node-sub">FocusSession[] / TaskResult[]</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="任务范围执行证据">任务范围执行证据</h3>
+        <p class="node-sub" title="FocusSession[] / TaskResult[]">FocusSession[] / TaskResult[]</p>
         
     <details class="node-attach" data-element-id="C-HistoryIntegrity" data-badge-only="1" data-focus-target="C-HistoryIntegrity">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-HistoryIntegrity" data-focus-target="C-HistoryIntegrity" title="执行历史不可改写、不得静默丢失与显式失败">⚑ 执行历史不可改写、不得静默丢失与显式失败</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-DailyReview" data-focus-target="E-DailyReview" data-has-edges="1" data-layer="1" style="left:336px;top:204px;width:236px;height:96px" tabindex="0" title="DailyReview[]（日范围执行历史事实，可读不可改写）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">DailyReview[]</h3>
-        <p class="node-sub">日范围执行历史事实，可读不可改写</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="DailyReview[]">DailyReview[]</h3>
+        <p class="node-sub" title="日范围执行历史事实，可读不可改写">日范围执行历史事实，可读不可改写</p>
         
     <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">3</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">3</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-HistoryIntegrity" data-focus-target="C-HistoryIntegrity" title="执行历史不可改写、不得静默丢失与显式失败">⚑ 执行历史不可改写、不得静默丢失与显式失败</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-TodayTaskSelection" data-focus-target="E-TodayTaskSelection" data-has-edges="1" data-layer="0" style="left:648px;top:24px;width:236px;height:96px" tabindex="0" title="TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">TodayTaskSelection[] 与 Task Card 计算状态</h3>
-        <p class="node-sub">closed / locked / available、唯一推荐</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="TodayTaskSelection[] 与 Task Card 计算状态">TodayTaskSelection[] 与 Task Card 计算状态</h3>
+        <p class="node-sub" title="closed / locked / available、唯一推荐">closed / locked / available、唯一推荐</p>
         
     <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-PlanChangeSummary" data-focus-target="E-PlanChangeSummary" data-has-edges="1" data-layer="1" style="left:648px;top:204px;width:236px;height:96px" tabindex="0" title="PlanChangeSummary[]（一次确定性调整的持久收据）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">PlanChangeSummary[]</h3>
-        <p class="node-sub">一次确定性调整的持久收据</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="PlanChangeSummary[]">PlanChangeSummary[]</h3>
+        <p class="node-sub" title="一次确定性调整的持久收据">一次确定性调整的持久收据</p>
         
     <details class="node-attach" data-element-id="C-PlanStructureAndState" data-badge-only="1" data-focus-target="C-PlanStructureAndState">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="C-PlanStructureAndState" data-focus-target="C-PlanStructureAndState" title="模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）">⚑ 模型结构、唯一性与状态不变量</li><li class="attach-item" data-element-id="C-TruthAndConsumptionBoundary" data-focus-target="C-TruthAndConsumptionBoundary" title="真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）">⚑ 真相归属、写入权限、消费纪律与 legacy 边界</li></ul>
     </details>
       </article></div>
@@ -178,12 +184,7 @@
       </div>
     </div>
     
-    <div class="l0-legend">
-      <span class="legend-key"><b>节点</b> = element</span>
-      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
-      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
-      <span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span>
-    </div>
+    <div class="l0-legend"><span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span></div>
     <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>
       
@@ -214,14 +215,14 @@
   
 <section class="focus-panel" data-focus-for="E-InitialPlanning" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-InitialPlanning</span> 初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-InitialPlanning</span> 初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-04"><span class="rel">—consumes→</span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li><li data-edge-ref="ED-05"><span class="rel">—produces→</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-04"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li><li data-edge-ref="ED-05"><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button></div></div>
   </div>
 </section>
 </article>
@@ -243,14 +244,14 @@
   
 <section class="focus-panel" data-focus-for="E-Replanning" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-Replanning</span> 重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-Replanning</span> 重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel">—consumes→</span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li><li data-edge-ref="ED-07"><span class="rel">—consumes→</span> <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span></li><li data-edge-ref="ED-08"><span class="rel">—consumes→</span> <span class="node">任务范围执行证据（FocusSession[] / TaskResult[]）</span></li><li data-edge-ref="ED-09"><span class="rel">—produces→</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li><li data-edge-ref="ED-10"><span class="rel">—produces→</span> <span class="node">PlanChangeSummary[]（一次确定性调整的持久收据）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">执行历史不可改写、不得静默丢失与显式失败</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li><li data-edge-ref="ED-07"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span></li><li data-edge-ref="ED-08"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">任务范围执行证据（FocusSession[] / TaskResult[]）</span></li><li data-edge-ref="ED-09"><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li><li data-edge-ref="ED-10"><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">PlanChangeSummary[]（一次确定性调整的持久收据）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">执行历史不可改写、不得静默丢失与显式失败</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></div></div>
   </div>
 </section>
 </article></div>
@@ -276,14 +277,14 @@
   
 <section class="focus-panel" data-focus-for="E-Goal" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-Goal</span> Goal（用户原始目标意图 + 目标范围硬约束）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-Goal</span> Goal（用户原始目标意图 + 目标范围硬约束）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel">←consumes—</span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
   </div>
 </section>
 </article>
@@ -305,14 +306,14 @@
   
 <section class="focus-panel" data-focus-for="E-UserProfile" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-UserProfile</span> UserProfile（跨目标用户上下文与表达/排期偏好）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-UserProfile</span> UserProfile（跨目标用户上下文与表达/排期偏好）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-02"><span class="rel">←consumes—</span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§UserProfile" title="打开原文位置">§UserProfile</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-02"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§UserProfile" title="打开原文位置">§UserProfile</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
   </div>
 </section>
 </article>
@@ -334,14 +335,14 @@
   
 <section class="focus-panel" data-focus-for="E-PlannerInputs" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-PlannerInputs</span> planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-PlannerInputs</span> planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-04"><span class="rel">←consumes—</span> <span class="node">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</span></li><li data-edge-ref="ED-06"><span class="rel">←consumes—</span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel">—consumes→</span> <span class="node">Goal（用户原始目标意图 + 目标范围硬约束）</span></li><li data-edge-ref="ED-02"><span class="rel">—consumes→</span> <span class="node">UserProfile（跨目标用户上下文与表达/排期偏好）</span></li><li data-edge-ref="ED-03"><span class="rel">—consumes→</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-04"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</span></li><li data-edge-ref="ED-06"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">Goal（用户原始目标意图 + 目标范围硬约束）</span></li><li data-edge-ref="ED-02"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">UserProfile（跨目标用户上下文与表达/排期偏好）</span></li><li data-edge-ref="ED-03"><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
   </div>
 </section>
 </article>
@@ -363,14 +364,14 @@
   
 <section class="focus-panel" data-focus-for="E-PlanBundle" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-PlanBundle</span> PlanBundle 聚合（Plan + Stage[] + Task[]）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-PlanBundle</span> PlanBundle 聚合（Plan + Stage[] + Task[]）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-03"><span class="rel">←consumes—</span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li><li data-edge-ref="ED-05"><span class="rel">←produces—</span> <span class="node">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</span></li><li data-edge-ref="ED-09"><span class="rel">←produces—</span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li><li data-edge-ref="ED-12"><span class="rel">←relates-to—</span> <span class="node">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button><button class="ref as-link" data-source-ref="§Task" title="打开原文位置">§Task</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-03"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span></li><li data-edge-ref="ED-05"><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">初始规划流程（由 Goal + UserProfile 产出首个 PlanBundle）</span></li><li data-edge-ref="ED-09"><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li><li data-edge-ref="ED-12"><span class="rel"><span class="rel-en">←relates-to—</span><span class="rel-zh">← 关联</span></span> <span class="node">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button><button class="ref as-link" data-source-ref="§Task" title="打开原文位置">§Task</button><button class="ref as-link" data-source-ref="§F40 conclusion" title="打开原文位置">§F40 conclusion</button></div></div>
   </div>
 </section>
 </article>
@@ -392,14 +393,14 @@
   
 <section class="focus-panel" data-focus-for="E-ExecutionEvidence" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-ExecutionEvidence</span> 任务范围执行证据（FocusSession[] / TaskResult[]）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-ExecutionEvidence</span> 任务范围执行证据（FocusSession[] / TaskResult[]）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-08"><span class="rel">←consumes—</span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li><li data-edge-ref="ED-11"><span class="rel">←relates-to—</span> <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">执行历史不可改写、不得静默丢失与显式失败</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-08"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li><li data-edge-ref="ED-11"><span class="rel"><span class="rel-en">←relates-to—</span><span class="rel-zh">← 关联</span></span> <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">执行历史不可改写、不得静默丢失与显式失败</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></div></div>
   </div>
 </section>
 </article>
@@ -421,14 +422,14 @@
   
 <section class="focus-panel" data-focus-for="E-DailyReview" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-DailyReview</span> DailyReview[]（日范围执行历史事实，可读不可改写）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-DailyReview</span> DailyReview[]（日范围执行历史事实，可读不可改写）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-07"><span class="rel">←consumes—</span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-11"><span class="rel">—relates-to→</span> <span class="node">任务范围执行证据（FocusSession[] / TaskResult[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">执行历史不可改写、不得静默丢失与显式失败</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-07"><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-11"><span class="rel"><span class="rel-en">—relates-to→</span><span class="rel-zh">关联 →</span></span> <span class="node">任务范围执行证据（FocusSession[] / TaskResult[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">执行历史不可改写、不得静默丢失与显式失败</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></div></div>
   </div>
 </section>
 </article>
@@ -450,14 +451,14 @@
   
 <section class="focus-panel" data-focus-for="E-TodayTaskSelection" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-TodayTaskSelection</span> TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-TodayTaskSelection</span> TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-12"><span class="rel">—relates-to→</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§TodayTaskSelection" title="打开原文位置">§TodayTaskSelection</button><button class="ref as-link" data-source-ref="§Task Card computed contract" title="打开原文位置">§Task Card computed contract</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref="ED-12"><span class="rel"><span class="rel-en">—relates-to→</span><span class="rel-zh">关联 →</span></span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§TodayTaskSelection" title="打开原文位置">§TodayTaskSelection</button><button class="ref as-link" data-source-ref="§Task Card computed contract" title="打开原文位置">§Task Card computed contract</button></div></div>
   </div>
 </section>
 </article>
@@ -479,14 +480,14 @@
   
 <section class="focus-panel" data-focus-for="E-PlanChangeSummary" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-PlanChangeSummary</span> PlanChangeSummary[]（一次确定性调整的持久收据）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-PlanChangeSummary</span> PlanChangeSummary[]（一次确定性调整的持久收据）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-10"><span class="rel">←produces—</span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref="ED-10"><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></div></div>
   </div>
 </section>
 </article></div>
@@ -512,14 +513,14 @@
   
 <section class="focus-panel" data-focus-for="C-PlanStructureAndState" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">C-PlanStructureAndState</span> 模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">C-PlanStructureAndState</span> 模型结构、唯一性与状态不变量（Plan / Stage / Task / Goal / 选择 / Review）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span> · <span class="node">Goal（用户原始目标意图 + 目标范围硬约束）</span> · <span class="node">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span> · <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span> · <span class="node">PlanChangeSummary[]（一次确定性调整的持久收据）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button><button class="ref as-link" data-source-ref="§Task" title="打开原文位置">§Task</button><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Task Card computed contract" title="打开原文位置">§Task Card computed contract</button><button class="ref as-link" data-source-ref="§TodayTaskSelection" title="打开原文位置">§TodayTaskSelection</button><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span> · <span class="node">Goal（用户原始目标意图 + 目标范围硬约束）</span> · <span class="node">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span> · <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span> · <span class="node">PlanChangeSummary[]（一次确定性调整的持久收据）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Stage" title="打开原文位置">§Stage</button><button class="ref as-link" data-source-ref="§Task" title="打开原文位置">§Task</button><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Task Card computed contract" title="打开原文位置">§Task Card computed contract</button><button class="ref as-link" data-source-ref="§TodayTaskSelection" title="打开原文位置">§TodayTaskSelection</button><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button></div></div>
   </div>
 </section>
 </article>
@@ -541,14 +542,14 @@
   
 <section class="focus-panel" data-focus-for="C-HistoryIntegrity" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">C-HistoryIntegrity</span> 执行历史不可改写、不得静默丢失与显式失败</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">C-HistoryIntegrity</span> 执行历史不可改写、不得静默丢失与显式失败</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span> · <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span> · <span class="node">任务范围执行证据（FocusSession[] / TaskResult[]）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">重规划流程（现实偏离计划时产出新 PlanBundle / 受控变更集，或显式 infeasible）</span> · <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span> · <span class="node">任务范围执行证据（FocusSession[] / TaskResult[]）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Replanning flow" title="打开原文位置">§Replanning flow</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button><button class="ref as-link" data-source-ref="§FocusSession, TaskResult and DailyReview" title="打开原文位置">§FocusSession, TaskResult and DailyReview</button></div></div>
   </div>
 </section>
 </article>
@@ -570,14 +571,14 @@
   
 <section class="focus-panel" data-focus-for="C-TruthAndConsumptionBoundary" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">C-TruthAndConsumptionBoundary</span> 真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">C-TruthAndConsumptionBoundary</span> 真相归属、写入权限、消费纪律与 legacy 边界（AI / service / 页面 / 隐私 / DailyPlan[]）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span> · <span class="node">Goal（用户原始目标意图 + 目标范围硬约束）</span> · <span class="node">UserProfile（跨目标用户上下文与表达/排期偏好）</span> · <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span> · <span class="node">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span> · <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span> · <span class="node">PlanChangeSummary[]（一次确定性调整的持久收据）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Computed views" title="打开原文位置">§Computed views</button><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button><button class="ref as-link" data-source-ref="§UserProfile" title="打开原文位置">§UserProfile</button><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button><button class="ref as-link" data-source-ref="§DailyReviewPromptDismissal" title="打开原文位置">§DailyReviewPromptDismissal</button><button class="ref as-link" data-source-ref="§DailyPlan legacy boundary" title="打开原文位置">§DailyPlan legacy boundary</button><button class="ref as-link" data-source-ref="§Migration direction" title="打开原文位置">§Migration direction</button><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">PlanBundle 聚合（Plan + Stage[] + Task[]）</span> · <span class="node">Goal（用户原始目标意图 + 目标范围硬约束）</span> · <span class="node">UserProfile（跨目标用户上下文与表达/排期偏好）</span> · <span class="node">planner 临时输入上下文（InitialPlanContext / ReplanContext，含派生的 AI 输入 schema）</span> · <span class="node">TodayTaskSelection[] 与 Task Card 计算状态（closed / locked / available、唯一推荐）</span> · <span class="node">DailyReview[]（日范围执行历史事实，可读不可改写）</span> · <span class="node">PlanChangeSummary[]（一次确定性调整的持久收据）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§Computed views" title="打开原文位置">§Computed views</button><button class="ref as-link" data-source-ref="§PlanBundle" title="打开原文位置">§PlanBundle</button><button class="ref as-link" data-source-ref="§Plan" title="打开原文位置">§Plan</button><button class="ref as-link" data-source-ref="§Goal" title="打开原文位置">§Goal</button><button class="ref as-link" data-source-ref="§UserProfile" title="打开原文位置">§UserProfile</button><button class="ref as-link" data-source-ref="§DailyReview" title="打开原文位置">§DailyReview</button><button class="ref as-link" data-source-ref="§DailyReviewPromptDismissal" title="打开原文位置">§DailyReviewPromptDismissal</button><button class="ref as-link" data-source-ref="§DailyPlan legacy boundary" title="打开原文位置">§DailyPlan legacy boundary</button><button class="ref as-link" data-source-ref="§Migration direction" title="打开原文位置">§Migration direction</button><button class="ref as-link" data-source-ref="§Initial planning flow" title="打开原文位置">§Initial planning flow</button><button class="ref as-link" data-source-ref="§PlanChangeSummary" title="打开原文位置">§PlanChangeSummary</button></div></div>
   </div>
 </section>
 </article></div>

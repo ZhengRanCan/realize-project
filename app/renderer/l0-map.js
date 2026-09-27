@@ -47,6 +47,34 @@ const TYPE_LABEL = {
 };
 const TYPE_ORDER = ['process', 'artifact', 'concept', 'state', 'constraint', 'component'];
 
+/**
+ * Phase 4.1 polish · Reading View 的**显示层**术语映射（纯 UI terminology）
+ *
+ * Contract 的 relation 词一个都没改：Review View 与数据里永远是 `consumes` / `produces`。
+ * 这里只决定「第一眼看到的那个词」，目的是不让读者先学一套 ontology 才能看图。
+ * 未知 relation 一律**原样显示**（不猜、不硬翻）。
+ */
+const REL_ZH = {
+  consumes: '使用', produces: '产出', 'depends-on': '依赖', contains: '包含',
+  validates: '校验', controls: '控制', constrains: '约束', 'transforms-to': '转换为',
+  'relates-to': '关联',
+};
+const relZh = (t) => REL_ZH[t] || t;
+
+/**
+ * 副标题的显示收敛（纯显示，不改数据）：
+ * 长列表只露前两项 + 项数，完整内容在节点 hover / focus 后的详情里。
+ * 注意措辞是「共 N 项」而不是「N 个函数」—— 数的是**这个 label 里列了几项**，
+ * 不是替生成物解释这些项是什么（那属于生成侧的事，UI 不代它回答）。
+ */
+function shortSubtitle(text) {
+  const s = String(text == null ? '' : text).trim();
+  if (s.length <= 34) return s;
+  const items = s.split(/[、/]/).map((x) => x.trim()).filter(Boolean);
+  if (items.length >= 4) return `${items.slice(0, 2).join('、')} … 共 ${items.length} 项`;
+  return s.slice(0, 33) + '…';
+}
+
 const esc = (s) => String(s == null ? '' : s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -77,28 +105,30 @@ const qualifierLine = (q) => {
  * Reading View · Relationship-first graph（Phase 4.1）
  * ------------------------------------------------------------------ */
 
-/** 焦点面板（预渲染在 Review 的卡片里；Reading 选中时拷进 #l0-focus-slot） */
+/** 焦点面板（预渲染在 Review 的卡片里；Reading 选中时拷进 #l0-focus-slot）
+ *  中英双标签：Review 看原词（Incoming/Outgoing/Attached/Provenance），Reading 说人话。
+ *  切换只靠 CSS，不复制面板、不加交互。 */
 function renderFocusPanel(e) {
-  const outRows = e.outgoing.map((r) => `<li data-edge-ref="${esc(r.id || '')}"><span class="rel">—${esc(r.type)}→</span> <span class="node">${esc(r.peerLabel)}</span>${r.selfLoop ? '<span class="flag self">自环</span>' : ''}</li>`).join('');
-  const inRows = e.incoming.map((r) => (r.selfLoop ? '' : `<li data-edge-ref="${esc(r.id || '')}"><span class="rel">←${esc(r.type)}—</span> <span class="node">${esc(r.peerLabel)}</span></li>`)).join('');
+  const outRows = e.outgoing.map((r) => `<li data-edge-ref="${esc(r.id || '')}"><span class="rel"><span class="rel-en">—${esc(r.type)}→</span><span class="rel-zh">${esc(relZh(r.type))} →</span></span> <span class="node">${esc(r.peerLabel)}</span>${r.selfLoop ? '<span class="flag self">自环</span>' : ''}</li>`).join('');
+  const inRows = e.incoming.map((r) => (r.selfLoop ? '' : `<li data-edge-ref="${esc(r.id || '')}"><span class="rel"><span class="rel-en">←${esc(r.type)}—</span><span class="rel-zh">← ${esc(relZh(r.type))}</span></span> <span class="node">${esc(r.peerLabel)}</span></li>`)).join('');
   const attRows = e.attachmentAsElement.map((a) => `<li><span class="rel">⇢ 挂到</span> ${a.hostLabels.map((l) => `<span class="node">${esc(l)}</span>`).join(' · ')}</li>`).join('')
     + e.attachmentAsHost.map((a) => `<li><span class="rel">⇐ 挂靠</span> <span class="node">${esc(a.elementLabel)}</span></li>`).join('');
   return `
 <section class="focus-panel" data-focus-for="${esc(e.id)}" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">${esc(e.id)}</span> ${esc(e.label)}</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">${esc(e.id)}</span> ${esc(e.label)}</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list">${inRows || '<li class="muted">（无）</li>'}</ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list">${outRows || '<li class="muted">（无）</li>'}</ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list">${attRows || '<li class="muted">（无）</li>'}</ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov">${refChips([...e.provenance.sectionRefs, ...e.provenance.sourceUnitIds])}</div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list">${inRows || '<li class="muted">（无）</li>'}</ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list">${outRows || '<li class="muted">（无）</li>'}</ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list">${attRows || '<li class="muted">（无）</li>'}</ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov">${refChips([...e.provenance.sectionRefs, ...e.provenance.sourceUnitIds])}</div></div>
   </div>
 </section>`;
 }
 
-/** 一个节点：标题 + 副标题 + 约束角标。**不显示机器 ID / type / role**（副标题来自原始 label）。 */
+/** 一个节点：标题（1 行）+ 副标题（最多 2 行）+ 约束角标。**不显示机器 ID / type / role**。 */
 function renderGraphNode(n, vm) {
   const badgeItems = n.badgeIds.map((id, i) => {
     const el = vm.elements.find((x) => x.id === id);
@@ -107,14 +137,14 @@ function renderGraphNode(n, vm) {
   }).join('');
   const badgeBlock = n.badgeIds.length ? `
     <details class="node-attach" data-element-id="${esc(n.badgeIds[0])}" data-badge-only="1" data-focus-target="${esc(n.badgeIds[0])}">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">${n.badgeIds.length}</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">${n.badgeIds.length}</span> 条约束</summary>
       <ul class="attach-pop">${badgeItems}</ul>
     </details>` : '';
   return `
       <article class="l0-node type-${esc(n.type)}" data-element-id="${esc(n.id)}" data-focus-target="${esc(n.id)}" data-has-edges="${n.hasEdges ? '1' : '0'}" data-layer="${n.layer}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;height:${n.h}px" tabindex="0" title="${esc(n.label)}">
-        <span class="node-glyph" data-glyph="${esc(n.type)}" title="${esc(n.type)}">${esc(n.glyph)}</span>
-        <h3 class="node-title">${esc(n.title)}</h3>
-        ${n.subtitle ? `<p class="node-sub">${esc(n.subtitle)}</p>` : ''}
+        <span class="node-glyph" data-glyph="${esc(n.type)}" title="${esc(L0Layout.TYPE_GLYPH_LABEL[n.type] || n.type)}">${esc(n.glyph)}</span>
+        <h3 class="node-title" title="${esc(n.title)}">${esc(n.title)}</h3>
+        ${n.subtitle ? `<p class="node-sub" title="${esc(n.subtitle)}">${esc(shortSubtitle(n.subtitle))}</p>` : ''}
         ${badgeBlock}
       </article>`;
 }
@@ -127,10 +157,12 @@ function renderLegend(vm) {
 
 function renderReading(vm, layout) {
   const noEdge = layout.edges.length === 0;
+  const titleOf = new Map(layout.nodes.map((n) => [n.id, n.title]));
   const edgePaths = layout.edges.map((p) => `
-          <path class="l0-edge kind-${esc(p.kind)}${p.selfLoop ? ' is-selfloop' : ''}" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}" data-kind="${esc(p.kind)}" d="${esc(p.d)}" marker-end="url(#l0-arrow)"><title>${esc(`${p.from} —${p.type}→ ${p.to}${p.label ? '：' + p.label : ''}`)}</title></path>`).join('');
+          <path class="l0-edge kind-${esc(p.kind)}${p.selfLoop ? ' is-selfloop' : ''}" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-edge-type="${esc(p.type)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}" data-kind="${esc(p.kind)}" d="${esc(p.d)}" marker-end="url(#l0-arrow)"><title>${esc(`${titleOf.get(p.from) || p.from} ${relZh(p.type)}→ ${titleOf.get(p.to) || p.to}${p.label ? '：' + p.label : ''}`)}</title></path>`).join('');
+  // 线标签：Reading 说人话（使用 / 产出 / 依赖…），原始 relation 词留在 data-edge-type 与 Review View
   const edgeLabels = layout.edges.map((p) => `
-          <text class="l0-edge-label" x="${p.labelX}" y="${p.labelY}" text-anchor="middle" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}">${esc(p.type)}${p.selfLoop ? ' ↺' : ''}</text>`).join('');
+          <text class="l0-edge-label" x="${p.labelX}" y="${p.labelY}" text-anchor="middle" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-edge-type="${esc(p.type)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}">${esc(relZh(p.type))}${p.selfLoop ? ' ↺' : ''}</text>`).join('');
   const nodes = layout.nodes.map((n) => renderGraphNode(n, vm)).join('');
   const orphanNote = layout.orphanBand
     ? `<div class="l0-orphan-note" style="top:${layout.orphanBand.y}px">不在任何 edge 上（${layout.orphanBand.count}）</div>`
@@ -153,14 +185,28 @@ function renderReading(vm, layout) {
       </div>
     </div>
     ${noEdge ? '<p class="l0-no-edge">这份 map 没有任何 <code>edge</code> —— <b>没有主轴就不发明主轴</b>，所以这里不画任何线。</p>' : ''}
-    <div class="l0-legend">
-      <span class="legend-key"><b>节点</b> = element</span>
-      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
-      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
-      ${renderLegend(vm)}
-    </div>
+    <div class="l0-legend">${renderLegend(vm)}</div>
     <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>`;
+}
+
+/** 顶部那段说明：属于"怎么读这张图"，默认折叠，不占第一屏 */
+function renderHowTo() {
+  return `
+  <details class="l0-howto">
+    <summary>ⓘ 如何阅读这张图</summary>
+    <div class="howto-body">
+      <p><b>Reading View 是关系优先的</b>：<b>节点 = element</b>，<b>线 = edge</b>（箭头就是方向），
+        <code>⚑</code> = constraint / attachment（挂在宿主节点上）。</p>
+      <p><b>Layout organizes space; it does not create semantics.</b>
+        —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+        位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。</p>
+      <p>第一眼只给你骨架：<b>谁能从谁那里拿到什么</b>。完整标题／函数名／出处／机器 ID／type / role / 校验结论
+        都在 <b>Review View</b>，或者点节点、点线之后在下面的详情里看。</p>
+      <p class="mono">Reading View 的关系词是显示层翻译（使用 / 产出 / 依赖 …），
+        Contract 与 Review View 永远保留原词（consumes / produces / depends-on …）。</p>
+    </div>
+  </details>`;
 }
 
 /* ------------------------------------------------------------------ *
@@ -369,15 +415,7 @@ function renderL0MapHTML(vm, opts = {}) {
 
   ${scope ? `<div class="l0-scope"><span class="k">这是什么文档</span> ${esc(scope)}</div>` : ''}
   ${nonGoal ? `<details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>${esc(nonGoal)}</div></details>` : ''}
-
-  <p class="l0-principle">
-    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
-    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
-    <b>Layout organizes space; it does not create semantics.</b>
-    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
-    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
-    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
-  </p>
+  ${renderHowTo()}
 
   <div class="l0-body">
     <main class="l0-main">

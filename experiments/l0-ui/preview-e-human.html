@@ -29,15 +29,21 @@
 
   <div class="l0-scope"><span class="k">这是什么文档</span> 本手册把「F13–F16 全部 passing 所需要的剩余工作」拆成可由人工 reviewer 在本地或 CloudBase 环境逐步执行的操作步骤，并附回归用例与证据留存规范。</div>
   
-
-  <p class="l0-principle">
-    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
-    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
-    <b>Layout organizes space; it does not create semantics.</b>
-    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
-    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
-    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
-  </p>
+  
+  <details class="l0-howto">
+    <summary>ⓘ 如何阅读这张图</summary>
+    <div class="howto-body">
+      <p><b>Reading View 是关系优先的</b>：<b>节点 = element</b>，<b>线 = edge</b>（箭头就是方向），
+        <code>⚑</code> = constraint / attachment（挂在宿主节点上）。</p>
+      <p><b>Layout organizes space; it does not create semantics.</b>
+        —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+        位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。</p>
+      <p>第一眼只给你骨架：<b>谁能从谁那里拿到什么</b>。完整标题／函数名／出处／机器 ID／type / role / 校验结论
+        都在 <b>Review View</b>，或者点节点、点线之后在下面的详情里看。</p>
+      <p class="mono">Reading View 的关系词是显示层翻译（使用 / 产出 / 依赖 …），
+        Contract 与 Review View 永远保留原词（consumes / produces / depends-on …）。</p>
+    </div>
+  </details>
 
   <div class="l0-body">
     <main class="l0-main">
@@ -51,125 +57,120 @@
             <marker id="l0-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
           </defs>
           <g class="l0-edge-layer">
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-from="E-02" data-to="E-01" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-02 —produces→ E-01</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-01" data-from="E-03" data-to="E-01" data-kind="forward" d="M 454 120 C 454 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-03 —consumes→ E-01</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-09" data-from="E-03" data-to="E-09" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-03 —produces→ E-09</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-04-&gt;E-01" data-from="E-04" data-to="E-01" data-kind="forward" d="M 766 120 C 766 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-04 —consumes→ E-01</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-05-&gt;E-01" data-from="E-05" data-to="E-01" data-kind="forward" d="M 1078 120 C 1078 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-05 —consumes→ E-01</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-06-&gt;E-01" data-from="E-06" data-to="E-01" data-kind="forward" d="M 1390 120 C 1390 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-06 —consumes→ E-01</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-07-&gt;E-09" data-from="E-07" data-to="E-09" data-kind="forward" d="M 1702 120 C 1702 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-07 —produces→ E-09</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-08-&gt;E-09" data-from="E-08" data-to="E-09" data-kind="forward" d="M 2014 120 C 2014 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-08 —produces→ E-09</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-13-&gt;E-01" data-from="E-13" data-to="E-01" data-kind="forward" d="M 2326 120 C 2326 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-13 —validates→ E-01</title></path></g>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-edge-type="produces" data-from="E-02" data-to="E-01" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>submitAfterSales / cancelAfterSales 产出→ 订单</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-01" data-edge-type="consumes" data-from="E-03" data-to="E-01" data-kind="forward" d="M 454 120 C 454 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>processAfterSales 使用→ 订单</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-09" data-edge-type="produces" data-from="E-03" data-to="E-09" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>processAfterSales 产出→ 库存 / 优惠券 / 积分资产</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-04-&gt;E-01" data-edge-type="consumes" data-from="E-04" data-to="E-01" data-kind="forward" d="M 766 120 C 766 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>refundOrder 使用→ 订单</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-05-&gt;E-01" data-edge-type="consumes" data-from="E-05" data-to="E-01" data-kind="forward" d="M 1078 120 C 1078 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>refundNotify 使用→ 订单</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-06-&gt;E-01" data-edge-type="consumes" data-from="E-06" data-to="E-01" data-kind="forward" d="M 1390 120 C 1390 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>refundQueryCron 使用→ 订单</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-07-&gt;E-09" data-edge-type="produces" data-from="E-07" data-to="E-09" data-kind="forward" d="M 1702 120 C 1702 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>retryAfterSalesCompensation 产出→ 库存 / 优惠券 / 积分资产</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-08-&gt;E-09" data-edge-type="produces" data-from="E-08" data-to="E-09" data-kind="forward" d="M 2014 120 C 2014 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>forceRestockAndAssets 产出→ 库存 / 优惠券 / 积分资产</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-13-&gt;E-01" data-edge-type="validates" data-from="E-13" data-to="E-01" data-kind="forward" d="M 2326 120 C 2326 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>证据留存与独立审查 / reviewer 决策 校验→ 订单</title></path></g>
           <g class="l0-label-layer">
-          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-from="E-02" data-to="E-01">produces</text>
-          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-01" data-from="E-03" data-to="E-01">consumes</text>
-          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-09" data-from="E-03" data-to="E-09">produces</text>
-          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-04-&gt;E-01" data-from="E-04" data-to="E-01">consumes</text>
-          <text class="l0-edge-label" x="610" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-05-&gt;E-01" data-from="E-05" data-to="E-01">consumes</text>
-          <text class="l0-edge-label" x="766" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-06-&gt;E-01" data-from="E-06" data-to="E-01">consumes</text>
-          <text class="l0-edge-label" x="1078" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-07-&gt;E-09" data-from="E-07" data-to="E-09">produces</text>
-          <text class="l0-edge-label" x="1234" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-08-&gt;E-09" data-from="E-08" data-to="E-09">produces</text>
-          <text class="l0-edge-label" x="1234" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-13-&gt;E-01" data-from="E-13" data-to="E-01">validates</text></g>
+          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-edge-type="produces" data-from="E-02" data-to="E-01">产出</text>
+          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-01" data-edge-type="consumes" data-from="E-03" data-to="E-01">使用</text>
+          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-09" data-edge-type="produces" data-from="E-03" data-to="E-09">产出</text>
+          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-04-&gt;E-01" data-edge-type="consumes" data-from="E-04" data-to="E-01">使用</text>
+          <text class="l0-edge-label" x="610" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-05-&gt;E-01" data-edge-type="consumes" data-from="E-05" data-to="E-01">使用</text>
+          <text class="l0-edge-label" x="766" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-06-&gt;E-01" data-edge-type="consumes" data-from="E-06" data-to="E-01">使用</text>
+          <text class="l0-edge-label" x="1078" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-07-&gt;E-09" data-edge-type="produces" data-from="E-07" data-to="E-09">产出</text>
+          <text class="l0-edge-label" x="1234" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-08-&gt;E-09" data-edge-type="produces" data-from="E-08" data-to="E-09">产出</text>
+          <text class="l0-edge-label" x="1234" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-13-&gt;E-01" data-edge-type="validates" data-from="E-13" data-to="E-01">校验</text></g>
         </svg>
         <div class="l0-nodes">
       <article class="l0-node type-artifact" data-element-id="E-01" data-focus-target="E-01" data-has-edges="1" data-layer="1" style="left:24px;top:204px;width:236px;height:96px" tabindex="0" title="订单（售后与退款状态的载体）">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">订单</h3>
-        <p class="node-sub">售后与退款状态的载体</p>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="订单">订单</h3>
+        <p class="node-sub" title="售后与退款状态的载体">售后与退款状态的载体</p>
         
     <details class="node-attach" data-element-id="E-10" data-badge-only="1" data-focus-target="E-10">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-10" data-focus-target="E-10" title="售后与退款状态集（afterSalesStatus / refundStatus）">⚑ 售后与退款状态集</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-02" data-focus-target="E-02" data-has-edges="1" data-layer="0" style="left:24px;top:24px;width:236px;height:96px" tabindex="0" title="submitAfterSales / cancelAfterSales（用户申请与撤销）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">submitAfterSales / cancelAfterSales</h3>
-        <p class="node-sub">用户申请与撤销</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="submitAfterSales / cancelAfterSales">submitAfterSales / cancelAfterSales</h3>
+        <p class="node-sub" title="用户申请与撤销">用户申请与撤销</p>
         
     <details class="node-attach" data-element-id="E-12" data-badge-only="1" data-focus-target="E-12">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-12" data-focus-target="E-12" title="撤销不触发资产回补；非订单所有者不得撤销或操作">⚑ 撤销不触发资产回补；非订单所有者不得撤销或操作</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-03" data-focus-target="E-03" data-has-edges="1" data-layer="0" style="left:336px;top:24px;width:236px;height:96px" tabindex="0" title="processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">processAfterSales</h3>
-        <p class="node-sub">商家审批，REFUND_SUCCESS 触发补偿</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="processAfterSales">processAfterSales</h3>
+        <p class="node-sub" title="商家审批，REFUND_SUCCESS 触发补偿">商家审批，REFUND_SUCCESS 触发补偿</p>
         
     <details class="node-attach" data-element-id="E-10" data-badge-only="1" data-focus-target="E-10">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-10" data-focus-target="E-10" title="售后与退款状态集（afterSalesStatus / refundStatus）">⚑ 售后与退款状态集</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-04" data-focus-target="E-04" data-has-edges="1" data-layer="0" style="left:648px;top:24px;width:236px;height:96px" tabindex="0" title="refundOrder（向微信发起退款）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">refundOrder</h3>
-        <p class="node-sub">向微信发起退款</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="refundOrder">refundOrder</h3>
+        <p class="node-sub" title="向微信发起退款">向微信发起退款</p>
         
     <details class="node-attach" data-element-id="E-10" data-badge-only="1" data-focus-target="E-10">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-10" data-focus-target="E-10" title="售后与退款状态集（afterSalesStatus / refundStatus）">⚑ 售后与退款状态集</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-05" data-focus-target="E-05" data-has-edges="1" data-layer="0" style="left:960px;top:24px;width:236px;height:96px" tabindex="0" title="refundNotify（退款回调）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">refundNotify</h3>
-        <p class="node-sub">退款回调</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="refundNotify">refundNotify</h3>
+        <p class="node-sub" title="退款回调">退款回调</p>
         
     <details class="node-attach" data-element-id="E-10" data-badge-only="1" data-focus-target="E-10">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-10" data-focus-target="E-10" title="售后与退款状态集（afterSalesStatus / refundStatus）">⚑ 售后与退款状态集</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-06" data-focus-target="E-06" data-has-edges="1" data-layer="0" style="left:1272px;top:24px;width:236px;height:96px" tabindex="0" title="refundQueryCron（查单纠偏）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">refundQueryCron</h3>
-        <p class="node-sub">查单纠偏</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="refundQueryCron">refundQueryCron</h3>
+        <p class="node-sub" title="查单纠偏">查单纠偏</p>
         
     <details class="node-attach" data-element-id="E-10" data-badge-only="1" data-focus-target="E-10">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">2</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-10" data-focus-target="E-10" title="售后与退款状态集（afterSalesStatus / refundStatus）">⚑ 售后与退款状态集</li><li class="attach-item" data-element-id="E-11" data-focus-target="E-11" title="有界失败：连续 10 次查单失败置 REFUND_FAILED">⚑ 有界失败</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-07" data-focus-target="E-07" data-has-edges="1" data-layer="0" style="left:1584px;top:24px;width:236px;height:96px" tabindex="0" title="retryAfterSalesCompensation（补偿失败重试）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">retryAfterSalesCompensation</h3>
-        <p class="node-sub">补偿失败重试</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="retryAfterSalesCompensation">retryAfterSalesCompensation</h3>
+        <p class="node-sub" title="补偿失败重试">补偿失败重试</p>
         
       </article>
       <article class="l0-node type-process" data-element-id="E-08" data-focus-target="E-08" data-has-edges="1" data-layer="0" style="left:1896px;top:24px;width:236px;height:96px" tabindex="0" title="forceRestockAndAssets（仅管理员可调用的强制补偿）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">forceRestockAndAssets</h3>
-        <p class="node-sub">仅管理员可调用的强制补偿</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="forceRestockAndAssets">forceRestockAndAssets</h3>
+        <p class="node-sub" title="仅管理员可调用的强制补偿">仅管理员可调用的强制补偿</p>
         
       </article>
       <article class="l0-node type-artifact" data-element-id="E-09" data-focus-target="E-09" data-has-edges="1" data-layer="1" style="left:336px;top:204px;width:236px;height:96px" tabindex="0" title="库存 / 优惠券 / 积分资产">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">库存 / 优惠券 / 积分资产</h3>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="库存 / 优惠券 / 积分资产">库存 / 优惠券 / 积分资产</h3>
         
         
     <details class="node-attach" data-element-id="E-12" data-badge-only="1" data-focus-target="E-12">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-12" data-focus-target="E-12" title="撤销不触发资产回补；非订单所有者不得撤销或操作">⚑ 撤销不触发资产回补；非订单所有者不得撤销或操作</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-13" data-focus-target="E-13" data-has-edges="1" data-layer="0" style="left:2208px;top:24px;width:236px;height:96px" tabindex="0" title="证据留存与独立审查 / reviewer 决策（人工介入）">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">证据留存与独立审查 / reviewer 决策</h3>
-        <p class="node-sub">人工介入</p>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="证据留存与独立审查 / reviewer 决策">证据留存与独立审查 / reviewer 决策</h3>
+        <p class="node-sub" title="人工介入">人工介入</p>
         
       </article></div>
         
       </div>
     </div>
     
-    <div class="l0-legend">
-      <span class="legend-key"><b>节点</b> = element</span>
-      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
-      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
-      <span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="state">◆</span> 状态</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span>
-    </div>
+    <div class="l0-legend"><span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="state">◆</span> 状态</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span></div>
     <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>
       
@@ -200,14 +201,14 @@
   
 <section class="focus-panel" data-focus-for="E-02" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-02</span> submitAfterSales / cancelAfterSales（用户申请与撤销）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-02</span> submitAfterSales / cancelAfterSales（用户申请与撤销）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—produces→</span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">撤销不触发资产回补；非订单所有者不得撤销或操作</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">撤销不触发资产回补；非订单所有者不得撤销或操作</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
   </div>
 </section>
 </article>
@@ -229,14 +230,14 @@
   
 <section class="focus-panel" data-focus-for="E-03" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-03</span> processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-03</span> processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—consumes→</span> <span class="node">订单（售后与退款状态的载体）</span></li><li data-edge-ref=""><span class="rel">—produces→</span> <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">订单（售后与退款状态的载体）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
   </div>
 </section>
 </article>
@@ -258,14 +259,14 @@
   
 <section class="focus-panel" data-focus-for="E-04" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-04</span> refundOrder（向微信发起退款）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-04</span> refundOrder（向微信发起退款）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—consumes→</span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button></div></div>
   </div>
 </section>
 </article>
@@ -287,14 +288,14 @@
   
 <section class="focus-panel" data-focus-for="E-05" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-05</span> refundNotify（退款回调）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-05</span> refundNotify（退款回调）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—consumes→</span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button></div></div>
   </div>
 </section>
 </article>
@@ -316,14 +317,14 @@
   
 <section class="focus-panel" data-focus-for="E-06" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-06</span> refundQueryCron（查单纠偏）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-06</span> refundQueryCron（查单纠偏）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—consumes→</span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">有界失败：连续 10 次查单失败置 REFUND_FAILED</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button><button class="ref as-link" data-source-ref="§8" title="打开原文位置">§8</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">有界失败：连续 10 次查单失败置 REFUND_FAILED</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button><button class="ref as-link" data-source-ref="§8" title="打开原文位置">§8</button></div></div>
   </div>
 </section>
 </article>
@@ -345,14 +346,14 @@
   
 <section class="focus-panel" data-focus-for="E-07" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-07</span> retryAfterSalesCompensation（补偿失败重试）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-07</span> retryAfterSalesCompensation（补偿失败重试）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—produces→</span> <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button></div></div>
   </div>
 </section>
 </article>
@@ -374,14 +375,14 @@
   
 <section class="focus-panel" data-focus-for="E-08" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-08</span> forceRestockAndAssets（仅管理员可调用的强制补偿）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-08</span> forceRestockAndAssets（仅管理员可调用的强制补偿）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—produces→</span> <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button></div></div>
   </div>
 </section>
 </article>
@@ -403,14 +404,14 @@
   
 <section class="focus-panel" data-focus-for="E-13" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-13</span> 证据留存与独立审查 / reviewer 决策（人工介入）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-13</span> 证据留存与独立审查 / reviewer 决策（人工介入）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—validates→</span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—validates→</span><span class="rel-zh">校验 →</span></span> <span class="node">订单（售后与退款状态的载体）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button></div></div>
   </div>
 </section>
 </article></div>
@@ -436,14 +437,14 @@
   
 <section class="focus-panel" data-focus-for="E-01" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-01</span> 订单（售后与退款状态的载体）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-01</span> 订单（售后与退款状态的载体）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">←produces—</span> <span class="node">submitAfterSales / cancelAfterSales（用户申请与撤销）</span></li><li data-edge-ref=""><span class="rel">←consumes—</span> <span class="node">processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span></li><li data-edge-ref=""><span class="rel">←consumes—</span> <span class="node">refundOrder（向微信发起退款）</span></li><li data-edge-ref=""><span class="rel">←consumes—</span> <span class="node">refundNotify（退款回调）</span></li><li data-edge-ref=""><span class="rel">←consumes—</span> <span class="node">refundQueryCron（查单纠偏）</span></li><li data-edge-ref=""><span class="rel">←validates—</span> <span class="node">证据留存与独立审查 / reviewer 决策（人工介入）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">submitAfterSales / cancelAfterSales（用户申请与撤销）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">refundOrder（向微信发起退款）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">refundNotify（退款回调）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">refundQueryCron（查单纠偏）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←validates—</span><span class="rel-zh">← 校验</span></span> <span class="node">证据留存与独立审查 / reviewer 决策（人工介入）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后与退款状态集（afterSalesStatus / refundStatus）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
   </div>
 </section>
 </article>
@@ -465,14 +466,14 @@
   
 <section class="focus-panel" data-focus-for="E-09" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-09</span> 库存 / 优惠券 / 积分资产</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-09</span> 库存 / 优惠券 / 积分资产</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">←produces—</span> <span class="node">processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span></li><li data-edge-ref=""><span class="rel">←produces—</span> <span class="node">retryAfterSalesCompensation（补偿失败重试）</span></li><li data-edge-ref=""><span class="rel">←produces—</span> <span class="node">forceRestockAndAssets（仅管理员可调用的强制补偿）</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">撤销不触发资产回补；非订单所有者不得撤销或操作</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">retryAfterSalesCompensation（补偿失败重试）</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">forceRestockAndAssets（仅管理员可调用的强制补偿）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">撤销不触发资产回补；非订单所有者不得撤销或操作</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
   </div>
 </section>
 </article></div>
@@ -498,14 +499,14 @@
   
 <section class="focus-panel" data-focus-for="E-10" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-10</span> 售后与退款状态集（afterSalesStatus / refundStatus）</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-10</span> 售后与退款状态集（afterSalesStatus / refundStatus）</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">订单（售后与退款状态的载体）</span> · <span class="node">processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span> · <span class="node">refundOrder（向微信发起退款）</span> · <span class="node">refundNotify（退款回调）</span> · <span class="node">refundQueryCron（查单纠偏）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button><button class="ref as-link" data-source-ref="§8" title="打开原文位置">§8</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">订单（售后与退款状态的载体）</span> · <span class="node">processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）</span> · <span class="node">refundOrder（向微信发起退款）</span> · <span class="node">refundNotify（退款回调）</span> · <span class="node">refundQueryCron（查单纠偏）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button><button class="ref as-link" data-source-ref="§8" title="打开原文位置">§8</button></div></div>
   </div>
 </section>
 </article></div>
@@ -531,14 +532,14 @@
   
 <section class="focus-panel" data-focus-for="E-11" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-11</span> 有界失败：连续 10 次查单失败置 REFUND_FAILED</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-11</span> 有界失败：连续 10 次查单失败置 REFUND_FAILED</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">refundQueryCron（查单纠偏）</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">refundQueryCron（查单纠偏）</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button></div></div>
   </div>
 </section>
 </article>
@@ -560,14 +561,14 @@
   
 <section class="focus-panel" data-focus-for="E-12" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-12</span> 撤销不触发资产回补；非订单所有者不得撤销或操作</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-12</span> 撤销不触发资产回补；非订单所有者不得撤销或操作</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">submitAfterSales / cancelAfterSales（用户申请与撤销）</span> · <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">submitAfterSales / cancelAfterSales（用户申请与撤销）</span> · <span class="node">库存 / 优惠券 / 积分资产</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button></div></div>
   </div>
 </section>
 </article></div>

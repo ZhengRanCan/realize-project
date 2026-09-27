@@ -190,10 +190,73 @@ check('原则声明在位（Layout organizes space; it does not create semantics
   const b = byName('d');
   return b.html.includes('Layout organizes space; it does not create semantics') ? true : '缺少原则声明';
 });
-check('修正后的原则在位（语义来自线，不来自坐标）', () => {
+check('修正后的原则在位（语义来自线，不来自坐标）—— 但收进折叠的「如何阅读」里', () => {
   const b = byName('d');
-  return (b.html.includes('语义来自线，不来自坐标') && b.html.includes('节点</b> = element'))
-    ? true : '缺少"关系优先"的声明';
+  if (!b.html.includes('语义来自线，不来自坐标')) return '缺少"关系优先"的声明';
+  if (!b.html.includes('ⓘ 如何阅读这张图')) return '缺少折叠入口';
+  const howto = slice(b.html, 'class="l0-howto"', 'id="l0-reading"');
+  if (!howto.includes('节点 = element') || !howto.includes('线 = edge')) return '折叠区里没有"节点/线"的说明';
+  return true;
+});
+check('顶部说明默认折叠，且第一屏顺序是「文档定位 → 图」（不是先读设计原则）', () => {
+  for (const b of built) {
+    if (countOf(b.html, 'class="l0-howto" open') !== 0) return `${b.item.name} 默认展开了说明`;
+    if (b.html.includes('class="l0-principle"')) return `${b.item.name} 仍有占第一屏的原则段落`;
+    const iScope = b.html.indexOf('这是什么文档');
+    const iHowto = b.html.indexOf('如何阅读这张图');
+    const iGraph = b.html.indexOf('id="l0-reading"');
+    if (!(iScope >= 0 && iScope < iHowto && iHowto < iGraph)) return `${b.item.name} 第一屏顺序不对`;
+  }
+  return true;
+});
+
+/* ---- Phase 4.1 polish：Reading 说人话，Review 保留原词 ---- */
+check('Reading 的关系词已中文化（使用 / 产出 / 依赖 …），且原词没丢（data-edge-type）', () => {
+  const raw = ['consumes', 'produces', 'depends-on', 'relates-to'];
+  for (const b of built) {
+    const labels = [...b.reading.matchAll(/class="l0-edge-label"[^>]*data-edge-type="([^"]+)"/g)];
+    const types = [...b.reading.matchAll(/data-edge-type="([^"]+)"/g)].map((m) => m[1]);
+    if (types.length !== (b.map.edges || []).length * 2) return `${b.item.name}: data-edge-type 数量 ${types.length}（线 + 标签应各一份）`;
+    const texts = [...b.reading.matchAll(/class="l0-edge-label"[^>]*>([^<]*)</g)].map((m) => m[1]);
+    const leaked = texts.filter((t) => raw.includes(t.trim().replace(/\s*↺$/, '')));
+    if (leaked.length) return `${b.item.name}: 线标签仍是原词 ${leaked.slice(0, 2).join(',')}`;
+    if (labels.length !== (b.map.edges || []).length) return `${b.item.name}: 标签缺 data-edge-type`;
+  }
+  return true;
+});
+check('Review 仍是原词（—consumes→ / —produces→），中文化只发生在显示层', () => {
+  const b = byName('d');
+  if (!b.review.includes('<span class="rel">—consumes→</span>')) return 'Review 丢失原词 consumes';
+  return b.review.includes('—produces→') ? true : 'Review 丢失原词 produces';
+});
+check('Reading 里没有残留工程词（constraints / Focused Relations / Incoming / Outgoing / Provenance）', () => {
+  const words = ['constraints', 'Focused Relations', '>Incoming<', '>Outgoing<', '>Attached<', '>Provenance<'];
+  for (const b of built) {
+    const hit = words.filter((w) => b.reading.includes(w));
+    if (hit.length) return `${b.item.name}: 残留 ${hit.join(', ')}`;
+    if (!b.reading.includes('条约束') && b.map.attachments.length) return `${b.item.name}: 角标没有中文化`;
+  }
+  return true;
+});
+check('长列表副标题被收敛（前两项 + 共 N 项），完整内容留在 title 里', () => {
+  const b = byName('e');
+  if (!b.reading.includes('共 ')) return '没有收敛长列表副标题';
+  const subs = [...b.reading.matchAll(/class="node-sub" title="([^"]*)"/g)].map((m) => m[1]);
+  if (!subs.length) return '节点副标题没有 title（无法 hover 看全文）';
+  const long = subs.filter((s) => s.length > 34);
+  return long.length ? true : '样本没有长副标题（断言失效，需换样本）';
+});
+check('标题/副标题的行数规则写死在 CSS（标题 1 行、副标题 2 行）', () => {
+  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  const title = /\.l0-node \.node-title \{[^}]*-webkit-line-clamp: 1[^}]*\}/.test(css);
+  const sub = /\.l0-node \.node-sub \{[^}]*?-webkit-line-clamp: 2[^}]*\}/.test(css);
+  return (title && sub) || `title1=${title} sub2=${sub}`;
+});
+check('Reading 隐藏一切机器 ID（.eid 在 reading 视图不显示）', () => {
+  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  if (!css.includes('.l0-root[data-view="reading"] .eid { display: none; }')) return 'CSS 缺少 Reading 隐藏 eid 的规则';
+  const b = byName('d');
+  return b.reading.includes('class="eid"') ? 'Reading 标记里仍有 eid' : true;
 });
 check('Reading / Review 互斥且都在 DOM 里（隐藏 ≠ 删除）', () => {
   const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');

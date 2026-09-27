@@ -29,15 +29,21 @@
 
   <div class="l0-scope"><span class="k">这是什么文档</span> 本文只讨论 Context Consumption 的产品语义层级，不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。</div>
   <details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>不采用 Context Influence 作为第四级；不承诺输出变化严格由 DeepTutor 上下文导致。</div></details>
-
-  <p class="l0-principle">
-    <b>Reading View 是关系优先的</b>：节点 = <code>element</code>，线 = <code>edge</code>（箭头就是方向），
-    <code>⚑</code> = constraint / attachment（挂在宿主节点上）。
-    <b>Layout organizes space; it does not create semantics.</b>
-    —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
-    位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。
-    工程明细（机器 ID / type / role / provenance / 校验）在 <b>Review View</b>。
-  </p>
+  
+  <details class="l0-howto">
+    <summary>ⓘ 如何阅读这张图</summary>
+    <div class="howto-body">
+      <p><b>Reading View 是关系优先的</b>：<b>节点 = element</b>，<b>线 = edge</b>（箭头就是方向），
+        <code>⚑</code> = constraint / attachment（挂在宿主节点上）。</p>
+      <p><b>Layout organizes space; it does not create semantics.</b>
+        —— 修正后的理解：布局<b>不能</b>创造原数据没有的语义，但<b>可以</b>用已有的 edge 帮你看懂语义。
+        位置只用来减少交叉；<b>语义来自线，不来自坐标</b>：没有 edge 就不画线，没有主轴就不发明主轴，自环就画自环。</p>
+      <p>第一眼只给你骨架：<b>谁能从谁那里拿到什么</b>。完整标题／函数名／出处／机器 ID／type / role / 校验结论
+        都在 <b>Review View</b>，或者点节点、点线之后在下面的详情里看。</p>
+      <p class="mono">Reading View 的关系词是显示层翻译（使用 / 产出 / 依赖 …），
+        Contract 与 Review View 永远保留原词（consumes / produces / depends-on …）。</p>
+    </div>
+  </details>
 
   <div class="l0-body">
     <main class="l0-main">
@@ -51,82 +57,82 @@
             <marker id="l0-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"></path></marker>
           </defs>
           <g class="l0-edge-layer">
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-from="E-02" data-to="E-01" data-kind="forward" d="M 142 300 C 142 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>E-02 —depends-on→ E-01</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-02" data-from="E-03" data-to="E-02" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>E-03 —consumes→ E-02</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-04" data-from="E-03" data-to="E-04" data-kind="forward" d="M 142 120 C 142 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-03 —produces→ E-04</title></path>
-          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-05-&gt;E-04" data-from="E-05" data-to="E-04" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>E-05 —consumes→ E-04</title></path></g>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-edge-type="depends-on" data-from="E-02" data-to="E-01" data-kind="forward" d="M 142 300 C 142 337.8, 142 346.2, 142 384" marker-end="url(#l0-arrow)"><title>Generation-facing Projection 依赖→ Frozen Context</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-02" data-edge-type="consumes" data-from="E-03" data-to="E-02" data-kind="forward" d="M 142 120 C 142 157.8, 142 166.2, 142 204" marker-end="url(#l0-arrow)"><title>Outline Generation Attempt 使用→ Generation-facing Projection</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-03-&gt;E-04" data-edge-type="produces" data-from="E-03" data-to="E-04" data-kind="forward" d="M 142 120 C 142 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>Outline Generation Attempt 产出→ Context-shaped Outline Revisi…</title></path>
+          <path class="l0-edge kind-forward" data-focus-edge="1" data-edge-id="E-05-&gt;E-04" data-edge-type="consumes" data-from="E-05" data-to="E-04" data-kind="forward" d="M 454 120 C 454 157.8, 454 166.2, 454 204" marker-end="url(#l0-arrow)"><title>Scene Generation 使用→ Context-shaped Outline Revisi…</title></path></g>
           <g class="l0-label-layer">
-          <text class="l0-edge-label" x="142" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-from="E-02" data-to="E-01">depends-on</text>
-          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-02" data-from="E-03" data-to="E-02">consumes</text>
-          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-04" data-from="E-03" data-to="E-04">produces</text>
-          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-05-&gt;E-04" data-from="E-05" data-to="E-04">consumes</text></g>
+          <text class="l0-edge-label" x="142" y="342" text-anchor="middle" data-focus-edge="1" data-edge-id="E-02-&gt;E-01" data-edge-type="depends-on" data-from="E-02" data-to="E-01">依赖</text>
+          <text class="l0-edge-label" x="142" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-02" data-edge-type="consumes" data-from="E-03" data-to="E-02">使用</text>
+          <text class="l0-edge-label" x="298" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-03-&gt;E-04" data-edge-type="produces" data-from="E-03" data-to="E-04">产出</text>
+          <text class="l0-edge-label" x="454" y="162" text-anchor="middle" data-focus-edge="1" data-edge-id="E-05-&gt;E-04" data-edge-type="consumes" data-from="E-05" data-to="E-04">使用</text></g>
         </svg>
         <div class="l0-nodes">
       <article class="l0-node type-artifact" data-element-id="E-01" data-focus-target="E-01" data-has-edges="1" data-layer="2" style="left:24px;top:384px;width:236px;height:96px" tabindex="0" title="Frozen Context">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">Frozen Context</h3>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="Frozen Context">Frozen Context</h3>
         
         
     <details class="node-attach" data-element-id="E-06" data-badge-only="1" data-focus-target="E-06">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-06" data-focus-target="E-06" title="Context Receipt">⚑ Context Receipt</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-02" data-focus-target="E-02" data-has-edges="1" data-layer="1" style="left:24px;top:204px;width:236px;height:96px" tabindex="0" title="Generation-facing Projection">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">Generation-facing Projection</h3>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="Generation-facing Projection">Generation-facing Projection</h3>
         
         
     <details class="node-attach" data-element-id="E-07" data-badge-only="1" data-focus-target="E-07">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-07" data-focus-target="E-07" title="Context Availability">⚑ Context Availability</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-03" data-focus-target="E-03" data-has-edges="1" data-layer="0" style="left:24px;top:24px;width:236px;height:96px" tabindex="0" title="Outline Generation Attempt">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">Outline Generation Attempt</h3>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="Outline Generation Attempt">Outline Generation Attempt</h3>
         
         
     <details class="node-attach" data-element-id="E-08" data-badge-only="1" data-focus-target="E-08">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-08" data-focus-target="E-08" title="Context Consumption">⚑ Context Consumption</li></ul>
     </details>
       </article>
       <article class="l0-node type-artifact" data-element-id="E-04" data-focus-target="E-04" data-has-edges="1" data-layer="1" style="left:336px;top:204px;width:236px;height:96px" tabindex="0" title="Context-shaped Outline Revision">
-        <span class="node-glyph" data-glyph="artifact" title="artifact">◇</span>
-        <h3 class="node-title">Context-shaped Outline Revisi…</h3>
+        <span class="node-glyph" data-glyph="artifact" title="数据">◇</span>
+        <h3 class="node-title" title="Context-shaped Outline Revisi…">Context-shaped Outline Revisi…</h3>
         
         
     <details class="node-attach" data-element-id="E-09" data-badge-only="1" data-focus-target="E-09">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-09" data-focus-target="E-09" title="Output Alignment">⚑ Output Alignment</li></ul>
     </details>
       </article>
       <article class="l0-node type-process" data-element-id="E-05" data-focus-target="E-05" data-has-edges="1" data-layer="0" style="left:336px;top:24px;width:236px;height:96px" tabindex="0" title="Scene Generation">
-        <span class="node-glyph" data-glyph="process" title="process">▶</span>
-        <h3 class="node-title">Scene Generation</h3>
+        <span class="node-glyph" data-glyph="process" title="流程">▶</span>
+        <h3 class="node-title" title="Scene Generation">Scene Generation</h3>
         
         
     <details class="node-attach" data-element-id="E-09" data-badge-only="1" data-focus-target="E-09">
-      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> constraints</summary>
+      <summary title="展开看这些约束（它们仍是正式语义，只是视觉低一级）">⚑ <span class="attach-count">1</span> 条约束</summary>
       <ul class="attach-pop"><li class="attach-item" data-element-id="E-09" data-focus-target="E-09" title="Output Alignment">⚑ Output Alignment</li></ul>
     </details>
       </article>
       <article class="l0-node type-constraint" data-element-id="E-10" data-focus-target="E-10" data-has-edges="0" data-layer="-1" style="left:24px;top:588px;width:236px;height:96px" tabindex="0" title="Consumption ≠ Output Alignment">
-        <span class="node-glyph" data-glyph="constraint" title="constraint">⚑</span>
-        <h3 class="node-title">Consumption ≠ Output Alignment</h3>
+        <span class="node-glyph" data-glyph="constraint" title="规则">⚑</span>
+        <h3 class="node-title" title="Consumption ≠ Output Alignment">Consumption ≠ Output Alignment</h3>
         
         
       </article>
       <article class="l0-node type-constraint" data-element-id="E-11" data-focus-target="E-11" data-has-edges="0" data-layer="-1" style="left:336px;top:588px;width:236px;height:96px" tabindex="0" title="Context Influence 不得作为第四级">
-        <span class="node-glyph" data-glyph="constraint" title="constraint">⚑</span>
-        <h3 class="node-title">Context Influence 不得作为第四级</h3>
+        <span class="node-glyph" data-glyph="constraint" title="规则">⚑</span>
+        <h3 class="node-title" title="Context Influence 不得作为第四级">Context Influence 不得作为第四级</h3>
         
         
       </article>
       <article class="l0-node type-constraint" data-element-id="E-12" data-focus-target="E-12" data-has-edges="0" data-layer="-1" style="left:648px;top:588px;width:236px;height:96px" tabindex="0" title="Receipt / Availability / Consumption 不能互相替代">
-        <span class="node-glyph" data-glyph="constraint" title="constraint">⚑</span>
-        <h3 class="node-title">Receipt / Availability / Cons…</h3>
+        <span class="node-glyph" data-glyph="constraint" title="规则">⚑</span>
+        <h3 class="node-title" title="Receipt / Availability / Cons…">Receipt / Availability / Cons…</h3>
         
         
       </article></div>
@@ -134,12 +140,7 @@
       </div>
     </div>
     
-    <div class="l0-legend">
-      <span class="legend-key"><b>节点</b> = element</span>
-      <span class="legend-key"><b>线</b> = edge（箭头就是方向）</span>
-      <span class="legend-key"><b>⚑</b> = constraint / attachment（挂在宿主上）</span>
-      <span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="concept">○</span> 概念</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span>
-    </div>
+    <div class="l0-legend"><span class="legend-item"><span class="node-glyph" data-glyph="artifact">◇</span> 数据</span><span class="legend-item"><span class="node-glyph" data-glyph="process">▶</span> 流程</span><span class="legend-item"><span class="node-glyph" data-glyph="concept">○</span> 概念</span><span class="legend-item"><span class="node-glyph" data-glyph="constraint">⚑</span> 规则</span></div>
     <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>
       
@@ -170,14 +171,14 @@
   
 <section class="focus-panel" data-focus-for="E-03" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-03</span> Outline Generation Attempt</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-03</span> Outline Generation Attempt</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—consumes→</span> <span class="node">Generation-facing Projection</span></li><li data-edge-ref=""><span class="rel">—produces→</span> <span class="node">Context-shaped Outline Revision</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Consumption</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-044" title="打开原文位置">SU-044</button><button class="ref as-link" data-source-ref="SU-046" title="打开原文位置">SU-046</button><button class="ref as-link" data-source-ref="SU-050" title="打开原文位置">SU-050</button><button class="ref as-link" data-source-ref="SU-076" title="打开原文位置">SU-076</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">Generation-facing Projection</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">—produces→</span><span class="rel-zh">产出 →</span></span> <span class="node">Context-shaped Outline Revision</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Consumption</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-044" title="打开原文位置">SU-044</button><button class="ref as-link" data-source-ref="SU-046" title="打开原文位置">SU-046</button><button class="ref as-link" data-source-ref="SU-050" title="打开原文位置">SU-050</button><button class="ref as-link" data-source-ref="SU-076" title="打开原文位置">SU-076</button></div></div>
   </div>
 </section>
 </article>
@@ -199,14 +200,14 @@
   
 <section class="focus-panel" data-focus-for="E-05" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-05</span> Scene Generation</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-05</span> Scene Generation</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—consumes→</span> <span class="node">Context-shaped Outline Revision</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Output Alignment</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-051" title="打开原文位置">SU-051</button><button class="ref as-link" data-source-ref="SU-055" title="打开原文位置">SU-055</button><button class="ref as-link" data-source-ref="SU-075" title="打开原文位置">SU-075</button><button class="ref as-link" data-source-ref="SU-076" title="打开原文位置">SU-076</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—consumes→</span><span class="rel-zh">使用 →</span></span> <span class="node">Context-shaped Outline Revision</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Output Alignment</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-051" title="打开原文位置">SU-051</button><button class="ref as-link" data-source-ref="SU-055" title="打开原文位置">SU-055</button><button class="ref as-link" data-source-ref="SU-075" title="打开原文位置">SU-075</button><button class="ref as-link" data-source-ref="SU-076" title="打开原文位置">SU-076</button></div></div>
   </div>
 </section>
 </article></div>
@@ -232,14 +233,14 @@
   
 <section class="focus-panel" data-focus-for="E-01" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-01</span> Frozen Context</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-01</span> Frozen Context</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">←depends-on—</span> <span class="node">Generation-facing Projection</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Receipt</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-014" title="打开原文位置">SU-014</button><button class="ref as-link" data-source-ref="SU-020" title="打开原文位置">SU-020</button><button class="ref as-link" data-source-ref="SU-058" title="打开原文位置">SU-058</button><button class="ref as-link" data-source-ref="SU-065" title="打开原文位置">SU-065</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">←depends-on—</span><span class="rel-zh">← 依赖</span></span> <span class="node">Generation-facing Projection</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Receipt</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-014" title="打开原文位置">SU-014</button><button class="ref as-link" data-source-ref="SU-020" title="打开原文位置">SU-020</button><button class="ref as-link" data-source-ref="SU-058" title="打开原文位置">SU-058</button><button class="ref as-link" data-source-ref="SU-065" title="打开原文位置">SU-065</button></div></div>
   </div>
 </section>
 </article>
@@ -261,14 +262,14 @@
   
 <section class="focus-panel" data-focus-for="E-02" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-02</span> Generation-facing Projection</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-02</span> Generation-facing Projection</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">←consumes—</span> <span class="node">Outline Generation Attempt</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">—depends-on→</span> <span class="node">Frozen Context</span></li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Availability</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-046" title="打开原文位置">SU-046</button><button class="ref as-link" data-source-ref="SU-047" title="打开原文位置">SU-047</button><button class="ref as-link" data-source-ref="SU-048" title="打开原文位置">SU-048</button><button class="ref as-link" data-source-ref="SU-059" title="打开原文位置">SU-059</button><button class="ref as-link" data-source-ref="SU-080" title="打开原文位置">SU-080</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">Outline Generation Attempt</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">—depends-on→</span><span class="rel-zh">依赖 →</span></span> <span class="node">Frozen Context</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Availability</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-046" title="打开原文位置">SU-046</button><button class="ref as-link" data-source-ref="SU-047" title="打开原文位置">SU-047</button><button class="ref as-link" data-source-ref="SU-048" title="打开原文位置">SU-048</button><button class="ref as-link" data-source-ref="SU-059" title="打开原文位置">SU-059</button><button class="ref as-link" data-source-ref="SU-080" title="打开原文位置">SU-080</button></div></div>
   </div>
 </section>
 </article>
@@ -290,14 +291,14 @@
   
 <section class="focus-panel" data-focus-for="E-04" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-04</span> Context-shaped Outline Revision</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-04</span> Context-shaped Outline Revision</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref=""><span class="rel">←produces—</span> <span class="node">Outline Generation Attempt</span></li><li data-edge-ref=""><span class="rel">←consumes—</span> <span class="node">Scene Generation</span></li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Output Alignment</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-054" title="打开原文位置">SU-054</button><button class="ref as-link" data-source-ref="SU-056" title="打开原文位置">SU-056</button><button class="ref as-link" data-source-ref="SU-062" title="打开原文位置">SU-062</button><button class="ref as-link" data-source-ref="SU-079" title="打开原文位置">SU-079</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li data-edge-ref=""><span class="rel"><span class="rel-en">←produces—</span><span class="rel-zh">← 产出</span></span> <span class="node">Outline Generation Attempt</span></li><li data-edge-ref=""><span class="rel"><span class="rel-en">←consumes—</span><span class="rel-zh">← 使用</span></span> <span class="node">Scene Generation</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">Output Alignment</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-054" title="打开原文位置">SU-054</button><button class="ref as-link" data-source-ref="SU-056" title="打开原文位置">SU-056</button><button class="ref as-link" data-source-ref="SU-062" title="打开原文位置">SU-062</button><button class="ref as-link" data-source-ref="SU-079" title="打开原文位置">SU-079</button></div></div>
   </div>
 </section>
 </article></div>
@@ -323,14 +324,14 @@
   
 <section class="focus-panel" data-focus-for="E-06" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-06</span> Context Receipt</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-06</span> Context Receipt</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Frozen Context</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Receipt / Availability / Consumption 不能互相替代</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-004" title="打开原文位置">SU-004</button><button class="ref as-link" data-source-ref="SU-012" title="打开原文位置">SU-012</button><button class="ref as-link" data-source-ref="SU-014" title="打开原文位置">SU-014</button><button class="ref as-link" data-source-ref="SU-057" title="打开原文位置">SU-057</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Frozen Context</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Receipt / Availability / Consumption 不能互相替代</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-004" title="打开原文位置">SU-004</button><button class="ref as-link" data-source-ref="SU-012" title="打开原文位置">SU-012</button><button class="ref as-link" data-source-ref="SU-014" title="打开原文位置">SU-014</button><button class="ref as-link" data-source-ref="SU-057" title="打开原文位置">SU-057</button></div></div>
   </div>
 </section>
 </article>
@@ -352,14 +353,14 @@
   
 <section class="focus-panel" data-focus-for="E-07" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-07</span> Context Availability</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-07</span> Context Availability</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Generation-facing Projection</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Receipt / Availability / Consumption 不能互相替代</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-004" title="打开原文位置">SU-004</button><button class="ref as-link" data-source-ref="SU-017" title="打开原文位置">SU-017</button><button class="ref as-link" data-source-ref="SU-018" title="打开原文位置">SU-018</button><button class="ref as-link" data-source-ref="SU-058" title="打开原文位置">SU-058</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Generation-facing Projection</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Receipt / Availability / Consumption 不能互相替代</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-004" title="打开原文位置">SU-004</button><button class="ref as-link" data-source-ref="SU-017" title="打开原文位置">SU-017</button><button class="ref as-link" data-source-ref="SU-018" title="打开原文位置">SU-018</button><button class="ref as-link" data-source-ref="SU-058" title="打开原文位置">SU-058</button></div></div>
   </div>
 </section>
 </article>
@@ -381,14 +382,14 @@
   
 <section class="focus-panel" data-focus-for="E-08" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-08</span> Context Consumption</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-08</span> Context Consumption</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Outline Generation Attempt</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Consumption ≠ Output Alignment</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Influence 不得作为第四级</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Receipt / Availability / Consumption 不能互相替代</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-004" title="打开原文位置">SU-004</button><button class="ref as-link" data-source-ref="SU-022" title="打开原文位置">SU-022</button><button class="ref as-link" data-source-ref="SU-023" title="打开原文位置">SU-023</button><button class="ref as-link" data-source-ref="SU-024" title="打开原文位置">SU-024</button><button class="ref as-link" data-source-ref="SU-085" title="打开原文位置">SU-085</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Outline Generation Attempt</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Consumption ≠ Output Alignment</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Context Influence 不得作为第四级</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Receipt / Availability / Consumption 不能互相替代</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-004" title="打开原文位置">SU-004</button><button class="ref as-link" data-source-ref="SU-022" title="打开原文位置">SU-022</button><button class="ref as-link" data-source-ref="SU-023" title="打开原文位置">SU-023</button><button class="ref as-link" data-source-ref="SU-024" title="打开原文位置">SU-024</button><button class="ref as-link" data-source-ref="SU-085" title="打开原文位置">SU-085</button></div></div>
   </div>
 </section>
 </article>
@@ -410,14 +411,14 @@
   
 <section class="focus-panel" data-focus-for="E-09" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-09</span> Output Alignment</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-09</span> Output Alignment</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context-shaped Outline Revision</span> · <span class="node">Scene Generation</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Consumption ≠ Output Alignment</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-010" title="打开原文位置">SU-010</button><button class="ref as-link" data-source-ref="SU-039" title="打开原文位置">SU-039</button><button class="ref as-link" data-source-ref="SU-078" title="打开原文位置">SU-078</button><button class="ref as-link" data-source-ref="SU-080" title="打开原文位置">SU-080</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context-shaped Outline Revision</span> · <span class="node">Scene Generation</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">Consumption ≠ Output Alignment</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-010" title="打开原文位置">SU-010</button><button class="ref as-link" data-source-ref="SU-039" title="打开原文位置">SU-039</button><button class="ref as-link" data-source-ref="SU-078" title="打开原文位置">SU-078</button><button class="ref as-link" data-source-ref="SU-080" title="打开原文位置">SU-080</button></div></div>
   </div>
 </section>
 </article></div>
@@ -443,14 +444,14 @@
   
 <section class="focus-panel" data-focus-for="E-10" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-10</span> Consumption ≠ Output Alignment</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-10</span> Consumption ≠ Output Alignment</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context Consumption</span> · <span class="node">Output Alignment</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-002" title="打开原文位置">SU-002</button><button class="ref as-link" data-source-ref="SU-008" title="打开原文位置">SU-008</button><button class="ref as-link" data-source-ref="SU-040" title="打开原文位置">SU-040</button><button class="ref as-link" data-source-ref="SU-079" title="打开原文位置">SU-079</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context Consumption</span> · <span class="node">Output Alignment</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-002" title="打开原文位置">SU-002</button><button class="ref as-link" data-source-ref="SU-008" title="打开原文位置">SU-008</button><button class="ref as-link" data-source-ref="SU-040" title="打开原文位置">SU-040</button><button class="ref as-link" data-source-ref="SU-079" title="打开原文位置">SU-079</button></div></div>
   </div>
 </section>
 </article>
@@ -472,14 +473,14 @@
   
 <section class="focus-panel" data-focus-for="E-11" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-11</span> Context Influence 不得作为第四级</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-11</span> Context Influence 不得作为第四级</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context Consumption</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-007" title="打开原文位置">SU-007</button><button class="ref as-link" data-source-ref="SU-032" title="打开原文位置">SU-032</button><button class="ref as-link" data-source-ref="SU-034" title="打开原文位置">SU-034</button><button class="ref as-link" data-source-ref="SU-084" title="打开原文位置">SU-084</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context Consumption</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-007" title="打开原文位置">SU-007</button><button class="ref as-link" data-source-ref="SU-032" title="打开原文位置">SU-032</button><button class="ref as-link" data-source-ref="SU-034" title="打开原文位置">SU-034</button><button class="ref as-link" data-source-ref="SU-084" title="打开原文位置">SU-084</button></div></div>
   </div>
 </section>
 </article>
@@ -501,14 +502,14 @@
   
 <section class="focus-panel" data-focus-for="E-12" hidden>
   <header class="focus-head">
-    <span class="focus-title">Focused Relations · <span class="eid">E-12</span> Receipt / Availability / Consumption 不能互相替代</span>
+    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">E-12</span> Receipt / Availability / Consumption 不能互相替代</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
   <div class="focus-cols">
-    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
-    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context Receipt</span> · <span class="node">Context Availability</span> · <span class="node">Context Consumption</span></li></ul></div>
-    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-005" title="打开原文位置">SU-005</button><button class="ref as-link" data-source-ref="SU-019" title="打开原文位置">SU-019</button><button class="ref as-link" data-source-ref="SU-025" title="打开原文位置">SU-025</button><button class="ref as-link" data-source-ref="SU-064" title="打开原文位置">SU-064</button></div></div>
+    <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">Context Receipt</span> · <span class="node">Context Availability</span> · <span class="node">Context Consumption</span></li></ul></div>
+    <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov"><button class="ref as-link" data-source-ref="SU-005" title="打开原文位置">SU-005</button><button class="ref as-link" data-source-ref="SU-019" title="打开原文位置">SU-019</button><button class="ref as-link" data-source-ref="SU-025" title="打开原文位置">SU-025</button><button class="ref as-link" data-source-ref="SU-064" title="打开原文位置">SU-064</button></div></div>
   </div>
 </section>
 </article></div>

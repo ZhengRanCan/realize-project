@@ -45,6 +45,28 @@ Finding 3
 > 却没有把 Framework Map 的"关系结构"作为主视觉展示出来。**
 > 所以这一刀切的是 Reading 的主视觉，而不是继续加图形或修样式。
 
+### Round 0 → Round 0.5 · UI polish（做完即冻结 UI）
+
+用户在看过 Phase 4.1 之后确认：**"已经不是信息架构还不对，而是进入纯 UI polish 阶段了"**——
+新版与上一版是质变（D 的 13 element / 12 edge 直接成为 node-edge 图），所以**不再改结构设计**，
+只做四件小事，然后冻结 UI、正式跑 Track A：
+
+```text
+① 顶部设计原则 → ⓘ 如何阅读这张图（默认折叠）；第一屏：文档定位 → Framework Map
+② Reading 关系词中文化（使用/产出/依赖/…），Contract 与 Review 保留原词
+③ 标题 1 行 + 副标题 2 行 + hover 看全文；长列表压成"前两项 … 共 N 项"
+④ ⚑ N 条约束 · 关联关系 / 来自 / 指向 / 约束 / 出处（Reading 专用）
+```
+
+冻结清单（不再动）：layout 算法 / Contract ontology / **不为"D 缺 Task 节点"补 UI 节点** /
+constraint 不回到大卡片 / Topic 不重新展开 / 不加新交互。
+
+> 用户对 D 的判断（直接进入 Track A 的理由）：
+> **Task 没有独立节点、PlanBundle 只写着 `Plan + Stage[] + Task[]`、12 条 edge 里也没有 Task dependency ——
+> 这正是生成侧缺陷。UI 应该诚实地让它看起来就是缺了一块，而不是帮生成模型修答案。**
+
+---
+
 ### 这一轮顺带暴露的三个实现问题（都不是"样式问题"）
 
 ```text

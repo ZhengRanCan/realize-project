@@ -512,6 +512,10 @@ async function runSelfTest() {
           out.topics = document.querySelectorAll('.topic-entry').length;
           out.hasTopicNav = !!document.getElementById('topic-nav');
           out.topicsOpen = document.querySelectorAll('.topic-fold[open]').length; // 默认不展开
+          out.howtoOpen = document.querySelectorAll('.l0-howto[open]').length;    // Phase 4.1 polish：说明默认折叠
+          out.legendHasEngineeringWords = /Focused Relations|constraints/.test((document.querySelector('#l0-reading .l0-legend') || {}).textContent || '');
+          out.edgeLabelTexts = [...document.querySelectorAll('#l0-reading text.l0-edge-label')].map((t) => t.textContent.trim());
+          out.edgeTypesRaw = [...document.querySelectorAll('#l0-reading text.l0-edge-label')].map((t) => t.getAttribute('data-edge-type'));
           out.focusPanels = document.querySelectorAll('.focus-panel').length;
           out.factsElementCount = res.viewModel.facts.elementCount;
           out.factsEdgeCount = res.viewModel.facts.edgeCount;
@@ -526,6 +530,13 @@ async function runSelfTest() {
           out.focusSlotFilled = !!(slot && slot.children.length > 0);
           out.visibleFocusPanels = [...document.querySelectorAll('.focus-panel')].filter((p) => !p.hidden).length;
           out.dimmed = document.querySelectorAll('.is-dim').length;
+          // ③b Phase 4.1 polish：下钻面板在 Reading 下必须是中文术语（Review 仍是英文原词）
+          out.slotZhVisible = !!slot && !!slot.querySelector('.lbl-zh') && getComputedStyle(slot.querySelector('.lbl-zh')).display !== 'none';
+          out.slotEnHidden = !!slot && !!slot.querySelector('.lbl-en') && getComputedStyle(slot.querySelector('.lbl-en')).display === 'none';
+          out.slotEidHidden = (() => {
+            const eid = slot && slot.querySelector('.eid');
+            return !eid || getComputedStyle(eid).display === 'none';
+          })();
           // ④ 从下钻面板里点 provenance → openSource(ref)（节点 → details → 原文，这才是新设计的链路）
           const refBtn = (slot && slot.querySelector('[data-source-ref]')) || document.querySelector('[data-source-ref]');
           out.ref = refBtn ? refBtn.getAttribute('data-source-ref') : null;
@@ -587,6 +598,22 @@ async function runSelfTest() {
           ok(`L0 集成：Reading 不显示机器 ID（${seam.readingEids} 个 .eid）· Topic 默认折叠（${seam.topicsOpen} 个展开）`);
         } else {
           fail(`L0 集成：Reading 混入了工程 metadata（eid=${seam.readingEids}）或 Topic 默认展开了 ${seam.topicsOpen} 个`);
+        }
+        // Phase 4.1 polish：关系词说人话（原词仍在 data-edge-type 里），顶部说明默认折叠
+        {
+          const RAW = ['consumes', 'produces', 'depends-on', 'relates-to', 'contains', 'validates'];
+          const leaked = (seam.edgeLabelTexts || []).filter((t) => RAW.includes(t.replace(/\s*↺$/, '')));
+          if (seam.howtoOpen === 0 && !seam.legendHasEngineeringWords && leaked.length === 0
+              && (seam.edgeTypesRaw || []).length === f.edgeCount) {
+            ok(`L0 集成：Reading 的关系词已产品化（${(seam.edgeLabelTexts || []).slice(0, 3).join('/')}；原词共 ${seam.edgeTypesRaw.length} 份保留在 data-edge-type）· 顶部说明默认折叠`);
+          } else {
+            fail(`L0 集成：术语未产品化（howtoOpen=${seam.howtoOpen} legend=${seam.legendHasEngineeringWords} 泄漏=${leaked.join(',')} raw=${(seam.edgeTypesRaw || []).length}）`);
+          }
+        }
+        if (seam.slotZhVisible && seam.slotEnHidden && seam.slotEidHidden) {
+          ok('L0 集成：Reading 下钻面板用中文术语（关联关系/来自/指向/约束/出处），英文与机器 ID 只在 Review');
+        } else {
+          fail(`L0 集成：下钻面板术语切换异常（zh=${seam.slotZhVisible} enHidden=${seam.slotEnHidden} eidHidden=${seam.slotEidHidden}）`);
         }
         if (seam.dataView === 'reading' && seam.reviewHiddenInReading) {
           ok('L0 集成：默认 Reading View，且 Review 整块在 Reading 下被隐藏（数据仍在 DOM）');

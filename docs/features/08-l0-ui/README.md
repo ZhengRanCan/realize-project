@@ -135,9 +135,43 @@ Phase 4.1 Relationship-first Reading View ✅ 完成（Track A Round 0 裁决后
 作为 attachment 且有宿主的约束降级为宿主节点上的 `⚑ N constraints` 角标，展开才列出。
 它仍然是正式语义，只是视觉低一级；这与 F10 已发现的 **Constraint Composition / Compression Gap** 一致。
 
-### 明确没改（硬约束）
+### 4.1.1 UI Polish（Round 0 之后的最后一轮，然后冻结 UI）
+
+用户裁决：**"现在已经不是信息架构还不对，而是进入纯 UI polish 阶段了"** —— 只做四件事，
+做完就冻结 UI、正式跑 Track A，不再进入新一轮大改版。
 
 ```text
+1. 顶部那段"设计原则"折叠成 ⓘ 如何阅读这张图（默认收起）
+   第一屏顺序：文档定位 → Framework Map（不再让用户先读 renderer 说明）
+   图例只剩角标含义（◇ 数据 / ▶ 流程 / ⚑ 约束），"节点 = element" 这类话移入折叠区
+2. Reading 的关系词显示层中文化（纯 UI terminology，Contract 一个词没改）
+   consumes→使用  produces→产出  depends-on→依赖  contains→包含  validates→校验
+   controls→控制  constrains→约束  transforms-to→转换为  relates-to→关联
+   原始词保留在 data-edge-type 与 Review View；未知 relation 一律原样显示（不硬翻）
+3. 节点文字收敛：标题 1 行（ellipsis）+ 副标题 2 行 + hover/focus 看全文
+   长列表副标题压成「前两项 … 共 N 项」；范围前缀（`F13–F16 …`）只在 Reading 标题上去掉
+   （原文 / tooltip / Review 全部保留全称）
+4. 残留工程词产品化（Reading 专用，Review 保持英文与机器字段）
+   ⚑ 2 constraints → ⚑ 2 条约束
+   Focused Relations → 关联关系 · Incoming → 来自 · Outgoing → 指向 · Attached → 约束 · Provenance → 出处
+```
+
+中英切换靠 CSS 双标签（`.lbl-en/.lbl-zh`、`.rel-en/.rel-zh` + `[data-view]`），
+**不复制面板、不加交互**；`.l0-root[data-view="reading"] .eid { display: none }` 让 Reading 里任何机器 ID 都不出现。
+
+### 冻结清单（UI polish 之后不再动）
+
+```text
+❌ 不再换 layout 算法（app/renderer/l0-layout.js 视为冻结）
+❌ 不再调整 Contract ontology
+❌ 不为"D 缺 Task 节点"在 UI 层补节点 —— UI 要诚实显示"缺了一块"，不帮生成模型修答案
+❌ 不让 constraint 重新变成大卡片
+❌ 不重新展开 Topic Navigation
+❌ 不再增加新交互
+```
+
+```text
+（Phase 4.1 全程未碰）
 ❌ Contract / schema / check-map        ❌ view model 语义（l0-view-model.js 未改）
 ❌ F10 的 prompt / runner / 两阶段流程   ❌ validator
 ❌ Focused Relations / provenance 能力（原地复用，成为 Reading 的下钻面板）
