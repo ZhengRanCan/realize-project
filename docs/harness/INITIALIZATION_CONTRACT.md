@@ -19,7 +19,8 @@ npm start       # 启动应用；首屏点「打开 fixture」进入方案总览
 | L1 static | `npm run validate` | fixture 的 Schema 校验 + 一致性检查 |
 | L1 static | `npm run audit` | 覆盖审计：原文每节被引用、每条 Decision 能关联 |
 | L1 static | `npm run check:docs` | 文档引用检查：markdown 里指向仓库内文件的路径是否真实存在 |
-| L2 feature | `npm run test:all` | 全部离线单元测试：`test:plan`、`test:block`、`test:map`、`test:ai-map`、`test:grounding`、`test:l0`、`test:docs` |
+| L1 static | `npm run check:experiments` | `experiments/index.json`（逐 run 归属表）与实验产物是否一致 |
+| L2 feature | `npm run test:all` | 全部离线单元测试与索引校验：`test:plan`、`test:block`、`test:map`、`test:ai-map`、`test:grounding`、`test:l0`、`check:docs`、`check:experiments` |
 | L3 system | `npm run check-overview` | 装配后的 overview 是否合格（覆盖率 / provenance / 段落结构） |
 | L3 system | `npm run verify-preview` | 在真实 renderer 里渲染静态 Preview 并断言 |
 | L3 system | `npm run selftest` | Electron 渲染进程内跑通导入 → 两页渲染 → 审批 → 保存 → Gate，然后退出 |
@@ -33,6 +34,14 @@ npm start       # 启动应用；首屏点「打开 fixture」进入方案总览
 | --- | --- |
 | `npm run ai:plan` / `npm run ai:block` / `npm run ai:framework-map` | 会调用外部模型，凭据按 `CONSTRAINTS.md` 解析；不参与任何标准验证流程 |
 | `npm run f10:run` | F10 的两阶段实验运行器；同样消耗额度，不可作为验收证据 |
+
+### 只读的维护命令（不产生模型调用）
+
+| Command | Note |
+| --- | --- |
+| `npm run index:experiments` | 重建 `experiments/index.json`（逐 run → feature 的归属表） |
+| `npm run check:experiments` | 校验该索引是否与现状漂移；改动了 `experiments/` 之后必须重跑 |
+| `npm run source` | 从被审 Markdown 重新切分 `docs/source-sections.json`（供 Source 回查） |
 
 ## 受限环境（沙箱 / CI）
 
@@ -58,4 +67,5 @@ npm run validate && npm run audit
 npm run check-overview
 npm run selftest          # 不需要手工点击 GUI
 npm run verify:harness    # 只在动 harness 元数据时需要
+npm run check:docs && npm run check:experiments   # 文档引用与实验索引是否仍然自洽
 ```

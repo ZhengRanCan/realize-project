@@ -28,7 +28,7 @@
 | 查某个跨 feature、难以逆转的决策为什么这么定 | `docs/decisions.md` |
 | 查形状词汇表、framework-map 契约、Overview 覆盖标准 | `docs/specs/{shape-catalog,framework-map-contract,overview-coverage}.md` |
 | 查某个 feature 的需求、结论与验收证据 | `docs/log/artifacts/Fxx-*/`（先看 `brief.md`、`verification-summary.md`） |
-| 查原始实验 run（什么参数下生成了什么、失败留下了什么） | `experiments/README.md` |
+| 查原始实验 run（什么参数下生成了什么、失败留下了什么） | `experiments/README.md` + `experiments/index.json`（逐 run → feature 的归属表） |
 | 找回规范化之前的旧路径 | `docs/README.md` 的 Path mapping |
 | 记录真实缺陷或用户返工反馈 | `docs/harness/incidents/`；可复用经验进 `docs/harness/lessons.jsonl` |
 | 看形状探索原型、背景材料、改进建议 | `docs/prototypes/`、`docs/notes/` |
@@ -90,10 +90,11 @@
 ## 常用命令
 
 ```bash
-npm run test:all          # 离线单元测试（零模型调用）
-npm run selftest          # Electron 真实渲染进程内跑通整条链路
-npm run verify:harness    # feature 合同与证据元数据门禁
-npm run check:docs        # 文档引用检查
+npm run test:all            # 离线单元测试 + 文档/实验索引校验（零模型调用）
+npm run selftest            # Electron 真实渲染进程内跑通整条链路
+npm run verify:harness      # feature 合同与证据元数据门禁
+npm run check:docs          # 文档引用检查
+npm run check:experiments   # experiments 索引漂移检查（动了 experiments/ 之后必须跑）
 ```
 
 完整的初始化步骤与分层验证命令见 `docs/harness/INITIALIZATION_CONTRACT.md`。

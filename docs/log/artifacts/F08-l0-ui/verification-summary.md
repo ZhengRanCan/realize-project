@@ -54,3 +54,11 @@
 
 - `npm run verify:harness` 结果见 `docs/progress.md` 的 "Latest harness gate" 一行。
 - F08 状态为 `active`（index 与合同 frontmatter 一致），故不触发 `passing` 的额外 gate 约束。
+
+## 实验产物
+
+`experiments/l0-ui/*.html` 共 **6 份预览**，逐条登记在 `experiments/index.json`（`areas.l0-ui`，带 fixture 字母）：
+`preview-a`、`preview-d`、`preview-d-overbudget`、`preview-d-selfloop`、`preview-e`、`preview-e-human`。
+
+它们是 `npm run l0:preview` 的产物；输入 map 来自 F04 / F05 / F09 的 drafts（对应关系见 `experiments/index.json` 的
+`fixtureContext`）。索引与校验：`npm run index:experiments` / `npm run check:experiments`。

@@ -24,7 +24,7 @@ docs/
 | `docs/specs/**` | 被代码与校验器引用的**判断层**规格（shape 词汇表、framework-map 契约、Overview 覆盖标准） | 阶段计划与任务书 |
 | `docs/notes/**` | 背景材料、讨论稿、改进建议 | 任何被代码或校验器依赖的规则 |
 | `docs/log/artifacts/Fxx-*/` | 该 feature 的验收证据、历史任务书与结果 | 下一个 feature 的上下文 |
-| `experiments/**` | 原始 run 产物与实验报告 | 产品运行时会读取的数据 |
+| `experiments/**` | 原始 run 产物与实验报告（逐 run → feature 的归属表见 `experiments/index.json`） | 产品运行时会读取的数据 |
 
 `docs/source-sections.json` 是唯一的例外：它由 `npm run source` 生成，但 `app/main/main.js` 与多个
 `scripts/check-*.js` 直接按这个路径读取，因此**保留在 `docs/` 根目录**，不迁进 `docs/specs/`。

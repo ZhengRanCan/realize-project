@@ -41,3 +41,13 @@
 ## Harness layer
 
 - `npm run verify:harness` 结果见 `docs/progress.md` 的 "Latest harness gate" 一行。
+
+## 实验产物
+
+本 feature 的实验 run 逐条登记在 `experiments/index.json`（`areas.stage2`、`areas.stage2-full`，共 35 units）：
+
+- `experiments/stage2/`：8 个 block 试点产物 + `_first-attempt-failures/` 的 4 个首次失败尝试 + `pilot-summary.json`
+- `experiments/stage2-full/`：`blocks/` 21 个 block + `_before-fix/{O-05,O-08}`，顶层 `manifest.json`、
+  `overview.generated.json`、`overview-preview.html`、`check-overview.txt`、`full-run-report.md`
+
+索引与校验：`npm run index:experiments` / `npm run check:experiments`；归属依据与 fixture 对应见 `experiments/README.md`。

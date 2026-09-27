@@ -47,6 +47,7 @@ Harness gate: 9 features, 0 errors.
 | `scripts/test-l0-preview.js` | 127/127（7 份预览；材料里记为 51/51 与 119，两个旧值仍保留在证据文件里） |
 | `npm run verify:harness` | 9 features, 0 errors |
 | `npm run check:docs` | 69 markdown files checked, 0 broken |
+| `npm run check:experiments` | 66 units + 17 artifacts, up to date |
 
 `scripts/test-check-plan.js` 在受限沙箱里无法运行（它用 `execFileSync` 捕获子进程管道输出，
 每个用例都拿到空结果）；`scripts/check-plan.js` 直接调用时退出码为 0，见

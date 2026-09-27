@@ -71,3 +71,11 @@
 - `npm run verify:harness` 结果见 `docs/progress.md` 的 "Latest harness gate" 一行（2026-09-27，主 agent 收口时执行）。
 - 本 feature 为 `blocked`，`knownUnverified` 与 `humanReviewRequired` 均**非空**（见合同 frontmatter）；
   在 PARTIAL PASS 的处置被登记之前不得改为 `passing`。
+
+## 实验产物
+
+`experiments/semantic-grounding/fixture-{d,e}/run-NN/` 共 **15 个 run**（d 4 个 + e 11 个），逐条登记在
+`experiments/index.json`（`perFeature.F10`，带 `stages` / `status` / `validator` / `fixture`）。
+
+注意 `fixture-e/run-02` **没有 `run-meta.json`**（Stage B 被 kill），索引里它的 `provenance` 记作 `stage-trace` ——
+这是本区域唯一无法机读状态与参数的 run。索引与校验：`npm run index:experiments` / `npm run check:experiments`。

@@ -1,0 +1,1283 @@
+{
+  "generator": "scripts/index-experiments.js",
+  "note": "本文件由脚本生成：npm run index:experiments；用 npm run check:experiments 校验是否漂移。",
+  "areaFeature": {
+    "framework-map-generation": "F07",
+    "semantic-grounding": "F10",
+    "stage2": "F01",
+    "stage2-full": "F01",
+    "l0-ui": "F08",
+    "reports": "baseline"
+  },
+  "areaNote": {
+    "framework-map-generation": "scripts/generate-framework-map.js 的逐 run 产物（prompt ai/framework-map-generation.prompt.md）",
+    "semantic-grounding": "scripts/run-semantic-grounding.js 的两阶段 run（Stage A inventory → Stage B map）",
+    "stage2": "Stage 2 pilot：6 个 block 的试点产物与首次失败尝试，F01 问题清单的来源",
+    "stage2-full": "Stage 2 全量 run：21 个 block + 修复前快照，F01 的修复对象",
+    "l0-ui": "scripts/build-l0-preview.js 生成的 L0 静态预览",
+    "reports": "F 系列之前的 Stage 1 计划对比报告（MVP / Phase 1 基线）"
+  },
+  "fixtureContext": {
+    "a": "Fixture A · Context Consumption（最早样本，F03/F04 的语境）",
+    "b": "Fixture B · Data Model heavy（F05 跨文档类型验证）",
+    "c": "Fixture C · Process / Operational heavy（F05 跨文档类型验证）",
+    "d": "Fixture D · Goal/Plan/Task 状态模型（F09 资格选择，F10 复测）",
+    "e": "Fixture E · F13–F16 售后 runbook（F09 资格选择，F10 复测）"
+  },
+  "perFeature": {
+    "F01": {
+      "units": 35,
+      "artifactFiles": 6,
+      "areas": [
+        "stage2",
+        "stage2-full"
+      ]
+    },
+    "F07": {
+      "units": 16,
+      "artifactFiles": 0,
+      "areas": [
+        "framework-map-generation"
+      ]
+    },
+    "F08": {
+      "units": 0,
+      "artifactFiles": 6,
+      "areas": [
+        "l0-ui"
+      ]
+    },
+    "F10": {
+      "units": 15,
+      "artifactFiles": 0,
+      "areas": [
+        "semantic-grounding"
+      ]
+    },
+    "baseline": {
+      "units": 0,
+      "artifactFiles": 5,
+      "areas": [
+        "reports"
+      ]
+    }
+  },
+  "areas": {
+    "framework-map-generation": {
+      "feature": "F07",
+      "note": "scripts/generate-framework-map.js 的逐 run 产物（prompt ai/framework-map-generation.prompt.md）",
+      "units": [
+        "experiments/framework-map-generation/fixture-a/run-02",
+        "experiments/framework-map-generation/fixture-a/run-03",
+        "experiments/framework-map-generation/fixture-a/run-04",
+        "experiments/framework-map-generation/fixture-a/run-05",
+        "experiments/framework-map-generation/fixture-b/run-01",
+        "experiments/framework-map-generation/fixture-b/run-02",
+        "experiments/framework-map-generation/fixture-b/run-03",
+        "experiments/framework-map-generation/fixture-c/run-01",
+        "experiments/framework-map-generation/fixture-c/run-02",
+        "experiments/framework-map-generation/fixture-c/run-03",
+        "experiments/framework-map-generation/fixture-d/run-01",
+        "experiments/framework-map-generation/fixture-d/run-02",
+        "experiments/framework-map-generation/fixture-d/run-03",
+        "experiments/framework-map-generation/fixture-e/run-01",
+        "experiments/framework-map-generation/fixture-e/run-02",
+        "experiments/framework-map-generation/fixture-e/run-03"
+      ],
+      "artifactFiles": []
+    },
+    "l0-ui": {
+      "feature": "F08",
+      "note": "scripts/build-l0-preview.js 生成的 L0 静态预览",
+      "units": [],
+      "artifactFiles": [
+        {
+          "path": "l0-ui/preview-a.html",
+          "fixture": "a"
+        },
+        {
+          "path": "l0-ui/preview-d-overbudget.html",
+          "fixture": "d"
+        },
+        {
+          "path": "l0-ui/preview-d-selfloop.html",
+          "fixture": "d"
+        },
+        {
+          "path": "l0-ui/preview-d.html",
+          "fixture": "d"
+        },
+        {
+          "path": "l0-ui/preview-e-human.html",
+          "fixture": "e"
+        },
+        {
+          "path": "l0-ui/preview-e.html",
+          "fixture": "e"
+        }
+      ]
+    },
+    "reports": {
+      "feature": "baseline",
+      "note": "F 系列之前的 Stage 1 计划对比报告（MVP / Phase 1 基线）",
+      "units": [],
+      "artifactFiles": [
+        {
+          "path": "reports/stage1-run-4-5-manifest.json"
+        },
+        {
+          "path": "reports/stage1-run-4-5-report.md"
+        },
+        {
+          "path": "reports/stage1-run-manifest.json"
+        },
+        {
+          "path": "reports/stage1-run-report.md"
+        },
+        {
+          "path": "reports/stage2-pilot-report.md"
+        }
+      ]
+    },
+    "semantic-grounding": {
+      "feature": "F10",
+      "note": "scripts/run-semantic-grounding.js 的两阶段 run（Stage A inventory → Stage B map）",
+      "units": [
+        "experiments/semantic-grounding/fixture-d/run-01",
+        "experiments/semantic-grounding/fixture-d/run-02",
+        "experiments/semantic-grounding/fixture-d/run-03",
+        "experiments/semantic-grounding/fixture-d/run-04",
+        "experiments/semantic-grounding/fixture-e/run-01",
+        "experiments/semantic-grounding/fixture-e/run-02",
+        "experiments/semantic-grounding/fixture-e/run-03",
+        "experiments/semantic-grounding/fixture-e/run-04",
+        "experiments/semantic-grounding/fixture-e/run-05",
+        "experiments/semantic-grounding/fixture-e/run-06",
+        "experiments/semantic-grounding/fixture-e/run-07",
+        "experiments/semantic-grounding/fixture-e/run-08",
+        "experiments/semantic-grounding/fixture-e/run-09",
+        "experiments/semantic-grounding/fixture-e/run-10",
+        "experiments/semantic-grounding/fixture-e/run-11"
+      ],
+      "artifactFiles": []
+    },
+    "stage2": {
+      "feature": "F01",
+      "note": "Stage 2 pilot：6 个 block 的试点产物与首次失败尝试，F01 问题清单的来源",
+      "units": [
+        "experiments/stage2/O-03",
+        "experiments/stage2/O-04",
+        "experiments/stage2/O-07",
+        "experiments/stage2/O-08",
+        "experiments/stage2/O-10",
+        "experiments/stage2/O-10b",
+        "experiments/stage2/O-11b",
+        "experiments/stage2/O-12",
+        "experiments/stage2/_first-attempt-failures/O-03-provenance",
+        "experiments/stage2/_first-attempt-failures/O-04",
+        "experiments/stage2/_first-attempt-failures/O-04-structural",
+        "experiments/stage2/_first-attempt-failures/O-07"
+      ],
+      "artifactFiles": [
+        {
+          "path": "stage2/pilot-summary.json"
+        }
+      ]
+    },
+    "stage2-full": {
+      "feature": "F01",
+      "note": "Stage 2 全量 run：21 个 block + 修复前快照，F01 的修复对象",
+      "units": [
+        "experiments/stage2-full/_before-fix/O-05",
+        "experiments/stage2-full/_before-fix/O-08",
+        "experiments/stage2-full/blocks/O-01",
+        "experiments/stage2-full/blocks/O-02",
+        "experiments/stage2-full/blocks/O-03",
+        "experiments/stage2-full/blocks/O-04",
+        "experiments/stage2-full/blocks/O-04b",
+        "experiments/stage2-full/blocks/O-04c",
+        "experiments/stage2-full/blocks/O-05",
+        "experiments/stage2-full/blocks/O-06",
+        "experiments/stage2-full/blocks/O-07",
+        "experiments/stage2-full/blocks/O-08",
+        "experiments/stage2-full/blocks/O-09",
+        "experiments/stage2-full/blocks/O-10",
+        "experiments/stage2-full/blocks/O-10b",
+        "experiments/stage2-full/blocks/O-10c",
+        "experiments/stage2-full/blocks/O-11",
+        "experiments/stage2-full/blocks/O-11b",
+        "experiments/stage2-full/blocks/O-12",
+        "experiments/stage2-full/blocks/O-13",
+        "experiments/stage2-full/blocks/O-14",
+        "experiments/stage2-full/blocks/O-15",
+        "experiments/stage2-full/blocks/O-16"
+      ],
+      "artifactFiles": [
+        {
+          "path": "stage2-full/check-overview.txt"
+        },
+        {
+          "path": "stage2-full/full-run-report.md"
+        },
+        {
+          "path": "stage2-full/manifest.json"
+        },
+        {
+          "path": "stage2-full/overview-preview.html"
+        },
+        {
+          "path": "stage2-full/overview.generated.json"
+        }
+      ]
+    }
+  },
+  "unitCount": 66,
+  "artifactFileCount": 17,
+  "units": [
+    {
+      "path": "experiments/framework-map-generation/fixture-a/run-02",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "a",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-a/run-03",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "a",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-a/run-04",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "a",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-a/run-05",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "a",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-b/run-01",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "b",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-b/run-02",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "b",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-b/run-03",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "b",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-c/run-01",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "c",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-c/run-02",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "c",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-c/run-03",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "c",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-d/run-01",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "d",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-d/run-02",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "d",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-d/run-03",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "d",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-e/run-01",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-e/run-02",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/framework-map-generation/fixture-e/run-03",
+      "area": "framework-map-generation",
+      "feature": "F07",
+      "files": 5,
+      "artifacts": [
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "status": "success",
+      "validator": "PASS",
+      "prompt": "ai/framework-map-generation.prompt.md",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-d/run-01",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 9,
+      "artifacts": [
+        "semantic-inventory.json",
+        "map-selection.json",
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "stages": [
+        "a",
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "d",
+      "stage": "both",
+      "status": "success",
+      "validator": "PASS",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-d/run-02",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 4,
+      "artifacts": [
+        "semantic-inventory.json",
+        "run-meta.json"
+      ],
+      "stages": [
+        "a"
+      ],
+      "provenance": "run-meta",
+      "fixture": "d",
+      "stage": "both",
+      "status": "stage-a-shape-invalid",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-d/run-03",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 4,
+      "artifacts": [
+        "semantic-inventory.json",
+        "run-meta.json"
+      ],
+      "stages": [
+        "a"
+      ],
+      "provenance": "run-meta",
+      "fixture": "d",
+      "stage": "both",
+      "status": "stage-a-shape-invalid",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-d/run-04",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 9,
+      "artifacts": [
+        "semantic-inventory.json",
+        "map-selection.json",
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "stages": [
+        "a",
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "d",
+      "stage": "both",
+      "status": "success",
+      "validator": "PASS",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-01",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 3,
+      "artifacts": [
+        "run-meta.json"
+      ],
+      "stages": [
+        "a"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "both",
+      "status": "stage-a-parse-failed",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-02",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 4,
+      "artifacts": [
+        "semantic-inventory.json"
+      ],
+      "stages": [
+        "a",
+        "b"
+      ],
+      "provenance": "stage-trace"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-03",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 3,
+      "artifacts": [
+        "run-meta.json"
+      ],
+      "stages": [
+        "a"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "both",
+      "status": "stage-a-parse-failed",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-04",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 6,
+      "artifacts": [
+        "semantic-inventory.json",
+        "run-meta.json"
+      ],
+      "stages": [
+        "a",
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "both",
+      "status": "stage-b-parse-failed",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-05",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 6,
+      "artifacts": [
+        "map-selection.json",
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "stages": [
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "b",
+      "status": "success",
+      "validator": "PASS",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-06",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 6,
+      "artifacts": [
+        "map-selection.json",
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "stages": [
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "b",
+      "status": "success",
+      "validator": "PASS",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-07",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 3,
+      "artifacts": [
+        "run-meta.json"
+      ],
+      "stages": [
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "b",
+      "status": "stage-b-parse-failed",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-08",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 6,
+      "artifacts": [
+        "map-selection.json",
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "stages": [
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "b",
+      "status": "success",
+      "validator": "PASS",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-09",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 4,
+      "artifacts": [
+        "semantic-inventory.json",
+        "run-meta.json"
+      ],
+      "stages": [
+        "a"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "a",
+      "status": "stage-a-only",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-10",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 6,
+      "artifacts": [
+        "map-selection.json",
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "stages": [
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "b",
+      "status": "success",
+      "validator": "PASS",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/semantic-grounding/fixture-e/run-11",
+      "area": "semantic-grounding",
+      "feature": "F10",
+      "files": 6,
+      "artifacts": [
+        "map-selection.json",
+        "framework-map.json",
+        "check-map.txt",
+        "run-meta.json"
+      ],
+      "stages": [
+        "b"
+      ],
+      "provenance": "run-meta",
+      "fixture": "e",
+      "stage": "b",
+      "status": "success",
+      "validator": "PASS",
+      "model": "deepseek-flash"
+    },
+    {
+      "path": "experiments/stage2/O-03",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "diff"
+    },
+    {
+      "path": "experiments/stage2/O-04",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "current-target-flow"
+    },
+    {
+      "path": "experiments/stage2/O-07",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "capability-matrix"
+    },
+    {
+      "path": "experiments/stage2/O-08",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "two-column-comparison"
+    },
+    {
+      "path": "experiments/stage2/O-10",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "ladder"
+    },
+    {
+      "path": "experiments/stage2/O-10b",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "checklist"
+    },
+    {
+      "path": "experiments/stage2/O-11b",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "combo"
+    },
+    {
+      "path": "experiments/stage2/O-12",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "walkthrough"
+    },
+    {
+      "path": "experiments/stage2/_first-attempt-failures/O-03-provenance",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "diff"
+    },
+    {
+      "path": "experiments/stage2/_first-attempt-failures/O-04",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 2,
+      "artifacts": [],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "current-target-flow"
+    },
+    {
+      "path": "experiments/stage2/_first-attempt-failures/O-04-structural",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "current-target-flow"
+    },
+    {
+      "path": "experiments/stage2/_first-attempt-failures/O-07",
+      "area": "stage2",
+      "feature": "F01",
+      "files": 2,
+      "artifacts": [],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "capability-matrix"
+    },
+    {
+      "path": "experiments/stage2-full/_before-fix/O-05",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "flow"
+    },
+    {
+      "path": "experiments/stage2-full/_before-fix/O-08",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "two-column-comparison"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-01",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "prose"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-02",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "ladder"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-03",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "diff"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-04",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "current-target-flow"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-04b",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "checklist"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-04c",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "matrix"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-05",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "flow"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-06",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "capability-matrix"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-07",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "capability-matrix"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-08",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "two-column-comparison"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-09",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "ladder"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-10",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "ladder"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-10b",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "checklist"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-10c",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "checklist"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-11",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "two-column-comparison"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-11b",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "combo"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-12",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "walkthrough"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-13",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "combo"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-14",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "checklist"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-15",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "checklist"
+    },
+    {
+      "path": "experiments/stage2-full/blocks/O-16",
+      "area": "stage2-full",
+      "feature": "F01",
+      "files": 4,
+      "artifacts": [
+        "block.generated.json",
+        "check-block.txt"
+      ],
+      "provenance": "request",
+      "prompt": "ai/stage2-blocks.prompt.md",
+      "model": "gpt-5.6-sol",
+      "shape": "flow"
+    }
+  ]
+}

@@ -69,3 +69,11 @@
   本轮为登记，不在本文件内重复粘贴输出。
 - 本 feature 标为 `blocked`，因此不要求 `knownUnverified` / `humanReviewRequired` 为空；
   这两组条目见 `docs/harness/features/individual_feature/F07-ai-framework-map-generation/feature.md`。
+
+## 实验产物
+
+`experiments/framework-map-generation/fixture-{a..e}/run-NN/` 共 **16 个 run**，逐条登记在 `experiments/index.json`
+（`perFeature.F07`；每个单元带 `fixture` / `status` / `validator` / `prompt` / `model`）。
+
+注意 `fixture-a/run-02` 用的是 `max_tokens = 32000`（flag bug），与其余 15 个 run 的 65536 不同 —— 引用统计数字时要分开看。
+索引与校验：`npm run index:experiments` / `npm run check:experiments`。
