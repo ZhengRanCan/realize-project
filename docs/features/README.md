@@ -65,7 +65,7 @@ XX-feature-name/
 | 07 | ai-framework-map-generation | **Executed**（Phase 1–4 完成；`Gate = PARTIAL PASS` —— Technical 15/15 PASS、Semantic 0/15） | DSH agent | 用户 | - |
 | 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |
 | 09 | contract-adversarial-test | **Completed / Closed**（Gate = PASS） | DSH agent | 用户 | 2026-09-26 |
-| 10 | semantic-grounding | **In Progress**（Phase 0/1 完成：parity audit + 两份 prompt + 两份 schema + 两阶段运行器 + 离线安全验证 48/48；D×3+E×3 待跑） | DSH agent | 用户 | - |
+| 10 | semantic-grounding | **Completed / Closed**（`Gate = PARTIAL PASS` —— 两阶段架构方向成立、E 侧机制保留成立；**D 侧核心基础关系 E3 未关闭**） | DSH agent | 用户 | 2026-09-26 |
 
 ## 创建新 Feature
 
