@@ -93,7 +93,7 @@ Phase 1  framework-map → view-model adapter            ✅ 完成（scripts/l0
 Phase 2  standalone HTML preview（Fixture D + E）      ✅ 完成（scripts/build-l0-preview.js）
 Phase 3  Electron L0 screen integration（一屏两区）     ✅ 第一版完成（第三个一级页面 · L0 框架图）
 Phase 4  交互：element / edge / topic / provenance     ✅ 第一版完成（selection / focus / Focused Relations）
-Phase 5  A–E regression（自动化 ✅ 34+60）· 人工 Track A ⬜ 待做
+Phase 5  A–E regression（自动化 ✅ 34+60 + Electron 集成 selftest ✅）· 人工 Track A ⬜ 待做
 ```
 
 > **Phase 3/4 第一版说明**：Electron 里新增第三个一级页面「L0 框架图」（与方案总览 / 决策清单并列），
@@ -102,8 +102,11 @@ Phase 5  A–E regression（自动化 ✅ 34+60）· 人工 Track A ⬜ 待做
 > **Focused Relations**；点 edge 同时聚焦两端并展开 qualifier / provenance；点 topic 高亮关联 elements
 > （无 element 也照常进入）；点 provenance 打开右侧 Source 面板对应章节；`清除选择` / `Esc` 回到 Overview。
 
-⚠️ **Electron L0 页面目前只有"能加载并渲染"的接线，还没有自动化 UI 断言**（预览侧的 60 条断言覆盖了同一份
-renderer 模块）。给 selftest 补 L0 断言属于 Phase 5 的收尾项。
+✅ **Electron L0 集成 selftest 已补**（`npm run selftest`，E fixture · 走 `l0:loadPath` 绕开原生选择器）：
+断言链路 `preload API → IPC → main.loadFrameworkMap → app.js mount → DOM`，并覆盖
+DOM 计数与 view model 一致（12 elements / 8 edges / 9 topics / 12 focus panels）、默认 Reading View
+（Review 区隐藏但数据仍在 DOM）、点 element → 焦点态 + Focused Relations、点 provenance → `openSource()`
+打开 Source 面板。**只测集成缝（integration seam）**，不做视觉回归 —— 视觉回归不在第一轮 Gate 内。
 
 ⚠️ 顺带改动一条**既有 selftest 断言**：`一级导航只有两个页面` → 同步为三个页面（加 L0 是有意的产品变更，
 不是回归）。`npm run selftest` 仍 PASSED。
@@ -152,7 +155,9 @@ Electron 只要算好 view model 并调用同一个 `renderL0MapHTML` / `mount` 
 scripts/l0-view-model.js          Phase 1 · 纯投影适配器（零推理）
 scripts/build-l0-preview.js       Phase 2 · 静态预览构建器（构建期 SSR）
 scripts/test-l0-view-model.js     回归：不丢 / 不裁 / 不改 / 不造 / 不崩（34 断言 · 28 份 map）
-scripts/test-l0-preview.js        验收：对生成的 HTML 断言（51 断言 · 6 份预览）
+scripts/test-l0-preview.js        验收：对生成的 HTML 断言（60 断言 · 6 份预览）
+app/main/main.js 的 selftest 块    集成：Electron 里 L0 页面真能加载 / 默认 Reading / 焦点与 provenance 可达
+docs/features/08-l0-ui/results/track-a-round1.md   人工 Track A 记录表（D + E · 待填）
 app/renderer/l0-map.js            deterministic renderer（双模）
 app/renderer/l0-map.css           样式（只有分区/卡片/列表，无暗示性视觉语法）
 experiments/l0-ui/preview-*.html  6 份预览（D / E / 自环 / 81元素 / A / E-human）
@@ -174,9 +179,11 @@ experiments/l0-ui/preview-*.html  6 份预览（D / E / 自环 / 81元素 / A / 
 ✅ renderer 不修改输入语义（输入文件 sha 前后一致）
 
 → A/B/C regression：5 fixtures → no crash → no semantic disappearance caused by renderer
-→ 人工 UX 检查（Track A）另行进行：
+→ Electron 集成：链路可用 + 默认 Reading + 焦点/provenance 可达（`npm run selftest`）✅
+→ 人工 UX 检查（Track A · 记录表：`results/track-a-round1.md`）：
    用户能否快速找到某机制？会不会点错 Topic？是否频繁回退？
-   D 的实体网络是否读得懂？E 的异常/人工路径是否看得到？
+   D · 测 reviewability（生成物缺 `Task --depends-on--> Task` 时，用户能否指出"是图的问题"）
+   E · 测 readability（bounded failure → REFUND_FAILED → force compensation → admin 边界，理想不用开原文）
 ```
 
 ---

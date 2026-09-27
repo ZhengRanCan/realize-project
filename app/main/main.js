@@ -469,6 +469,109 @@ async function runSelfTest() {
       fail(`仍有面板类元素: stat=${rendered.statCards} review=${rendered.reviewCards} gate=${rendered.gateCards}`);
     }
 
+    /* ── Feature 08 · L0 的 Electron 集成 seam ────────────────────────────
+     * 只测新接缝：preload API → IPC → main.loadFrameworkMap() → view model → L0Map.mount → DOM 交互。
+     * 不重复 renderer 自身的断言（那 60 条在 scripts/test-l0-preview.js，预览侧覆盖同一份模块）。
+     * 刻意绕开系统文件选择器（用 loadPath(knownFixture)），原生 picker 留给手工 smoke test。
+     * fixture 选 E：12 elements / 8 edges / attachments / state / constraint / 无 element Topic —— 够覆盖又不重。
+     */
+    try {
+      const l0Fixture = path.join(PROJECT_ROOT, 'experiments', 'semantic-grounding', 'fixture-e', 'run-08', 'framework-map.json');
+      const l0Loaded = await loadFrameworkMap(l0Fixture); // main 侧加载函数（IPC handler 用的同一个）
+      if (!l0Loaded.ok || !l0Loaded.viewModel) {
+        fail(`L0 加载失败: ${(l0Loaded.errors || []).join('; ')}`);
+      } else {
+        const f = l0Loaded.viewModel.facts;
+        const seam = await win.webContents.executeJavaScript(`(async () => {
+          const out = {};
+          // ① preload → IPC → main：走真实的 window.designReview.l0.loadPath
+          const res = await window.designReview.l0.loadPath(${JSON.stringify(l0Fixture)});
+          out.preloadOk = !!(res && res.ok && res.viewModel);
+          if (!out.preloadOk) return out;
+          // ② 注入 view model 并把视图切到 l0（模拟 loadL0() 之后的 render）
+          state.l0ViewModel = res.viewModel;
+          state.l0Path = res.mapPath;
+          state.l0View = 'reading';
+          state.view = 'l0';
+          render();
+          const root = document.querySelector('.l0-root');
+          out.mounted = !!root;
+          out.dataView = root ? root.getAttribute('data-view') : null;
+          out.title = root && root.querySelector('h1') ? root.querySelector('h1').textContent.trim() : null;
+          out.expectedTitle = res.viewModel.document.title;
+          out.elements = document.querySelectorAll('[data-element-id]').length;
+          out.edges = document.querySelectorAll('[data-focus-edge]').length;
+          out.topics = document.querySelectorAll('.topic-entry').length;
+          out.hasTopicNav = !!document.getElementById('topic-nav');
+          out.focusPanels = document.querySelectorAll('.focus-panel').length;
+          out.factsElementCount = res.viewModel.facts.elementCount;
+          out.factsEdgeCount = res.viewModel.facts.edgeCount;
+          out.factsTopicCount = res.viewModel.facts.topicCount;
+          out.reviewHiddenInReading = getComputedStyle(document.querySelector('.review-slot')).display === 'none';
+          // ③ 点一个 element → 焦点态 + Focused Relations
+          const card = document.querySelector('[data-element-id][data-focus-target]');
+          card.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          out.hasFocusClass = root.classList.contains('has-focus');
+          const slot = document.getElementById('l0-focus-slot');
+          out.focusSlotFilled = !!(slot && slot.children.length > 0);
+          out.visibleFocusPanels = [...document.querySelectorAll('.focus-panel')].filter((p) => !p.hidden).length;
+          out.dimmed = document.querySelectorAll('.is-dim').length;
+          // ④ 点 provenance → openSource(ref)（只确认调用到已有接口 + ref 正确，不测 Source 面板本身）
+          const refBtn = document.querySelector('[data-source-ref]');
+          out.ref = refBtn ? refBtn.getAttribute('data-source-ref') : null;
+          if (refBtn) refBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          await new Promise((r) => setTimeout(r, 150));
+          out.sourcePanelOpen = !document.getElementById('source-panel').classList.contains('hidden');
+          out.sourceHeadText = document.getElementById('source-head').textContent.trim();
+          // ⑤ 复原，保证后续断言仍在 overview 视图
+          closeSource();
+          state.view = 'overview';
+          state.l0ViewModel = null;
+          render();
+          // buildToc() 重建了 .toc-item，会把 .active 丢掉；而 setActiveBlock 在
+          // state.activeBlockId 未变时会提前 return → 高亮不会自己回来。
+          // 这里用产品自己的函数（清 id 再设）把"我在读哪一段"恢复成原状。
+          state.activeBlockId = null;
+          const firstBlock = document.querySelector('#main .block');
+          if (firstBlock && typeof setActiveBlock === 'function') setActiveBlock(firstBlock.dataset.blockId);
+          await new Promise((r) => setTimeout(r, 60));
+          out.restored = document.querySelector('.l0-root') === null;
+          return out;
+        })()`);
+
+        if (seam.preloadOk) ok('L0 集成：preload API → IPC → main.loadFrameworkMap 链路可用（window.designReview.l0.loadPath）');
+        else fail('L0 集成：preload/IPC 链路不可用');
+        if (seam.mounted && seam.title === seam.expectedTitle && seam.hasTopicNav) {
+          ok(`L0 集成：view model 被 app.js 接收并 mount（标题「${seam.title}」+ Topic Navigation）`);
+        } else {
+          fail(`L0 集成：mount 异常（mounted=${seam.mounted} title=${seam.title} nav=${seam.hasTopicNav}）`);
+        }
+        if (seam.elements === f.elementCount && seam.edges === f.edgeCount && seam.topics === f.topicCount && seam.focusPanels === f.elementCount) {
+          ok(`L0 集成：DOM 计数与 view model 一致（${seam.elements} elements / ${seam.edges} edges / ${seam.topics} topics / ${seam.focusPanels} focus panels）`);
+        } else {
+          fail(`L0 集成：DOM 计数不符（${seam.elements}/${seam.edges}/${seam.topics}/${seam.focusPanels} vs ${f.elementCount}/${f.edgeCount}/${f.topicCount}/${f.elementCount}）`);
+        }
+        if (seam.dataView === 'reading' && seam.reviewHiddenInReading) {
+          ok('L0 集成：默认 Reading View，且 Review 区在 Reading 下被隐藏（数据仍在 DOM）');
+        } else {
+          fail(`L0 集成：默认视图异常（data-view=${seam.dataView} reviewHidden=${seam.reviewHiddenInReading}）`);
+        }
+        if (seam.hasFocusClass && seam.focusSlotFilled && seam.visibleFocusPanels >= 1 && seam.dimmed > 0) {
+          ok(`L0 集成：点 element → 焦点态 + Focused Relations 出现（dim 降噪 ${seam.dimmed} 项）`);
+        } else {
+          fail(`L0 集成：焦点交互异常（focus=${seam.hasFocusClass} slot=${seam.focusSlotFilled} panels=${seam.visibleFocusPanels} dim=${seam.dimmed}）`);
+        }
+        if (seam.sourcePanelOpen && seam.ref && seam.sourceHeadText.includes(seam.ref)) {
+          ok(`L0 集成：点 provenance「${seam.ref}」→ 走到已有 openSource() 并打开 Source 面板`);
+        } else {
+          fail(`L0 集成：provenance 链路异常（open=${seam.sourcePanelOpen} ref=${seam.ref} head=${seam.sourceHeadText}）`);
+        }
+        if (!seam.restored) fail('L0 集成：测试后未复原到 overview 视图');
+      }
+    } catch (error) {
+      fail(`L0 集成检查抛错: ${error.message}`);
+    }
+
     // 方案总览 = 完整视觉重述：四段 + 全部区块 + 常驻目录
     const overview = await win.webContents.executeJavaScript(
       `(() => {

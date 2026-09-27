@@ -294,8 +294,11 @@ function renderL0MapHTML(vm, opts = {}) {
 function bindInteractions(root, opts = {}) {
   if (!root || root.__l0Bound) return;
   root.__l0Bound = true;
+  // mount() 的宿主可能是 #main（Electron），而状态 class 的 CSS 作用域是 `.l0-root`：
+  // 必须把 class 加到真正的 .l0-root 上，否则降噪/命中样式在 Electron 下不生效。
+  const stateRoot = root.classList && root.classList.contains('l0-root') ? root : (root.querySelector('.l0-root') || root);
   const clear = () => {
-    root.classList.remove('has-focus', 'focus-element', 'focus-edge', 'focus-topic');
+    stateRoot.classList.remove('has-focus', 'focus-element', 'focus-edge', 'focus-topic');
     root.querySelectorAll('[data-focus-for]').forEach((p) => { p.hidden = true; });
     root.querySelectorAll('.is-dim,.is-hit').forEach((n) => n.classList.remove('is-dim', 'is-hit'));
     const slot = root.querySelector('#l0-focus-slot');
@@ -307,7 +310,7 @@ function bindInteractions(root, opts = {}) {
 
   function focusElement(id) {
     clear();
-    root.classList.add('has-focus', 'focus-element');
+    stateRoot.classList.add('has-focus', 'focus-element');
     dimAll();
     const card = root.querySelector(`[data-focus-target="${id}"][data-element-id]`);
     const panel = root.querySelector(`[data-focus-for="${id}"]`);
@@ -331,7 +334,7 @@ function bindInteractions(root, opts = {}) {
 
   function focusEdge(row) {
     clear();
-    root.classList.add('has-focus', 'focus-edge');
+    stateRoot.classList.add('has-focus', 'focus-edge');
     dimAll();
     row.classList.remove('is-dim'); row.classList.add('is-hit');
     row.classList.add('is-open');
@@ -343,7 +346,7 @@ function bindInteractions(root, opts = {}) {
 
   function focusTopic(row) {
     clear();
-    root.classList.add('has-focus', 'focus-topic');
+    stateRoot.classList.add('has-focus', 'focus-topic');
     dimAll();
     row.classList.remove('is-dim'); row.classList.add('is-hit');
     (row.dataset.elementIds || '').split(',').filter(Boolean).forEach((id) => {

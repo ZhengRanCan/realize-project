@@ -13,7 +13,7 @@
 ✅ Phase 2  standalone HTML preview（D + E + 极端）   scripts/build-l0-preview.js
 ⬜ Phase 3  Electron L0 screen integration（一屏两区）
 ⬜ Phase 4  交互：element / edge / topic / provenance
-🟡 Phase 5  A–E regression（自动化部分已完成）· 人工视觉审阅待做
+🟡 Phase 5  A–E regression（自动化 + Electron 集成 selftest 已完成）· 人工 Track A 待做
 ```
 
 **前置条件（已核）**：① 契约与校验器可用（6 类 element / 9 个关系词 / edge 可选 id·label·qualifiers）
@@ -111,16 +111,16 @@ preview-e-human.html      E · 人类 candidate · 含 2 条 relationGap
 ```bash
 node scripts/test-l0-view-model.js    # 28 份 map：不丢 / 不裁 / 不改 / 不造 / 不崩
 node scripts/test-l0-preview.js       # 6 份预览：渲染完整性 + 标注正确性
+npm run selftest                      # Electron 集成缝：加载链路 / 默认 Reading / 焦点 / provenance
 ```
 
 ```text
 自动化：5 fixtures（A–E）+ 极端样本 → no crash → **no semantic disappearance caused by renderer**
-人工（Track A · 尚未进行）：
-  · 用户能否快速找到某机制？
-  · 会不会点错 Topic？
-  · 是否频繁回退？
-  · D 的实体网络是否读得懂？
-  · E 的异常 / 人工路径是否看得到？
+自动化（集成）：preload → IPC → main → app.js → DOM 全链路可用（**只测缝，不做视觉回归**）
+人工（Track A · 待做 · 记录表 `results/track-a-round1.md`）：
+  · D · reviewability：生成物缺基础关系时，用户能否指出"这是图的问题"而非"我不会用"
+  · E · readability：异常 → 状态 → 人工介入 → 权限边界，能否不开原文走完
+  · 公共 5 数据：耗时 / 答案正确性 / 点错的 Topic / 回退次数 / 是否开了原 Markdown + 一句"最难找的是什么"
 ```
 
 ---
