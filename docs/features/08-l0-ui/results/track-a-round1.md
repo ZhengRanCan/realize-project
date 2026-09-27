@@ -16,6 +16,11 @@
   E 用    experiments/semantic-grounding/fixture-e/run-08/framework-map.json
 默认视图   Reading（Review 需要手动切）
 手工 smoke（自动化刻意不做）：原生文件选择器、Source 面板的完整阅读
+
+> **2026-09-27 手工 smoke 记录（Track A 前置）**：第一次点「打开 framework-map.json」时，
+> 信息行显示"已加载"但**界面完全没有变化** —— 真实入口调了一个不存在的 `enterReview()` 并静默抛错。
+> 已修（`loadL0(path)` 成为唯一入口，含真实切屏），selftest 补了「真的切屏了」与「无 model 导航守卫」
+> 两条断言。**这是 Track A 之前必须修完的阻断项，不是 UI 打磨。**
 ```
 
 ---

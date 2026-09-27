@@ -117,6 +117,7 @@ npm run selftest                      # Electron 集成缝：加载链路 / 默�
 ```text
 自动化：5 fixtures（A–E）+ 极端样本 → no crash → **no semantic disappearance caused by renderer**
 自动化（集成）：preload → IPC → main → app.js → DOM 全链路可用（**只测缝，不做视觉回归**）
+  ⚠️ 必须调**真实入口** `loadL0(path)`：第一版手抄了状态切换，导致副本通过、真实按钮静默抛错。
 人工（Track A · 待做 · 记录表 `results/track-a-round1.md`）：
   · D · reviewability：生成物缺基础关系时，用户能否指出"这是图的问题"而非"我不会用"
   · E · readability：异常 → 状态 → 人工介入 → 权限边界，能否不开原文走完

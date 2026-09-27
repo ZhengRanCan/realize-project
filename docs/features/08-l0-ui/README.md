@@ -102,11 +102,18 @@ Phase 5  A–E regression（自动化 ✅ 34+60 + Electron 集成 selftest ✅�
 > **Focused Relations**；点 edge 同时聚焦两端并展开 qualifier / provenance；点 topic 高亮关联 elements
 > （无 element 也照常进入）；点 provenance 打开右侧 Source 面板对应章节；`清除选择` / `Esc` 回到 Overview。
 
-✅ **Electron L0 集成 selftest 已补**（`npm run selftest`，E fixture · 走 `l0:loadPath` 绕开原生选择器）：
+✅ **Electron L0 集成 selftest**（`npm run selftest`，E fixture · 走 `loadPath` 绕开原生选择器）：
 断言链路 `preload API → IPC → main.loadFrameworkMap → app.js mount → DOM`，并覆盖
-DOM 计数与 view model 一致（12 elements / 8 edges / 9 topics / 12 focus panels）、默认 Reading View
+**加载后真的切屏**（首屏隐藏 → Review 屏显示）、DOM 计数与 view model 一致
+（12 elements / 8 edges / 9 topics / 12 focus panels）、默认 Reading View
 （Review 区隐藏但数据仍在 DOM）、点 element → 焦点态 + Focused Relations、点 provenance → `openSource()`
-打开 Source 面板。**只测集成缝（integration seam）**，不做视觉回归 —— 视觉回归不在第一轮 Gate 内。
+打开 Source 面板、以及 **L0 可独立打开**（无 `design-review.json` 时切向总览/决策被挡住）。共 8 条断言。
+
+> **只测集成缝（integration seam）**，不做视觉回归。而且它必须调**真实入口** `loadL0(path)` ——
+> 这条规矩是踩出来的：selftest 第一版手抄了一遍"注入 view model + 切视图"的状态切换，
+> 于是手抄版是对的、真实按钮入口却调了一个不存在的 `enterReview()` 并静默抛错
+> （**自动化全绿，手工点「打开 framework-map.json」毫无反应**，信息行还照常显示"已加载"）。
+> 教训：**测试一旦复制产品逻辑，就只验证了副本**。现在 `loadL0(path)` 是唯一入口，按钮与测试调同一个函数。
 
 ⚠️ 顺带改动一条**既有 selftest 断言**：`一级导航只有两个页面` → 同步为三个页面（加 L0 是有意的产品变更，
 不是回归）。`npm run selftest` 仍 PASSED。

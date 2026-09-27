@@ -484,16 +484,16 @@ async function runSelfTest() {
         const f = l0Loaded.viewModel.facts;
         const seam = await win.webContents.executeJavaScript(`(async () => {
           const out = {};
-          // ① preload → IPC → main：走真实的 window.designReview.l0.loadPath
-          const res = await window.designReview.l0.loadPath(${JSON.stringify(l0Fixture)});
+          // ① 走**真实入口** loadL0(path)：preload → IPC → main.loadFrameworkMap
+          //    + 它自己做的首屏→Review 屏切换 + render()。之前这里手抄过这段状态切换，
+          //    结果手抄版对的、真实版调了不存在的 enterReview() 且静默抛错 —— 自动化全绿但按钮没用。
+          const res = await loadL0(${JSON.stringify(l0Fixture)});
           out.preloadOk = !!(res && res.ok && res.viewModel);
           if (!out.preloadOk) return out;
-          // ② 注入 view model 并把视图切到 l0（模拟 loadL0() 之后的 render）
-          state.l0ViewModel = res.viewModel;
-          state.l0Path = res.mapPath;
-          state.l0View = 'reading';
-          state.view = 'l0';
-          render();
+          // ② 真实屏切换发生了吗（这是那次 bug 直接违反的不变量）
+          out.reviewVisible = !document.getElementById('screen-review').classList.contains('hidden');
+          out.startHidden = document.getElementById('screen-start').classList.contains('hidden');
+          out.view = state.view;
           const root = document.querySelector('.l0-root');
           out.mounted = !!root;
           out.dataView = root ? root.getAttribute('data-view') : null;
@@ -525,6 +525,17 @@ async function runSelfTest() {
           out.sourceHeadText = document.getElementById('source-head').textContent.trim();
           // ⑤ 复原，保证后续断言仍在 overview 视图
           closeSource();
+          // ⑤ 首屏直开 L0（state.model 尚未加载）时，切到依赖 model 的页面必须被挡住
+          out.navGuard = (() => {
+            const savedModel = state.model;
+            state.model = null;
+            const btn = [...document.querySelectorAll('.nav-item')].find((b) => b.dataset.view === 'overview');
+            btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            const blocked = state.view === 'l0' && document.querySelector('.l0-root') !== null;
+            state.model = savedModel;
+            return blocked;
+          })();
+          // ⑥ 复原，保证后续断言仍在 overview 视图
           state.view = 'overview';
           state.l0ViewModel = null;
           render();
@@ -539,8 +550,13 @@ async function runSelfTest() {
           return out;
         })()`);
 
-        if (seam.preloadOk) ok('L0 集成：preload API → IPC → main.loadFrameworkMap 链路可用（window.designReview.l0.loadPath）');
+        if (seam.preloadOk) ok('L0 集成：preload API → IPC → main.loadFrameworkMap 链路可用（走真实入口 loadL0(path)）');
         else fail('L0 集成：preload/IPC 链路不可用');
+        if (seam.reviewVisible && seam.startHidden && seam.view === 'l0') {
+          ok('L0 集成：加载后真的切屏了（首屏隐藏 → Review 屏显示，view=l0）');
+        } else {
+          fail(`L0 集成：没有切屏（review=${seam.reviewVisible} startHidden=${seam.startHidden} view=${seam.view}）`);
+        }
         if (seam.mounted && seam.title === seam.expectedTitle && seam.hasTopicNav) {
           ok(`L0 集成：view model 被 app.js 接收并 mount（标题「${seam.title}」+ Topic Navigation）`);
         } else {
@@ -565,6 +581,11 @@ async function runSelfTest() {
           ok(`L0 集成：点 provenance「${seam.ref}」→ 走到已有 openSource() 并打开 Source 面板`);
         } else {
           fail(`L0 集成：provenance 链路异常（open=${seam.sourcePanelOpen} ref=${seam.ref} head=${seam.sourceHeadText}）`);
+        }
+        if (seam.navGuard) {
+          ok('L0 集成：L0 可独立打开 —— 无 design-review.json 时切向总览/决策被挡住（不进入空视图）');
+        } else {
+          fail('L0 集成：无 model 时导航守卫失效');
         }
         if (!seam.restored) fail('L0 集成：测试后未复原到 overview 视图');
       }

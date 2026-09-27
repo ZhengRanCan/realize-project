@@ -1040,21 +1040,39 @@ function viewL0() {
   });
 }
 
-async function loadL0() {
+/**
+ * 打开 L0 Framework Map —— **这是唯一入口**。
+ *   手工点按钮：loadL0()        → 走系统文件选择器
+ *   自动化/深链：loadL0(path)   → 直接给路径（selftest 用）
+ *
+ * ⚠️ 不许在别处复制这段状态切换。曾经复制过一次：selftest 里那份复制版是对的，
+ * 真实入口却调了一个不存在的 enterReview() 并静默抛错 —— 自动化全绿、手工点按钮毫无反应。
+ * 测试要覆盖这条缝，就只能调这个函数本身。
+ */
+async function loadL0(mapPath) {
   const api = window.designReview;
-  const res = await api.l0.openJson();
+  const res = mapPath ? await api.l0.loadPath(mapPath) : await api.l0.openJson();
   if (!res || !res.ok) {
-    if (res && res.canceled) return;
+    if (res && res.canceled) return null;
     window.alert(`加载 framework-map 失败：${(res && res.errors && res.errors[0]) || '未知错误'}`);
-    return;
+    return null;
   }
   state.l0ViewModel = res.viewModel;
   state.l0Path = res.mapPath;
   state.l0View = 'reading'; // 用户裁决：Reading 为默认
   if ($('#l0-info')) $('#l0-info').textContent = `已加载：${res.mapPath}${res.checkMapPath ? '（含 check-map 结论）' : ''}`;
-  enterReview();
+
+  // 与 design-review.json 加载路径一致的**真实屏切换**（首屏 → Review 屏）
+  $('#screen-start').classList.add('hidden');
+  $('#screen-review').classList.remove('hidden');
+  closeSource();
+
   state.view = 'l0';
   render();
+
+  const f = res.viewModel.facts;
+  toast(`已加载 L0 框架图：${f.elementCount} 个元素 / ${f.edgeCount} 条关系 / ${f.topicCount} 个 Topic`);
+  return res;
 }
 
 
@@ -1171,7 +1189,14 @@ function bindStartScreen() {
 function bindReviewScreen() {
   document.querySelectorAll('.nav-item').forEach((btn) => {
     btn.addEventListener('click', () => {
-      state.view = btn.dataset.view;
+      const next = btn.dataset.view;
+      // L0 可以**独立**打开（首屏直接开图，不必先加载 design-review.json）；
+      // 另外两页依赖 design-review.json —— 未加载时不要切到一个渲染不出来的空视图。
+      if (next !== 'l0' && !state.model) {
+        toast('请先在首屏加载「结构化分析结果」（design-review.json）', true);
+        return;
+      }
+      state.view = next;
       render();
     });
   });
@@ -1245,15 +1270,15 @@ function bindReviewScreen() {
       closeSource();
       return;
     }
-    if (key === 'g') {
+    if (key === 'g' || key === 'd') {
+      // 与导航同一守卫：L0 可以独立打开，另外两页需要 design-review.json
+      if (!state.model) {
+        event.preventDefault();
+        toast('请先在首屏加载「结构化分析结果」（design-review.json）', true);
+        return;
+      }
       event.preventDefault();
-      state.view = 'overview';
-      render();
-      return;
-    }
-    if (key === 'd') {
-      event.preventDefault();
-      state.view = 'decisions';
+      state.view = key === 'g' ? 'overview' : 'decisions';
       render();
       return;
     }

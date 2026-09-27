@@ -76,7 +76,7 @@
 - [ ] A–E 五份 fixture 全部 no crash
 - [ ] **renderer 导致的语义消失 = 0**（用第 3 节的计数断言证明）
 - [ ] 极端样本通过：81 elements · 自环 · 无主轴 · 无 element Topic · sourceUnit 粒度（A）
-- [x] Electron 集成 selftest 通过（加载链路 / 默认 Reading / 焦点 / provenance → Source）
+- [x] Electron 集成 selftest 通过（真实入口 loadL0(path) / 真的切屏 / 默认 Reading / 焦点 / provenance → Source / 无 model 导航守卫）
 - [ ] 人工 Track A（D + E）已记录 → `results/track-a-round1.md`
 
 ---
