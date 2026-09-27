@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L0 Framework Map · Goal / Plan / Stage / Task target model contract</title>
+<link rel="stylesheet" href="../../app/renderer/l0-map.css">
+</head><body>
+<div class="preview-banner">
+  <b>F08 · L0 Framework Map 预览</b>
+  <span>D 旧臂 · 含 task→task 自环（F07）</span>
+  <span class="mono">source: experiments/framework-map-generation/fixture-d/run-01/framework-map.json</span>
+  <span class="mono">check-map: experiments/framework-map-generation/fixture-d/run-01/check-map.txt</span>
+  <span>由 deterministic renderer 从 view model 生成；AI 未生成任何 HTML。</span>
+</div>
+
+<div class="l0-root" data-view="review">
+  <header class="l0-head">
+    <div class="l0-title">
+      <h1>Goal / Plan / Stage / Task target model contract</h1>
+      <div class="l0-sub mono">测试文档/fixture-d-goal-plan-task-state-model.md · level L0 · section (provisional) ⚠️ provisional</div>
+    </div>
+    <div class="l0-facts">
+      <span class="fact">elements <b>23</b> <span class="flag warn">&gt; budget 12（W1 · 只是 Warning，不裁剪）</span></span>
+      <span class="fact">edges <b>39</b></span>
+      <span class="fact">attachments <b>5</b></span>
+      <span class="fact">topics <b>15</b></span>
+      <span class="fact">relationGap <b>1</b></span>
+      <span class="fact">自环 <b>1</b></span>
+      <span class="fact">无 element 的 Topic <b>3</b></span>
+    </div>
+    <div class="l0-toggle" role="tablist">
+      <button class="tab " data-l0-view="reading">Reading View</button>
+      <button class="tab active" data-l0-view="review">Review View</button>
+    </div>
+  </header>
+
+  <p class="l0-principle">
+    <b>Layout organizes space; it does not create semantics.</b>
+    下面的分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系；
+    唯一正式的语义是 <code>edge</code> / <code>attachment</code> / <code>qualifier</code> —— 每条边都在「关系」区显式写出方向。
+  </p>
+
+  <div class="l0-body">
+    <main class="l0-main">
+      <section class="block">
+        <h2>核心结构（按 element.type 分区 · 23 个）</h2>
+        
+          <div class="type-group">
+            <div class="type-head">process <span class="muted">×2</span></div>
+            <div class="cards">
+<article class="card type-process" id="element-initialPlanning" data-element-id="initialPlanning">
+  <header class="card-head">
+    <span class="eid">initialPlanning</span>
+    <span class="card-label">Initial planning</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">process</span>
+    <span class="chip role">role: producer</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 1</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-initial-planning-flow" data-topic-id="initial-planning-flow">Initial planning flow</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Initial planning flow</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e10</span> <span class="rel">—consumes→</span> <a href="#element-initialPlanContext">InitialPlanContext</a></li><li><span class="dir">出</span> <span class="eid">e11</span> <span class="rel">—produces→</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir">出</span> <span class="eid">e12</span> <span class="rel">—validates→</span> <a href="#element-planBundle">PlanBundle</a></li></ul></div>
+  
+</article>
+<article class="card type-process" id="element-replanning" data-element-id="replanning">
+  <header class="card-head">
+    <span class="eid">replanning</span>
+    <span class="card-label">Replanning</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">process</span>
+    <span class="chip role">role: producer</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 1</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-replanning-flow" data-topic-id="replanning-flow">Replanning flow</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Replanning flow</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e18</span> <span class="rel">—consumes→</span> <a href="#element-replanContext">ReplanContext</a></li><li><span class="dir">出</span> <span class="eid">e19</span> <span class="rel">—consumes→</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir">出</span> <span class="eid">e20</span> <span class="rel">—consumes→</span> <a href="#element-dailyReview">DailyReview</a></li><li><span class="dir">出</span> <span class="eid">e21</span> <span class="rel">—consumes→</span> <a href="#element-taskResult">TaskResult</a></li><li><span class="dir">出</span> <span class="eid">e22</span> <span class="rel">—produces→</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir">出</span> <span class="eid">e23</span> <span class="rel">—produces→</span> <a href="#element-planChangeSummary">PlanChangeSummary</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-executionHistoryImmutabilityConstraint">Execution history immutability</a></li></ul></div>
+</article></div>
+          </div>
+          <div class="type-group">
+            <div class="type-head">artifact <span class="muted">×16</span></div>
+            <div class="cards">
+<article class="card type-artifact" id="element-goal" data-element-id="goal">
+  <header class="card-head">
+    <span class="eid">goal</span>
+    <span class="card-label">Goal</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-goal-model" data-topic-id="goal-model">Goal model</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Goal</span><span class="ref">§F40 conclusion</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-plan">Plan</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-initialPlanContext">InitialPlanContext</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-replanContext">ReplanContext</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-planningCapacityConstraint">Daily capacity and stage minutes constraint</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-userProfile" data-element-id="userProfile">
+  <header class="card-head">
+    <span class="eid">userProfile</span>
+    <span class="card-label">UserProfile</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-user-profile-model" data-topic-id="user-profile-model">UserProfile model</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§UserProfile</span><span class="ref">§F40 conclusion</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-initialPlanContext">InitialPlanContext</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-replanContext">ReplanContext</a></li></ul></div>
+  
+</article>
+<article class="card type-artifact" id="element-planBundle" data-element-id="planBundle">
+  <header class="card-head">
+    <span class="eid">planBundle</span>
+    <span class="card-label">PlanBundle</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 4</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">PlanBundle, Plan, Stage, Task</a><a class="chip link" href="#topic-initial-planning-flow" data-topic-id="initial-planning-flow">Initial planning flow</a><a class="chip link" href="#topic-replanning-flow" data-topic-id="replanning-flow">Replanning flow</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§PlanBundle</span><span class="ref">§F40 conclusion</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e1</span> <span class="rel">—contains→</span> <a href="#element-plan">Plan</a></li><li><span class="dir">出</span> <span class="eid">e2</span> <span class="rel">—contains→</span> <a href="#element-stage">Stage</a></li><li><span class="dir">出</span> <span class="eid">e3</span> <span class="rel">—contains→</span> <a href="#element-task">Task</a></li><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-initialPlanning">Initial planning</a></li><li><span class="dir in">入</span> <span class="rel">←validates—</span> <a href="#element-initialPlanning">Initial planning</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-replanContext">ReplanContext</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-replanning">Replanning</a></li><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-replanning">Replanning</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-todayTaskSelection">TodayTaskSelection</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-planChangeSummary">PlanChangeSummary</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-taskCardView">TaskCardView</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-dailyPlanLegacy">DailyPlan[] legacy</a></li></ul></div>
+  
+</article>
+<article class="card type-artifact" id="element-plan" data-element-id="plan">
+  <header class="card-head">
+    <span class="eid">plan</span>
+    <span class="card-label">Plan</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">PlanBundle, Plan, Stage, Task</a><a class="chip link" href="#topic-plan-change-summary" data-topic-id="plan-change-summary">PlanChangeSummary</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Plan</span><span class="ref">§PlanBundle</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e4</span> <span class="rel">—depends-on→</span> <a href="#element-goal">Goal</a></li><li><span class="dir in">入</span> <span class="rel">←contains—</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-stage">Stage</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-task">Task</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-dailyReview">DailyReview</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-planChangeSummary">PlanChangeSummary</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-planningCapacityConstraint">Daily capacity and stage minutes constraint</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-planStructureConstraint">Plan structure and detailedThrough constraint</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-stage" data-element-id="stage">
+  <header class="card-head">
+    <span class="eid">stage</span>
+    <span class="card-label">Stage</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">PlanBundle, Plan, Stage, Task</a><a class="chip link" href="#topic-replanning-flow" data-topic-id="replanning-flow">Replanning flow</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Stage</span><span class="ref">§PlanBundle</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e5</span> <span class="rel">—depends-on→</span> <a href="#element-plan">Plan</a></li><li><span class="dir in">入</span> <span class="rel">←contains—</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-task">Task</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-replanContext">ReplanContext</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-planningCapacityConstraint">Daily capacity and stage minutes constraint</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-planStructureConstraint">Plan structure and detailedThrough constraint</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-task" data-element-id="task">
+  <header class="card-head">
+    <span class="eid">task</span>
+    <span class="card-label">Task</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 4</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">PlanBundle, Plan, Stage, Task</a><a class="chip link" href="#topic-task-card-computed-contract" data-topic-id="task-card-computed-contract">Task Card computed contract</a><a class="chip link" href="#topic-today-task-selection" data-topic-id="today-task-selection">TodayTaskSelection</a><a class="chip link" href="#topic-execution-history" data-topic-id="execution-history">FocusSession, TaskResult, DailyReview</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Task</span><span class="ref">§PlanBundle</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e6</span> <span class="rel">—depends-on→</span> <a href="#element-plan">Plan</a></li><li><span class="dir">出</span> <span class="eid">e7</span> <span class="rel">—relates-to→</span> <a href="#element-stage">Stage</a></li><li><span class="dir">出</span> <span class="eid">e24</span> <span class="rel">—depends-on→</span> <a href="#element-task">Task</a><span class="flag self">自环</span></li><li><span class="dir in">入</span> <span class="rel">←contains—</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-focusSession">FocusSession</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-taskResult">TaskResult</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-todayTaskSelection">TodayTaskSelection</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-planChangeSummary">PlanChangeSummary</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-taskCardView">TaskCardView</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-taskDependencyConstraint">Task dependency validity constraint</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-planningCapacityConstraint">Daily capacity and stage minutes constraint</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-planStructureConstraint">Plan structure and detailedThrough constraint</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-initialPlanContext" data-element-id="initialPlanContext">
+  <header class="card-head">
+    <span class="eid">initialPlanContext</span>
+    <span class="card-label">InitialPlanContext</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: input</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-initial-planning-flow" data-topic-id="initial-planning-flow">Initial planning flow</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Initial planning flow</span><span class="ref">§F40 conclusion</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e8</span> <span class="rel">—depends-on→</span> <a href="#element-goal">Goal</a></li><li><span class="dir">出</span> <span class="eid">e9</span> <span class="rel">—depends-on→</span> <a href="#element-userProfile">UserProfile</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-initialPlanning">Initial planning</a></li></ul></div>
+  
+</article>
+<article class="card type-artifact" id="element-replanContext" data-element-id="replanContext">
+  <header class="card-head">
+    <span class="eid">replanContext</span>
+    <span class="card-label">ReplanContext</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: input</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-replanning-flow" data-topic-id="replanning-flow">Replanning flow</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Replanning flow</span><span class="ref">§F40 conclusion</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e13</span> <span class="rel">—depends-on→</span> <a href="#element-goal">Goal</a></li><li><span class="dir">出</span> <span class="eid">e14</span> <span class="rel">—depends-on→</span> <a href="#element-userProfile">UserProfile</a></li><li><span class="dir">出</span> <span class="eid">e15</span> <span class="rel">—depends-on→</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir">出</span> <span class="eid">e16</span> <span class="rel">—depends-on→</span> <a href="#element-dailyReview">DailyReview</a></li><li><span class="dir">出</span> <span class="eid">e17</span> <span class="rel">—depends-on→</span> <a href="#element-stage">Stage</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-replanning">Replanning</a></li></ul></div>
+  
+</article>
+<article class="card type-artifact" id="element-dailyReview" data-element-id="dailyReview">
+  <header class="card-head">
+    <span class="eid">dailyReview</span>
+    <span class="card-label">DailyReview</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-execution-history" data-topic-id="execution-history">FocusSession, TaskResult, DailyReview</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§DailyReview</span><span class="ref">§FocusSession, TaskResult and DailyReview</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e28</span> <span class="rel">—relates-to→</span> <a href="#element-taskResult">TaskResult</a></li><li><span class="dir">出</span> <span class="eid">e29</span> <span class="rel">—relates-to→</span> <a href="#element-plan">Plan</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-replanContext">ReplanContext</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-replanning">Replanning</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-executionHistoryImmutabilityConstraint">Execution history immutability</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-taskResult" data-element-id="taskResult">
+  <header class="card-head">
+    <span class="eid">taskResult</span>
+    <span class="card-label">TaskResult</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-execution-history" data-topic-id="execution-history">FocusSession, TaskResult, DailyReview</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§FocusSession, TaskResult and DailyReview</span><span class="ref">§DailyReview</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e26</span> <span class="rel">—relates-to→</span> <a href="#element-task">Task</a></li><li><span class="dir">出</span> <span class="eid">e27</span> <span class="rel">—relates-to→</span> <a href="#element-focusSession">FocusSession</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-replanning">Replanning</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-dailyReview">DailyReview</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-executionHistoryImmutabilityConstraint">Execution history immutability</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-focusSession" data-element-id="focusSession">
+  <header class="card-head">
+    <span class="eid">focusSession</span>
+    <span class="card-label">FocusSession</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 1</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-execution-history" data-topic-id="execution-history">FocusSession, TaskResult, DailyReview</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§FocusSession, TaskResult and DailyReview</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e25</span> <span class="rel">—relates-to→</span> <a href="#element-task">Task</a></li><li><span class="dir in">入</span> <span class="rel">←relates-to—</span> <a href="#element-taskResult">TaskResult</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-executionHistoryImmutabilityConstraint">Execution history immutability</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-todayTaskSelection" data-element-id="todayTaskSelection">
+  <header class="card-head">
+    <span class="eid">todayTaskSelection</span>
+    <span class="card-label">TodayTaskSelection</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-today-task-selection" data-topic-id="today-task-selection">TodayTaskSelection</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§TodayTaskSelection</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e30</span> <span class="rel">—relates-to→</span> <a href="#element-task">Task</a></li><li><span class="dir">出</span> <span class="eid">e31</span> <span class="rel">—relates-to→</span> <a href="#element-planBundle">PlanBundle</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-dailyReviewPromptDismissal" data-element-id="dailyReviewPromptDismissal">
+  <header class="card-head">
+    <span class="eid">dailyReviewPromptDismissal</span>
+    <span class="card-label">DailyReviewPromptDismissal</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-daily-review-prompt-dismissal" data-topic-id="daily-review-prompt-dismissal">DailyReviewPromptDismissal</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§DailyReviewPromptDismissal</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e32</span> <span class="rel">—relates-to→</span> <a href="#element-goal">Goal</a></li><li><span class="dir">出</span> <span class="eid">e33</span> <span class="rel">—relates-to→</span> <a href="#element-plan">Plan</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-planChangeSummary" data-element-id="planChangeSummary">
+  <header class="card-head">
+    <span class="eid">planChangeSummary</span>
+    <span class="card-label">PlanChangeSummary</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: target</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-plan-change-summary" data-topic-id="plan-change-summary">PlanChangeSummary</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§PlanChangeSummary</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e34</span> <span class="rel">—relates-to→</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir">出</span> <span class="eid">e35</span> <span class="rel">—relates-to→</span> <a href="#element-plan">Plan</a></li><li><span class="dir">出</span> <span class="eid">e36</span> <span class="rel">—relates-to→</span> <a href="#element-task">Task</a></li><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-replanning">Replanning</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-dailyPlanLegacy" data-element-id="dailyPlanLegacy">
+  <header class="card-head">
+    <span class="eid">dailyPlanLegacy</span>
+    <span class="card-label">DailyPlan[] legacy</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: boundary</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-purpose-and-scope" data-topic-id="purpose-and-scope">Purpose and F40 conclusion</a><a class="chip link" href="#topic-daily-plan-legacy-boundary" data-topic-id="daily-plan-legacy-boundary">DailyPlan legacy boundary</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§DailyPlan legacy boundary</span><span class="ref">§Model layers</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e39</span> <span class="rel">—relates-to→</span> <a href="#element-planBundle">PlanBundle</a></li></ul></div>
+  
+</article>
+<article class="card type-artifact" id="element-taskCardView" data-element-id="taskCardView">
+  <header class="card-head">
+    <span class="eid">taskCardView</span>
+    <span class="card-label">TaskCardView</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: output</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 1</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-task-card-computed-contract" data-topic-id="task-card-computed-contract">Task Card computed contract</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Task Card computed contract</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">e37</span> <span class="rel">—depends-on→</span> <a href="#element-planBundle">PlanBundle</a></li><li><span class="dir">出</span> <span class="eid">e38</span> <span class="rel">—depends-on→</span> <a href="#element-task">Task</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-taskDependencyConstraint">Task dependency validity constraint</a></li></ul></div>
+</article></div>
+          </div>
+          <div class="type-group">
+            <div class="type-head">constraint <span class="muted">×5</span></div>
+            <div class="cards">
+<article class="card type-constraint" id="element-taskDependencyConstraint" data-element-id="taskDependencyConstraint">
+  <header class="card-head">
+    <span class="eid">taskDependencyConstraint</span>
+    <span class="card-label">Task dependency validity constraint</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: constraint</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 2</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">PlanBundle, Plan, Stage, Task</a><a class="chip link" href="#topic-task-card-computed-contract" data-topic-id="task-card-computed-contract">Task Card computed contract</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Task</span><span class="ref">§Task Card computed contract</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-task">Task</a> · <a href="#element-taskCardView">TaskCardView</a></li></ul></div>
+</article>
+<article class="card type-constraint" id="element-executionHistoryImmutabilityConstraint" data-element-id="executionHistoryImmutabilityConstraint">
+  <header class="card-head">
+    <span class="eid">executionHistoryImmutabilityConstraint</span>
+    <span class="card-label">Execution history immutability</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: constraint</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-execution-history" data-topic-id="execution-history">FocusSession, TaskResult, DailyReview</a><a class="chip link" href="#topic-replanning-flow" data-topic-id="replanning-flow">Replanning flow</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§FocusSession, TaskResult and DailyReview</span><span class="ref">§DailyReview</span><span class="ref">§Replanning flow</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-dailyReview">DailyReview</a> · <a href="#element-taskResult">TaskResult</a> · <a href="#element-focusSession">FocusSession</a> · <a href="#element-replanning">Replanning</a></li></ul></div>
+</article>
+<article class="card type-constraint" id="element-planningCapacityConstraint" data-element-id="planningCapacityConstraint">
+  <header class="card-head">
+    <span class="eid">planningCapacityConstraint</span>
+    <span class="card-label">Daily capacity and stage minutes constraint</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: constraint</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-goal-model" data-topic-id="goal-model">Goal model</a><a class="chip link" href="#topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">PlanBundle, Plan, Stage, Task</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Goal</span><span class="ref">§Plan</span><span class="ref">§Task</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-goal">Goal</a> · <a href="#element-plan">Plan</a> · <a href="#element-stage">Stage</a> · <a href="#element-task">Task</a></li></ul></div>
+</article>
+<article class="card type-constraint" id="element-planStateUniquenessConstraint" data-element-id="planStateUniquenessConstraint">
+  <header class="card-head">
+    <span class="eid">planStateUniquenessConstraint</span>
+    <span class="card-label">One active/selection/dismissal/summary constraint</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: constraint</span>
+    <span class="chip topics">topics: 4</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-goal-model" data-topic-id="goal-model">Goal model</a><a class="chip link" href="#topic-today-task-selection" data-topic-id="today-task-selection">TodayTaskSelection</a><a class="chip link" href="#topic-daily-review-prompt-dismissal" data-topic-id="daily-review-prompt-dismissal">DailyReviewPromptDismissal</a><a class="chip link" href="#topic-plan-change-summary" data-topic-id="plan-change-summary">PlanChangeSummary</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Goal</span><span class="ref">§TodayTaskSelection</span><span class="ref">§DailyReviewPromptDismissal</span><span class="ref">§PlanChangeSummary</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-goal">Goal</a> · <a href="#element-plan">Plan</a> · <a href="#element-todayTaskSelection">TodayTaskSelection</a> · <a href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a> · <a href="#element-planChangeSummary">PlanChangeSummary</a></li></ul></div>
+</article>
+<article class="card type-constraint" id="element-planStructureConstraint" data-element-id="planStructureConstraint">
+  <header class="card-head">
+    <span class="eid">planStructureConstraint</span>
+    <span class="card-label">Plan structure and detailedThrough constraint</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: constraint</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 3</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">PlanBundle, Plan, Stage, Task</a><a class="chip link" href="#topic-task-card-computed-contract" data-topic-id="task-card-computed-contract">Task Card computed contract</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Plan</span><span class="ref">§Stage</span><span class="ref">§Task</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-plan">Plan</a> · <a href="#element-stage">Stage</a> · <a href="#element-task">Task</a></li></ul></div>
+</article></div>
+          </div>
+      </section>
+
+      <section class="block" id="relations">
+        <h2>关系（edge · 39 条 · 含 1 条自环）</h2>
+        <ul class="edge-list">
+<li class="edge-row " id="edge-e1" data-edge-id="e1" data-from="planBundle" data-to="plan">
+  <span class="edge-line">
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    <span class="rel">—contains→</span>
+    <a class="node" href="#element-plan">Plan</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e1</span>
+    <span class="qual">cardinality one → one · ownership owned</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e2" data-edge-id="e2" data-from="planBundle" data-to="stage">
+  <span class="edge-line">
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    <span class="rel">—contains→</span>
+    <a class="node" href="#element-stage">Stage</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e2</span>
+    <span class="qual">cardinality one → one-or-many · ownership owned</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e3" data-edge-id="e3" data-from="planBundle" data-to="task">
+  <span class="edge-line">
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    <span class="rel">—contains→</span>
+    <a class="node" href="#element-task">Task</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e3</span>
+    <span class="qual">cardinality one → one-or-many · ownership owned</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e4" data-edge-id="e4" data-from="plan" data-to="goal">
+  <span class="edge-line">
+    <a class="node" href="#element-plan">Plan</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-goal">Goal</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e4</span>
+    <span class="qual">cardinality zero-or-many → one · ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e5" data-edge-id="e5" data-from="stage" data-to="plan">
+  <span class="edge-line">
+    <a class="node" href="#element-stage">Stage</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-plan">Plan</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e5</span>
+    <span class="qual">cardinality zero-or-many → one · ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e6" data-edge-id="e6" data-from="task" data-to="plan">
+  <span class="edge-line">
+    <a class="node" href="#element-task">Task</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-plan">Plan</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e6</span>
+    <span class="qual">cardinality zero-or-many → one · ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e7" data-edge-id="e7" data-from="task" data-to="stage">
+  <span class="edge-line">
+    <a class="node" href="#element-task">Task</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-stage">Stage</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e7</span>
+    <span class="qual">cardinality zero-or-many → zero-or-one · ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e8" data-edge-id="e8" data-from="initialPlanContext" data-to="goal">
+  <span class="edge-line">
+    <a class="node" href="#element-initialPlanContext">InitialPlanContext</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-goal">Goal</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e8</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e9" data-edge-id="e9" data-from="initialPlanContext" data-to="userProfile">
+  <span class="edge-line">
+    <a class="node" href="#element-initialPlanContext">InitialPlanContext</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-userProfile">UserProfile</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e9</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e10" data-edge-id="e10" data-from="initialPlanning" data-to="initialPlanContext">
+  <span class="edge-line">
+    <a class="node" href="#element-initialPlanning">Initial planning</a>
+    <span class="rel">—consumes→</span>
+    <a class="node" href="#element-initialPlanContext">InitialPlanContext</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e10</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e11" data-edge-id="e11" data-from="initialPlanning" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-initialPlanning">Initial planning</a>
+    <span class="rel">—produces→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e11</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e12" data-edge-id="e12" data-from="initialPlanning" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-initialPlanning">Initial planning</a>
+    <span class="rel">—validates→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e12</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e13" data-edge-id="e13" data-from="replanContext" data-to="goal">
+  <span class="edge-line">
+    <a class="node" href="#element-replanContext">ReplanContext</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-goal">Goal</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e13</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e14" data-edge-id="e14" data-from="replanContext" data-to="userProfile">
+  <span class="edge-line">
+    <a class="node" href="#element-replanContext">ReplanContext</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-userProfile">UserProfile</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e14</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e15" data-edge-id="e15" data-from="replanContext" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-replanContext">ReplanContext</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e15</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e16" data-edge-id="e16" data-from="replanContext" data-to="dailyReview">
+  <span class="edge-line">
+    <a class="node" href="#element-replanContext">ReplanContext</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-dailyReview">DailyReview</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e16</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e17" data-edge-id="e17" data-from="replanContext" data-to="stage">
+  <span class="edge-line">
+    <a class="node" href="#element-replanContext">ReplanContext</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-stage">Stage</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e17</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e18" data-edge-id="e18" data-from="replanning" data-to="replanContext">
+  <span class="edge-line">
+    <a class="node" href="#element-replanning">Replanning</a>
+    <span class="rel">—consumes→</span>
+    <a class="node" href="#element-replanContext">ReplanContext</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e18</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e19" data-edge-id="e19" data-from="replanning" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-replanning">Replanning</a>
+    <span class="rel">—consumes→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e19</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e20" data-edge-id="e20" data-from="replanning" data-to="dailyReview">
+  <span class="edge-line">
+    <a class="node" href="#element-replanning">Replanning</a>
+    <span class="rel">—consumes→</span>
+    <a class="node" href="#element-dailyReview">DailyReview</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e20</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e21" data-edge-id="e21" data-from="replanning" data-to="taskResult">
+  <span class="edge-line">
+    <a class="node" href="#element-replanning">Replanning</a>
+    <span class="rel">—consumes→</span>
+    <a class="node" href="#element-taskResult">TaskResult</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e21</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e22" data-edge-id="e22" data-from="replanning" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-replanning">Replanning</a>
+    <span class="rel">—produces→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e22</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e23" data-edge-id="e23" data-from="replanning" data-to="planChangeSummary">
+  <span class="edge-line">
+    <a class="node" href="#element-replanning">Replanning</a>
+    <span class="rel">—produces→</span>
+    <a class="node" href="#element-planChangeSummary">PlanChangeSummary</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e23</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row is-selfloop" id="edge-e24" data-edge-id="e24" data-from="task" data-to="task">
+  <span class="edge-line">
+    <a class="node" href="#element-task">Task</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-task">Task</a>
+    <span class="flag self">自环（同一个元素）</span>
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e24</span>
+    <span class="qual">cardinality zero-or-many → zero-or-many · ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e25" data-edge-id="e25" data-from="focusSession" data-to="task">
+  <span class="edge-line">
+    <a class="node" href="#element-focusSession">FocusSession</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-task">Task</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e25</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e26" data-edge-id="e26" data-from="taskResult" data-to="task">
+  <span class="edge-line">
+    <a class="node" href="#element-taskResult">TaskResult</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-task">Task</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e26</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e27" data-edge-id="e27" data-from="taskResult" data-to="focusSession">
+  <span class="edge-line">
+    <a class="node" href="#element-taskResult">TaskResult</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-focusSession">FocusSession</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e27</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e28" data-edge-id="e28" data-from="dailyReview" data-to="taskResult">
+  <span class="edge-line">
+    <a class="node" href="#element-dailyReview">DailyReview</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-taskResult">TaskResult</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e28</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e29" data-edge-id="e29" data-from="dailyReview" data-to="plan">
+  <span class="edge-line">
+    <a class="node" href="#element-dailyReview">DailyReview</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-plan">Plan</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e29</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e30" data-edge-id="e30" data-from="todayTaskSelection" data-to="task">
+  <span class="edge-line">
+    <a class="node" href="#element-todayTaskSelection">TodayTaskSelection</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-task">Task</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e30</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e31" data-edge-id="e31" data-from="todayTaskSelection" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-todayTaskSelection">TodayTaskSelection</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e31</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e32" data-edge-id="e32" data-from="dailyReviewPromptDismissal" data-to="goal">
+  <span class="edge-line">
+    <a class="node" href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-goal">Goal</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e32</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e33" data-edge-id="e33" data-from="dailyReviewPromptDismissal" data-to="plan">
+  <span class="edge-line">
+    <a class="node" href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-plan">Plan</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e33</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e34" data-edge-id="e34" data-from="planChangeSummary" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-planChangeSummary">PlanChangeSummary</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e34</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e35" data-edge-id="e35" data-from="planChangeSummary" data-to="plan">
+  <span class="edge-line">
+    <a class="node" href="#element-planChangeSummary">PlanChangeSummary</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-plan">Plan</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e35</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e36" data-edge-id="e36" data-from="planChangeSummary" data-to="task">
+  <span class="edge-line">
+    <a class="node" href="#element-planChangeSummary">PlanChangeSummary</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-task">Task</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e36</span>
+    <span class="qual">ownership reference</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e37" data-edge-id="e37" data-from="taskCardView" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-taskCardView">TaskCardView</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e37</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e38" data-edge-id="e38" data-from="taskCardView" data-to="task">
+  <span class="edge-line">
+    <a class="node" href="#element-taskCardView">TaskCardView</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-task">Task</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e38</span>
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-e39" data-edge-id="e39" data-from="dailyPlanLegacy" data-to="planBundle">
+  <span class="edge-line">
+    <a class="node" href="#element-dailyPlanLegacy">DailyPlan[] legacy</a>
+    <span class="rel">—relates-to→</span>
+    <a class="node" href="#element-planBundle">PlanBundle</a>
+    
+  </span>
+  <span class="edge-meta">
+    <span class="eid">e39</span>
+    <span class="qual">ownership shared</span>
+    <span class="muted">（无 label）</span>
+  </span>
+</li></ul>
+      </section>
+
+      <section class="block" id="attachments">
+        <h2>侧挂 / 约束（attachments · 5 条）</h2>
+        <ul class="attach-list">
+<li class="attach-row" id="attachment-taskDependencyConstraint" data-attach-id="taskDependencyConstraint">
+  <a class="node" href="#element-taskDependencyConstraint">Task dependency validity constraint</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-task">Task</a> · <a class="node" href="#element-taskCardView">TaskCardView</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li>
+<li class="attach-row" id="attachment-executionHistoryImmutabilityConstraint" data-attach-id="executionHistoryImmutabilityConstraint">
+  <a class="node" href="#element-executionHistoryImmutabilityConstraint">Execution history immutability</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-dailyReview">DailyReview</a> · <a class="node" href="#element-taskResult">TaskResult</a> · <a class="node" href="#element-focusSession">FocusSession</a> · <a class="node" href="#element-replanning">Replanning</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li>
+<li class="attach-row" id="attachment-planningCapacityConstraint" data-attach-id="planningCapacityConstraint">
+  <a class="node" href="#element-planningCapacityConstraint">Daily capacity and stage minutes constraint</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-goal">Goal</a> · <a class="node" href="#element-plan">Plan</a> · <a class="node" href="#element-stage">Stage</a> · <a class="node" href="#element-task">Task</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li>
+<li class="attach-row" id="attachment-planStateUniquenessConstraint" data-attach-id="planStateUniquenessConstraint">
+  <a class="node" href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-goal">Goal</a> · <a class="node" href="#element-plan">Plan</a> · <a class="node" href="#element-todayTaskSelection">TodayTaskSelection</a> · <a class="node" href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a> · <a class="node" href="#element-planChangeSummary">PlanChangeSummary</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li>
+<li class="attach-row" id="attachment-planStructureConstraint" data-attach-id="planStructureConstraint">
+  <a class="node" href="#element-planStructureConstraint">Plan structure and detailedThrough constraint</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-plan">Plan</a> · <a class="node" href="#element-stage">Stage</a> · <a class="node" href="#element-task">Task</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li></ul>
+      </section>
+
+      <div class="review-slot">
+<section class="review" id="review">
+  <h2>Review View · 审阅信息</h2>
+  <p class="note">这些是审阅信息，<b>不是</b>图上的语义。relationGap 不是 edge；告警不影响渲染。</p>
+  <div class="review-grid">
+    <div class="review-box">
+      <h3>check-map 结论</h3>
+      <div class="review-facts">HARD 0 · WARN 5 · INFO 18 · 状态 PASS</div>
+      
+      <div class="diag warn"><b>WARN</b><ul><li>W2 role 未知（controlled-but-extensible，不判 Hard）: taskDependencyConstraint:constraint, executionHistoryImmutabilityConstraint:constraint, planningCapacityConstraint:constraint, planStateUniquenessConstraint:constraint, planStructureConstraint:constraint</li><li>W6 relates-to 兜底词使用了 14 次（&gt;1）—— 兜底词一多说明词表不够用</li><li>W1 element 总数 23 &gt; preferred budget 12（认知容量 heuristic，非 semantic validity）；内容都有 L1/L2 入口 → 只需检查 Navigation invariant</li><li>W3 Topic 数 15 &gt; 10</li><li>W5 relationGap[0] stage ⇢ replanning：「Stage completion may trigger replanning for future stages/tasks.」（REVIEW REQUIRED —— 现有词表无法在不失真前提下表达）</li></ul></div>
+      
+    </div>
+    <div class="review-box">
+      <h3>relationGap（1）</h3>
+      <ul class="gap-list">
+<li class="gap-row">
+  <span class="gap-line">Stage <span class="rel">⇢</span> Replanning</span>
+  <span class="flag warn">relationGap（不是 edge）</span>
+  <div class="gap-why">Stage completion may trigger replanning for future stages/tasks.</div>
+  <div class="gap-reason muted">Base relation vocabulary has no trigger/event relation; depends-on or controls would misstate the relationship.</div>
+</li></ul>
+    </div>
+    <div class="review-box">
+      <h3>诊断</h3>
+      <ul>
+        <li>role 未知：taskDependencyConstraint=constraint, executionHistoryImmutabilityConstraint=constraint, planningCapacityConstraint=constraint, planStateUniquenessConstraint=constraint, planStructureConstraint=constraint</li>
+        <li>无 provenance 的 element：无</li>
+        <li>无 sectionRefs 的 Topic：无</li>
+        <li>孤立元素：无</li>
+      </ul>
+    </div>
+  </div>
+</section></div>
+    </main>
+
+    <aside class="l0-nav" id="topic-nav">
+      <h2>Topic Navigation（完整入口索引 · 15）</h2>
+      <p class="note">这里与左侧不是一一对应的：左边是<b>核心机制</b>，这里是<b>完整入口</b>。没有 L0 element 的 Topic 也照样能进入。</p>
+      <ul class="topic-list">
+<li class="topic-entry " id="topic-purpose-and-scope" data-topic-id="purpose-and-scope">
+  <div class="topic-head">
+    <span class="eid">purpose-and-scope</span>
+    <span class="topic-title">Purpose and F40 conclusion</span>
+    
+  </div>
+  <div class="topic-prop">This is the F40 target data model contract for the planning domain; it sets migration direction without deleting legacy DailyPlan[] or changing storage/compatibility/AI/planner behavior.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-goal">Goal</a><a class="chip link" href="#element-userProfile">UserProfile</a><a class="chip link" href="#element-planBundle">PlanBundle</a><a class="chip link" href="#element-initialPlanContext">InitialPlanContext</a><a class="chip link" href="#element-replanContext">ReplanContext</a><a class="chip link" href="#element-dailyReview">DailyReview</a><a class="chip link" href="#element-todayTaskSelection">TodayTaskSelection</a><a class="chip link" href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a><a class="chip link" href="#element-planChangeSummary">PlanChangeSummary</a><a class="chip link" href="#element-dailyPlanLegacy">DailyPlan[] legacy</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Purpose</span><span class="ref">§F40 conclusion</span><span class="ref">§Model layers</span></span></div>
+</li>
+<li class="topic-entry " id="topic-initial-planning-flow" data-topic-id="initial-planning-flow">
+  <div class="topic-head">
+    <span class="eid">initial-planning-flow</span>
+    <span class="topic-title">Initial planning flow</span>
+    
+  </div>
+  <div class="topic-prop">Initial planning assembles InitialPlanContext from Goal and UserProfile and produces a validated PlanBundle without DailyReview.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-planBundle">PlanBundle</a><a class="chip link" href="#element-initialPlanContext">InitialPlanContext</a><a class="chip link" href="#element-initialPlanning">Initial planning</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Initial planning flow</span></span></div>
+</li>
+<li class="topic-entry " id="topic-replanning-flow" data-topic-id="replanning-flow">
+  <div class="topic-head">
+    <span class="eid">replanning-flow</span>
+    <span class="topic-title">Replanning flow</span>
+    
+  </div>
+  <div class="topic-prop">Replanning loads current PlanBundle and execution feedback into ReplanContext and produces a new PlanBundle or PlanChangeSet while preserving history.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-planBundle">PlanBundle</a><a class="chip link" href="#element-stage">Stage</a><a class="chip link" href="#element-replanContext">ReplanContext</a><a class="chip link" href="#element-replanning">Replanning</a><a class="chip link" href="#element-executionHistoryImmutabilityConstraint">Execution history immutability</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Replanning flow</span></span></div>
+</li>
+<li class="topic-entry " id="topic-goal-model" data-topic-id="goal-model">
+  <div class="topic-head">
+    <span class="eid">goal-model</span>
+    <span class="topic-title">Goal model</span>
+    
+  </div>
+  <div class="topic-prop">Goal is the user's original intent and goal-scoped hard constraints with target fields for intent, success criteria, scope, starting point, and constraints.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-goal">Goal</a><a class="chip link" href="#element-planningCapacityConstraint">Daily capacity and stage minutes constraint</a><a class="chip link" href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Goal</span></span></div>
+</li>
+<li class="topic-entry " id="topic-user-profile-model" data-topic-id="user-profile-model">
+  <div class="topic-head">
+    <span class="eid">user-profile-model</span>
+    <span class="topic-title">UserProfile model</span>
+    
+  </div>
+  <div class="topic-prop">UserProfile is cross-goal reusable user context for scheduling and expression preferences, separate from daily execution energy.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-userProfile">UserProfile</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§UserProfile</span></span></div>
+</li>
+<li class="topic-entry " id="topic-plan-bundle-and-parts" data-topic-id="plan-bundle-and-parts">
+  <div class="topic-head">
+    <span class="eid">plan-bundle-and-parts</span>
+    <span class="topic-title">PlanBundle, Plan, Stage, Task</span>
+    
+  </div>
+  <div class="topic-prop">PlanBundle is the core persistent planning aggregate containing Plan, Stage[], and Task[]; Plan, Stage, and Task have target fields and lifecycle rules.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-planBundle">PlanBundle</a><a class="chip link" href="#element-plan">Plan</a><a class="chip link" href="#element-stage">Stage</a><a class="chip link" href="#element-task">Task</a><a class="chip link" href="#element-taskDependencyConstraint">Task dependency validity constraint</a><a class="chip link" href="#element-planningCapacityConstraint">Daily capacity and stage minutes constraint</a><a class="chip link" href="#element-planStructureConstraint">Plan structure and detailedThrough constraint</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§PlanBundle</span><span class="ref">§Plan</span><span class="ref">§Stage</span><span class="ref">§Task</span></span></div>
+</li>
+<li class="topic-entry " id="topic-task-card-computed-contract" data-topic-id="task-card-computed-contract">
+  <div class="topic-head">
+    <span class="eid">task-card-computed-contract</span>
+    <span class="topic-title">Task Card computed contract</span>
+    
+  </div>
+  <div class="topic-prop">A pure selector derives TaskCardView availability, recommendation, and unmet dependencies from a PlanBundle without storage, AI, or mutation.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-task">Task</a><a class="chip link" href="#element-taskCardView">TaskCardView</a><a class="chip link" href="#element-taskDependencyConstraint">Task dependency validity constraint</a><a class="chip link" href="#element-planStructureConstraint">Plan structure and detailedThrough constraint</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Task Card computed contract</span></span></div>
+</li>
+<li class="topic-entry " id="topic-execution-history" data-topic-id="execution-history">
+  <div class="topic-head">
+    <span class="eid">execution-history</span>
+    <span class="topic-title">FocusSession, TaskResult, DailyReview</span>
+    
+  </div>
+  <div class="topic-prop">FocusSession, TaskResult, and DailyReview are separate execution concepts: a focus process, a task execution result, and day-scoped review history.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-task">Task</a><a class="chip link" href="#element-dailyReview">DailyReview</a><a class="chip link" href="#element-taskResult">TaskResult</a><a class="chip link" href="#element-focusSession">FocusSession</a><a class="chip link" href="#element-executionHistoryImmutabilityConstraint">Execution history immutability</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§FocusSession, TaskResult and DailyReview</span><span class="ref">§DailyReview</span></span></div>
+</li>
+<li class="topic-entry " id="topic-today-task-selection" data-topic-id="today-task-selection">
+  <div class="topic-head">
+    <span class="eid">today-task-selection</span>
+    <span class="topic-title">TodayTaskSelection</span>
+    
+  </div>
+  <div class="topic-prop">TodayTaskSelection records which existing Task the user chose to execute on a concrete date, without rewriting scheduledDate.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-task">Task</a><a class="chip link" href="#element-todayTaskSelection">TodayTaskSelection</a><a class="chip link" href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§TodayTaskSelection</span></span></div>
+</li>
+<li class="topic-entry " id="topic-daily-review-prompt-dismissal" data-topic-id="daily-review-prompt-dismissal">
+  <div class="topic-head">
+    <span class="eid">daily-review-prompt-dismissal</span>
+    <span class="topic-title">DailyReviewPromptDismissal</span>
+    
+  </div>
+  <div class="topic-prop">DailyReviewPromptDismissal is UI prompt history for one Goal/Plan/executionDate and is not execution or review truth.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-dailyReviewPromptDismissal">DailyReviewPromptDismissal</a><a class="chip link" href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§DailyReviewPromptDismissal</span></span></div>
+</li>
+<li class="topic-entry " id="topic-plan-change-summary" data-topic-id="plan-change-summary">
+  <div class="topic-head">
+    <span class="eid">plan-change-summary</span>
+    <span class="topic-title">PlanChangeSummary</span>
+    
+  </div>
+  <div class="topic-prop">PlanChangeSummary is a persisted deterministic-adjustment receipt, not a second Plan truth source, with trigger fingerprint and acknowledgement.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-plan">Plan</a><a class="chip link" href="#element-planChangeSummary">PlanChangeSummary</a><a class="chip link" href="#element-planStateUniquenessConstraint">One active/selection/dismissal/summary constraint</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§PlanChangeSummary</span></span></div>
+</li>
+<li class="topic-entry " id="topic-daily-plan-legacy-boundary" data-topic-id="daily-plan-legacy-boundary">
+  <div class="topic-head">
+    <span class="eid">daily-plan-legacy-boundary</span>
+    <span class="topic-title">DailyPlan legacy boundary</span>
+    
+  </div>
+  <div class="topic-prop">DailyPlan[] does not belong to the future core domain model and is only a legacy compatibility surface until a separate breaking migration removes it.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-dailyPlanLegacy">DailyPlan[] legacy</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§DailyPlan legacy boundary</span></span></div>
+</li>
+<li class="topic-entry no-element" id="topic-computed-views" data-topic-id="computed-views">
+  <div class="topic-head">
+    <span class="eid">computed-views</span>
+    <span class="topic-title">Computed views</span>
+    <span class="flag info">无 L0 element —— 仍是导航入口</span>
+  </div>
+  <div class="topic-prop">Computed views are not persistent truth; services/selectors derive page-facing data from PlanBundle, DailyReview, and UserProfile.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Computed views</span></span></div>
+</li>
+<li class="topic-entry no-element" id="topic-migration-direction" data-topic-id="migration-direction">
+  <div class="topic-head">
+    <span class="eid">migration-direction</span>
+    <span class="topic-title">Migration direction</span>
+    <span class="flag info">无 L0 element —— 仍是导航入口</span>
+  </div>
+  <div class="topic-prop">Migration after F40 is split into later features: model fields, AI schemas, replanner schemas, deterministic fallback, view replacement, and removal of DailyPlan[].</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Migration direction</span></span></div>
+</li>
+<li class="topic-entry no-element" id="topic-historical-notes" data-topic-id="historical-notes">
+  <div class="topic-head">
+    <span class="eid">historical-notes</span>
+    <span class="topic-title">Historical notes</span>
+    <span class="flag info">无 L0 element —— 仍是导航入口</span>
+  </div>
+  <div class="topic-prop">Historical notes record prior features F16, F39, F41, F56, and F58 and their additive model changes.</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§Historical notes</span></span></div>
+</li></ul>
+      <div class="doc-entries">
+        <h3>文档级入口</h3>
+        <div class="doc-entry"><span class="k">scope</span><div>Target data model contract for the planning domain: core persistent aggregate PlanBundle (Plan, Stage[], Task[]), transient planner inputs, execution history, computed views, legacy DailyPlan[] boundary, and migration direction.</div><div class="v"><span class="ref">§Purpose</span><span class="ref">§F40 conclusion</span><span class="ref">§Model layers</span></div></div><div class="doc-entry"><span class="k">nonGoalSummary</span><div>F40 does not delete DailyPlan[], change storage keys, change compatibility reads, or implement AI/planner rewrites; these are later features.</div><div class="v"><span class="ref">§Purpose</span><span class="ref">§F40 conclusion</span><span class="ref">§DailyPlan legacy boundary</span></div></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+  // 唯一的前端行为：Reading / Review 视图切换（不改变任何数据）
+  document.addEventListener('click', (ev) => {
+    const t = ev.target.closest('[data-l0-view]');
+    if (!t) return;
+    const root = t.closest('.l0-root');
+    root.setAttribute('data-view', t.getAttribute('data-l0-view'));
+    root.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b === t));
+  });
+</script>
+</body></html>

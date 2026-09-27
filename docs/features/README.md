@@ -63,7 +63,7 @@ XX-feature-name/
 | 05 | l0-generalization-gate | Executed（Gate = PASS，待验收） | DSH agent | 用户 | - |
 | 06 | contract-and-validators | Executed（待验收；含 F09 修复：H8/W7/W8、W4→I6、heading tree） | DSH agent | 用户 | - |
 | 07 | ai-framework-map-generation | **Executed**（Phase 1–4 完成；`Gate = PARTIAL PASS` —— Technical 15/15 PASS、Semantic 0/15） | DSH agent | 用户 | - |
-| 08 | l0-ui | Blocked（等 06） | TBD | TBD | - |
+| 08 | l0-ui | **In Progress**（第一轮 deterministic UI integration：Phase 0/1/2 完成 · 34+51 断言全绿；Gate = `TECHNICAL PASS / UX VALIDATION PENDING`） | DSH agent | 用户 | - |
 | 09 | contract-adversarial-test | **Completed / Closed**（Gate = PASS） | DSH agent | 用户 | 2026-09-26 |
 | 10 | semantic-grounding | **Completed / Closed**（`Gate = PARTIAL PASS` —— 两阶段架构方向成立、E 侧机制保留成立；**D 侧核心基础关系 E3 未关闭**） | DSH agent | 用户 | 2026-09-26 |
 

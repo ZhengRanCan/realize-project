@@ -1,0 +1,116 @@
+/* Feature 08 · L0 Framework Map 渲染样式
+ *
+ * 原则：**Layout organizes space; it does not create semantics.**
+ * 因此这里只有"分区 / 卡片 / 列表"三种空间组织，不使用任何暗示顺序、归属或依赖的视觉语法
+ * （没有从左到右的流水线、没有垂直堆叠表示 ownership、没有距离表示相关度）。
+ * 语义只由文字显式表达：A —type→ B、⇢ 挂到、qualifier 文本。
+ */
+
+.l0-root {
+  --ink: #111;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --bg: #fff;
+  --bg-soft: #fafafa;
+  --accent: #1f6feb;
+  --warn: #b45309;
+  --hard: #b91c1c;
+  --flag-bg: #fff7ed;
+  font: 14px/1.55 -apple-system, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  padding: 16px 20px 40px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.l0-root h1 { font-size: 20px; margin: 0 0 4px; }
+.l0-root h2 { font-size: 15px; margin: 0 0 10px; letter-spacing: .01em; }
+.l0-root h3 { font-size: 13px; margin: 0 0 6px; }
+.l0-root code { background: var(--bg-soft); padding: 1px 4px; border-radius: 3px; }
+.mono { font-family: ui-monospace, Consolas, monospace; }
+.muted { color: var(--muted); }
+.note { color: var(--muted); font-size: 12px; margin: 0 0 10px; }
+
+/* header */
+.l0-head { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.l0-sub { color: var(--muted); font-size: 12px; }
+.l0-facts { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; }
+.fact b { font-size: 13px; }
+.l0-toggle { display: flex; gap: 6px; }
+.tab { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 12px; }
+.tab.active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+.l0-principle { margin: 12px 0 18px; padding: 10px 12px; background: var(--bg-soft); border-left: 3px solid var(--accent); font-size: 12.5px; }
+
+/* body: 主区 + 导航区（两区，职责不同） */
+.l0-body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+@media (max-width: 1100px) { .l0-body { grid-template-columns: 1fr; } }
+
+.block { margin-bottom: 22px; }
+.type-group { margin-bottom: 14px; }
+.type-head { font-size: 12px; text-transform: none; color: var(--muted); border-bottom: 1px dashed var(--line); padding-bottom: 4px; margin-bottom: 8px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; scroll-margin-top: 12px; }
+.card:target { outline: 2px solid var(--accent); }
+.card-head { display: flex; gap: 8px; align-items: baseline; margin-bottom: 6px; }
+.card-label { font-weight: 600; }
+.eid { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--muted); }
+.card-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.chip { font-size: 11px; border: 1px solid var(--line); border-radius: 10px; padding: 1px 7px; color: var(--muted); background: var(--bg-soft); }
+.chip.link { color: var(--accent); text-decoration: none; }
+.chip.type { color: var(--ink); font-weight: 600; }
+.card-row { display: flex; gap: 8px; font-size: 12px; margin-top: 3px; }
+.card-row .k { flex: 0 0 62px; color: var(--muted); }
+.card-row .v { min-width: 0; }
+.ref { font-family: ui-monospace, Consolas, monospace; font-size: 11px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; margin-right: 3px; display: inline-block; }
+.rel-list { list-style: none; margin: 0; padding: 0; }
+.rel-list li { margin: 1px 0; }
+.rel { font-family: ui-monospace, Consolas, monospace; color: #334155; }
+.dir { font-size: 10.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 3px; padding: 0 3px; margin-right: 3px; }
+.dir.in { color: #0f766e; }
+.qual { font-size: 11px; color: #0f766e; background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 3px; padding: 0 4px; margin-right: 4px; }
+.elabel { color: #374151; }
+
+/* edge / attachment 列表：**显式写方向**，不靠位置 */
+.edge-list, .attach-list { list-style: none; margin: 0; padding: 0; }
+.edge-row, .attach-row { border-top: 1px solid var(--line); padding: 7px 2px; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; scroll-margin-top: 12px; }
+.edge-row:target, .attach-row:target { background: #eff6ff; }
+.edge-line .node, .attach-row .node { color: var(--ink); text-decoration: none; border-bottom: 1px dotted #cbd5e1; }
+.edge-line .node:hover { color: var(--accent); }
+.edge-meta { font-size: 12px; color: #374151; }
+.edge-row.is-selfloop { background: #fffbeb; }
+
+/* Topic 导航 */
+.l0-nav { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--bg-soft); position: sticky; top: 12px; max-height: calc(100vh - 40px); overflow: auto; }
+.topic-list { list-style: none; margin: 0; padding: 0; }
+.topic-entry { border-top: 1px solid var(--line); padding: 8px 0; scroll-margin-top: 12px; }
+.topic-entry:target { background: #eff6ff; }
+.topic-head { display: flex; gap: 6px; align-items: baseline; }
+.topic-title { font-weight: 600; font-size: 13px; }
+.topic-prop { font-size: 12px; color: #374151; margin: 3px 0; }
+.topic-entry.no-element { border-left: 3px solid #cbd5e1; padding-left: 8px; }
+.doc-entries { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
+.doc-entry { font-size: 12px; margin-bottom: 8px; }
+.doc-entry .k { font-family: ui-monospace, Consolas, monospace; color: var(--muted); }
+
+/* flag */
+.flag { font-size: 11px; border-radius: 3px; padding: 0 5px; border: 1px solid var(--line); background: var(--flag-bg); color: var(--warn); }
+.flag.self { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+.flag.info { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+.flag.warn { background: var(--flag-bg); }
+
+/* Review View：默认折叠，切到 review 才显示 */
+.l0-root[data-view="reading"] .review-slot { display: none; }
+.review { border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-top: 18px; background: var(--bg-soft); }
+.review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.review-box { border: 1px solid var(--line); border-radius: 6px; background: #fff; padding: 10px; }
+.review-facts { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+.diag ul { margin: 4px 0 0 16px; padding: 0; font-size: 12px; }
+.diag.hard b { color: var(--hard); }
+.diag.warn b { color: var(--warn); }
+.gap-list { list-style: none; margin: 0; padding: 0; }
+.gap-row { border-top: 1px dashed var(--line); padding: 6px 0; font-size: 12px; }
+.gap-why { margin-top: 2px; }
+.gap-reason { font-size: 11.5px; }

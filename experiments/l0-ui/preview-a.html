@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L0 Framework Map · Pre-class Fusion Context Consumption 语义模型</title>
+<link rel="stylesheet" href="../../app/renderer/l0-map.css">
+</head><body>
+<div class="preview-banner">
+  <b>F08 · L0 Framework Map 预览</b>
+  <span>A · sourceUnit 粒度 · 人类 candidate</span>
+  <span class="mono">source: docs/features/04-l0-framework-map/drafts/context-consumption.map.json</span>
+  <span class="mono">check-map: (未提供)</span>
+  <span>由 deterministic renderer 从 view model 生成；AI 未生成任何 HTML。</span>
+</div>
+
+<div class="l0-root" data-view="review">
+  <header class="l0-head">
+    <div class="l0-title">
+      <h1>Pre-class Fusion Context Consumption 语义模型</h1>
+      <div class="l0-sub mono">测试文档/18-context-consumption-semantic-model.md · level L0 · sourceUnit</div>
+    </div>
+    <div class="l0-facts">
+      <span class="fact">elements <b>12</b></span>
+      <span class="fact">edges <b>4</b></span>
+      <span class="fact">attachments <b>7</b></span>
+      <span class="fact">topics <b>5</b></span>
+      <span class="fact">relationGap <b>0</b></span>
+      
+      <span class="fact">无 element 的 Topic <b>0</b></span>
+    </div>
+    <div class="l0-toggle" role="tablist">
+      <button class="tab " data-l0-view="reading">Reading View</button>
+      <button class="tab active" data-l0-view="review">Review View</button>
+    </div>
+  </header>
+
+  <p class="l0-principle">
+    <b>Layout organizes space; it does not create semantics.</b>
+    下面的分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系；
+    唯一正式的语义是 <code>edge</code> / <code>attachment</code> / <code>qualifier</code> —— 每条边都在「关系」区显式写出方向。
+  </p>
+
+  <div class="l0-body">
+    <main class="l0-main">
+      <section class="block">
+        <h2>核心结构（按 element.type 分区 · 12 个）</h2>
+        
+          <div class="type-group">
+            <div class="type-head">process <span class="muted">×2</span></div>
+            <div class="cards">
+<article class="card type-process" id="element-E-03" data-element-id="E-03">
+  <header class="card-head">
+    <span class="eid">E-03</span>
+    <span class="card-label">Outline Generation Attempt</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">process</span>
+    <span class="chip role">role: instance</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">生成链路与消费点</a><a class="chip link" href="#topic-T-03" data-topic-id="T-03">消费的证据与判定</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-044</span><span class="ref">SU-046</span><span class="ref">SU-050</span><span class="ref">SU-076</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid"></span> <span class="rel">—consumes→</span> <a href="#element-E-02">Generation-facing Projection</a></li><li><span class="dir">出</span> <span class="eid"></span> <span class="rel">—produces→</span> <a href="#element-E-04">Context-shaped Outline Revision</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-E-08">Context Consumption</a></li></ul></div>
+</article>
+<article class="card type-process" id="element-E-05" data-element-id="E-05">
+  <header class="card-head">
+    <span class="eid">E-05</span>
+    <span class="card-label">Scene Generation</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">process</span>
+    <span class="chip role">role: consumer</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">生成链路与消费点</a><a class="chip link" href="#topic-T-04" data-topic-id="T-04">两条链的边界与状态组合</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-051</span><span class="ref">SU-055</span><span class="ref">SU-075</span><span class="ref">SU-076</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid"></span> <span class="rel">—consumes→</span> <a href="#element-E-04">Context-shaped Outline Revision</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-E-09">Output Alignment</a></li></ul></div>
+</article></div>
+          </div>
+          <div class="type-group">
+            <div class="type-head">artifact <span class="muted">×3</span></div>
+            <div class="cards">
+<article class="card type-artifact" id="element-E-01" data-element-id="E-01">
+  <header class="card-head">
+    <span class="eid">E-01</span>
+    <span class="card-label">Frozen Context</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: input</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">生成链路与消费点</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-014</span><span class="ref">SU-020</span><span class="ref">SU-058</span><span class="ref">SU-065</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-E-02">Generation-facing Projection</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-E-06">Context Receipt</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-E-02" data-element-id="E-02">
+  <header class="card-head">
+    <span class="eid">E-02</span>
+    <span class="card-label">Generation-facing Projection</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: intermediate</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 5</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">生成链路与消费点</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-046</span><span class="ref">SU-047</span><span class="ref">SU-048</span><span class="ref">SU-059</span><span class="ref">SU-080</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid"></span> <span class="rel">—depends-on→</span> <a href="#element-E-01">Frozen Context</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-E-03">Outline Generation Attempt</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-E-07">Context Availability</a></li></ul></div>
+</article>
+<article class="card type-artifact" id="element-E-04" data-element-id="E-04">
+  <header class="card-head">
+    <span class="eid">E-04</span>
+    <span class="card-label">Context-shaped Outline Revision</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">artifact</span>
+    <span class="chip role">role: intermediate</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">生成链路与消费点</a><a class="chip link" href="#topic-T-04" data-topic-id="T-04">两条链的边界与状态组合</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-054</span><span class="ref">SU-056</span><span class="ref">SU-062</span><span class="ref">SU-079</span></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-E-03">Outline Generation Attempt</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-E-05">Scene Generation</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-E-09">Output Alignment</a></li></ul></div>
+</article></div>
+          </div>
+          <div class="type-group">
+            <div class="type-head">concept <span class="muted">×4</span></div>
+            <div class="cards">
+<article class="card type-concept" id="element-E-06" data-element-id="E-06">
+  <header class="card-head">
+    <span class="eid">E-06</span>
+    <span class="card-label">Context Receipt</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">concept</span>
+    <span class="chip role">role: semantic-level</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-01" data-topic-id="T-01">三级递进语义</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-004</span><span class="ref">SU-012</span><span class="ref">SU-014</span><span class="ref">SU-057</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-01">Frozen Context</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-E-12">Receipt / Availability / Consumption 不能互相替代</a></li></ul></div>
+</article>
+<article class="card type-concept" id="element-E-07" data-element-id="E-07">
+  <header class="card-head">
+    <span class="eid">E-07</span>
+    <span class="card-label">Context Availability</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">concept</span>
+    <span class="chip role">role: semantic-level</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-01" data-topic-id="T-01">三级递进语义</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-004</span><span class="ref">SU-017</span><span class="ref">SU-018</span><span class="ref">SU-058</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-02">Generation-facing Projection</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-E-12">Receipt / Availability / Consumption 不能互相替代</a></li></ul></div>
+</article>
+<article class="card type-concept" id="element-E-08" data-element-id="E-08">
+  <header class="card-head">
+    <span class="eid">E-08</span>
+    <span class="card-label">Context Consumption</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">concept</span>
+    <span class="chip role">role: semantic-level</span>
+    <span class="chip topics">topics: 2</span>
+    <span class="chip prov">出处: 5</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-01" data-topic-id="T-01">三级递进语义</a><a class="chip link" href="#topic-T-03" data-topic-id="T-03">消费的证据与判定</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-004</span><span class="ref">SU-022</span><span class="ref">SU-023</span><span class="ref">SU-024</span><span class="ref">SU-085</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-03">Outline Generation Attempt</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-E-10">Consumption ≠ Output Alignment</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-E-11">Context Influence 不得作为第四级</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-E-12">Receipt / Availability / Consumption 不能互相替代</a></li></ul></div>
+</article>
+<article class="card type-concept" id="element-E-09" data-element-id="E-09">
+  <header class="card-head">
+    <span class="eid">E-09</span>
+    <span class="card-label">Output Alignment</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">concept</span>
+    <span class="chip role">role: output</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-04" data-topic-id="T-04">两条链的边界与状态组合</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-010</span><span class="ref">SU-039</span><span class="ref">SU-078</span><span class="ref">SU-080</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-04">Context-shaped Outline Revision</a> · <a href="#element-E-05">Scene Generation</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-E-10">Consumption ≠ Output Alignment</a></li></ul></div>
+</article></div>
+          </div>
+          <div class="type-group">
+            <div class="type-head">constraint <span class="muted">×3</span></div>
+            <div class="cards">
+<article class="card type-constraint" id="element-E-10" data-element-id="E-10">
+  <header class="card-head">
+    <span class="eid">E-10</span>
+    <span class="card-label">Consumption ≠ Output Alignment</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: boundary</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-04" data-topic-id="T-04">两条链的边界与状态组合</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-002</span><span class="ref">SU-008</span><span class="ref">SU-040</span><span class="ref">SU-079</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-08">Context Consumption</a> · <a href="#element-E-09">Output Alignment</a></li></ul></div>
+</article>
+<article class="card type-constraint" id="element-E-11" data-element-id="E-11">
+  <header class="card-head">
+    <span class="eid">E-11</span>
+    <span class="card-label">Context Influence 不得作为第四级</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: excluded</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-05" data-topic-id="T-05">语义边界与非主张</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-007</span><span class="ref">SU-032</span><span class="ref">SU-034</span><span class="ref">SU-084</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-08">Context Consumption</a></li></ul></div>
+</article>
+<article class="card type-constraint" id="element-E-12" data-element-id="E-12">
+  <header class="card-head">
+    <span class="eid">E-12</span>
+    <span class="card-label">Receipt / Availability / Consumption 不能互相替代</span>
+  </header>
+  <div class="card-meta">
+    <span class="chip type">constraint</span>
+    <span class="chip role">role: boundary</span>
+    <span class="chip topics">topics: 1</span>
+    <span class="chip prov">出处: 4</span>
+  </div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-01" data-topic-id="T-01">三级递进语义</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">SU-005</span><span class="ref">SU-019</span><span class="ref">SU-025</span><span class="ref">SU-064</span></span></div>
+  <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-06">Context Receipt</a> · <a href="#element-E-07">Context Availability</a> · <a href="#element-E-08">Context Consumption</a></li></ul></div>
+</article></div>
+          </div>
+      </section>
+
+      <section class="block" id="relations">
+        <h2>关系（edge · 4 条）</h2>
+        <ul class="edge-list">
+<li class="edge-row " id="edge-E-02-E-01" data-edge-id="" data-from="E-02" data-to="E-01">
+  <span class="edge-line">
+    <a class="node" href="#element-E-02">Generation-facing Projection</a>
+    <span class="rel">—depends-on→</span>
+    <a class="node" href="#element-E-01">Frozen Context</a>
+    
+  </span>
+  <span class="edge-meta">
+    
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-E-03-E-02" data-edge-id="" data-from="E-03" data-to="E-02">
+  <span class="edge-line">
+    <a class="node" href="#element-E-03">Outline Generation Attempt</a>
+    <span class="rel">—consumes→</span>
+    <a class="node" href="#element-E-02">Generation-facing Projection</a>
+    
+  </span>
+  <span class="edge-meta">
+    
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-E-03-E-04" data-edge-id="" data-from="E-03" data-to="E-04">
+  <span class="edge-line">
+    <a class="node" href="#element-E-03">Outline Generation Attempt</a>
+    <span class="rel">—produces→</span>
+    <a class="node" href="#element-E-04">Context-shaped Outline Revision</a>
+    
+  </span>
+  <span class="edge-meta">
+    
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li>
+<li class="edge-row " id="edge-E-05-E-04" data-edge-id="" data-from="E-05" data-to="E-04">
+  <span class="edge-line">
+    <a class="node" href="#element-E-05">Scene Generation</a>
+    <span class="rel">—consumes→</span>
+    <a class="node" href="#element-E-04">Context-shaped Outline Revision</a>
+    
+  </span>
+  <span class="edge-meta">
+    
+    
+    <span class="muted">（无 label）</span>
+  </span>
+</li></ul>
+      </section>
+
+      <section class="block" id="attachments">
+        <h2>侧挂 / 约束（attachments · 7 条）</h2>
+        <ul class="attach-list">
+<li class="attach-row" id="attachment-E-06" data-attach-id="E-06">
+  <a class="node" href="#element-E-06">Context Receipt</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-E-01">Frozen Context</a>
+  <span class="edge-meta"><span class="chip type">type: concept</span></span>
+</li>
+<li class="attach-row" id="attachment-E-07" data-attach-id="E-07">
+  <a class="node" href="#element-E-07">Context Availability</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-E-02">Generation-facing Projection</a>
+  <span class="edge-meta"><span class="chip type">type: concept</span></span>
+</li>
+<li class="attach-row" id="attachment-E-08" data-attach-id="E-08">
+  <a class="node" href="#element-E-08">Context Consumption</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-E-03">Outline Generation Attempt</a>
+  <span class="edge-meta"><span class="chip type">type: concept</span></span>
+</li>
+<li class="attach-row" id="attachment-E-09" data-attach-id="E-09">
+  <a class="node" href="#element-E-09">Output Alignment</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-E-04">Context-shaped Outline Revision</a> · <a class="node" href="#element-E-05">Scene Generation</a>
+  <span class="edge-meta"><span class="chip type">type: concept</span></span>
+</li>
+<li class="attach-row" id="attachment-E-10" data-attach-id="E-10">
+  <a class="node" href="#element-E-10">Consumption ≠ Output Alignment</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-E-08">Context Consumption</a> · <a class="node" href="#element-E-09">Output Alignment</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li>
+<li class="attach-row" id="attachment-E-11" data-attach-id="E-11">
+  <a class="node" href="#element-E-11">Context Influence 不得作为第四级</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-E-08">Context Consumption</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li>
+<li class="attach-row" id="attachment-E-12" data-attach-id="E-12">
+  <a class="node" href="#element-E-12">Receipt / Availability / Consumption 不能互相替代</a>
+  <span class="rel">⇢ 挂到</span>
+  <a class="node" href="#element-E-06">Context Receipt</a> · <a class="node" href="#element-E-07">Context Availability</a> · <a class="node" href="#element-E-08">Context Consumption</a>
+  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+</li></ul>
+      </section>
+
+      <div class="review-slot">
+<section class="review" id="review">
+  <h2>Review View · 审阅信息</h2>
+  <p class="note">这些是审阅信息，<b>不是</b>图上的语义。relationGap 不是 edge；告警不影响渲染。</p>
+  <div class="review-grid">
+    <div class="review-box">
+      <h3>check-map 结论（未提供）</h3>
+      <div class="muted">未提供 check-map.txt —— 不猜测</div>
+    </div>
+    <div class="review-box">
+      <h3>relationGap（0）</h3>
+      <ul class="gap-list"><li class="muted">（无 relationGap）</li></ul>
+    </div>
+    <div class="review-box">
+      <h3>诊断</h3>
+      <ul>
+        <li>role 未知：无</li>
+        <li>无 provenance 的 element：无</li>
+        <li>无 sectionRefs 的 Topic：T-01, T-02, T-03, T-04, T-05</li>
+        <li>孤立元素：无</li>
+      </ul>
+    </div>
+  </div>
+</section></div>
+    </main>
+
+    <aside class="l0-nav" id="topic-nav">
+      <h2>Topic Navigation（完整入口索引 · 5）</h2>
+      <p class="note">这里与左侧不是一一对应的：左边是<b>核心机制</b>，这里是<b>完整入口</b>。没有 L0 element 的 Topic 也照样能进入。</p>
+      <ul class="topic-list">
+<li class="topic-entry " id="topic-T-01" data-topic-id="T-01">
+  <div class="topic-head">
+    <span class="eid">T-01</span>
+    <span class="topic-title">三级递进语义</span>
+    
+  </div>
+  <div class="topic-prop">Receipt、Availability、Consumption 是三个可以同时为真、但不能互相替代的语义层级 —— 上下文到了不等于可用，可用不等于被消费；被消费的是教学语义，不是实现控制对象。</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-06">Context Receipt</a><a class="chip link" href="#element-E-07">Context Availability</a><a class="chip link" href="#element-E-08">Context Consumption</a><a class="chip link" href="#element-E-12">Receipt / Availability / Consumption 不能互相替代</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-02, O-07, O-08, O-09</span></span></div>
+</li>
+<li class="topic-entry " id="topic-T-02" data-topic-id="T-02">
+  <div class="topic-head">
+    <span class="eid">T-02</span>
+    <span class="topic-title">生成链路与消费点</span>
+    
+  </div>
+  <div class="topic-prop">消费点是 outline generation：Frozen Context 派生出的 projection 必须成为 outline 生成的真实输入，而不是被附加在 Prompt 里；scene 继承的是 context-shaped outline。</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-01">Frozen Context</a><a class="chip link" href="#element-E-02">Generation-facing Projection</a><a class="chip link" href="#element-E-03">Outline Generation Attempt</a><a class="chip link" href="#element-E-04">Context-shaped Outline Revision</a><a class="chip link" href="#element-E-05">Scene Generation</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-04, O-04b, O-04c</span></span></div>
+</li>
+<li class="topic-entry " id="topic-T-03" data-topic-id="T-03">
+  <div class="topic-head">
+    <span class="eid">T-03</span>
+    <span class="topic-title">消费的证据与判定</span>
+    
+  </div>
+  <div class="topic-prop">判定消费的最低证据是「某一次 Outline Generation Attempt 实际使用了 generation-facing projection」；函数调用、Prompt 字符串、成功返回都不能升级为 Consumption。</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-03">Outline Generation Attempt</a><a class="chip link" href="#element-E-08">Context Consumption</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-10, O-10b, O-16, O-14</span></span></div>
+</li>
+<li class="topic-entry " id="topic-T-04" data-topic-id="T-04">
+  <div class="topic-head">
+    <span class="eid">T-04</span>
+    <span class="topic-title">两条链的边界与状态组合</span>
+    
+  </div>
+  <div class="topic-prop">Consumption 管「这次生成用了什么」，Output Alignment 管「生成出来体现了什么」；两链在 outline revision 处衔接，五种状态组合各有产品解释。</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-04">Context-shaped Outline Revision</a><a class="chip link" href="#element-E-05">Scene Generation</a><a class="chip link" href="#element-E-09">Output Alignment</a><a class="chip link" href="#element-E-10">Consumption ≠ Output Alignment</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-05, O-06, O-11b, O-13</span></span></div>
+</li>
+<li class="topic-entry " id="topic-T-05" data-topic-id="T-05">
+  <div class="topic-head">
+    <span class="eid">T-05</span>
+    <span class="topic-title">语义边界与非主张</span>
+    
+  </div>
+  <div class="topic-prop">消费不要求盲目服从，也不要求输出明显不同；本篇不采用第四级 Context Influence，也不承诺某个输出变化严格由上下文导致。</div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-11">Context Influence 不得作为第四级</a></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><span class="muted">（无出处）</span><span class="muted">· L2 blocks: O-03, O-10c, O-11, O-12, O-15</span></span></div>
+</li></ul>
+      <div class="doc-entries">
+        <h3>文档级入口</h3>
+        <div class="doc-entry"><span class="k">scope</span><div>本文只讨论 Context Consumption 的产品语义层级，不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。</div><div class="v"><span class="ref">SU-001</span></div></div><div class="doc-entry"><span class="k">nonGoalSummary</span><div>不采用 Context Influence 作为第四级；不承诺输出变化严格由 DeepTutor 上下文导致。</div><div class="v"><span class="ref">SU-007</span><span class="ref">SU-034</span><span class="ref">SU-083</span></div></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+  // 唯一的前端行为：Reading / Review 视图切换（不改变任何数据）
+  document.addEventListener('click', (ev) => {
+    const t = ev.target.closest('[data-l0-view]');
+    if (!t) return;
+    const root = t.closest('.l0-root');
+    root.setAttribute('data-view', t.getAttribute('data-l0-view'));
+    root.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b === t));
+  });
+</script>
+</body></html>
