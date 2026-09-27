@@ -63,15 +63,24 @@ const relZh = (t) => REL_ZH[t] || t;
 
 /**
  * 副标题的显示收敛（纯显示，不改数据）：
- * 长列表只露前两项 + 项数，完整内容在节点 hover / focus 后的详情里。
- * 注意措辞是「共 N 项」而不是「N 个函数」—— 数的是**这个 label 里列了几项**，
- * 不是替生成物解释这些项是什么（那属于生成侧的事，UI 不代它回答）。
+ * 只有**平铺的标识符列表**才做"前两项 + 项数"压缩，其余一律按字符截断。
+ * 判据（踩过坑）：
+ *   · `、` 永远是分隔符；
+ *   · `/` 只有在**两边都有空格**时才算分隔符 —— 否则像 `retryAfterSalesCompensation * / 10`
+ *     这种 cron 表达式会被切成两项（这是真实被切坏过的例子）；
+ *   · 含括号的（有嵌套结构）不做项数压缩，直接截断。
+ * 措辞是「共 N 项」而不是「N 个函数」：数的是这个 label 里列了几项，
+ * 不替生成物解释这些项是什么（那是生成侧的事，UI 不代它回答）。
+ * 完整内容始终在节点的 hover / 详情里。
  */
 function shortSubtitle(text) {
   const s = String(text == null ? '' : text).trim();
   if (s.length <= 34) return s;
-  const items = s.split(/[、/]/).map((x) => x.trim()).filter(Boolean);
-  if (items.length >= 4) return `${items.slice(0, 2).join('、')} … 共 ${items.length} 项`;
+  const nested = /[（(）)]/.test(s);
+  if (!nested) {
+    const items = s.split(/、|\s+\/\s+/).map((x) => x.trim()).filter(Boolean);
+    if (items.length >= 4) return `${items.slice(0, 2).join('、')} … 共 ${items.length} 项`;
+  }
   return s.slice(0, 33) + '…';
 }
 

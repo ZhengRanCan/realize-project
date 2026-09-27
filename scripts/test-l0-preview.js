@@ -238,13 +238,33 @@ check('Reading 里没有残留工程词（constraints / Focused Relations / Inco
   }
   return true;
 });
-check('长列表副标题被收敛（前两项 + 共 N 项），完整内容留在 title 里', () => {
+check('节点副标题的收敛是"安全投影"：要么全文、要么前缀+…、要么前两项+共 N 项', () => {
+  // 与 renderer 里 shortSubtitle 的规则一致（这里把它当规格钉住）
+  const expectShort = (s) => {
+    const t = String(s || '').trim();
+    if (t.length <= 34) return t;
+    if (!/[（(）)]/.test(t)) {
+      const items = t.split(/、|\s+\/\s+/).map((x) => x.trim()).filter(Boolean);
+      if (items.length >= 4) return `${items.slice(0, 2).join('、')} … 共 ${items.length} 项`;
+    }
+    return t.slice(0, 33) + '…';
+  };
+  for (const b of built) {
+    const pairs = [...b.reading.matchAll(/class="node-sub" title="([^"]*)">([^<]*)</g)];
+    for (const [, full, shown] of pairs) {
+      if (shown !== expectShort(full)) return `${b.item.name}: 收敛不符规格\n      全文: ${full}\n      显示: ${shown}`;
+    }
+  }
+  return true;
+});
+check('回归：cron / 斜杠标识符不会被当成分隔符切坏', () => {
   const b = byName('e');
-  if (!b.reading.includes('共 ')) return '没有收敛长列表副标题';
-  const subs = [...b.reading.matchAll(/class="node-sub" title="([^"]*)"/g)].map((m) => m[1]);
-  if (!subs.length) return '节点副标题没有 title（无法 hover 看全文）';
-  const long = subs.filter((s) => s.length > 34);
-  return long.length ? true : '样本没有长副标题（断言失效，需换样本）';
+  const pairs = [...b.reading.matchAll(/class="node-sub" title="([^"]*)">([^<]*)</g)].map((m) => [m[1], m[2]]);
+  const cron = pairs.find(([full]) => full.includes('*/10'));
+  if (!cron) return '样本里没有 cron 表达式（断言失效，需换样本）';
+  if (cron[1].includes('*、')) return `cron 被切断：${cron[1]}`;
+  if (cron[1].includes('共 ') && !cron[0].includes('（')) return 'cron 文本走了项数压缩';
+  return true;
 });
 check('标题/副标题的行数规则写死在 CSS（标题 1 行、副标题 2 行）', () => {
   const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
