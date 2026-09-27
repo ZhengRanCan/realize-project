@@ -91,10 +91,22 @@ Contract 没编的关系，layout 不许"画"出来。
 Phase 0  Precondition + 现有 app 集成面审计            ✅ 完成
 Phase 1  framework-map → view-model adapter            ✅ 完成（scripts/l0-view-model.js）
 Phase 2  standalone HTML preview（Fixture D + E）      ✅ 完成（scripts/build-l0-preview.js）
-Phase 3  Electron L0 screen integration（一屏两区）     ⬜ 待做
-Phase 4  交互：element / edge / topic / provenance     ⬜ 待做
-Phase 5  A–E regression + 人工视觉审阅                 🟡 自动化部分已完成（34/34 + 51/51）
+Phase 3  Electron L0 screen integration（一屏两区）     ✅ 第一版完成（第三个一级页面 · L0 框架图）
+Phase 4  交互：element / edge / topic / provenance     ✅ 第一版完成（selection / focus / Focused Relations）
+Phase 5  A–E regression（自动化 ✅ 34+60）· 人工 Track A ⬜ 待做
 ```
+
+> **Phase 3/4 第一版说明**：Electron 里新增第三个一级页面「L0 框架图」（与方案总览 / 决策清单并列），
+> 读取 `framework-map.json`（主进程算 view model → `window.L0Map.mount` 渲染，**与预览共用同一份 renderer**）。
+> 交互按用户裁决做成 **interaction-based graph reading**：点 element 聚焦其直接相邻的 edge / attachment 并展开
+> **Focused Relations**；点 edge 同时聚焦两端并展开 qualifier / provenance；点 topic 高亮关联 elements
+> （无 element 也照常进入）；点 provenance 打开右侧 Source 面板对应章节；`清除选择` / `Esc` 回到 Overview。
+
+⚠️ **Electron L0 页面目前只有"能加载并渲染"的接线，还没有自动化 UI 断言**（预览侧的 60 条断言覆盖了同一份
+renderer 模块）。给 selftest 补 L0 断言属于 Phase 5 的收尾项。
+
+⚠️ 顺带改动一条**既有 selftest 断言**：`一级导航只有两个页面` → 同步为三个页面（加 L0 是有意的产品变更，
+不是回归）。`npm run selftest` 仍 PASSED。
 
 ### 第一版必须表达的（Phase 2 已覆盖）
 

@@ -11,34 +11,33 @@
   <span class="mono">source: experiments/semantic-grounding/fixture-e/run-08/framework-map.json</span>
   <span class="mono">check-map: experiments/semantic-grounding/fixture-e/run-08/check-map.txt</span>
   <span>由 deterministic renderer 从 view model 生成；AI 未生成任何 HTML。</span>
+  <span id="preview-source-hit" class="mono" style="display:none"></span>
 </div>
 
-<div class="l0-root" data-view="review">
+<div class="l0-root" data-view="reading">
   <header class="l0-head">
     <div class="l0-title">
       <h1>F13–F16 售后链路运行验证 &amp; 部署手册</h1>
-      <div class="l0-sub mono">测试文档/fixture-e-f13-f16-runbook.md · level L0 · section (provisional) ⚠️ provisional</div>
-    </div>
-    <div class="l0-facts">
-      <span class="fact">elements <b>12</b></span>
-      <span class="fact">edges <b>8</b></span>
-      <span class="fact">attachments <b>5</b></span>
-      <span class="fact">topics <b>9</b></span>
-      <span class="fact">relationGap <b>0</b></span>
-      
-      <span class="fact">无 element 的 Topic <b>1</b></span>
+      <div class="l0-sub mono">测试文档/fixture-e-f13-f16-runbook.md · L0 · role current</div>
     </div>
     <div class="l0-toggle" role="tablist">
-      <button class="tab " data-l0-view="reading">Reading View</button>
-      <button class="tab active" data-l0-view="review">Review View</button>
+      <button class="tab active" data-l0-view="reading">Reading View</button>
+      <button class="tab " data-l0-view="review">Review View</button>
+      <button class="tab ghost" data-focus-clear="1">清除选择</button>
     </div>
   </header>
 
+  <div class="l0-scope"><span class="k">这是什么文档</span> 本手册给出 F13–F16 售后链路的部署、沙箱运行验证、证据留存与沙箱→真实环境切换的可执行步骤。</div>
+  <details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>不新增让用户选择库存释放时机的 preferredReleaseStock 字段（§10 决策 3 明确不推荐）；不改动 payOrder / payNotify 等支付核心文件，退款域只以 WX_PAY_* 作缺省回退。</div></details>
+
   <p class="l0-principle">
     <b>Layout organizes space; it does not create semantics.</b>
-    下面的分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系；
-    唯一正式的语义是 <code>edge</code> / <code>attachment</code> / <code>qualifier</code> —— 每条边都在「关系」区显式写出方向。
+    分区依据是 <code>element.type</code>（契约字段），<b>不是</b>关系；唯一正式的语义是
+    <code>edge</code> / <code>attachment</code> / <code>qualifier</code> —— 每条边都在「关系」区显式写出方向。
+    点任意元素 / 边 / Topic 可以聚焦并追关系。
   </p>
+
+  <div class="l0-focus-slot" id="l0-focus-slot"></div>
 
   <div class="l0-body">
     <main class="l0-main">
@@ -48,7 +47,7 @@
           <div class="type-group">
             <div class="type-head">process <span class="muted">×4</span></div>
             <div class="cards">
-<article class="card type-process" id="element-E-01" data-element-id="E-01">
+<article class="card type-process" id="element-E-01" data-element-id="E-01" data-focus-target="E-01" tabindex="0">
   <header class="card-head">
     <span class="eid">E-01</span>
     <span class="card-label">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span>
@@ -59,12 +58,25 @@
     <span class="chip topics">topics: 1</span>
     <span class="chip prov">出处: 5</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">部署前置与云函数发布</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§2</span><span class="ref">§2.1</span><span class="ref">§2.2</span><span class="ref">§3</span><span class="ref">§3.1</span></span></div>
-  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">ED-01</span> <span class="rel">—produces→</span> <a href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a></li><li><span class="dir">出</span> <span class="eid">ED-02</span> <span class="rel">—produces→</span> <a href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a></li></ul></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</a></li></ul></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-02">部署前置与云函数发布</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§2" title="打开原文位置">§2</button><button class="ref as-link" data-source-ref="§2.1" title="打开原文位置">§2.1</button><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§3" title="打开原文位置">§3</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li data-edge-ref="ED-01"><span class="rel">—produces→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-02"><span class="rel">—produces→</span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="E-01" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-01</span> 部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel">—produces→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-02"><span class="rel">—produces→</span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§2" title="打开原文位置">§2</button><button class="ref as-link" data-source-ref="§2.1" title="打开原文位置">§2.1</button><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§3" title="打开原文位置">§3</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button></div></div>
+  </div>
+</section>
 </article>
-<article class="card type-process" id="element-E-04" data-element-id="E-04">
+<article class="card type-process" id="element-E-04" data-element-id="E-04" data-focus-target="E-04" tabindex="0">
   <header class="card-head">
     <span class="eid">E-04</span>
     <span class="card-label">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span>
@@ -75,12 +87,25 @@
     <span class="chip topics">topics: 1</span>
     <span class="chip prov">出处: 6</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-03" data-topic-id="T-03">沙箱模式端到端验证</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§4.1</span><span class="ref">§4.2</span><span class="ref">§4.3</span><span class="ref">§4.4</span><span class="ref">§4.5</span><span class="ref">§4.6</span></span></div>
-  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">ED-03</span> <span class="rel">—consumes→</span> <a href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a></li><li><span class="dir">出</span> <span class="eid">ED-04</span> <span class="rel">—produces→</span> <a href="#element-E-07">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-E-08">沙箱 → 真实环境切换与切换后回归</a></li></ul></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-03">沙箱模式端到端验证</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li data-edge-ref="ED-03"><span class="rel">—consumes→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-04"><span class="rel">—produces→</span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li><li data-edge-ref="ED-06"><span class="rel">←depends-on—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
   
+  
+<section class="focus-panel" data-focus-for="E-04" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-04</span> 沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel">←depends-on—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-03"><span class="rel">—consumes→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li><li data-edge-ref="ED-04"><span class="rel">—produces→</span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button></div></div>
+  </div>
+</section>
 </article>
-<article class="card type-process" id="element-E-05" data-element-id="E-05">
+<article class="card type-process" id="element-E-05" data-element-id="E-05" data-focus-target="E-05" tabindex="0">
   <header class="card-head">
     <span class="eid">E-05</span>
     <span class="card-label">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
@@ -91,12 +116,25 @@
     <span class="chip topics">topics: 3</span>
     <span class="chip prov">出处: 4</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-03" data-topic-id="T-03">沙箱模式端到端验证</a><a class="chip link" href="#topic-T-06" data-topic-id="T-06">故障排查速查</a><a class="chip link" href="#topic-T-08" data-topic-id="T-08">未发货仅退款库存释放时机决策</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§3.2</span><span class="ref">§4.7</span><span class="ref">§4.8</span><span class="ref">§6.3</span></span></div>
-  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">ED-05</span> <span class="rel">—depends-on→</span> <a href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a></li></ul></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-E-09">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-C-01">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</a></li></ul></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-03">沙箱模式端到端验证</button><button class="chip link" data-topic-focus="T-06">故障排查速查</button><button class="chip link" data-topic-focus="T-08">未发货仅退款库存释放时机决策</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li data-edge-ref="ED-05"><span class="rel">—depends-on→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="E-05" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-05</span> 资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-05"><span class="rel">—depends-on→</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button></div></div>
+  </div>
+</section>
 </article>
-<article class="card type-process" id="element-E-08" data-element-id="E-08">
+<article class="card type-process" id="element-E-08" data-element-id="E-08" data-focus-target="E-08" tabindex="0">
   <header class="card-head">
     <span class="eid">E-08</span>
     <span class="card-label">沙箱 → 真实环境切换与切换后回归</span>
@@ -107,16 +145,29 @@
     <span class="chip topics">topics: 1</span>
     <span class="chip prov">出处: 4</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-05" data-topic-id="T-05">沙箱到真实环境的切换</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§7</span><span class="ref">§7.1</span><span class="ref">§7.2</span><span class="ref">§7.3</span></span></div>
-  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir">出</span> <span class="eid">ED-06</span> <span class="rel">—depends-on→</span> <a href="#element-E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</a></li><li><span class="dir">出</span> <span class="eid">ED-07</span> <span class="rel">—depends-on→</span> <a href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a></li><li><span class="dir">出</span> <span class="eid">ED-08</span> <span class="rel">—produces→</span> <a href="#element-E-07">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</a></li></ul></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-05">沙箱到真实环境的切换</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§7.2" title="打开原文位置">§7.2</button><button class="ref as-link" data-source-ref="§7.3" title="打开原文位置">§7.3</button></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li data-edge-ref="ED-06"><span class="rel">—depends-on→</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-07"><span class="rel">—depends-on→</span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li><li data-edge-ref="ED-08"><span class="rel">—produces→</span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li></ul></div>
   
+  
+<section class="focus-panel" data-focus-for="E-08" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-08</span> 沙箱 → 真实环境切换与切换后回归</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li data-edge-ref="ED-06"><span class="rel">—depends-on→</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-07"><span class="rel">—depends-on→</span> <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li><li data-edge-ref="ED-08"><span class="rel">—produces→</span> <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span></li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§7.2" title="打开原文位置">§7.2</button><button class="ref as-link" data-source-ref="§7.3" title="打开原文位置">§7.3</button></div></div>
+  </div>
+</section>
 </article></div>
           </div>
           <div class="type-group">
             <div class="type-head">artifact <span class="muted">×3</span></div>
             <div class="cards">
-<article class="card type-artifact" id="element-E-02" data-element-id="E-02">
+<article class="card type-artifact" id="element-E-02" data-element-id="E-02" data-focus-target="E-02" tabindex="0">
   <header class="card-head">
     <span class="eid">E-02</span>
     <span class="card-label">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
@@ -127,12 +178,25 @@
     <span class="chip topics">topics: 3</span>
     <span class="chip prov">出处: 3</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-01" data-topic-id="T-01">F13–F16 售后链路的构成与依赖顺序</a><a class="chip link" href="#topic-T-02" data-topic-id="T-02">部署前置与云函数发布</a><a class="chip link" href="#topic-T-07" data-topic-id="T-07">与 F01 支付域的边界</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§1</span><span class="ref">§3.1</span><span class="ref">§9</span></span></div>
-  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</a></li><li><span class="dir in">入</span> <span class="rel">←consumes—</span> <a href="#element-E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a></li></ul></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</a></li><li><span class="dir in">挂靠</span> ← <a href="#element-C-01">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</a></li></ul></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-01">F13–F16 售后链路的构成与依赖顺序</button><button class="chip link" data-topic-focus="T-02">部署前置与云函数发布</button><button class="chip link" data-topic-focus="T-07">与 F01 支付域的边界</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li data-edge-ref="ED-01"><span class="rel">←produces—</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-03"><span class="rel">←consumes—</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-05"><span class="rel">←depends-on—</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="E-02" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-02</span> F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-01"><span class="rel">←produces—</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-03"><span class="rel">←consumes—</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-05"><span class="rel">←depends-on—</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span></li><li><span class="rel">⇐ 挂靠</span> <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></div></div>
+  </div>
+</section>
 </article>
-<article class="card type-artifact" id="element-E-03" data-element-id="E-03">
+<article class="card type-artifact" id="element-E-03" data-element-id="E-03" data-focus-target="E-03" tabindex="0">
   <header class="card-head">
     <span class="eid">E-03</span>
     <span class="card-label">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span>
@@ -143,12 +207,25 @@
     <span class="chip topics">topics: 3</span>
     <span class="chip prov">出处: 4</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">部署前置与云函数发布</a><a class="chip link" href="#topic-T-05" data-topic-id="T-05">沙箱到真实环境的切换</a><a class="chip link" href="#topic-T-06" data-topic-id="T-06">故障排查速查</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§3.2</span><span class="ref">§3.3</span><span class="ref">§3.4</span><span class="ref">§7.1</span></span></div>
-  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</a></li><li><span class="dir in">入</span> <span class="rel">←depends-on—</span> <a href="#element-E-08">沙箱 → 真实环境切换与切换后回归</a></li></ul></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir in">挂靠</span> ← <a href="#element-C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</a></li></ul></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-02">部署前置与云函数发布</button><button class="chip link" data-topic-focus="T-05">沙箱到真实环境的切换</button><button class="chip link" data-topic-focus="T-06">故障排查速查</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§3.4" title="打开原文位置">§3.4</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li data-edge-ref="ED-02"><span class="rel">←produces—</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-07"><span class="rel">←depends-on—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="E-03" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-03</span> 云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-02"><span class="rel">←produces—</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span></li><li data-edge-ref="ED-07"><span class="rel">←depends-on—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇐ 挂靠</span> <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§3.4" title="打开原文位置">§3.4</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button></div></div>
+  </div>
+</section>
 </article>
-<article class="card type-artifact" id="element-E-07" data-element-id="E-07">
+<article class="card type-artifact" id="element-E-07" data-element-id="E-07" data-focus-target="E-07" tabindex="0">
   <header class="card-head">
     <span class="eid">E-07</span>
     <span class="card-label">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span>
@@ -159,16 +236,29 @@
     <span class="chip topics">topics: 1</span>
     <span class="chip prov">出处: 3</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-04" data-topic-id="T-04">证据留存与独立审查</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§5</span><span class="ref">§5.3</span><span class="ref">§6</span></span></div>
-  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</a></li><li><span class="dir in">入</span> <span class="rel">←produces—</span> <a href="#element-E-08">沙箱 → 真实环境切换与切换后回归</a></li></ul></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-04">证据留存与独立审查</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button></span></div>
+  <div class="card-row"><span class="k">关系</span><ul class="rel-list"><li data-edge-ref="ED-04"><span class="rel">←produces—</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-08"><span class="rel">←produces—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
   
+  
+<section class="focus-panel" data-focus-for="E-07" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-07</span> 证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li data-edge-ref="ED-04"><span class="rel">←produces—</span> <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span></li><li data-edge-ref="ED-08"><span class="rel">←produces—</span> <span class="node">沙箱 → 真实环境切换与切换后回归</span></li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button></div></div>
+  </div>
+</section>
 </article></div>
           </div>
           <div class="type-group">
             <div class="type-head">concept <span class="muted">×1</span></div>
             <div class="cards">
-<article class="card type-concept" id="element-E-09" data-element-id="E-09">
+<article class="card type-concept" id="element-E-09" data-element-id="E-09" data-focus-target="E-09" tabindex="0">
   <header class="card-head">
     <span class="eid">E-09</span>
     <span class="card-label">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span>
@@ -179,16 +269,29 @@
     <span class="chip topics">topics: 1</span>
     <span class="chip prov">出处: 5</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-08" data-topic-id="T-08">未发货仅退款库存释放时机决策</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§10</span><span class="ref">§现状对照表</span><span class="ref">§两种实现的风险</span><span class="ref">§Reviewer 决策项（必看）</span><span class="ref">§默认推荐</span></span></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-08">未发货仅退款库存释放时机决策</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button><button class="ref as-link" data-source-ref="§现状对照表" title="打开原文位置">§现状对照表</button><button class="ref as-link" data-source-ref="§两种实现的风险" title="打开原文位置">§两种实现的风险</button><button class="ref as-link" data-source-ref="§Reviewer 决策项（必看）" title="打开原文位置">§Reviewer 决策项（必看）</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></span></div>
   <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="E-09" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-09</span> 未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button><button class="ref as-link" data-source-ref="§现状对照表" title="打开原文位置">§现状对照表</button><button class="ref as-link" data-source-ref="§两种实现的风险" title="打开原文位置">§两种实现的风险</button><button class="ref as-link" data-source-ref="§Reviewer 决策项（必看）" title="打开原文位置">§Reviewer 决策项（必看）</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></div></div>
+  </div>
+</section>
 </article></div>
           </div>
           <div class="type-group">
             <div class="type-head">state <span class="muted">×1</span></div>
             <div class="cards">
-<article class="card type-state" id="element-E-06" data-element-id="E-06">
+<article class="card type-state" id="element-E-06" data-element-id="E-06" data-focus-target="E-06" tabindex="0">
   <header class="card-head">
     <span class="eid">E-06</span>
     <span class="card-label">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span>
@@ -199,16 +302,29 @@
     <span class="chip topics">topics: 3</span>
     <span class="chip prov">出处: 4</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-03" data-topic-id="T-03">沙箱模式端到端验证</a><a class="chip link" href="#topic-T-04" data-topic-id="T-04">证据留存与独立审查</a><a class="chip link" href="#topic-T-06" data-topic-id="T-06">故障排查速查</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§4.2</span><span class="ref">§4.3</span><span class="ref">§4.4</span><span class="ref">§6.2</span></span></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-03">沙箱模式端到端验证</button><button class="chip link" data-topic-focus="T-04">证据留存与独立审查</button><button class="chip link" data-topic-focus="T-06">故障排查速查</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></span></div>
   <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="E-06" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">E-06</span> 售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></div></div>
+  </div>
+</section>
 </article></div>
           </div>
           <div class="type-group">
             <div class="type-head">constraint <span class="muted">×3</span></div>
             <div class="cards">
-<article class="card type-constraint" id="element-C-01" data-element-id="C-01">
+<article class="card type-constraint" id="element-C-01" data-element-id="C-01" data-focus-target="C-01" tabindex="0">
   <header class="card-head">
     <span class="eid">C-01</span>
     <span class="card-label">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span>
@@ -219,12 +335,25 @@
     <span class="chip topics">topics: 2</span>
     <span class="chip prov">出处: 4</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-03" data-topic-id="T-03">沙箱模式端到端验证</a><a class="chip link" href="#topic-T-04" data-topic-id="T-04">证据留存与独立审查</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§4.4</span><span class="ref">§4.8</span><span class="ref">§6.1</span><span class="ref">§6.2</span></span></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-03">沙箱模式端到端验证</button><button class="chip link" data-topic-focus="T-04">证据留存与独立审查</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.1" title="打开原文位置">§6.1</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></span></div>
   <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a> · <a href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span> · <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="C-01" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">C-01</span> 权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span> · <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.1" title="打开原文位置">§6.1</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></div></div>
+  </div>
+</section>
 </article>
-<article class="card type-constraint" id="element-C-02" data-element-id="C-02">
+<article class="card type-constraint" id="element-C-02" data-element-id="C-02" data-focus-target="C-02" tabindex="0">
   <header class="card-head">
     <span class="eid">C-02</span>
     <span class="card-label">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span>
@@ -235,12 +364,25 @@
     <span class="chip topics">topics: 3</span>
     <span class="chip prov">出处: 5</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-03" data-topic-id="T-03">沙箱模式端到端验证</a><a class="chip link" href="#topic-T-04" data-topic-id="T-04">证据留存与独立审查</a><a class="chip link" href="#topic-T-06" data-topic-id="T-06">故障排查速查</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§4.7</span><span class="ref">§5.3</span><span class="ref">§6.3</span><span class="ref">§6.4</span><span class="ref">§默认推荐</span></span></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-03">沙箱模式端到端验证</button><button class="chip link" data-topic-focus="T-04">证据留存与独立审查</button><button class="chip link" data-topic-focus="T-06">故障排查速查</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></span></div>
   <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="C-02" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">C-02</span> 补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></div></div>
+  </div>
+</section>
 </article>
-<article class="card type-constraint" id="element-C-03" data-element-id="C-03">
+<article class="card type-constraint" id="element-C-03" data-element-id="C-03" data-focus-target="C-03" tabindex="0">
   <header class="card-head">
     <span class="eid">C-03</span>
     <span class="card-label">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span>
@@ -251,10 +393,23 @@
     <span class="chip topics">topics: 3</span>
     <span class="chip prov">出处: 5</span>
   </div>
-  <div class="card-row"><span class="k">Topic</span><span class="v"><a class="chip link" href="#topic-T-02" data-topic-id="T-02">部署前置与云函数发布</a><a class="chip link" href="#topic-T-05" data-topic-id="T-05">沙箱到真实环境的切换</a><a class="chip link" href="#topic-T-07" data-topic-id="T-07">与 F01 支付域的边界</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§2.2</span><span class="ref">§2.3</span><span class="ref">§5.5</span><span class="ref">§7.1</span><span class="ref">§9</span></span></div>
+  <div class="card-row"><span class="k">Topic</span><span class="v"><button class="chip link" data-topic-focus="T-02">部署前置与云函数发布</button><button class="chip link" data-topic-focus="T-05">沙箱到真实环境的切换</button><button class="chip link" data-topic-focus="T-07">与 F01 支付域的边界</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§2.3" title="打开原文位置">§2.3</button><button class="ref as-link" data-source-ref="§5.5" title="打开原文位置">§5.5</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></span></div>
   <div class="card-row"><span class="k">关系</span><span class="v muted">（该元素不在任何 edge 上）</span></div>
-  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="dir">挂出</span> → <a href="#element-E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</a> · <a href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a></li></ul></div>
+  <div class="card-row"><span class="k">侧挂</span><ul class="rel-list"><li><span class="rel">⇢ 挂到</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span> · <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
+  
+<section class="focus-panel" data-focus-for="C-03" hidden>
+  <header class="focus-head">
+    <span class="focus-title">Focused Relations · <span class="eid">C-03</span> 环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span>
+    <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
+  </header>
+  <div class="focus-cols">
+    <div class="focus-col"><h4>Incoming</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Outgoing</h4><ul class="focus-list"><li class="muted">（无）</li></ul></div>
+    <div class="focus-col"><h4>Attached</h4><ul class="focus-list"><li><span class="rel">⇢ 挂到</span> <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span> · <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span></li></ul></div>
+    <div class="focus-col"><h4>Provenance</h4><div class="focus-prov"><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§2.3" title="打开原文位置">§2.3</button><button class="ref as-link" data-source-ref="§5.5" title="打开原文位置">§5.5</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></div></div>
+  </div>
+</section>
 </article></div>
           </div>
       </section>
@@ -262,11 +417,11 @@
       <section class="block" id="relations">
         <h2>关系（edge · 8 条）</h2>
         <ul class="edge-list">
-<li class="edge-row " id="edge-ED-01" data-edge-id="ED-01" data-from="E-01" data-to="E-02">
+<li class="edge-row " id="edge-ED-01" data-edge-id="ED-01" data-from="E-01" data-to="E-02" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</a>
+    <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span>
     <span class="rel">—produces→</span>
-    <a class="node" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a>
+    <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
     
   </span>
   <span class="edge-meta">
@@ -274,12 +429,16 @@
     
     <span class="elabel">node --check 与 npm 构建通过后，按 1–11 顺序部署云函数（refundCommon 作为 lib 不单独部署）</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-01</span> <button class="ref as-link" data-source-ref="§2" title="打开原文位置">§2</button><button class="ref as-link" data-source-ref="§2.1" title="打开原文位置">§2.1</button><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§3" title="打开原文位置">§3</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button></span><span class="prov-group"><span class="eid">E-02</span> <button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></span></div>
+  </div>
 </li>
-<li class="edge-row " id="edge-ED-02" data-edge-id="ED-02" data-from="E-01" data-to="E-03">
+<li class="edge-row " id="edge-ED-02" data-edge-id="ED-02" data-from="E-01" data-to="E-03" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</a>
+    <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span>
     <span class="rel">—produces→</span>
-    <a class="node" href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a>
+    <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span>
     
   </span>
   <span class="edge-meta">
@@ -287,12 +446,16 @@
     
     <span class="elabel">部署阶段建立定时触发器、HTTP 网关路由与环境变量</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-01</span> <button class="ref as-link" data-source-ref="§2" title="打开原文位置">§2</button><button class="ref as-link" data-source-ref="§2.1" title="打开原文位置">§2.1</button><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§3" title="打开原文位置">§3</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button></span><span class="prov-group"><span class="eid">E-03</span> <button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§3.4" title="打开原文位置">§3.4</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button></span></div>
+  </div>
 </li>
-<li class="edge-row " id="edge-ED-03" data-edge-id="ED-03" data-from="E-04" data-to="E-02">
+<li class="edge-row " id="edge-ED-03" data-edge-id="ED-03" data-from="E-04" data-to="E-02" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</a>
+    <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span>
     <span class="rel">—consumes→</span>
-    <a class="node" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a>
+    <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
     
   </span>
   <span class="edge-meta">
@@ -300,12 +463,16 @@
     
     <span class="elabel">用例 1–3 通过云函数调用驱动售后链路</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-04</span> <button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button></span><span class="prov-group"><span class="eid">E-02</span> <button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></span></div>
+  </div>
 </li>
-<li class="edge-row " id="edge-ED-04" data-edge-id="ED-04" data-from="E-04" data-to="E-07">
+<li class="edge-row " id="edge-ED-04" data-edge-id="ED-04" data-from="E-04" data-to="E-07" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</a>
+    <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span>
     <span class="rel">—produces→</span>
-    <a class="node" href="#element-E-07">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</a>
+    <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span>
     
   </span>
   <span class="edge-meta">
@@ -313,12 +480,16 @@
     
     <span class="elabel">验证运行产生截图 / 日志与 audit_logs 证据</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-04</span> <button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button></span><span class="prov-group"><span class="eid">E-07</span> <button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button></span></div>
+  </div>
 </li>
-<li class="edge-row " id="edge-ED-05" data-edge-id="ED-05" data-from="E-05" data-to="E-02">
+<li class="edge-row " id="edge-ED-05" data-edge-id="ED-05" data-from="E-05" data-to="E-02" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a>
+    <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
     <span class="rel">—depends-on→</span>
-    <a class="node" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a>
+    <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
     
   </span>
   <span class="edge-meta">
@@ -326,12 +497,16 @@
     
     <span class="elabel">补偿在退款成功回调之后执行，依赖已部署的退款与售后云函数</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-05</span> <button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button></span><span class="prov-group"><span class="eid">E-02</span> <button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§3.1" title="打开原文位置">§3.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></span></div>
+  </div>
 </li>
-<li class="edge-row " id="edge-ED-06" data-edge-id="ED-06" data-from="E-08" data-to="E-04">
+<li class="edge-row " id="edge-ED-06" data-edge-id="ED-06" data-from="E-08" data-to="E-04" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-08">沙箱 → 真实环境切换与切换后回归</a>
+    <span class="node">沙箱 → 真实环境切换与切换后回归</span>
     <span class="rel">—depends-on→</span>
-    <a class="node" href="#element-E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</a>
+    <span class="node">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</span>
     
   </span>
   <span class="edge-meta">
@@ -339,12 +514,16 @@
     
     <span class="elabel">沙箱 passing 之后才执行真实环境切换</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-08</span> <button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§7.2" title="打开原文位置">§7.2</button><button class="ref as-link" data-source-ref="§7.3" title="打开原文位置">§7.3</button></span><span class="prov-group"><span class="eid">E-04</span> <button class="ref as-link" data-source-ref="§4.1" title="打开原文位置">§4.1</button><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.5" title="打开原文位置">§4.5</button><button class="ref as-link" data-source-ref="§4.6" title="打开原文位置">§4.6</button></span></div>
+  </div>
 </li>
-<li class="edge-row " id="edge-ED-07" data-edge-id="ED-07" data-from="E-08" data-to="E-03">
+<li class="edge-row " id="edge-ED-07" data-edge-id="ED-07" data-from="E-08" data-to="E-03" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-08">沙箱 → 真实环境切换与切换后回归</a>
+    <span class="node">沙箱 → 真实环境切换与切换后回归</span>
     <span class="rel">—depends-on→</span>
-    <a class="node" href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a>
+    <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span>
     
   </span>
   <span class="edge-meta">
@@ -352,12 +531,16 @@
     
     <span class="elabel">切换依赖控制台设置的真实模式变量与退款通知路由</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-08</span> <button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§7.2" title="打开原文位置">§7.2</button><button class="ref as-link" data-source-ref="§7.3" title="打开原文位置">§7.3</button></span><span class="prov-group"><span class="eid">E-03</span> <button class="ref as-link" data-source-ref="§3.2" title="打开原文位置">§3.2</button><button class="ref as-link" data-source-ref="§3.3" title="打开原文位置">§3.3</button><button class="ref as-link" data-source-ref="§3.4" title="打开原文位置">§3.4</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button></span></div>
+  </div>
 </li>
-<li class="edge-row " id="edge-ED-08" data-edge-id="ED-08" data-from="E-08" data-to="E-07">
+<li class="edge-row " id="edge-ED-08" data-edge-id="ED-08" data-from="E-08" data-to="E-07" data-focus-edge="1">
   <span class="edge-line">
-    <a class="node" href="#element-E-08">沙箱 → 真实环境切换与切换后回归</a>
+    <span class="node">沙箱 → 真实环境切换与切换后回归</span>
     <span class="rel">—produces→</span>
-    <a class="node" href="#element-E-07">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</a>
+    <span class="node">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</span>
     
   </span>
   <span class="edge-meta">
@@ -365,48 +548,64 @@
     
     <span class="elabel">切换后用真实小额退款与回归记录留存证据</span>
   </span>
+  <div class="edge-extra">
+    <div class="edge-qual muted">（无 qualifiers）</div>
+    <div class="edge-prov"><b>provenance</b> <span class="prov-group"><span class="eid">E-08</span> <button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§7.2" title="打开原文位置">§7.2</button><button class="ref as-link" data-source-ref="§7.3" title="打开原文位置">§7.3</button></span><span class="prov-group"><span class="eid">E-07</span> <button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button></span></div>
+  </div>
 </li></ul>
       </section>
 
       <section class="block" id="attachments">
         <h2>侧挂 / 约束（attachments · 5 条）</h2>
         <ul class="attach-list">
-<li class="attach-row" id="attachment-E-06" data-attach-id="E-06">
-  <a class="node" href="#element-E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</a>
+<li class="attach-row" id="attachment-E-06" data-attach-id="E-06" data-attach-element="E-06">
+  <span class="node">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</span>
   <span class="rel">⇢ 挂到</span>
-  <a class="node" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a>
-  <span class="edge-meta"><span class="chip type">type: state</span></span>
+  <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span>
+  <span class="edge-meta"><span class="chip type">type: state</span><button class="ref as-link" data-source-ref="§4.2" title="打开原文位置">§4.2</button><button class="ref as-link" data-source-ref="§4.3" title="打开原文位置">§4.3</button><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></span>
 </li>
-<li class="attach-row" id="attachment-E-09" data-attach-id="E-09">
-  <a class="node" href="#element-E-09">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</a>
+<li class="attach-row" id="attachment-E-09" data-attach-id="E-09" data-attach-element="E-09">
+  <span class="node">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</span>
   <span class="rel">⇢ 挂到</span>
-  <a class="node" href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a>
-  <span class="edge-meta"><span class="chip type">type: concept</span></span>
+  <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
+  <span class="edge-meta"><span class="chip type">type: concept</span><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button><button class="ref as-link" data-source-ref="§现状对照表" title="打开原文位置">§现状对照表</button><button class="ref as-link" data-source-ref="§两种实现的风险" title="打开原文位置">§两种实现的风险</button><button class="ref as-link" data-source-ref="§Reviewer 决策项（必看）" title="打开原文位置">§Reviewer 决策项（必看）</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></span>
 </li>
-<li class="attach-row" id="attachment-C-01" data-attach-id="C-01">
-  <a class="node" href="#element-C-01">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</a>
+<li class="attach-row" id="attachment-C-01" data-attach-id="C-01" data-attach-element="C-01">
+  <span class="node">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</span>
   <span class="rel">⇢ 挂到</span>
-  <a class="node" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a> · <a class="node" href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a>
-  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+  <span class="node">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</span> · <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
+  <span class="edge-meta"><span class="chip type">type: constraint</span><button class="ref as-link" data-source-ref="§4.4" title="打开原文位置">§4.4</button><button class="ref as-link" data-source-ref="§4.8" title="打开原文位置">§4.8</button><button class="ref as-link" data-source-ref="§6.1" title="打开原文位置">§6.1</button><button class="ref as-link" data-source-ref="§6.2" title="打开原文位置">§6.2</button></span>
 </li>
-<li class="attach-row" id="attachment-C-02" data-attach-id="C-02">
-  <a class="node" href="#element-C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</a>
+<li class="attach-row" id="attachment-C-02" data-attach-id="C-02" data-attach-element="C-02">
+  <span class="node">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</span>
   <span class="rel">⇢ 挂到</span>
-  <a class="node" href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a>
-  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+  <span class="node">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</span>
+  <span class="edge-meta"><span class="chip type">type: constraint</span><button class="ref as-link" data-source-ref="§4.7" title="打开原文位置">§4.7</button><button class="ref as-link" data-source-ref="§5.3" title="打开原文位置">§5.3</button><button class="ref as-link" data-source-ref="§6.3" title="打开原文位置">§6.3</button><button class="ref as-link" data-source-ref="§6.4" title="打开原文位置">§6.4</button><button class="ref as-link" data-source-ref="§默认推荐" title="打开原文位置">§默认推荐</button></span>
 </li>
-<li class="attach-row" id="attachment-C-03" data-attach-id="C-03">
-  <a class="node" href="#element-C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</a>
+<li class="attach-row" id="attachment-C-03" data-attach-id="C-03" data-attach-element="C-03">
+  <span class="node">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</span>
   <span class="rel">⇢ 挂到</span>
-  <a class="node" href="#element-E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</a> · <a class="node" href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a>
-  <span class="edge-meta"><span class="chip type">type: constraint</span></span>
+  <span class="node">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</span> · <span class="node">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</span>
+  <span class="edge-meta"><span class="chip type">type: constraint</span><button class="ref as-link" data-source-ref="§2.2" title="打开原文位置">§2.2</button><button class="ref as-link" data-source-ref="§2.3" title="打开原文位置">§2.3</button><button class="ref as-link" data-source-ref="§5.5" title="打开原文位置">§5.5</button><button class="ref as-link" data-source-ref="§7.1" title="打开原文位置">§7.1</button><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></span>
 </li></ul>
       </section>
 
       <div class="review-slot">
 <section class="review" id="review">
   <h2>Review View · 审阅信息</h2>
-  <p class="note">这些是审阅信息，<b>不是</b>图上的语义。relationGap 不是 edge；告警不影响渲染。</p>
+  <p class="note">这些是**审阅信息**，<b>不是</b>图上的语义。relationGap 不是 edge；告警不影响渲染，也不裁剪任何节点。</p>
+
+  <div class="review-facts">
+    <span class="fact">elements <b>12</b></span>
+    <span class="fact">edges <b>8</b></span>
+    <span class="fact">attachments <b>5</b></span>
+    <span class="fact">topics <b>9</b></span>
+    <span class="fact">relationGap <b>0</b></span>
+    
+    <span class="fact">无 element 的 Topic <b>1</b></span>
+    <span class="fact">granularity <b>section (provisional)</b></span>
+  </div>
+
   <div class="review-grid">
     <div class="review-box">
       <h3>check-map 结论</h3>
@@ -436,87 +635,87 @@
       <h2>Topic Navigation（完整入口索引 · 9）</h2>
       <p class="note">这里与左侧不是一一对应的：左边是<b>核心机制</b>，这里是<b>完整入口</b>。没有 L0 element 的 Topic 也照样能进入。</p>
       <ul class="topic-list">
-<li class="topic-entry " id="topic-T-01" data-topic-id="T-01">
+<li class="topic-entry " id="topic-T-01" data-topic-id="T-01" data-topic-focus="T-01" data-element-ids="E-02">
   <div class="topic-head">
     <span class="eid">T-01</span>
     <span class="topic-title">F13–F16 售后链路的构成与依赖顺序</span>
     
   </div>
   <div class="topic-prop">F13→F14→F15→F16 是本次验证的串联主线，每个 Feature 对应一组云函数；F12 已被这四个 Feature 替代并在 Round 19 重新验收为 passing。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§1</span><span class="ref">§6.5</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button><button class="ref as-link" data-source-ref="§6.5" title="打开原文位置">§6.5</button></span></div>
 </li>
-<li class="topic-entry " id="topic-T-02" data-topic-id="T-02">
+<li class="topic-entry " id="topic-T-02" data-topic-id="T-02" data-topic-focus="T-02" data-element-ids="E-01,E-02,E-03,C-03">
   <div class="topic-head">
     <span class="eid">T-02</span>
     <span class="topic-title">部署前置与云函数发布</span>
     
   </div>
   <div class="topic-prop">上线前先过 node --check 与两套 npm 构建，再按 1–11 顺序部署云函数，并建立触发器、网关路由与环境变量。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</a><a class="chip link" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a><a class="chip link" href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a><a class="chip link" href="#element-C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§2</span><span class="ref">§3</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-01">部署流程：node --check → npm 构建（h5 / mp-weixin）→ 云函数按 1–11 顺序部署</button><button class="chip link" data-focus-target="E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</button><button class="chip link" data-focus-target="E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</button><button class="chip link" data-focus-target="C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§2" title="打开原文位置">§2</button><button class="ref as-link" data-source-ref="§3" title="打开原文位置">§3</button></span></div>
 </li>
-<li class="topic-entry " id="topic-T-03" data-topic-id="T-03">
+<li class="topic-entry " id="topic-T-03" data-topic-id="T-03" data-topic-focus="T-03" data-element-ids="E-04,E-05,E-06,C-01,C-02">
   <div class="topic-head">
     <span class="eid">T-03</span>
     <span class="topic-title">沙箱模式端到端验证</span>
     
   </div>
   <div class="topic-prop">沙箱下用三条用例、mock 通知、查单 cron 与失败重试，验证售后链路的状态推进与补偿行为。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</a><a class="chip link" href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a><a class="chip link" href="#element-E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</a><a class="chip link" href="#element-C-01">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</a><a class="chip link" href="#element-C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§4</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-04">沙箱端到端验证：预置数据 + 用例 1–3（仅退款 / 退货退款 / 撤销与越权）+ mock 通知 + 查单 cron</button><button class="chip link" data-focus-target="E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</button><button class="chip link" data-focus-target="E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</button><button class="chip link" data-focus-target="C-01">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</button><button class="chip link" data-focus-target="C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§4" title="打开原文位置">§4</button></span></div>
 </li>
-<li class="topic-entry " id="topic-T-04" data-topic-id="T-04">
+<li class="topic-entry " id="topic-T-04" data-topic-id="T-04" data-topic-focus="T-04" data-element-ids="E-06,E-07,C-01,C-02">
   <div class="topic-head">
     <span class="eid">T-04</span>
     <span class="topic-title">证据留存与独立审查</span>
     
   </div>
   <div class="topic-prop">每个 Feature passing 前必须留存指定证据，并通过 §6 的独立审查 checklist。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</a><a class="chip link" href="#element-E-07">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</a><a class="chip link" href="#element-C-01">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</a><a class="chip link" href="#element-C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§5</span><span class="ref">§6</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</button><button class="chip link" data-focus-target="E-07">证据与独立审查留痕：截图 / 日志证据、audit_logs、§6 独立审查 checklist</button><button class="chip link" data-focus-target="C-01">权限与越权边界：订单所有者校验、admin_whitelist 管理员校验、forceRestockAndAssets 仅管理员、非 REQUESTED / 重复审批 / 非法入参一律拒绝</button><button class="chip link" data-focus-target="C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§5" title="打开原文位置">§5</button><button class="ref as-link" data-source-ref="§6" title="打开原文位置">§6</button></span></div>
 </li>
-<li class="topic-entry " id="topic-T-05" data-topic-id="T-05">
+<li class="topic-entry " id="topic-T-05" data-topic-id="T-05" data-topic-focus="T-05" data-element-ids="E-03,E-08,C-03">
   <div class="topic-head">
     <span class="eid">T-05</span>
     <span class="topic-title">沙箱到真实环境的切换</span>
     
   </div>
   <div class="topic-prop">沙箱 passing 之后才切到真实模式，切换后必须回归全部沙箱用例并完成真实小额退款验证。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a><a class="chip link" href="#element-E-08">沙箱 → 真实环境切换与切换后回归</a><a class="chip link" href="#element-C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§7</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</button><button class="chip link" data-focus-target="E-08">沙箱 → 真实环境切换与切换后回归</button><button class="chip link" data-focus-target="C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§7" title="打开原文位置">§7</button></span></div>
 </li>
-<li class="topic-entry " id="topic-T-06" data-topic-id="T-06">
+<li class="topic-entry " id="topic-T-06" data-topic-id="T-06" data-topic-focus="T-06" data-element-ids="E-03,E-05,E-06,C-02">
   <div class="topic-head">
     <span class="eid">T-06</span>
     <span class="topic-title">故障排查速查</span>
     
   </div>
   <div class="topic-prop">针对 mode 缺失、签名校验失败、stillProcessing 递增、补偿 failed 递增、状态转移被拒、列表不显示等常见症状给出原因与处置。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</a><a class="chip link" href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a><a class="chip link" href="#element-E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</a><a class="chip link" href="#element-C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§8</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-03">云函数运行时配置：定时触发器（retryAfterSalesCompensation */10、refundQueryCron */5）、HTTP 网关路由 /refundNotify、WECHAT_REFUND_* 环境变量</button><button class="chip link" data-focus-target="E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</button><button class="chip link" data-focus-target="E-06">售后单状态机 afterSalesStatus：REQUESTED → APPROVED / WAIT_RETURN → RETURN_SHIPPED → WAIT_INSPECTION → REFUND_PENDING → REFUNDED；CANCELLED；REFUND_FAILED</button><button class="chip link" data-focus-target="C-02">补偿 / 退款的幂等、有界重试与业务不变量：并发或重复触发只补偿一次、stockRestored 闸门、撤销不回补资产、补偿失败落 refundCompensationError、连续 10 次查单失败置 REFUND_FAILED</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§8" title="打开原文位置">§8</button></span></div>
 </li>
-<li class="topic-entry " id="topic-T-07" data-topic-id="T-07">
+<li class="topic-entry " id="topic-T-07" data-topic-id="T-07" data-topic-focus="T-07" data-element-ids="E-02,C-03">
   <div class="topic-head">
     <span class="eid">T-07</span>
     <span class="topic-title">与 F01 支付域的边界</span>
     
   </div>
   <div class="topic-prop">退款域独立使用 refundCommon，仅以 WX_PAY_* 作缺省回退，不修改支付核心文件。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</a><a class="chip link" href="#element-C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§9</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-02">F13–F16 售后/退款云函数集（submitAfterSales、cancelAfterSales / processAfterSales、queryAdminAfterSales / retryAfterSalesCompensation、forceRestockAndAssets、runCompensation / refundOrder、refundNotify、refundQueryCron + refundCommon lib）</button><button class="chip link" data-focus-target="C-03">环境与凭据约束：受限终端 EPERM 需换终端、.gitignore 敏感文件条目、WECHAT_REFUND_* 仅控制台设置、沙箱 / 真实模式变量集、WX_PAY_* 仅作缺省回退</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button></span></div>
 </li>
-<li class="topic-entry " id="topic-T-08" data-topic-id="T-08">
+<li class="topic-entry " id="topic-T-08" data-topic-id="T-08" data-topic-focus="T-08" data-element-ids="E-05,E-09">
   <div class="topic-head">
     <span class="eid">T-08</span>
     <span class="topic-title">未发货仅退款库存释放时机决策</span>
     
   </div>
   <div class="topic-prop">reviewer 需在 F15 passing 前决定库存释放时机（A 保守 / B 激进），默认推荐保持 A，并记录决策结论。</div>
-  <div class="card-row"><span class="k">elements</span><span class="v"><a class="chip link" href="#element-E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</a><a class="chip link" href="#element-E-09">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</a></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§10</span><span class="ref">§现状对照表</span><span class="ref">§Reviewer 决策项（必看）</span><span class="ref">§已知业务侧 UX 副作用（无论选 A 还是 B 都存在）</span></span></div>
+  <div class="card-row"><span class="k">elements</span><span class="v"><button class="chip link" data-focus-target="E-05">资产补偿与重试机制（runCompensation / retryAfterSalesCompensation / forceRestockAndAssets）：回补库存、优惠券、积分</button><button class="chip link" data-focus-target="E-09">未发货仅退款库存释放时机决策项（A 保守：REFUND_SUCCESS 释放 / B 激进：APPROVED 释放，默认推荐 A）</button></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button><button class="ref as-link" data-source-ref="§现状对照表" title="打开原文位置">§现状对照表</button><button class="ref as-link" data-source-ref="§Reviewer 决策项（必看）" title="打开原文位置">§Reviewer 决策项（必看）</button><button class="ref as-link" data-source-ref="§已知业务侧 UX 副作用（无论选 A 还是 B 都存在）" title="打开原文位置">§已知业务侧 UX 副作用（无论选 A 还是 B 都存在）</button></span></div>
 </li>
-<li class="topic-entry no-element" id="topic-T-09" data-topic-id="T-09">
+<li class="topic-entry no-element" id="topic-T-09" data-topic-id="T-09" data-topic-focus="T-09" data-element-ids="">
   <div class="topic-head">
     <span class="eid">T-09</span>
     <span class="topic-title">修订记录</span>
@@ -524,23 +723,34 @@
   </div>
   <div class="topic-prop">文档修订记录：v0.3 起新增 docs/harness/REVIEWER-GUIDE.md 作为 reviewer 入门指南。</div>
   <div class="card-row"><span class="k">elements</span><span class="v"><span class="muted">（该 Topic 没有 L0 element）</span></span></div>
-  <div class="card-row"><span class="k">出处</span><span class="v"><span class="ref">§11</span></span></div>
+  <div class="card-row"><span class="k">出处</span><span class="v"><button class="ref as-link" data-source-ref="§11" title="打开原文位置">§11</button></span></div>
 </li></ul>
       <div class="doc-entries">
         <h3>文档级入口</h3>
-        <div class="doc-entry"><span class="k">scope</span><div>本手册给出 F13–F16 售后链路的部署、沙箱运行验证、证据留存与沙箱→真实环境切换的可执行步骤。</div><div class="v"><span class="ref">§1</span></div></div><div class="doc-entry"><span class="k">nonGoalSummary</span><div>不新增让用户选择库存释放时机的 preferredReleaseStock 字段（§10 决策 3 明确不推荐）；不改动 payOrder / payNotify 等支付核心文件，退款域只以 WX_PAY_* 作缺省回退。</div><div class="v"><span class="ref">§9</span><span class="ref">§10</span></div></div>
+        <div class="doc-entry"><span class="k">scope</span><div>本手册给出 F13–F16 售后链路的部署、沙箱运行验证、证据留存与沙箱→真实环境切换的可执行步骤。</div><div class="v"><button class="ref as-link" data-source-ref="§1" title="打开原文位置">§1</button></div></div><div class="doc-entry"><span class="k">nonGoalSummary</span><div>不新增让用户选择库存释放时机的 preferredReleaseStock 字段（§10 决策 3 明确不推荐）；不改动 payOrder / payNotify 等支付核心文件，退款域只以 WX_PAY_* 作缺省回退。</div><div class="v"><button class="ref as-link" data-source-ref="§9" title="打开原文位置">§9</button><button class="ref as-link" data-source-ref="§10" title="打开原文位置">§10</button></div></div>
       </div>
     </aside>
   </div>
 </div>
 <script>
-  // 唯一的前端行为：Reading / Review 视图切换（不改变任何数据）
+  // 视图切换（Reading 默认）+ 交互绑定（selection / focus / provenance hook）
   document.addEventListener('click', (ev) => {
     const t = ev.target.closest('[data-l0-view]');
     if (!t) return;
     const root = t.closest('.l0-root');
     root.setAttribute('data-view', t.getAttribute('data-l0-view'));
-    root.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b === t));
+    root.querySelectorAll('.tab[data-l0-view]').forEach((b) => b.classList.toggle('active', b === t));
+  });
+  // 预览里 provenance 没有原文可跳：先把点击到的 §ref 显示在 banner 上，证明链路可用
+  window.L0Map.bindInteractions(document.querySelector('.l0-root'), {
+    onSourceRef: (ref) => {
+      const box = document.getElementById('preview-source-hit');
+      if (box) { box.textContent = 'provenance 点击 → ' + ref + '（Electron 里会打开对应原文位置）'; box.style.display = 'inline'; }
+    },
+    onClear: () => {
+      const box = document.getElementById('preview-source-hit');
+      if (box) box.style.display = 'none';
+    },
   });
 </script>
 </body></html>

@@ -60,16 +60,28 @@ function buildOne({ map, check, out, view = 'reading', note = '' }) {
   <span class="mono">source: ${map}</span>
   <span class="mono">check-map: ${fs.existsSync(checkAbs) ? path.relative(ROOT, checkAbs).replace(/\\/g, '/') : '(未提供)'}</span>
   <span>由 deterministic renderer 从 view model 生成；AI 未生成任何 HTML。</span>
+  <span id="preview-source-hit" class="mono" style="display:none"></span>
 </div>
 ${body}
 <script>
-  // 唯一的前端行为：Reading / Review 视图切换（不改变任何数据）
+  // 视图切换（Reading 默认）+ 交互绑定（selection / focus / provenance hook）
   document.addEventListener('click', (ev) => {
     const t = ev.target.closest('[data-l0-view]');
     if (!t) return;
     const root = t.closest('.l0-root');
     root.setAttribute('data-view', t.getAttribute('data-l0-view'));
-    root.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b === t));
+    root.querySelectorAll('.tab[data-l0-view]').forEach((b) => b.classList.toggle('active', b === t));
+  });
+  // 预览里 provenance 没有原文可跳：先把点击到的 §ref 显示在 banner 上，证明链路可用
+  window.L0Map.bindInteractions(document.querySelector('.l0-root'), {
+    onSourceRef: (ref) => {
+      const box = document.getElementById('preview-source-hit');
+      if (box) { box.textContent = 'provenance 点击 → ' + ref + '（Electron 里会打开对应原文位置）'; box.style.display = 'inline'; }
+    },
+    onClear: () => {
+      const box = document.getElementById('preview-source-hit');
+      if (box) box.style.display = 'none';
+    },
   });
 </script>
 </body></html>
@@ -87,7 +99,8 @@ function main() {
       const r = buildOne({
         map: item.map,
         out: `experiments/l0-ui/preview-${item.name}.html`,
-        view: 'review',
+        // 用户裁决：**默认 Reading View**（先回答"讲什么 / 从哪进去"，不是"有多少 WARN"）
+        view: 'reading',
         note: item.note,
       });
       rows.push({ name: item.name, ...r });

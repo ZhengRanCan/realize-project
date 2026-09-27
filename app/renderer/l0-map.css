@@ -114,3 +114,55 @@
 .gap-row { border-top: 1px dashed var(--line); padding: 6px 0; font-size: 12px; }
 .gap-why { margin-top: 2px; }
 .gap-reason { font-size: 11.5px; }
+
+/* ------------------------------------------------------------------ *
+ * Phase 3/4：Reading 默认去审阅味 + interaction-based graph reading
+ * 原则不变：隐藏 ≠ 删除；焦点只切换 class / hidden，不改任何数据
+ * ------------------------------------------------------------------ */
+
+/* Reading 视图：审阅信息与工程事实整体收起（数据仍在 DOM 里） */
+.l0-root[data-view="reading"] .review-slot { display: none; }
+
+/* 文档定位：Reading 第一眼要回答"这篇设计在讲什么" */
+.l0-scope { margin: 10px 0 6px; padding: 10px 12px; background: #fff; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }
+.l0-scope .k { color: var(--muted); margin-right: 6px; font-size: 12px; }
+.l0-nongoal { margin: 0 0 12px; font-size: 12.5px; color: #374151; }
+.l0-nongoal summary { cursor: pointer; color: var(--muted); font-size: 12px; }
+
+/* provenance chip 可点 */
+.ref.as-link { cursor: pointer; background: #f8fafc; border: 1px solid var(--line); color: #1d4ed8; }
+.ref.as-link:hover { background: #eff6ff; border-color: var(--accent); }
+.prov-group { display: inline-block; margin-right: 10px; }
+
+/* edge 行：默认只显示一句话 + 一行元信息；qualifier / provenance 在被聚焦或 Review 时展开 */
+.edge-extra { display: none; margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--line); font-size: 12px; }
+.edge-row.is-open .edge-extra,
+.l0-root[data-view="review"] .edge-extra { display: block; }
+.edge-qual b, .edge-prov b { color: var(--muted); font-weight: 600; margin-right: 4px; }
+
+/* 焦点面板（预渲染，选中时显示） */
+.l0-focus-slot:empty { display: none; }
+.focus-panel { border: 1px solid var(--accent); border-radius: 8px; padding: 10px 12px; margin: 10px 0 16px; background: #f8fbff; }
+.focus-panel.focus-inline { margin: 0; }
+.focus-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.focus-title { font-weight: 600; font-size: 13px; }
+.focus-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.focus-col h4 { margin: 0 0 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.focus-list { list-style: none; margin: 0; padding: 0; font-size: 12px; }
+.focus-list li { margin: 1px 0; }
+.focus-prov { font-size: 12px; }
+
+/* 选择态：命中的清晰，其余降噪（不是隐藏） */
+.l0-root.has-focus .is-dim { opacity: .32; }
+.is-hit { background: #eff6ff !important; }
+.card.is-hit { outline: 2px solid var(--accent); }
+.edge-row.is-hit { background: #eff6ff; }
+.topic-entry.is-hit { background: #eff6ff; }
+.tab.ghost { color: var(--muted); }
+
+/* Electron 集成：L0 模式下左栏 TOC 让位（L0 自己带"核心机制 + 完整入口"两区） */
+#screen-review.l0-mode .toc-pane { display: none; }
+#screen-review.l0-mode .layout { grid-template-columns: minmax(0, 1fr); }
+.l0-empty { padding: 24px; color: var(--muted); }
+
+

@@ -56,6 +56,10 @@ const state = {
   humanReviewPath: null,
   markdown: null,
   view: 'overview',
+  /** Feature 08 · L0 Framework Map（view model 由主进程算好；renderer 只渲染） */
+  l0ViewModel: null,
+  l0Path: null,
+  l0View: 'reading',
   /** 区块折叠状态：blockId -> boolean。初始值来自 defaultExpanded。 */
   blockExpanded: {},
   /** 决策详情展开状态 */
@@ -979,26 +983,80 @@ function renderGateBadge() {
 }
 
 function render() {
-  if (!state.model) return;
-  const summary = currentSummary();
+  if (!state.model && state.view !== 'l0') return;
+  const summary = state.model ? currentSummary() : null;
 
-  $('#design-title').textContent = state.model.design.title;
-  $('#design-id').textContent = state.model.design.id;
-  $('#design-status').textContent = state.model.design.status;
-  $('#model-path').textContent = state.modelPath || '';
-  $('#nav-decision-count').textContent = `待决定 ${summary.decisions.counts.pending}/${summary.decisions.total}`;
+  $('#design-title').textContent = (state.view === 'l0')
+    ? ((state.l0ViewModel && state.l0ViewModel.document.title) || 'L0 Framework Map')
+    : state.model.design.title;
+  $('#design-id').textContent = state.model ? state.model.design.id : 'L0';
+  $('#design-status').textContent = state.model ? state.model.design.status : '';
+  $('#model-path').textContent = (state.view === 'l0') ? (state.l0Path || '') : (state.modelPath || '');
+  $('#nav-decision-count').textContent = summary ? `待决定 ${summary.decisions.counts.pending}/${summary.decisions.total}` : '';
+  if ($('#nav-l0-state')) {
+    $('#nav-l0-state').textContent = state.l0ViewModel
+      ? `${state.l0ViewModel.facts.elementCount} 元素 / ${state.l0ViewModel.facts.edgeCount} 关系`
+      : '未加载';
+  }
 
   document.querySelectorAll('.nav-item').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.view === state.view);
   });
   $('#screen-review').dataset.view = state.view;
+  $('#screen-review').classList.toggle('l0-mode', state.view === 'l0');
 
   renderGateBadge();
-  buildToc();
+  if (state.view !== 'l0') buildToc();
 
-  if (state.view === 'overview') viewOverview();
+  if (state.view === 'l0') viewL0();
+  else if (state.view === 'overview') viewOverview();
   else viewDecisions();
 }
+
+/* ================================================================== *
+ * Feature 08 · L0 Framework Map 视图（deterministic；不调用模型）
+ * view model 由主进程算好（scripts/l0-view-model.js），这里只渲染。
+ * ================================================================== */
+
+function viewL0() {
+  const host = $('#main');
+  if (!state.l0ViewModel) {
+    host.innerHTML = '<div class="l0-empty"><p>尚未加载 L0 Framework Map。</p>'
+      + '<p class="muted">返回首屏用「打开 framework-map.json」选择一份已通过 check-map 的图。</p></div>';
+    return;
+  }
+  window.L0Map.mount(host, state.l0ViewModel, {
+    view: state.l0View || 'reading',
+    // provenance → 打开右侧 Source 面板的对应章节（复用现有原文回查能力）
+    onSourceRef: (ref) => { openSource(ref); },
+  });
+  // Reading / Review 切换后保持视图状态（不重新计算任何数据）
+  host.querySelectorAll('[data-l0-view]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.l0View = btn.getAttribute('data-l0-view');
+      const root = host.querySelector('.l0-root');
+      if (root) root.setAttribute('data-view', state.l0View);
+    });
+  });
+}
+
+async function loadL0() {
+  const api = window.designReview;
+  const res = await api.l0.openJson();
+  if (!res || !res.ok) {
+    if (res && res.canceled) return;
+    window.alert(`加载 framework-map 失败：${(res && res.errors && res.errors[0]) || '未知错误'}`);
+    return;
+  }
+  state.l0ViewModel = res.viewModel;
+  state.l0Path = res.mapPath;
+  state.l0View = 'reading'; // 用户裁决：Reading 为默认
+  if ($('#l0-info')) $('#l0-info').textContent = `已加载：${res.mapPath}${res.checkMapPath ? '（含 check-map 结论）' : ''}`;
+  enterReview();
+  state.view = 'l0';
+  render();
+}
+
 
 /* ================================================================== *
  * 启动流程
@@ -1087,6 +1145,11 @@ function bindStartScreen() {
     const result = await api.openDesignJson();
     applyLoadResult(result);
   });
+
+  // Feature 08 · 打开 framework-map.json（L0 视图；不调用模型）
+  if ($('#btn-open-l0')) {
+    $('#btn-open-l0').addEventListener('click', () => { loadL0(); });
+  }
 
   $('#btn-pick-markdown').addEventListener('click', async () => {
     const md = await api.openMarkdown();

@@ -158,8 +158,27 @@ function createWindow() {
   });
 }
 
-function registerIpc() {
-  ipcMain.handle('app:paths', () => ({
+/**
+ * Feature 08 · 读取一份 framework-map.json → view model（**只读，不修改 map**）。
+ * 同目录的 check-map.txt 若存在，一并带上供 Review View 使用。
+ */
+async function loadFrameworkMap(mapPath) {
+  const p = path.resolve(mapPath);
+  const map = JSON.parse(await fs.readFile(p, 'utf8'));
+  const siblingCheck = path.join(path.dirname(p), 'check-map.txt');
+  let checkMapText = null;
+  try { checkMapText = await fs.readFile(siblingCheck, 'utf8'); } catch { checkMapText = null; }
+  // view model 的实现在 scripts/ 下（已被 test-l0-view-model.js 覆盖 34 断言）
+  const { buildL0ViewModel } = require(path.join(PROJECT_ROOT, 'scripts', 'l0-view-model.js'));
+  const schema = JSON.parse(await fs.readFile(path.join(PROJECT_ROOT, 'schema', 'framework-map.schema.json'), 'utf8'));
+  const viewModel = buildL0ViewModel(map, {
+    checkMapText,
+    knownRoles: schema.$defs.element.properties.role['x-known-roles'],
+  });
+  return { ok: true, mapPath: p, checkMapPath: checkMapText ? siblingCheck : null, viewModel };
+}
+
+function registerIpc() {  ipcMain.handle('app:paths', () => ({
     projectRoot: PROJECT_ROOT,
     defaultFixture: DEFAULT_FIXTURE,
     defaultDocument: DEFAULT_DOCUMENT,
@@ -167,6 +186,31 @@ function registerIpc() {
   }));
 
   ipcMain.handle('design:loadFixture', () => loadDesignReview(DEFAULT_FIXTURE, state.humanReviewPath));
+
+  // ── Feature 08 · L0 Framework Map（deterministic UI，不调用模型）────────────
+  // 只读 framework-map.json + 同目录的 check-map.txt（若存在），在主进程算好 view model 再交给 renderer
+  //（renderer 不接触 node fs）。**不修改 map**：buildL0ViewModel 自带"输入被改动就抛错"的自检。
+  ipcMain.handle('l0:openJson', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: '选择 framework-map.json',
+      defaultPath: PROJECT_ROOT,
+      filters: [{ name: 'Framework Map JSON', extensions: ['json'] }],
+      properties: ['openFile'],
+    });
+    if (result.canceled || result.filePaths.length === 0) return { ok: false, canceled: true };
+    return loadFrameworkMap(result.filePaths[0]);
+  });
+
+  ipcMain.handle('l0:loadPath', async (_event, payload) => {
+    if (!payload || typeof payload.path !== 'string' || payload.path.trim() === '') {
+      return { ok: false, stage: 'input', errors: ['未提供路径'] };
+    }
+    try {
+      return await loadFrameworkMap(payload.path);
+    } catch (error) {
+      return { ok: false, stage: 'read', errors: [error.message] };
+    }
+  });
 
   ipcMain.handle('design:openJson', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
@@ -412,8 +456,10 @@ async function runSelfTest() {
          gateBadge: document.getElementById('gate-badge').textContent,
        }))()`
     );
-    if (rendered.navItems.length === 2 && rendered.navItems[0].startsWith('方案总览') && rendered.navItems[1].startsWith('决策清单')) {
-      ok(`一级导航只有两个页面：${rendered.navItems.join(' / ')}`);
+    // Feature 08 起一级导航有三个页面：方案总览 / 决策清单 / L0 框架图。
+    // L0 是新的一级页面（不是塞进 Overview 的区块），因此这里的期望值同步为 3。
+    if (rendered.navItems.length === 3 && rendered.navItems[0].startsWith('方案总览') && rendered.navItems[1].startsWith('决策清单') && rendered.navItems[2].startsWith('L0')) {
+      ok(`一级导航有三个页面：${rendered.navItems.join(' / ')}`);
     } else {
       fail(`导航结构异常: ${JSON.stringify(rendered.navItems)}`);
     }

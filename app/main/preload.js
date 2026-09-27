@@ -26,6 +26,12 @@ contextBridge.exposeInMainWorld('designReview', {
 
   evaluateGate: () => ipcRenderer.invoke('gate:evaluate'),
 
+  // Feature 08 · L0 Framework Map（deterministic UI；主进程算好 view model 再交给 renderer）
+  l0: {
+    openJson: () => ipcRenderer.invoke('l0:openJson'),
+    loadPath: (mapPath) => ipcRenderer.invoke('l0:loadPath', { path: mapPath }),
+  },
+
   // 原文回查：Source 标签点开时右侧显示对应章节
   loadSource: () => ipcRenderer.invoke('source:load'),
 });

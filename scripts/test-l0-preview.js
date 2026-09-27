@@ -36,7 +36,7 @@ console.log('===== F08 · L0 预览验收（对生成的 HTML 断言）=====\n')
 
 const built = [];
 for (const item of SET) {
-  const r = buildOne({ map: item.map, out: `tmp/l0-preview-check/${item.name}.html`, view: 'review', note: item.note });
+  const r = buildOne({ map: item.map, out: `tmp/l0-preview-check/${item.name}.html`, view: 'reading', note: item.note });
   const html = fs.readFileSync(path.join(ROOT, r.out), 'utf8');
   const map = JSON.parse(fs.readFileSync(path.join(ROOT, item.map), 'utf8'));
   built.push({ item, r, html, map });
@@ -117,6 +117,57 @@ check('预览是静态 HTML（不依赖 Electron / 不依赖网络）', () => {
   if (/<script src="http/.test(b.html)) return '引用了网络资源';
   if (b.html.includes('require(')) return '含 require（应为纯静态）';
   return true;
+});
+
+/* ---- Phase 3/4：Reading 默认 + 交互条件 ---- */
+check('Reading 是默认视图（用户裁决：先回答"讲什么/从哪进去"，不是"有多少 WARN"）', () => {
+  for (const b of built) {
+    if (!b.html.includes('data-view="reading"')) return `${b.item.name} 不是 reading 默认`;
+  }
+  return true;
+});
+check('Reading 视图隐藏审阅区，但**数据仍在 DOM**（隐藏 ≠ 删除）', () => {
+  const b = byName('d');
+  if (!b.html.includes('Review View · 审阅信息')) return 'Review 区不在 DOM 里（应保留、只隐藏）';
+  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  return css.includes('.l0-root[data-view="reading"] .review-slot { display: none; }') || 'CSS 缺少 Reading 隐藏规则';
+});
+check('每个 element 都有预渲染的 Focused Relations 面板（可直接静态断言）', () => {
+  for (const b of built) {
+    const n = countOf(b.html, 'class="focus-panel"');
+    if (n !== b.map.elements.length) return `${b.item.name}: ${n} ≠ ${b.map.elements.length}`;
+  }
+  return true;
+});
+check('每条 edge 都有可展开的 qualifier / provenance 区（默认收起）', () => {
+  for (const b of built) {
+    const n = countOf(b.html, 'class="edge-extra"');
+    if (n !== (b.map.edges || []).length) return `${b.item.name}: ${n} ≠ ${(b.map.edges || []).length}`;
+  }
+  return true;
+});
+check('provenance 是可点链路（data-source-ref），不是死文本', () => {
+  const b = byName('d');
+  const refs = b.map.elements.flatMap((e) => e.sectionRefs || []);
+  const n = countOf(b.html, 'data-source-ref=');
+  return n >= refs.length ? true : `可点 provenance ${n} < 出处 ${refs.length}`;
+});
+check('有"清除选择"入口（Esc / 按钮），可回到完整 Overview', () => {
+  for (const b of built) if (!b.html.includes('data-focus-clear=')) return `${b.item.name} 缺清除入口`;
+  return true;
+});
+check('焦点交互已绑定（bindInteractions 被调用）', () => {
+  const b = byName('d');
+  return b.html.includes('bindInteractions') ? true : '预览未绑定交互';
+});
+check('Reading 第一眼给出文档定位（"这是什么文档"）', () => {
+  const b = byName('d');
+  return b.html.includes('这是什么文档') ? true : '缺少 scope 定位块';
+});
+check('分区依据被显式声明为 element.type（不是关系）', () => {
+  const b = byName('d');
+  return (b.html.includes('按 element.type 分区') && b.html.includes('Layout organizes space; it does not create semantics'))
+    ? true : '缺少分区依据声明';
 });
 
 console.log(results.join('\n'));

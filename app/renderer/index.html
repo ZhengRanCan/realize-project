@@ -6,6 +6,7 @@
         content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';" />
   <title>Design Review</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="l0-map.css" />
 </head>
 <body>
   <!-- 首屏：Import / Start（agent.md 第九节） -->
@@ -40,6 +41,14 @@
         <div id="fixture-info" class="file-hint"></div>
       </div>
 
+      <div class="start-block">
+        <div class="start-label">L0 Framework Map（Feature 08 · deterministic renderer，不调用模型）</div>
+        <div class="start-row">
+          <button id="btn-open-l0" class="btn">打开 framework-map.json</button>
+        </div>
+        <div id="l0-info" class="file-hint">尚未加载 L0 图。</div>
+      </div>
+
       <div id="start-error" class="error-box hidden"></div>
 
       <details class="start-details">
@@ -67,6 +76,7 @@
         <nav class="view-switch">
           <button class="nav-item active" data-view="overview">方案总览</button>
           <button class="nav-item" data-view="decisions">决策清单 <span id="nav-decision-count" class="nav-count"></span></button>
+          <button class="nav-item" data-view="l0">L0 框架图 <span id="nav-l0-state" class="nav-count"></span></button>
         </nav>
         <div id="gate-badge" class="gate-badge pending">—</div>
         <button id="btn-save" class="btn primary">保存 human-review.json</button>
@@ -99,6 +109,7 @@
 
   <script src="vendor/mermaid.min.js"></script>
   <script src="../shared/semantics.js"></script>
+  <script src="l0-map.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
