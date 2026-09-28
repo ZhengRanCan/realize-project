@@ -44,7 +44,7 @@
   {
     "id": "F08",
     "title": "L0 UI (framework map navigation screen)",
-    "status": "active",
+    "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F08-l0-ui",
     "version": "v0.1"
   },

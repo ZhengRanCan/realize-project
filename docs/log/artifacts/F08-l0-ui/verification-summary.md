@@ -76,6 +76,10 @@
 - **Phase 4.1 对应动作**：Reading 改 node-edge 图（节点 = element、线 = edge）；Reading 隐藏 type / role / 机器 ID；标题按分隔符切开；约束降级为 `⚑ N` 角标。
 - **2026-09-27 手工 smoke**：真实入口静默失败已修复，作为正式 Track A 之前的阻断项关闭。
 - **尚未做**：正式计时 Track A（D + E）与 reviewer 签署，见 `results/track-a-round1.md` 的状态行「⬜ 待进行」与 `validation-checklist.md` §7–§8 的未勾选项。
+- **2026-09-27 · F08 状态改为 `blocked`（用户裁决）**：用户对当前 Reading View 的表现层仍不满意（原话「先去改改」），
+  先做一轮 UI 迭代，Timed Track A 与 Gate 判定顺延到 UI 定稿之后。技术层证据不受影响（34/42/130 + selftest 13 条全绿）；
+  原因与解除条件记在 `docs/harness/features/individual_feature/F08-l0-ui/feature.md` 的「Blocked reason」一节，
+  `feature-index.json` 与 `docs/progress.md` 已同步。
 
 ## 已知偏差
 

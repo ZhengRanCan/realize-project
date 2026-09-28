@@ -3,8 +3,10 @@
 ## Status
 
 - Date: 2026-09-27.
-- Active feature: `F08` L0 UI（第一轮 deterministic UI integration 已完成；Gate = `TECHNICAL PASS / UX VALIDATION PENDING`）。
-- Next queued feature: none —— 没有 `not_started` 的 feature；可推进的实际动作是下面「等验收」与「F08 Track A」两列。
+- Active feature: **none** —— 2026-09-27 用户裁决把 `F08` 由 `active` 改为 `blocked`（对当前 UI 表现层不满意，先做一轮 UI 迭代），
+  `feature-index.json` / 合同 / 本 dashboard 三处已同步。
+- Next queued feature: none —— 没有 `not_started` 的 feature；当前实际动作是 **F08 的 UI 迭代**（等用户给出想法后落地），
+  之后再谈 Track A 与各 feature 的验收。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 
 ## Feature 状态一览
@@ -17,7 +19,7 @@
 | F05 | L0 Generalization Gate | `blocked` | 用户未在验收清单上记录判定（Gate = PASS） |
 | F06 | Contract and Validators | `blocked` | 用户未记录验收；规则口径需确认 |
 | F07 | AI Framework Map Generation | `blocked` | Gate = PARTIAL PASS（Semantic 0/15）+ 未验收 |
-| F08 | L0 UI | `active` | Track A 人工 UX 测试；Phase 3/4/5 未完成 |
+| F08 | L0 UI | `blocked` | 用户对当前 UI（Reading View 表现层）不满意，先做一轮 UI 迭代；Track A 与 Gate 延后（技术层 34/42/130 + selftest 13 条仍全绿） |
 | F09 | Contract Adversarial Test | `passing` | — |
 | F10 | Semantic Grounding | `blocked` | E3 未关闭（Gate = PARTIAL PASS）；处置未登记 |
 
