@@ -32,3 +32,7 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+# 外部参考材料（第三方浅克隆 + 索引 README，整体不进版本控制）
+# 用户裁决 2026-09-27：整个 docs/ref/ 忽略（此前只忽略三个浅克隆、保留 README.md）
+/docs/ref/

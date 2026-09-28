@@ -17,6 +17,12 @@ const path = require('node:path');
 
 const ROOT = path.resolve(__dirname, '..');
 const SKIP_DIR = /(^|\/)(node_modules|tmp|harness-template|\.git)(\/|$)/;
+/**
+ * 第三方参考材料（`docs/ref/`，浅克隆进来的外部文档 + 索引 README）。
+ * 里面的链接指向**别的仓库**，按定义不可能在本仓库解析成功，因此整目录不纳入检查。
+ * 用户裁决 2026-09-27：整个 docs/ref/ 既忽略版本控制，也不参与文档引用门禁。
+ */
+const SKIP_REF = /^docs\/ref(\/|$)/;
 const LEGACY_ONLY = /^docs\/log\/artifacts\/[^/]+\/(brief\.md|execution-prompt\.md|validation-checklist\.md|results\/|_archive\/|drafts\/)/;
 const HISTORICAL_NOTE = /规范化前|规范化之前/;
 const PLACEHOLDER = /Fxx/;
@@ -31,7 +37,7 @@ function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
     const rel = path.relative(ROOT, full).replace(/\\/g, '/');
-    if (SKIP_DIR.test(rel)) continue;
+    if (SKIP_DIR.test(rel) || SKIP_REF.test(rel)) continue;
     if (entry.isDirectory()) walk(full, out);
     else if (entry.name.endsWith('.md')) out.push(rel);
   }
