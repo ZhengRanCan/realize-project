@@ -26,10 +26,11 @@
 | 领取或新建一个 feature | `docs/harness/features/feature-index.json` → `docs/harness/features/README.md` |
 | 写 / 改 feature 合同 | `docs/harness/features/feature-template.md`、`verification-template.md` |
 | 查某个跨 feature、难以逆转的决策为什么这么定 | `docs/decisions.md` |
-| 查形状词汇表、framework-map 契约、Overview 覆盖标准 | `docs/specs/{shape-catalog,framework-map-contract,overview-coverage}.md` |
+| 查形状词汇表、**framework-map 当前语义**（ontology / relation 三层 / coverage 三分 / parser 规则 / severity）、Overview 覆盖标准 | `docs/specs/{shape-catalog,framework-map-contract,overview-coverage}.md`（**各自 scope 的 NORMATIVE**） |
 | 想知道 Reading **跨层**必须遵守什么（两个投影的关系、identity、Decision A–F、跨层不变量、机器保障） | `docs/specs/reading-view-cognitive-contract.md`（**NORMATIVE**，authority 入口） |
 | 想知道**某一层**（L0 / L1 / L2 / L3）具体必须遵守什么（七字段契约） | `docs/specs/reading-view-layer-contracts.md`（主契约明确纳入的 **normative subordinate**） |
-| 想知道上述规则**为什么存在**（实测数据、反例、关键数字） | `docs/specs/reading-view-cognitive-contract-evidence.md`（NON-NORMATIVE；冲突时以主契约为准） |
+| 想知道某条规则**为什么存在**（实测数据、反例、推导过程、当时的裁决） | Reading：`docs/specs/reading-view-cognitive-contract-evidence.md` · Framework Map：`docs/log/artifacts/F09-contract-adversarial-test/framework-map-contract-history.md` · Overview：`docs/log/artifacts/mvp-phase1/overview-coverage-history.md`（**全部 NON-NORMATIVE**，冲突时以对应规范为准） |
+| 判断某个主题该由哪份文档负责（authority 归属 / 冲突时谁优先） | 各 spec 开头的 **Authority / Scope** 段；Reading 与其它文档的优先级见 `docs/specs/reading-view-cognitive-contract.md` §1.2 的 scoped precedence |
 | 查某个 feature 的需求、结论与验收证据 | `docs/log/artifacts/Fxx-*/`（先看 `brief.md`、`verification-summary.md`） |
 | 查原始实验 run（什么参数下生成了什么、失败留下了什么） | `experiments/README.md` + `experiments/index.json`（逐 run → feature 的归属表） |
 | 找回规范化之前的旧路径 | `docs/README.md` 的 Path mapping |
@@ -37,12 +38,15 @@
 | 看形状探索原型、背景材料、改进建议 | `docs/prototypes/`、`docs/notes/` |
 | 理解某个 feature 的当前状态语义（`active` / `blocked` / `passing`） | `docs/harness/features/README.md` |
 
-三条读取纪律：
+四条读取纪律：
 
 1. **先读索引，再读内容**：`docs/progress.md` 与 `feature-index.json` 是入口，其余文件按需打开。
 2. **历史 feature 与长验证输出不是默认上下文**：只在核查证据时读，不要带进新任务的上下文。
 3. **改代码前先看它由哪个 validator 把关**：`check-plan` / `check-block` / `check-map` / `check-overview`
    以及 `schema/*.json`，别绕过验证链。
+4. **规范与历史分开**：`docs/specs/**` 只写"今天必须遵守什么"；"我们怎么走到这里"（实测数字、
+   bug 发现过程、当时的裁决）在 `docs/log/artifacts/**` 的 `*-history.md` / evidence appendix 里，
+   **它们永远不反向成为 authority**。往 specs 里补内容时，先问这句是规范还是历史。
 
 ---
 
