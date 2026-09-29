@@ -27,6 +27,9 @@
 | 写 / 改 feature 合同 | `docs/harness/features/feature-template.md`、`verification-template.md` |
 | 查某个跨 feature、难以逆转的决策为什么这么定 | `docs/decisions.md` |
 | 查形状词汇表、framework-map 契约、Overview 覆盖标准 | `docs/specs/{shape-catalog,framework-map-contract,overview-coverage}.md` |
+| 想知道 Reading **跨层**必须遵守什么（两个投影的关系、identity、Decision A–F、跨层不变量、机器保障） | `docs/specs/reading-view-cognitive-contract.md`（**NORMATIVE**，authority 入口） |
+| 想知道**某一层**（L0 / L1 / L2 / L3）具体必须遵守什么（七字段契约） | `docs/specs/reading-view-layer-contracts.md`（主契约明确纳入的 **normative subordinate**） |
+| 想知道上述规则**为什么存在**（实测数据、反例、关键数字） | `docs/specs/reading-view-cognitive-contract-evidence.md`（NON-NORMATIVE；冲突时以主契约为准） |
 | 查某个 feature 的需求、结论与验收证据 | `docs/log/artifacts/Fxx-*/`（先看 `brief.md`、`verification-summary.md`） |
 | 查原始实验 run（什么参数下生成了什么、失败留下了什么） | `experiments/README.md` + `experiments/index.json`（逐 run → feature 的归属表） |
 | 找回规范化之前的旧路径 | `docs/README.md` 的 Path mapping |
@@ -76,6 +79,7 @@
 | Schema | `schema/*.json` |
 | Shape Catalog（受控词汇表） | `docs/specs/shape-catalog.md` |
 | Framework map 契约 | `docs/specs/framework-map-contract.md` |
+| Reading View 认知契约 | 跨层：`docs/specs/reading-view-cognitive-contract.md`（NORMATIVE，authority 入口）· 各层：`docs/specs/reading-view-layer-contracts.md`（主契约纳入的 subordinate）· 证据：`-evidence.md`（冲突时以主契约为准） |
 | Validator | `scripts/check-plan.js`、`check-block.js`、`check-map.js`、`check-overview.js` |
 | Gold Fixture | `fixtures/context-consumption.json`、`fixtures/context-consumption.overview-plan.json` |
 | Renderer 契约 | `app/renderer/**`（预览与产品共用同一份 renderer 模块） |

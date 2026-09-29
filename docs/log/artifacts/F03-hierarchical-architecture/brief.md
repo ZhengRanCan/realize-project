@@ -1,5 +1,14 @@
 # Feature 03: Hierarchical Document Model（L0 → L3）
 
+> ⚠️ **历史材料（Historical feature artifact）—— 不是现行架构规范。**
+>
+> 本文件是 Feature 03 当时的规格与决策背景，保留用于追溯架构演化，并作为 F04 / F05 判据的锚点。
+> **Reading View L0–L3 的现行规范性语义已由
+> [`docs/specs/reading-view-cognitive-contract.md`](../../../specs/reading-view-cognitive-contract.md)
+> 接管**（在该契约 scope 内优先于本文件的 §2 层级职责、§3 L0 形态、§8 导航与交互等描述）。
+>
+> 想知道当前架构事实，请读该契约；本文件的内容按"当时为什么这样定"来读。
+
 > 状态：**2026-09-26 重写**。上一版（topic 卡片 + Entry Points + 手改 renderer）与同日的改进版
 > 均已归档到 `_archive/`，见 §17。
 >
@@ -51,6 +60,9 @@ Shape（局部表达）
 
 ## 2. 层级职责
 
+> 本节是 2026-09-26 时的层级职责表述。**现行规范性定义见
+> [`docs/specs/reading-view-cognitive-contract.md`](../../../specs/reading-view-cognitive-contract.md) §2.4 与 §5–§8。**
+
 | 层 | 是什么 | 回答什么 | 点它去哪 |
 |---|---|---|---|
 | **L0** | 一屏两区：主区 = 机制图，侧区 = topic 导航（§3） | 这篇设计在讲什么机制、涉及哪几件事 | 点元素 → L3；点 topic → L1 |
@@ -69,6 +81,11 @@ Topic 标题 · Summary · Key Question · 相关 Blocks · 相关 Topic Relatio
 ---
 
 ## 3. L0：一屏两区（默认入口）
+
+> 本节描述当时的 L0 形态。**现行规范性定义见
+> [`docs/specs/reading-view-cognitive-contract.md`](../../../specs/reading-view-cognitive-contract.md) §5。**
+> 注意：契约已把 L0 的认知职责写为三个**并列**答案（Framework Map / Topic Navigation /
+> Document Summary），"一屏两区"只是当时的版式表述。
 
 ### 3.1 版式
 

@@ -38,7 +38,10 @@ acyclic-depends-on / date-within / at-most-one-per-key / ...
 
 **⚠️ 对 AI 生成链路（Feature 07）的直接后果：** AI 为了通过 validator 而发明 edge type 的第一反应必须被堵死 —— schema 的 `type` 是封闭 enum（表外词 = HARD），所以它只能**误用**已有动词（例如把"引用"写成 `contains`、把一切塞进 `relates-to`）。这是 F07 要盯的主要失败模式，**不是** Contract 需要继续加词。
 
-规格来源：`docs/log/artifacts/F03-hierarchical-architecture/brief.md`（架构文档）
+规格来源：本文件自身（element ontology / relation vocabulary / 三种 coverage 的分离）。
+Reading 侧的认知语义（L0–L3 认知职责、跨层 identity、capability 状态）见
+`docs/specs/reading-view-cognitive-contract.md`。
+历史来源：`docs/log/artifacts/F03-hierarchical-architecture/brief.md`（历史材料，非现行规范）。
 验证来源：`docs/log/artifacts/F04-l0-framework-map/`（Fixture A）· `docs/log/artifacts/F05-l0-generalization-gate/`（A / B / C）· `docs/log/artifacts/F09-contract-adversarial-test/`（D / E，Gate = PASS）
 
 ---
@@ -60,6 +63,10 @@ Framework Coverage  ≠  Navigation Coverage  ≠  Semantic Coverage
 | `check-overview`（既有） | C |
 
 **永远不要把它们合成一个 "coverage = 100%"。**
+
+> Reading 侧的 coverage 术语对照（本契约的 **C. Semantic Coverage** ↔
+> `reading-view-cognitive-contract.md` 的 **Realized Source Coverage**）见
+> `docs/specs/reading-view-cognitive-contract.md` 的 **Decision F.1**。
 
 还有一条粒度纪律：
 

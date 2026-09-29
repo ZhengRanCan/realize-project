@@ -22,8 +22,12 @@
 - 交互与可访问性：
   - 快捷键 `A` / `R` / `L` 作用于当前聚焦的决策卡片，`G` / `D` 切换两个页面。
   - 区块与 Topic 需要可从键盘聚焦并触发下钻；L0 元素使用 `#element-<id>`，block 使用 `#block-<id>` 深链。
-  - L0 默认入口是 Map，`What → How → Prove → Boundary` 作为可切换的 Reading Lens，两者复用同一批 blocks。
+  - L0 默认入口是 Map，`What → How → Prove → Boundary` 作为可切换的 **Reading Lens**（交互层概念；
+    其认知语义以 Cognitive Contract 为准，见下），两者复用同一批 blocks。
   - 判断 UI 是否合格的最终标准是**能否不打开原 Markdown 就回答问题**，不是"好不好看"。
+  - **Reading 的认知语义不在本文件定义。** 跨层规则以 `docs/specs/reading-view-cognitive-contract.md`
+    为准，各层（L0–L3）的具体契约以 `docs/specs/reading-view-layer-contracts.md` 为准；
+    本文件只描述实现与交互如何满足这两份契约。实现若与契约冲突，以契约为准。
 
 ## 变更前置
 

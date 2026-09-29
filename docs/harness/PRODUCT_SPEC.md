@@ -14,8 +14,11 @@
   - **Visual Overview**：按认知路径推进的四段（甲 · 这是什么 / 乙 · 它怎么跑 / 丙 · 怎么算发生了 / 丁 · 边界与反模式），
     每个区块按内容形状选择承载形式（受控词汇表见 `docs/specs/shape-catalog.md`），并带 `Source` 回查标签。
   - **Decision List**：把需要人工判断的设计决策集中呈现，支持 同意 / 不同意 / 以后再说，写回 `human-review.json`。
-- **分层文档模型**：L0 一屏两区（framework map + topic 导航）→ L1 Topic → L2 Visual Blocks → L3 元素详情，
-  Source / Provenance 作为贯穿所有层级的纵向能力（规格见 `docs/log/artifacts/F03-hierarchical-architecture/brief.md`）。
+- **分层阅读模型（Reading）**：同一个语义模型上的 document-centric 投影，认知深度为 L0 概览 → L1 Topic →
+  L2 Block → L3 核查；Source / Provenance 是贯穿各层的纵向能力。与之正交的另一种观察方式是
+  **Explore**（entity-centric，围绕单一焦点实体展开模型关系）。
+  四层的**跨层规则**由 `docs/specs/reading-view-cognitive-contract.md` 定义，
+  各层具体契约由 `docs/specs/reading-view-layer-contracts.md` 定义；本文件只声明产品承诺与范围。
 - 语义覆盖而非句子覆盖：允许合并重复论证、改写措辞、调整顺序、使用折叠；不允许丢失重要定义、边界、例外、反例、
   Current-Target 差异与未决事项，也不允许把未决定的内容写成结论。
 - 可机检的契约层：Schema、`check-plan`、`check-block`、`check-map`、`check-overview` 等验证层，

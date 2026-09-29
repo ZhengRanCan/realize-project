@@ -1,7 +1,9 @@
 # Shape Catalog（第一版受控词汇表）
 
 本目录来自 `docs/prototypes/overview-shape.html` 与 `overview-shape-2.html` 中**真实存在**的表达方式，
-不是凭空设计的。`overview-plan.json` 的 `blocks[].shape` 只能取本表的 10 个值之一；新增形状必须先改本文件、再改校验器。
+不是凭空设计的。`overview-plan.json` 的 `blocks[].shape` 的**合法取值 = 本表 10 个正式视觉 shape
++ `prose` 例外 = 共 11 个允许值**。新增正式视觉 shape 必须先改本文件、再改校验器；
+`prose` 不计入视觉 shape catalog。
 
 原则：**形状由内容结构决定，内容不将就组件。**
 
@@ -39,6 +41,8 @@
 - **适合**：同一个系统在"现在"和"目标"两种形态下的结构差异，且**改动点需要被标出来**。
 - **不适合**：两个互相独立的概念对比（用 `two-column-comparison`）、纯枚举（用 `combo`）。
 - **典型字段**：两个 lane，`variant` 分别为 `current` / `target`；节点 `state` 用 `current` / `changed` / `target`。
+- **`state` 的认识论 provenance 语义**（`flowNode.state` 属 Generated Epistemic Assertion、provenance scope 未分类）
+  见 `docs/specs/reading-view-cognitive-contract.md` **Decision D.1**；本文件只规定它的**合法取值**，不定义其 provenance。
 - **推荐容量**：每侧 2–5 个节点。两侧节点数不必相等，但**差异必须体现在 edge.note 或 state 上**。
 - **硬约束**：两侧不能只有措辞差异而无结构差异，否则应降级为 `diff`。
 
@@ -109,9 +113,14 @@
 只有文档定位声明                      → prose（例外，慎用）
 ```
 
-## 4. 与现有 fixture 的对应
+## 4. Historical fixture correspondence（历史对应，不代表当前 inventory）
 
-`fixtures/context-consumption.json` 当前的 20 个区块用到 8 种形状，均在本表内：
+> 下表记录 **最初 20-block design-review overview snapshot** 的形状使用情况，
+> 用来说明 catalog 是从哪些真实样张归纳出来的。
+> 它**不代表当前 Plan inventory** —— 当前 `overview-plan.json` 是 21 个 block（含 O-16），
+> 见 `reading-view-cognitive-contract-evidence.md` §2.2。
+
+`fixtures/context-consumption.json` 当时的 20 个区块用到 8 种形状，均在本表内：
 
 ```text
 flow ×2（O-04, O-05）    ladder ×3（O-02, O-09, O-10）
