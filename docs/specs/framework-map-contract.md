@@ -244,15 +244,20 @@ relationGapCount / (relationGapCount + edges.length) ≥ 0.5   且   relationGap
 
 **所以不要为了让某个 Fixture 触发 `W8` 去调阈值。**
 
-**已登记的关系缺口：**
+**已登记的开放缺口（live registry）：**
 
-| 关系 | 出现处 | 为什么 `type + qualifiers` 表达不了 |
+判据：**每一行都必须能回答"它今天是否仍然影响合法建模 / validator 行为"** —— 不能回答的属于历史。
+
+| Gap | 今天是否仍存在 | 当前处理规则 |
 |---|---|---|
-| 跨语言一致性 | Fixture B | `depends-on` 只表示依赖，表达不了"必须一致" |
-| 持有 / 存储 | Fixture C | §5.2 放宽 `contains` 后**机制上已可表达**（`contains` + `ownership: owned`）；**但原 candidate map 尚未按新 Contract 重表达 → 不能算实测关闭**，列为 follow-up |
-| 通过 / 放行 | Fixture C | `validates` 只表达"谁校验谁"，缺"通过"语义 |
-| Task 依赖图无环 + 满足条件 | Fixture D（重表达后保留） | 基本关系（`depends-on`，两端 zero-or-many）已能表达；缺的是**关系自身的图级不变量** |
-| Stage 区间包含 `scheduledDate` | Fixture D（重表达后保留） | 归属已由 `contains + owned + one/one-or-many` 表达；缺的是**跨实体区间包含不变量** |
+| 跨语言一致性 | **是** —— relation vocabulary 缺口 | 用 `relationGap` 登记，**不补第 9 个动词** |
+| 通过 / 放行 | **是** —— `validates` 只表达"谁校验谁"，缺"通过"语义 | 同上 |
+| 「持有 / 存储」 | **否** —— §5.2 放宽后机制上已可表达（`contains` + `ownership: owned`） | **不得**再登记为 `relationGap`；原 candidate map 尚未按新 Contract 重表达，列为 follow-up，**不静默当作已解决** |
+| Task 依赖图无环 + 满足条件 | **是** —— 第 3 层：关系自身的图级不变量 | 留在 `relationGap`（成对锚定） |
+| Stage 区间包含 `scheduledDate` | **是** —— 跨实体区间包含不变量 | 留在 `relationGap`（成对锚定） |
+
+> 各条**首次发现处**（Fixture B / C / D）与其当时的推导过程见历史归档 §3 / §11；
+> 本表只登记"今天仍然有效"的部分。
 
 ### 5.4 Structured Constraint Gap（已登记，不阻塞 Gate）
 
@@ -329,7 +334,7 @@ Constraint: (goalId, date) unique / at-most-one     ← Structured Constraint Ga
 1. element budget = 12        ← 认知容量 heuristic，不是 semantic validity
 2. role 取值                   ← controlled-but-extensible；未知 role 只出 Warning
 3. qualifiers 取值             ← 同上；未知 ownership 只出 Warning（W7）
-4. relation vocabulary 完备性  ← 已登记已知 Relation gap（B / C），但不补词
+4. relation vocabulary 完备性  ← 已登记已知 Relation gap（见 §5.3），但不补词
 5. topology / layout           ← 无主轴、DAG、泳道都属具体文档
 ```
 
