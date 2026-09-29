@@ -24,6 +24,10 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 引入三项正式结构：**ReadingAddress**（我从哪里来）· **NavigationStack**（怎么回去）·
 **CanonicalReadingResolver**（从零打开这个实体时在哪）。
 
+这三项构成 Reading 与 Explore **共享的 identity / navigation substrate** ——
+本 feature 必须把它设计成**可被 F20（Explore）复用**，而不是只有 Reading 能用的私有结构。
+否则 Explore 会自己长出第二套 identity / navigation（见 F20 的验收）。
+
 ## Process preconditions
 
 - F16 / F17 / F18 已完成（四层已经真的连起来，否则本 feature 没有真实场景）。

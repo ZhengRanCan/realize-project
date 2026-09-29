@@ -6,7 +6,7 @@ status: not_started
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F16-l2-runtime/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中打开 L2：确认每个 Block 的 identity / 生成完整性 / coverage / occurrence 都来自 projection，而不是 renderer 自己读多份 artifact 后判断"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
+completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中打开 L2：确认每个 Block 的 identity / 生成完整性 / coverage / occurrence 都来自 projection，而不是 renderer 自己读多份 artifact 后判断","静态搜索确认 renderer / helper 里不再出现对 missing / empty / reviewObjects 关系 / sourceUnitIds 含义的本地判断"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F16 L2 Block Runtime (first product adoption)
@@ -36,6 +36,10 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 **为什么从 L2 开始而不是 L0**：L0 已经有 `framework-map` + 现有 view model；
 而 L2 是 Contract 已完整、Plan / Generated 数据真实存在、identity（`O-xx`）稳定、
 但**产品 runtime 尚未正式消费**的那一层 —— 最能检验 projection 是否真有价值。
+
+**F16 是整条路线的架构转折点。** B1 做得再好，只要它还是"测试 helper"，架构就没有真正改变；
+F16 才是把 `artifact → renderer` 改成 `artifact → semantic projection → L2 view model → renderer`，
+并开始消灭旁路的那一步。
 
 ## Process preconditions
 
@@ -68,9 +72,19 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
       不再是 test helper（第 2 项工程动作）。
 - [ ] 真实 L2 renderer 消费 projection 输出，**不再分别读取多份 artifact 自行解释**。
 - [ ] **behavior parity**：迁移前后正常内容零丢失（逐块对比 + 现有回归全绿）。
-- [ ] **消除旁路（最重要）**：semantic interpretation **只发生在 projection 层** ——
-      renderer 不再自行决定"缺失是 Unknown 还是 empty"、"`reviewObjects` 是 related 还是 supports"、
-      "evidence 是否 verified"。迁移完成的标志就是这条。
+- [ ] **消除旁路（最重要）**：semantic interpretation **只发生在 projection 层**。
+
+      **F16 是否完成，不看"L2 页面出来了"，而看 renderer / helper 里还有没有人在自己回答这四个问题：**
+
+      ```text
+      ① missing 是什么？                      （Unknown / Missing / 空？）
+      ② empty 是什么？                        （Known(0) 还是 Unknown？）
+      ③ reviewObjects 是什么关系？            （related 还是 supports？）
+      ④ sourceUnitIds 表示什么？某个 status 该显示成哪种 epistemic meaning？
+      ```
+
+      只要这些解释仍散落在 renderer / helper 里，**F16 就没有真正完成** ——
+      它只是把新路径接上了，却把旧解释留在了原地。
 - [ ] 契约 §6 矩阵 cell 更新（只更新 cell，Priority 不整行搬迁）。
 - [ ] 独立审查记录已写入 artifact 目录。
 

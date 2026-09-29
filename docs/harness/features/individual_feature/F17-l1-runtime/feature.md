@@ -21,6 +21,15 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 **L1 的独立性来自 scope transformation，而不是 entity enrichment** ——
 即使它引用与 L0 完全相同的 `E-xx` 与 edge，认知意义仍然不同。
 
+**F17 不是"给 Topic 做详情页"。** 真实数据已证明 Topic 是 **facet，不是 container**，
+所以正确的 L1 围绕 `Inside(T)` / `Boundary(T)` / `Crossing(T)` / `Block Organization(T)` 构建，
+回答的是：
+
+```text
+「从这个 concern 看系统，会看到什么局部与边界？」      ← 正确
+「这个 Topic 拥有哪些孩子？」                          ← 错误（把 facet 重新解释成 hierarchy）
+```
+
 ## Process preconditions
 
 - F16 已完成（L2 已在 projection 上运行；provenance / review 侧链路已就绪）。
@@ -60,9 +69,12 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 
 ## Risks and compatibility
 
+- **最危险的产品诱惑**：UI 开始想"用户点 Topic，当然应该看到 Topic 里面的内容"，
+  于是实现慢慢变成 `Topic ├── child ├── child └── child` —— 把 facet 强行重新解释成 hierarchy。
+  "内部关系为空不得伪造"这条验收就是它的守卫。
 - **Topic 的 canonical landing 目前是 Deferred**（契约 §2.3）。本 feature 若要把它提升为 Present，
   必须**先改契约再改代码**，并在合同里记录；不得让实现单方面"事实上"建立 landing。
-- 最容易犯的错是让 L1 退化成"L0 的一层 crop"—— 验收里"内部关系为空不得伪造"就是这条的守卫。
+- 最容易犯的错是让 L1 退化成"L0 的一层 crop"。
 
 ## Completion evidence
 

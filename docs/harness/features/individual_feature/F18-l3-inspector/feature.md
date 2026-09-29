@@ -22,6 +22,16 @@ Generation Integrity · Provenance Assurance。
 **仍然不提供 Claim Verification** —— 直到未来真的出现新的 carrier。
 这是本 feature 最重要的产品判断：**UI 只展示模型真正知道的东西，而不是为了显得完整把空白填满。**
 
+**F18 不是 Verification Feature。** 它的成功标志不是"信息看起来完整"（那会天然诱导出
+`Verified` / `Unverified` / `Evidence OK` / `Approved` 之类的总结 badge），而是：
+
+```text
+用户能看见系统知道什么、能追到哪里，
+同时也能看见系统不知道什么。
+```
+
+这与普通 dashboard 的思路很不一样，但正是本架构的辨识度。
+
 ## Process preconditions
 
 - F16 / F17 已完成（L2 与 L1 已在 projection 上运行；source 与 review 链路已就位）。

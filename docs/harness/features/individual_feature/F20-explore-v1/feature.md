@@ -6,7 +6,7 @@ status: not_started
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F20-explore-v1/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中从任意 Reading 深度进入 Explore（Focus = 某个 Element 或 Topic），确认它走的是同一套 identity 与 resolver，而不是第二套导航；再确认 attachment-only 的 constraint 只能作为 annotation，不能成为 Focus"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
+completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中从任意 Reading 深度进入 Explore（Focus = 某个 Element 或 Topic），确认它复用 F19 的 ReadingAddress / NavigationStack / CanonicalReadingResolver，没有自己的 route / resolver / back stack","确认 attachment-only 的 constraint 只能作为 annotation，不能成为 Focus"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F20 Explore v1 (reusing the Reading identity substrate)
@@ -24,7 +24,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 
 ## Process preconditions
 
-- F19 已完成（identity / navigation / resolver 已产品化）。
+- F19 已完成（identity / navigation / resolver 已产品化），并且**其 substrate 可被复用**。
 - 契约侧依据：Contract §2.1（两个正交投影）、Decision A（Explore Addressability）、
   §3.3 导航纪律、以及在证据里实测的 `174 : 0`（可核查 ≠ 可寻址）。
 - 注：顺序上在 F19 之后，**不登记为 `dependsOn`**。
@@ -54,7 +54,10 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 - [ ] 可从**任意 Reading 深度**进入 Explore（不是 L4，是横向切入）。
 - [ ] `Back to Reading` 恢复 ReadingAddress（上下文）；`Open in Reading(id)` 走 resolver（跨投影导航）——
       两者语义不同，不得合并。
-- [ ] **不新增第二套 identity / resolver**：Explore 复用 Reading 的 identity substrate。
+- [ ] **不得绕过 F19 的 resolver / identity substrate**（比"依赖 F19"更强的要求）：
+      Explore **不得**自己长出 `exploreEntityId` / `exploreRoute` / `exploreResolver` /
+      `exploreBackStack` 之类的第二套基础设施。这是本 feature 最大的结构风险 ——
+      不是图画得不好，而是系统悄悄拥有**两套** identity / navigation。
 - [ ] attachment-only 的 constraint 在 Explore 中**可作 annotation，不可作 Focus**。
 - [ ] 独立审查记录已写入 artifact 目录。
 
