@@ -42,7 +42,7 @@ Topic 没有 element 只出 Informational。契约刻意不写 `maxItems`、不�
   判据 F 同文档 label 唯一、element budget warning、relationGap、形态类 Informational；后期并入 H8 / W7 / W8 与 `W4 → I6`、heading tree。
 - `scripts/test-check-map.js`（新增）——单元测试：F06 记录 19 例，F09 修复后 29 例（新增 heading tree ×2、qualifiers ×4、relationGap 聚合 ×2）。
 - `docs/specs/framework-map-contract.md`（新增）——判断层契约：三种 coverage 的关系、concept vs state、何时用 attachment、
-  Capacity gap、关系三层与 Relation gap、不要强行串链（含 Fixture C 的真实来历）、三级冻结清单；F09 追加 §0 / §5.4 / §10.1。
+  Capacity gap、关系三层与 Relation gap、不要强行串链（含 Fixture C 的真实来历）、三级冻结清单；F09 追加 §0 / §5.4 / §9.1。
 - `package.json`（修改）——新增 `check-map` / `test:map` 脚本，`test:all` 并入 `test:map`。
 - 三篇被测 map 只补 `relationGap`（语义内容未改动）：`docs/log/artifacts/F04-l0-framework-map/drafts/context-consumption.map.json`、
   `docs/log/artifacts/F05-l0-generalization-gate/drafts/fixture-b.map.json`、`…/fixture-c.map.json`；A 另补 `meta.validationGranularity`。

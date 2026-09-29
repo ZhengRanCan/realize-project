@@ -190,7 +190,7 @@ Mutation    14/14 = 100%
 
 | 议题 | 裁决 |
 |---|---|
-| **Parser 的容忍度 ≠ 正确性** | ✅ 值得长期保留。"看到 `#` 就当标题"表面更通用，却把 fenced code 里的 `# expected output` 认成文档结构。正确方向是 Markdown syntax-aware + fence-aware + hierarchy-aware；**不要用文本 regex 假装自己在解析 Markdown**。对 table / code block / JSON example / Mermaid / quoted Markdown 同样适用 → 已写入契约 §10.1 |
+| **Parser 的容忍度 ≠ 正确性** | ✅ 值得长期保留。"看到 `#` 就当标题"表面更通用，却把 fenced code 里的 `# expected output` 认成文档结构。正确方向是 Markdown syntax-aware + fence-aware + hierarchy-aware；**不要用文本 regex 假装自己在解析 Markdown**。对 table / code block / JSON example / Mermaid / quoted Markdown 同样适用 → 已写入契约 §9.1 |
 | **B / C 没有重表达** | ✅ 处理正确。**不能因为 Contract 已具备 `contains + ownership`，就回头在结果里说"所以 B/C 的旧 relationGap 已解决"。** 正确说法是"机制上可能已能表达，但原 candidate map 尚未按新 Contract 重表达，因此不能算实测关闭"。→ 列为单独一轮 `F06 contract migration regression`，不阻塞任何 feature |
 
 ### 7.4 `contains ≠ references`

@@ -483,7 +483,7 @@ Topology               chain / DAG / star-DAG 均可表达
 
 > **Parser 的容忍度 ≠ Parser 的正确性。**
 > "看到 `#` 就当标题"表面更通用，却把 fenced code 里的 `# expected output` 认成了文档结构。
-> 不要用文本 regex 假装自己在解析 Markdown。（详见 `docs/specs/framework-map-contract.md` §10.1）
+> 不要用文本 regex 假装自己在解析 Markdown。（详见 `docs/specs/framework-map-contract.md` §9.1）
 
 以及它的**正确收尾方式**：
 
