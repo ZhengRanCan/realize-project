@@ -61,5 +61,40 @@
     "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F10-semantic-grounding",
     "version": "v0.1"
+  },
+  {
+    "id": "F11",
+    "title": "Current Implementation Conformance Audit",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F11-conformance-audit",
+    "version": "v0.1"
+  },
+  {
+    "id": "F12",
+    "title": "S1 Epistemic Collapse Regression",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F12-s1-epistemic-collapse",
+    "version": "v0.1"
+  },
+  {
+    "id": "F13",
+    "title": "Minimal Semantic Projection Boundary (B1)",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F13-projection-boundary",
+    "version": "v0.1"
+  },
+  {
+    "id": "F14",
+    "title": "Adversarial Semantic Tests (B2)",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F14-adversarial-semantic-tests",
+    "version": "v0.1"
+  },
+  {
+    "id": "F15",
+    "title": "Projection Integration Invariants",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F15-integration-invariants",
+    "version": "v0.1"
   }
 ]

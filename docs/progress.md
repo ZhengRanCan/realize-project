@@ -2,12 +2,15 @@
 
 ## Status
 
-- Date: 2026-09-27.
-- Active feature: **none** —— 2026-09-27 用户裁决把 `F08` 由 `active` 改为 `blocked`（对当前 UI 表现层不满意，先做一轮 UI 迭代），
-  `feature-index.json` / 合同 / 本 dashboard 三处已同步。
-- Next queued feature: none —— 没有 `not_started` 的 feature；当前实际动作是 **F08 的 UI 迭代**（等用户给出想法后落地），
-  之后再谈 Track A 与各 feature 的验收。
+- Date: 2026-09-29.
+- Active feature: **none** —— `F08` 自 2026-09-27 起为 `blocked`（用户对 UI 表现层不满意，先做一轮 UI 迭代）。
+- Next queued feature: **F11 Current Implementation Conformance Audit** —— 2026-09-29 新登记 F11–F15，
+  阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
+- 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
+  `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
+  （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
+  收口审计结论：authority 图无环、无第二份 normative 正文、规范与历史未混。
 
 ## Feature 状态一览
 
@@ -22,13 +25,61 @@
 | F08 | L0 UI | `blocked` | 用户对当前 UI（Reading View 表现层）不满意，先做一轮 UI 迭代；Track A 与 Gate 延后（技术层 34/42/130 + selftest 13 条仍全绿） |
 | F09 | Contract Adversarial Test | `passing` | — |
 | F10 | Semantic Grounding | `blocked` | E3 未关闭（Gate = PARTIAL PASS）；处置未登记 |
+| F11 | Current Implementation Conformance Audit | `not_started` | — |
+| F12 | S1 Epistemic Collapse Regression | `not_started` | — |
+| F13 | Minimal Semantic Projection Boundary (B1) | `not_started` | — |
+| F14 | Adversarial Semantic Tests (B2) | `not_started` | — |
+| F15 | Projection Integration Invariants | `not_started` | — |
+
+## 下一阶段路线（2026-09-29 登记）
+
+从「架构规范形成」切到「**现有实现向规范收敛**」：规范已经成为 conformity criterion，
+代码是被检查对象，不再是从代码反推设计意图。**不是重写，也不是"再跑一遍旧测试"**。
+
+```text
+F11  Conformance Audit          只读：现有实现 vs 契约，分类为
+                                Compliant / Violation / Partially Compliant /
+                                Not Implemented / Capability Absent /
+                                No Executable Boundary / Needs Inspection
+        ↓
+F12  S1 Regression              第一个现实违反（l0-view-model.js:109 的 || []）：
+                                先写会失败的测试 → 最小修改 → 既有 34/42/130/selftest 全绿
+        ↓
+F13  B1 最小投影边界             让「无边界」的规则第一次成为可结构化断言的对象
+                                （四类状态空间 + 名义隔离 + identity/authority 保持）
+        ↓
+F14  B2 反诱惑测试              S1 长期 suite + S3 / S4 / N6 / N7 / N8，
+                                每个 fixture 只增强一个诱惑来源
+        ↓
+F15  集成不变量                 renderer 纪律 / Decision B 导航 / Decision F coverage /
+                                L1 Topic 边界 / source-coordinate（N11）
+        ↓
+     更新契约 §6 Machine Enforcement Status 的对应 cell（随各 feature 完成，不整行搬迁）
+```
+
+三条纪律（写进各 feature 合同）：
+
+1. **不因为规范写好了就重写软件**：已实测正确的机制（assembler 注入 + `FIXED`、
+   悬空外键校验、`leaf ⊆ covers`、`source-sections.json` 解析器）保留，
+   只有真实 divergence 才改。
+2. **改之前先有会失败的测试**；`F12` 是第一个现实案例。
+3. **审计有两个输出**：违规清单，以及"已正确、不要动"的清单（后者防 B1 动投影层时弄坏既有机制）。
 
 ## Latest harness gate
 
 ```text
 $ npm run verify:harness
-Harness gate: 9 features, 0 errors.
+Harness gate: 14 features, 0 errors.        # 2026-09-29，加入 F11–F15 之后
+
+$ npm run check:docs
+Doc links: 89 markdown files checked, 0 broken.
+
+$ npm run check:experiments
+experiments index: 66 units + 17 artifacts, up to date.
 ```
+
+> 下面的「收口复跑」表是 **2026-09-27 的历史快照**（当时 9 features / 69 docs），
+> 按「规范与历史分开」的纪律**不随后续改动更新**；当前值以上面为准。
 
 ## 收口复跑（2026-09-27，规范化之后）
 
