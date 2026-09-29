@@ -30,6 +30,37 @@
 | F13 | Minimal Semantic Projection Boundary (B1) | `not_started` | — |
 | F14 | Adversarial Semantic Tests (B2) | `not_started` | — |
 | F15 | Projection Integration Invariants | `not_started` | — |
+| F16 | L2 Block Runtime（第一个产品采纳） | `not_started` | 契约待补（F11–F15 完成后细化） |
+| F17 | L1 Topic Runtime | `not_started` | 契约待补（F11–F16 完成后细化） |
+| F18 | L3 Inspector | `not_started` | 契约待补（F11–F17 完成后细化） |
+| F19 | Reading Navigation and Resolver | `not_started` | 契约待补（F11–F18 完成后细化） |
+| F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
+| F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
+
+### 阶段划分（2026-09-29 登记）
+
+```text
+Phase A  Contract Execution         代码能否忠实表达契约？        F11 → F12 → F13 → F14 → F15
+Phase B  Reading Runtime            用户能否真正使用 L0–L3？      F16 → F17 → F18
+Phase C  Cross-Projection Nav       Reading / Explore 共享 identity？ F19 → F20
+Phase D  Product Maturity           是否好用、快、清晰、可维护？  F21
+```
+
+**当前在 Phase A 前半。** B1 / B2 完成后不要继续加抽象测试，
+而要开始把已被测试保护的 projection 接进真实产品 —— 因为文档层已经走在产品运行时前面：
+`app/main/main.js` 今天并不消费 `overview.generated.json`。
+
+### Reading v1 的完成判据（不是 B2 全绿）
+
+```text
+L0 可用 · L1 可用 · L2 consume Plan + Generated · L3 可核查
+Back / Resolve 正确 · identity preserved
+Unknown / Missing / Absent 不 collapse
+Renderer 不重新推断 semantic relation
+高风险 invariants 有机器保护
+```
+
+到这里，Reading View Cognitive Contract v1 才算**从文档变成产品**。
 
 ## 下一阶段路线（2026-09-29 登记）
 
@@ -69,10 +100,10 @@ F15  集成不变量                 renderer 纪律 / Decision B 导航 / Decis
 
 ```text
 $ npm run verify:harness
-Harness gate: 14 features, 0 errors.        # 2026-09-29，加入 F11–F15 之后
+Harness gate: 20 features, 0 errors.        # 2026-09-29，加入 F11–F21 之后
 
 $ npm run check:docs
-Doc links: 89 markdown files checked, 0 broken.
+Doc links: 107 markdown files checked, 0 broken.
 
 $ npm run check:experiments
 experiments index: 66 units + 17 artifacts, up to date.

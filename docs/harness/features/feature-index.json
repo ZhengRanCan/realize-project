@@ -96,5 +96,47 @@
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F15-integration-invariants",
     "version": "v0.1"
+  },
+  {
+    "id": "F16",
+    "title": "L2 Block Runtime (first product adoption)",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F16-l2-runtime",
+    "version": "v0.1"
+  },
+  {
+    "id": "F17",
+    "title": "L1 Topic Runtime",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F17-l1-runtime",
+    "version": "v0.1"
+  },
+  {
+    "id": "F18",
+    "title": "L3 Inspector (traceability without verification)",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F18-l3-inspector",
+    "version": "v0.1"
+  },
+  {
+    "id": "F19",
+    "title": "Reading Navigation and Resolver",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F19-navigation-resolver",
+    "version": "v0.1"
+  },
+  {
+    "id": "F20",
+    "title": "Explore v1 (reusing the Reading identity substrate)",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F20-explore-v1",
+    "version": "v0.1"
+  },
+  {
+    "id": "F21",
+    "title": "Product Maturity (UX, performance, accessibility)",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F21-product-maturity",
+    "version": "v0.1"
   }
 ]
