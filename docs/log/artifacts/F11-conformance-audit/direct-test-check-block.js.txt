@@ -1,0 +1,36 @@
+=== check-block 自动测试 ===
+
+✓ 基线｜capability-matrix 正确写法 → PASS
+✓ 基线｜current-target-flow 正确写法 → PASS
+✓ 基线｜checklist 正确写法 → PASS
+✓ shape 与 content.type 不一致 → FAIL
+✓ 修改 plan 固定字段（title）→ FAIL
+✓ 修改 plan 固定字段（covers）→ FAIL
+✓ provenance 引用不在 covers 里的 sourceUnit → FAIL
+✓ core sourceUnit 没有任何元素承载 → FAIL
+✓ provenance 引用不存在的 sourceUnit → FAIL
+✓ current 泳道挂了 target-state 语义 → FAIL
+✓ node.state=current 但 provenance 是 target-state → FAIL
+✓ current-target-flow 缺少一个泳道 → FAIL
+✓ 未决事项被写成确定结论 → FAIL
+✓ 未决语义在 content 里完全没有落点 → FAIL
+✓ non-claim 被写成系统保证 → FAIL
+✓ content 出现 source-verified → FAIL
+✓ 新增禁用措辞（原文没出现过）→ FAIL
+✓ 原文出现过的措辞不算违规（如"充分条件"）→ PASS
+✓ supporting sourceUnit 未被承载 → WARNING
+✓ 一个元素挂过多 sourceUnit → WARNING
+✓ 短文本承载过多语义 → WARNING（过度概括）
+✓ 长文本占比过高 → WARNING（退化成 prose）
+✓ 同一 sourceUnit 在多个元素重复出现 → WARNING
+✓ capability-matrix 行数超过推荐容量 → WARNING
+✓ 承载语义的元素完全没有 provenance → FAIL（Hard Error）
+✓ Test 1｜checklist panel.title 承载语义但无 provenance → FAIL
+✓ Test 2｜checklist panel.title 承载语义且带 provenance → PASS
+✓ Test 3｜纯展示标签（CURRENT / 能说明）不要求 provenance → PASS
+✓ Test 3b｜diff 侧标题写成 TARGET / CURRENT 固定标签 → 不要求 provenance
+✓ Test 4｜matrix 自定义行首承载语义但无 provenance → FAIL
+✓ Test 4b｜matrix 行首是纯展示标签时不报错 → PASS
+
+========================================================
+结果：PASSED —— 31 个用例全部通过

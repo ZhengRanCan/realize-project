@@ -1,0 +1,31 @@
+===== test-check-map =====
+  PASS  基线最小 map：Hard Error = 0
+  PASS  未知 element type → HARD
+  PASS  缺 provenance → HARD
+  PASS  provenance 指向不存在的小节 → HARD
+  PASS  悬空 edge 端点 → HARD
+  PASS  表外关系词 → HARD
+  PASS  无导航路径 → HARD
+  PASS  原文小节无法解析 → 只 WARNING，不误报 HARD
+  PASS  检查被跳过时 → 状态是 PASS WITH INCOMPLETE VALIDATION（不是 PASS）
+  PASS  检查全部执行时 → 状态是 PASS
+  PASS  element id 重复 → HARD
+  PASS  主轴出现 constraint → HARD
+  PASS  element > 12 → WARNING 且不是 HARD
+  PASS  未知 role → WARNING 且不是 HARD
+  PASS  relationGap → WARNING 且不是 HARD
+  PASS  Topic 只挂一个 block/section → 已降级为 INFORMATIONAL（原 W4）
+  PASS  component = 0 与 state = 0 → INFORMATIONAL（不是 WARN/HARD）
+  PASS  Topic 没有 element → INFORMATIONAL（不是 HARD）
+  PASS  出现收敛节点（DAG）→ INFORMATIONAL
+  PASS  没有主轴 → INFORMATIONAL
+  PASS  非数字标题（## Goal）也能解析为小节全集
+  PASS  围栏代码块里的 # 注释不是标题（runbook 场景）
+  PASS  合法 qualifiers → 无 HARD、无 W7
+  PASS  qualifier 取值未知 → WARNING（W7，不是 HARD）
+  PASS  qualifiers.cardinality 缺 to 端 → HARD（形态错）
+  PASS  qualifiers 里出现未知结构属性 → HARD（不许长第三层词表）
+  PASS  relationGap 少而散 → 逐条 W5（不聚合）
+  PASS  relationGap 多而密 → 聚合为一条 W8，明细挪到 detail 段
+  PASS  词表确实从 schema 读（6 类 / 9 词）
+===== 29 passed, 0 failed =====

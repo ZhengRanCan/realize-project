@@ -1,0 +1,137 @@
+===== F08 · L0 预览验收（对生成的 HTML 断言）=====
+
+  PASS  d：element 全部渲染（13）
+  PASS  d：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  d：Review 覆盖全部 element
+  PASS  d：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  d：每条线都有方向箭头（方向是画出来的）
+  PASS  d：每条线都有 relation 类型标签
+  PASS  d：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  d：Reading 不出现机器 ID / type / role
+  PASS  d：节点标题是切开的短名（不是机器 ID）
+  PASS  d：edge 在 Review 逐条渲染（12）
+  PASS  d：attachment 全部渲染（3）
+  PASS  d：topic 全部渲染（21）
+  PASS  d：Review 方向显式（每行都有 —type→）
+  PASS  d：provenance 全部出现（§ref）
+  PASS  d：无未解析引用
+  PASS  d：Topic 默认折叠（导航不是第二篇文档）
+  PASS  e：element 全部渲染（12）
+  PASS  e：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  e：Review 覆盖全部 element
+  PASS  e：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  e：每条线都有方向箭头（方向是画出来的）
+  PASS  e：每条线都有 relation 类型标签
+  PASS  e：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  e：Reading 不出现机器 ID / type / role
+  PASS  e：节点标题是切开的短名（不是机器 ID）
+  PASS  e：edge 在 Review 逐条渲染（8）
+  PASS  e：attachment 全部渲染（5）
+  PASS  e：topic 全部渲染（9）
+  PASS  e：Review 方向显式（每行都有 —type→）
+  PASS  e：provenance 全部出现（§ref）
+  PASS  e：无未解析引用
+  PASS  e：Topic 默认折叠（导航不是第二篇文档）
+  PASS  d-selfloop：element 全部渲染（23）
+  PASS  d-selfloop：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  d-selfloop：Review 覆盖全部 element
+  PASS  d-selfloop：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  d-selfloop：每条线都有方向箭头（方向是画出来的）
+  PASS  d-selfloop：每条线都有 relation 类型标签
+  PASS  d-selfloop：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  d-selfloop：Reading 不出现机器 ID / type / role
+  PASS  d-selfloop：节点标题是切开的短名（不是机器 ID）
+  PASS  d-selfloop：edge 在 Review 逐条渲染（39）
+  PASS  d-selfloop：attachment 全部渲染（5）
+  PASS  d-selfloop：topic 全部渲染（15）
+  PASS  d-selfloop：Review 方向显式（每行都有 —type→）
+  PASS  d-selfloop：provenance 全部出现（§ref）
+  PASS  d-selfloop：无未解析引用
+  PASS  d-selfloop：Topic 默认折叠（导航不是第二篇文档）
+  PASS  d-overbudget：element 全部渲染（81）
+  PASS  d-overbudget：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  d-overbudget：Review 覆盖全部 element
+  PASS  d-overbudget：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  d-overbudget：每条线都有方向箭头（方向是画出来的）
+  PASS  d-overbudget：每条线都有 relation 类型标签
+  PASS  d-overbudget：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  d-overbudget：Reading 不出现机器 ID / type / role
+  PASS  d-overbudget：节点标题是切开的短名（不是机器 ID）
+  PASS  d-overbudget：edge 在 Review 逐条渲染（40）
+  PASS  d-overbudget：attachment 全部渲染（53）
+  PASS  d-overbudget：topic 全部渲染（21）
+  PASS  d-overbudget：Review 方向显式（每行都有 —type→）
+  PASS  d-overbudget：provenance 全部出现（§ref）
+  PASS  d-overbudget：无未解析引用
+  PASS  d-overbudget：Topic 默认折叠（导航不是第二篇文档）
+  PASS  a：element 全部渲染（12）
+  PASS  a：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  a：Review 覆盖全部 element
+  PASS  a：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  a：每条线都有方向箭头（方向是画出来的）
+  PASS  a：每条线都有 relation 类型标签
+  PASS  a：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  a：Reading 不出现机器 ID / type / role
+  PASS  a：节点标题是切开的短名（不是机器 ID）
+  PASS  a：edge 在 Review 逐条渲染（4）
+  PASS  a：attachment 全部渲染（7）
+  PASS  a：topic 全部渲染（5）
+  PASS  a：Review 方向显式（每行都有 —type→）
+  PASS  a：provenance 全部出现（§ref）
+  PASS  a：无未解析引用
+  PASS  a：Topic 默认折叠（导航不是第二篇文档）
+  PASS  e-human：element 全部渲染（13）
+  PASS  e-human：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  e-human：Review 覆盖全部 element
+  PASS  e-human：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  e-human：每条线都有方向箭头（方向是画出来的）
+  PASS  e-human：每条线都有 relation 类型标签
+  PASS  e-human：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  e-human：Reading 不出现机器 ID / type / role
+  PASS  e-human：节点标题是切开的短名（不是机器 ID）
+  PASS  e-human：edge 在 Review 逐条渲染（9）
+  PASS  e-human：attachment 全部渲染（3）
+  PASS  e-human：topic 全部渲染（8）
+  PASS  e-human：Review 方向显式（每行都有 —type→）
+  PASS  e-human：provenance 全部出现（§ref）
+  PASS  e-human：无未解析引用
+  PASS  e-human：Topic 默认折叠（导航不是第二篇文档）
+  PASS  E（分叉）没有被压成链：线逐条独立渲染，没有"链"式合并
+  PASS  >budget 的 map 不被裁（81 elements 全部渲染）
+  PASS  自环边被显式标注（Reading 画成自环 + Review 写「自环」）
+  PASS  relationGap 明确标注「不是 edge」
+  PASS  原则声明在位（Layout organizes space; it does not create semantics）
+  PASS  修正后的原则在位（语义来自线，不来自坐标）—— 但收进折叠的「如何阅读」里
+  PASS  顶部说明默认折叠，且第一屏顺序是「文档定位 → 图」（不是先读设计原则）
+  PASS  Reading 的关系词已中文化（使用 / 产出 / 依赖 …），且原词没丢（data-edge-type）
+  PASS  Review 仍是原词（—consumes→ / —produces→），中文化只发生在显示层
+  PASS  Reading 里没有残留工程词（constraints / Focused Relations / Incoming / Outgoing / Provenance）
+  PASS  节点副标题的收敛是"安全投影"：要么全文、要么前缀+…、要么前两项+共 N 项
+  PASS  回归：cron / 斜杠标识符不会被当成分隔符切坏
+  PASS  标题/副标题的行数规则写死在 CSS（标题 1 行、副标题 2 行）
+  PASS  选中只做加法：CSS 里没有任何"压暗其余内容"的规则（只高光，不隐藏）
+  PASS  约束角标带 data-host-ids（点约束时能把宿主一起点亮）
+  PASS  约束被点亮时有明确样式（点的是 summary / li，不是被自己的底色盖住）
+  PASS  Reading 隐藏一切机器 ID（.eid 在 reading 视图不显示）
+  PASS  Reading / Review 互斥且都在 DOM 里（隐藏 ≠ 删除）
+  PASS  无 element 的 Topic 仍是导航入口（页面上有标注）
+  PASS  约束被降级为角标，但仍在页面上可点
+  PASS  不在任何 edge 上的元素被单独标注（事实，不塞进层里）
+  PASS  没有 edge 的图不画线（不发明主轴）
+  PASS  0-edge 时所有节点都被标成"不在任何 edge 上"（虚线 + 单独一带）
+  PASS  Reading 是默认视图（用户裁决：先看结构，不是先看 WARN）
+  PASS  两个视图的切换都在（Reading / Review tab）
+  PASS  每个 element 都有预渲染的 Focused Relations 面板（可直接静态断言）
+  PASS  Reading 选中后下钻的 slot 在位（Focused Relations 成为 details panel）
+  PASS  每条 edge 在 Review 都有可展开的 qualifier / provenance 区
+  PASS  provenance 是可点链路（data-source-ref），不是死文本
+  PASS  有"清除选择"入口（Esc / 按钮），可回到完整 Overview
+  PASS  Reading 第一眼给出文档定位（"这是什么文档"）
+  PASS  Review 声明分区依据是 element.type（不是关系）
+  PASS  预览真的加载了 renderer 脚本（l0-layout.js → l0-map.js → 内联绑定）
+  PASS  预览是静态 HTML（不依赖 Electron / 不依赖网络）
+
+════════════════════════════════
+L0 预览验收: 130/130 通过（7 份预览）
+✓ 结论：关系被画成线 / 线数 == edge 数 / Reading 无工程 metadata / 约束降级为角标 / 不裁不丢 / 预览真的能跑
+════════════════════════════════

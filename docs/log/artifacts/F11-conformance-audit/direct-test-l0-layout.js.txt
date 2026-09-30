@@ -1,0 +1,49 @@
+===== F08 · L0 Layout 回归（28 份 framework-map）=====
+
+  PASS  displayFields：括号形态切成 标题/副标题（D 的主力形态）
+  PASS  displayFields：冒号形态切成 标题/副标题（E 的主力形态）
+  PASS  displayFields：短标签整句就是标题，不硬切
+  PASS  displayFields：无标点长句用 id 可读名做标题（不编造词）
+  PASS  displayFields：label 缺失时不崩
+  PASS  …/F04-l0-framework-map/drafts/context-consumption.map.json  (节点 8 · 角标 4 · 线 4 · 层内交叉 0→0 · 画布 908×708)
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-b.map.json  (节点 7 · 角标 5 · 线 6 · 层内交叉 0→0 · 画布 1220×324)
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-c.map.json  (节点 8 · 角标 4 · 线 8 · 层内交叉 0→0 · 画布 1220×504)
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-d.map.json  (节点 11 · 角标 1 · 线 11 · 层内交叉 0→0 · 画布 1844×504)
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-e.map.json  (节点 10 · 角标 3 · 线 9 · 层内交叉 6→6 · 画布 2468×324)
+  PASS  …mework-map-generation/fixture-a/run-02/framework-map.json  (节点 11 · 角标 4 · 线 9 · 层内交叉 0→0 · 画布 1768×504)
+  PASS  …mework-map-generation/fixture-a/run-03/framework-map.json  (节点 9 · 角标 5 · 线 5 · 层内交叉 0→0 · 画布 908×528)
+  PASS  …mework-map-generation/fixture-a/run-04/framework-map.json  (节点 9 · 角标 6 · 线 9 · 层内交叉 0→0 · 画布 908×708)
+  PASS  …mework-map-generation/fixture-a/run-05/framework-map.json  (节点 12 · 角标 4 · 线 7 · 层内交叉 0→0 · 画布 1220×888)
+  PASS  …mework-map-generation/fixture-b/run-01/framework-map.json  (节点 9 · 角标 3 · 线 12 · 层内交叉 0→0 · 画布 908×1044)
+  PASS  …mework-map-generation/fixture-b/run-02/framework-map.json  (节点 12 · 角标 2 · 线 18 · 层内交叉 1→1 · 画布 1532×684)
+  PASS  …mework-map-generation/fixture-b/run-03/framework-map.json  (节点 13 · 角标 5 · 线 15 · 层内交叉 1→1 · 画布 1532×1044)
+  PASS  …mework-map-generation/fixture-c/run-01/framework-map.json  (节点 14 · 角标 4 · 线 18 · 层内交叉 0→0 · 画布 1844×504)
+  PASS  …mework-map-generation/fixture-c/run-02/framework-map.json  (节点 15 · 角标 2 · 线 18 · 层内交叉 18→18 · 画布 2780×324)
+  PASS  …mework-map-generation/fixture-c/run-03/framework-map.json  (节点 14 · 角标 2 · 线 16 · 层内交叉 11→11 · 画布 2468×324)
+  PASS  …mework-map-generation/fixture-d/run-01/framework-map.json  (节点 18 · 角标 5 · 线 39 · 层内交叉 1→1 · 画布 1844×1584)
+  PASS  …mework-map-generation/fixture-d/run-02/framework-map.json  (节点 19 · 角标 3 · 线 30 · 层内交叉 5→5 · 画布 2156×864)
+  PASS  …mework-map-generation/fixture-d/run-03/framework-map.json  (节点 18 · 角标 7 · 线 29 · 层内交叉 0→0 · 画布 1844×1224)
+  PASS  …mework-map-generation/fixture-e/run-01/framework-map.json  (节点 13 · 角标 3 · 线 15 · 层内交叉 1→1 · 画布 2468×504)
+  PASS  …mework-map-generation/fixture-e/run-02/framework-map.json  (节点 9 · 角标 3 · 线 11 · 层内交叉 0→0 · 画布 908×1044)
+  PASS  …mework-map-generation/fixture-e/run-03/framework-map.json  (节点 13 · 角标 3 · 线 14 · 层内交叉 3→3 · 画布 1220×888)
+  PASS  …ts/semantic-grounding/fixture-d/run-01/framework-map.json  (节点 35 · 角标 46 · 线 40 · 层内交叉 14→14 · 画布 3092×1248)
+  PASS  …ts/semantic-grounding/fixture-d/run-04/framework-map.json  (节点 10 · 角标 3 · 线 12 · 层内交叉 0→0 · 画布 1220×504)
+  PASS  …ts/semantic-grounding/fixture-e/run-05/framework-map.json  (节点 8 · 角标 5 · 线 12 · 层内交叉 0→0 · 画布 908×1044)
+  PASS  …ts/semantic-grounding/fixture-e/run-06/framework-map.json  (节点 6 · 角标 7 · 线 7 · 层内交叉 0→0 · 画布 908×504)
+  PASS  …ts/semantic-grounding/fixture-e/run-08/framework-map.json  (节点 7 · 角标 5 · 线 8 · 层内交叉 0→0 · 画布 908×504)
+  PASS  …ts/semantic-grounding/fixture-e/run-10/framework-map.json  (节点 7 · 角标 5 · 线 7 · 层内交叉 0→0 · 画布 908×684)
+  PASS  …ts/semantic-grounding/fixture-e/run-11/framework-map.json  (节点 8 · 角标 4 · 线 8 · 层内交叉 0→0 · 画布 908×684)
+  PASS  用户感受 3：D 的节点标题是 UserProfile / PlanBundle 聚合，不再是 E-UserProfile 这种机器 ID
+  PASS  用户感受 3：id 仍然保留在数据里（data-element-id / badge），只是不进第一眼标题
+  PASS  用户感受 1：D 是网状 —— 关系被画成线，不是靠卡片文字；且有分叉（不是一条链）
+  PASS  用户感受 2：约束不再抢主视觉 —— 有 edge 的约束才是节点，其余降为宿主角标（不丢）
+  PASS  E 是分叉不是链：存在 ≥2 个后继的节点，且分层 ≥2 层
+  PASS  自环样本：自环被画成自环，且没有变成主线
+  PASS  81 元素极端样本：全部渲染、不裁剪、画布有限
+  PASS  只有 edge 才有线：所有样本的线数都严格等于 edge 数
+  PASS  确定性：全部样本两次布局逐字节相同
+
+════════════════════════════════
+L0 Layout 回归: 42/42 通过（覆盖 28 份 map，其中逐份矩阵 28/28）
+✓ 结论：不丢 / 不造线 / 不重叠 / 方向画出来 / 自环仍是自环 / 排序减少交叉 / 逐字节确定
+════════════════════════════════

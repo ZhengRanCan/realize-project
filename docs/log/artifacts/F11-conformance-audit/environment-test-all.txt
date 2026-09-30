@@ -1,0 +1,458 @@
+
+> design-review-mvp@0.1.0 test:all
+> node scripts/test-check-plan.js && node scripts/test-check-block.js && node scripts/test-check-map.js && node scripts/test-generate-framework-map.js && node scripts/test-semantic-grounding.js && node scripts/test-l0-view-model.js && node scripts/test-l0-layout.js && node scripts/test-l0-preview.js && node scripts/check-doc-links.js && node scripts/index-experiments.js --check
+
+=== check-plan 自动测试 ===
+
+✓ Gold fixture 通过（PASS WITH WARNINGS）
+✓ core sourceUnit 失去 coverage → FAIL
+✓ 使用未知 shape → FAIL
+✓ covers 引用不存在的 sourceUnit → FAIL
+✓ plan 中出现 source-verified → FAIL
+✓ 把"本文不决定"改成确定设计 → FAIL
+✓ supporting sourceUnit 未被覆盖 → WARNING
+✓ block 覆盖过多 sourceUnit → WARNING
+✓ 两个 block 高度覆盖相同 sourceUnits → WARNING
+✓ 把 Target Design 标成 Current Reality → FAIL
+✓ 同时承载现状与目标却未标注目标侧 → WARNING
+✓ 把「不承诺」写成系统保证 → FAIL
+✓ plan 中写人工审批状态 → FAIL
+✓ Test 1｜kind 写成 "capability-matrix" → FAIL
+✓ Test 2｜kind="boundary" + shape="capability-matrix" → PASS
+✓ Test 3｜kind 写成 "combo" → FAIL
+✓ Test 4｜kind 写成 catalog 外的 "boundary-list" → FAIL
+✓ 原文本身出现过的措辞（如"充分条件"）不算违规
+✓ 标题里的"不承诺的 5 项"不算系统保证
+✓ 缺少必填字段 → FAIL（Schema 层）
+✓ duplicatesMerged 引用不存在的 block → FAIL
+✓ sourceRef 指向不存在的章节 → FAIL
+
+========================================================
+结果：PASSED —— 22 个用例全部通过
+=== check-block 自动测试 ===
+
+✓ 基线｜capability-matrix 正确写法 → PASS
+✓ 基线｜current-target-flow 正确写法 → PASS
+✓ 基线｜checklist 正确写法 → PASS
+✓ shape 与 content.type 不一致 → FAIL
+✓ 修改 plan 固定字段（title）→ FAIL
+✓ 修改 plan 固定字段（covers）→ FAIL
+✓ provenance 引用不在 covers 里的 sourceUnit → FAIL
+✓ core sourceUnit 没有任何元素承载 → FAIL
+✓ provenance 引用不存在的 sourceUnit → FAIL
+✓ current 泳道挂了 target-state 语义 → FAIL
+✓ node.state=current 但 provenance 是 target-state → FAIL
+✓ current-target-flow 缺少一个泳道 → FAIL
+✓ 未决事项被写成确定结论 → FAIL
+✓ 未决语义在 content 里完全没有落点 → FAIL
+✓ non-claim 被写成系统保证 → FAIL
+✓ content 出现 source-verified → FAIL
+✓ 新增禁用措辞（原文没出现过）→ FAIL
+✓ 原文出现过的措辞不算违规（如"充分条件"）→ PASS
+✓ supporting sourceUnit 未被承载 → WARNING
+✓ 一个元素挂过多 sourceUnit → WARNING
+✓ 短文本承载过多语义 → WARNING（过度概括）
+✓ 长文本占比过高 → WARNING（退化成 prose）
+✓ 同一 sourceUnit 在多个元素重复出现 → WARNING
+✓ capability-matrix 行数超过推荐容量 → WARNING
+✓ 承载语义的元素完全没有 provenance → FAIL（Hard Error）
+✓ Test 1｜checklist panel.title 承载语义但无 provenance → FAIL
+✓ Test 2｜checklist panel.title 承载语义且带 provenance → PASS
+✓ Test 3｜纯展示标签（CURRENT / 能说明）不要求 provenance → PASS
+✓ Test 3b｜diff 侧标题写成 TARGET / CURRENT 固定标签 → 不要求 provenance
+✓ Test 4｜matrix 自定义行首承载语义但无 provenance → FAIL
+✓ Test 4b｜matrix 行首是纯展示标签时不报错 → PASS
+
+========================================================
+结果：PASSED —— 31 个用例全部通过
+===== test-check-map =====
+  PASS  基线最小 map：Hard Error = 0
+  PASS  未知 element type → HARD
+  PASS  缺 provenance → HARD
+  PASS  provenance 指向不存在的小节 → HARD
+  PASS  悬空 edge 端点 → HARD
+  PASS  表外关系词 → HARD
+  PASS  无导航路径 → HARD
+  PASS  原文小节无法解析 → 只 WARNING，不误报 HARD
+  PASS  检查被跳过时 → 状态是 PASS WITH INCOMPLETE VALIDATION（不是 PASS）
+  PASS  检查全部执行时 → 状态是 PASS
+  PASS  element id 重复 → HARD
+  PASS  主轴出现 constraint → HARD
+  PASS  element > 12 → WARNING 且不是 HARD
+  PASS  未知 role → WARNING 且不是 HARD
+  PASS  relationGap → WARNING 且不是 HARD
+  PASS  Topic 只挂一个 block/section → 已降级为 INFORMATIONAL（原 W4）
+  PASS  component = 0 与 state = 0 → INFORMATIONAL（不是 WARN/HARD）
+  PASS  Topic 没有 element → INFORMATIONAL（不是 HARD）
+  PASS  出现收敛节点（DAG）→ INFORMATIONAL
+  PASS  没有主轴 → INFORMATIONAL
+  PASS  非数字标题（## Goal）也能解析为小节全集
+  PASS  围栏代码块里的 # 注释不是标题（runbook 场景）
+  PASS  合法 qualifiers → 无 HARD、无 W7
+  PASS  qualifier 取值未知 → WARNING（W7，不是 HARD）
+  PASS  qualifiers.cardinality 缺 to 端 → HARD（形态错）
+  PASS  qualifiers 里出现未知结构属性 → HARD（不许长第三层词表）
+  PASS  relationGap 少而散 → 逐条 W5（不聚合）
+  PASS  relationGap 多而密 → 聚合为一条 W8，明细挪到 detail 段
+  PASS  词表确实从 schema 读（6 类 / 9 词）
+===== 29 passed, 0 failed =====
+===== F07 Gateway / 产物安全验证（离线，零模型调用）=====
+沙箱: tmp/gateway-safety-selftest
+
+  PASS  run-01（stub 成功）退出码 = 0
+  PASS  run-01 五个产物齐全
+  PASS  run-01 validator PASS（HARD 0）
+  PASS  run-01 成功写入协议全部走完
+  PASS  run-01 没有 .tmp.json 残留（原子 rename 成功）
+  PASS  run-01 记录 repair = none（生成器从不修改 AI 输出）
+  PASS  run-01 产出的 map 与 AI 返回内容逐字节一致（无自动修补）
+  PASS  run-02（validator FAIL）退出码 = 1
+  PASS  run-02 仍然保留了 framework-map.json（FAIL 是数据，不是垃圾）
+  PASS  run-02 check-map.txt 记录了 HARD
+  PASS  run-02 run-meta 状态 = success-validator-fail
+  PASS  run-02 记录了产物 sha（可追溯）
+  PASS  run-03（HTTP 503）退出码 = 2
+  PASS  run-03 没有 framework-map.json
+  PASS  run-03 保留了 request.json 与 run-meta.json（失败也要留档）
+  PASS  run-03 run-meta 记录了错误信息
+  PASS  ★ run-01 的成功产物字节未变（503 没有覆盖它）
+  PASS  run-04（传输层失败）退出码 = 2
+  PASS  run-04 没有 framework-map.json
+  PASS  ★ run-01 的成功产物字节未变（传输失败没有覆盖它）
+  PASS  run-05（返回非 JSON）退出码 = 2
+  PASS  run-05 保留了 raw-response.txt
+  PASS  run-05 没有 framework-map.json（不做猜测式修补）
+  PASS  run-05 run-meta 状态 = parse-failed
+  PASS  ★ run-01 的成功产物字节未变
+  PASS  run-06（合法 JSON 但不是 map）退出码 = 1
+  PASS  run-06 仍然保留了 framework-map.json（结构不成立也是数据）
+  PASS  run-06 check-map.txt 明确说明"结构不可校验"且不崩溃
+  PASS  ★ run-01 的成功产物字节未变
+  PASS  run-01 重跑（--run 1）被拒绝，退出码 = 3
+  PASS  ★ 被拒绝后 run-01 的产物仍然字节未变
+  PASS  被拒绝的 run 没有产生 .tmp.json
+  PASS  六个 run 分别落在 run-01 … run-06（各自独立目录；被拒绝那次未建目录）
+
+════════════════════════════════
+Gateway 安全验证: 33/33 通过
+✓ 结论：失败请求不会覆盖任何既有产物；validator FAIL 的产物被完整保留；全程无自动修补
+注：本轮全部为 stub 注入，**零模型调用**。正式 run 见 execution-prompt.md Phase 2。
+════════════════════════════════
+===== F10 · 两阶段产物安全 + 中间态保留验证（离线，零模型调用）=====
+沙箱: tmp/f10-selftest
+
+  PASS  run-01（A/B 都成功）退出码 = 0
+  PASS  run-01 产物齐全（两阶段 9 件）
+  PASS  run-01 check-map PASS（HARD 0）
+  PASS  run-01 integrity 干净（覆盖 3/3）
+  PASS  run-01 无 .tmp.json 残留
+  PASS  run-01 repair = none
+  PASS  run-01 两个产物与 raw 逐字节等价（无修补）
+  PASS  run-02（A ok / B 503）退出码 = 2
+  PASS  ★ run-02 的 semantic-inventory.json **保留**
+  PASS  ★ run-02 的 Stage A raw 也保留
+  PASS  run-02 没有 framework-map.json / map-selection.json
+  PASS  run-02 run-meta 记 stage B transport-failed
+  PASS  ★ run-01 的成功产物字节未变
+  PASS  run-03（A ok / B parse fail）退出码 = 2
+  PASS  ★ run-03 保留 semantic-inventory.json
+  PASS  ★ run-03 保留 raw-synthesis-response.txt
+  PASS  run-03 没有 framework-map.json（不猜、不补）
+  PASS  ★ run-01 产物仍未被触碰
+  PASS  run-04（B 缺第二个块）退出码 = 2
+  PASS  run-04 连 framework-map.json 也不产生（两产物同生共死）
+  PASS  run-04 保留 B raw 与 inventory
+  PASS  run-05（A malformed）退出码 = 1
+  PASS  ★ run-05 没有进入 Stage B（无 B request / raw / map）
+  PASS  run-05 保留 malformed inventory 本身（仍是证据）
+  PASS  run-05 run-meta 记 stage-a-shape-invalid + 具体问题
+  PASS  run-06（inventory duplicate id）退出码 = 1
+  PASS  run-06 报 duplicate id 且不进 Stage B
+  PASS  run-07（selection 少一条）退出码 = 1
+  PASS  ★ run-07 产物原样保留（map + selection 都在）
+  PASS  ★ run-07 integrity 报「漏掉 N 条」且**没有自动补**
+  PASS  run-07 run-meta status = success-integrity-fail
+  PASS  run-08（target 指向不存在 element）退出码 = 1
+  PASS  ★ run-08 报「指向不存在的 element」且产物保留
+  PASS  run-09（kind=constraint 指向非 constraint）退出码 = 1
+  PASS  ★ run-09 报「声称 constraint 但 type 是 artifact」
+  PASS  run-10（A 非 JSON）退出码 = 2
+  PASS  run-10 保留 A raw、无 inventory、无 Stage B
+  PASS  run-11（A 传输失败）退出码 = 2
+  PASS  run-11 只有 request / meta，无 inventory
+  PASS  run-12（--stage a）退出码 = 0
+  PASS  run-12 有 inventory，没有 Stage B 任何产物
+  PASS  run-12 run-meta status = stage-a-only
+  PASS  run-13（--stage b 复用 inventory）退出码 = 0
+  PASS  run-13 没有 Stage A 产物，但记录了 inventory 来源与 sha
+  PASS  run-01 重跑（--run 1）被拒绝，退出码 = 3
+  PASS  ★ 被拒绝后 run-01 产物仍字节未变
+  PASS  被拒绝的 run 没有产生 .tmp.json
+  PASS  run 目录为 run-01 … run-13（各阶段独立，无复用）
+
+════════════════════════════════
+F10 两阶段安全验证: 48/48 通过
+✓ 结论：Stage B 失败不会抹掉 Stage A 的证据；malformed inventory 不进 Stage B；integrity FAIL 原样保留且不自动补；全程无修补
+注：本轮全部为 stub 注入，**零模型调用**。正式 run 见 execution-prompt.md Phase 2。
+════════════════════════════════
+===== F08 · View Model 回归（28 份 framework-map）=====
+
+  PASS  …/F04-l0-framework-map/drafts/context-consumption.map.json
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-b.map.json
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-c.map.json
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-d.map.json
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-e.map.json
+  PASS  …mework-map-generation/fixture-a/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-a/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-a/run-04/framework-map.json
+  PASS  …mework-map-generation/fixture-a/run-05/framework-map.json
+  PASS  …mework-map-generation/fixture-b/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-b/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-b/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-c/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-c/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-c/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-d/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-d/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-d/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-e/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-e/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-e/run-03/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-d/run-01/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-d/run-04/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-05/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-06/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-08/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-10/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-11/framework-map.json
+  PASS  D（无主轴）能构建：不因"没有主轴"而报错或造主轴
+  PASS  E（分叉 + constraint/attachment）能构建
+  PASS  >12 elements 不被裁剪（E5 失败样本 81 elements）
+  PASS  自环边被保留并显式标注（不是被静默丢弃）
+  PASS  无 element 的 Topic 仍进入导航索引（D T-19/T-20、E T-08/T-11 之类）
+  PASS  relationGap 不被转成 edge
+
+===== 矩阵（A–E + 极端样本）=====
+| map | el | ed | attach | topics | gap | 自环 | 无element Topic | 超预算 | check-map HARD |
+|---|---|---|---|---|---|---|---|---|---|
+| F04-l0-framework-map/drafts/context-consumption.map.json | 12 | 4 | 7 | 5 | 0 | 0 | 0 |  | - |
+| F05-l0-generalization-gate/drafts/fixture-b.map.json | 12 | 6 | 5 | 5 | 1 | 0 | 1 |  | - |
+| F05-l0-generalization-gate/drafts/fixture-c.map.json | 12 | 8 | 4 | 6 | 2 | 0 | 1 |  | - |
+| F09-contract-adversarial-test/drafts/fixture-d.map.json | 12 | 11 | 2 | 7 | 2 | 1 | 1 |  | - |
+| F09-contract-adversarial-test/drafts/fixture-e.map.json | 13 | 9 | 3 | 8 | 2 | 0 | 3 | ⚠️ | - |
+| framework-map-generation/fixture-a/run-02/framework-map.json | 15 | 9 | 4 | 5 | 1 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-a/run-03/framework-map.json | 14 | 5 | 8 | 7 | 3 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-a/run-04/framework-map.json | 15 | 9 | 7 | 6 | 0 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-a/run-05/framework-map.json | 16 | 7 | 9 | 7 | 2 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-b/run-01/framework-map.json | 12 | 12 | 3 | 5 | 0 | 0 | 0 |  | 0 |
+| framework-map-generation/fixture-b/run-02/framework-map.json | 14 | 18 | 2 | 10 | 0 | 0 | 4 | ⚠️ | 0 |
+| framework-map-generation/fixture-b/run-03/framework-map.json | 18 | 15 | 5 | 10 | 0 | 0 | 1 | ⚠️ | 0 |
+| framework-map-generation/fixture-c/run-01/framework-map.json | 18 | 18 | 4 | 15 | 0 | 0 | 4 | ⚠️ | 0 |
+| framework-map-generation/fixture-c/run-02/framework-map.json | 17 | 18 | 2 | 12 | 1 | 0 | 1 | ⚠️ | 0 |
+| framework-map-generation/fixture-c/run-03/framework-map.json | 16 | 16 | 2 | 12 | 1 | 0 | 3 | ⚠️ | 0 |
+| framework-map-generation/fixture-d/run-01/framework-map.json | 23 | 39 | 5 | 15 | 1 | 1 | 3 | ⚠️ | 0 |
+| framework-map-generation/fixture-d/run-02/framework-map.json | 22 | 30 | 3 | 19 | 0 | 1 | 2 | ⚠️ | 0 |
+| framework-map-generation/fixture-d/run-03/framework-map.json | 25 | 29 | 7 | 15 | 0 | 1 | 2 | ⚠️ | 0 |
+| framework-map-generation/fixture-e/run-01/framework-map.json | 16 | 15 | 3 | 11 | 0 | 0 | 1 | ⚠️ | 0 |
+| framework-map-generation/fixture-e/run-02/framework-map.json | 12 | 11 | 3 | 11 | 1 | 0 | 1 |  | 0 |
+| framework-map-generation/fixture-e/run-03/framework-map.json | 16 | 14 | 4 | 11 | 0 | 0 | 2 | ⚠️ | 0 |
+| semantic-grounding/fixture-d/run-01/framework-map.json | 81 | 40 | 53 | 21 | 0 | 0 | 0 | ⚠️ | 0 |
+| semantic-grounding/fixture-d/run-04/framework-map.json | 13 | 12 | 3 | 21 | 0 | 0 | 2 | ⚠️ | 0 |
+| semantic-grounding/fixture-e/run-05/framework-map.json | 13 | 12 | 5 | 11 | 0 | 0 | 2 | ⚠️ | 0 |
+| semantic-grounding/fixture-e/run-06/framework-map.json | 13 | 7 | 7 | 11 | 0 | 0 | 1 | ⚠️ | 0 |
+| semantic-grounding/fixture-e/run-08/framework-map.json | 12 | 8 | 5 | 9 | 0 | 0 | 1 |  | 0 |
+| semantic-grounding/fixture-e/run-10/framework-map.json | 12 | 7 | 5 | 11 | 0 | 0 | 2 |  | 0 |
+| semantic-grounding/fixture-e/run-11/framework-map.json | 12 | 8 | 4 | 11 | 0 | 0 | 3 |  | 0 |
+
+════════════════════════════════
+View Model 回归: 34/34 通过（覆盖 28 份 map）
+✓ 结论：不丢 / 不裁 / 不改 / 不造 / 不崩；renderer 输入语义零修改
+════════════════════════════════
+===== F08 · L0 Layout 回归（28 份 framework-map）=====
+
+  PASS  displayFields：括号形态切成 标题/副标题（D 的主力形态）
+  PASS  displayFields：冒号形态切成 标题/副标题（E 的主力形态）
+  PASS  displayFields：短标签整句就是标题，不硬切
+  PASS  displayFields：无标点长句用 id 可读名做标题（不编造词）
+  PASS  displayFields：label 缺失时不崩
+  PASS  …/F04-l0-framework-map/drafts/context-consumption.map.json  (节点 8 · 角标 4 · 线 4 · 层内交叉 0→0 · 画布 908×708)
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-b.map.json  (节点 7 · 角标 5 · 线 6 · 层内交叉 0→0 · 画布 1220×324)
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-c.map.json  (节点 8 · 角标 4 · 线 8 · 层内交叉 0→0 · 画布 1220×504)
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-d.map.json  (节点 11 · 角标 1 · 线 11 · 层内交叉 0→0 · 画布 1844×504)
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-e.map.json  (节点 10 · 角标 3 · 线 9 · 层内交叉 6→6 · 画布 2468×324)
+  PASS  …mework-map-generation/fixture-a/run-02/framework-map.json  (节点 11 · 角标 4 · 线 9 · 层内交叉 0→0 · 画布 1768×504)
+  PASS  …mework-map-generation/fixture-a/run-03/framework-map.json  (节点 9 · 角标 5 · 线 5 · 层内交叉 0→0 · 画布 908×528)
+  PASS  …mework-map-generation/fixture-a/run-04/framework-map.json  (节点 9 · 角标 6 · 线 9 · 层内交叉 0→0 · 画布 908×708)
+  PASS  …mework-map-generation/fixture-a/run-05/framework-map.json  (节点 12 · 角标 4 · 线 7 · 层内交叉 0→0 · 画布 1220×888)
+  PASS  …mework-map-generation/fixture-b/run-01/framework-map.json  (节点 9 · 角标 3 · 线 12 · 层内交叉 0→0 · 画布 908×1044)
+  PASS  …mework-map-generation/fixture-b/run-02/framework-map.json  (节点 12 · 角标 2 · 线 18 · 层内交叉 1→1 · 画布 1532×684)
+  PASS  …mework-map-generation/fixture-b/run-03/framework-map.json  (节点 13 · 角标 5 · 线 15 · 层内交叉 1→1 · 画布 1532×1044)
+  PASS  …mework-map-generation/fixture-c/run-01/framework-map.json  (节点 14 · 角标 4 · 线 18 · 层内交叉 0→0 · 画布 1844×504)
+  PASS  …mework-map-generation/fixture-c/run-02/framework-map.json  (节点 15 · 角标 2 · 线 18 · 层内交叉 18→18 · 画布 2780×324)
+  PASS  …mework-map-generation/fixture-c/run-03/framework-map.json  (节点 14 · 角标 2 · 线 16 · 层内交叉 11→11 · 画布 2468×324)
+  PASS  …mework-map-generation/fixture-d/run-01/framework-map.json  (节点 18 · 角标 5 · 线 39 · 层内交叉 1→1 · 画布 1844×1584)
+  PASS  …mework-map-generation/fixture-d/run-02/framework-map.json  (节点 19 · 角标 3 · 线 30 · 层内交叉 5→5 · 画布 2156×864)
+  PASS  …mework-map-generation/fixture-d/run-03/framework-map.json  (节点 18 · 角标 7 · 线 29 · 层内交叉 0→0 · 画布 1844×1224)
+  PASS  …mework-map-generation/fixture-e/run-01/framework-map.json  (节点 13 · 角标 3 · 线 15 · 层内交叉 1→1 · 画布 2468×504)
+  PASS  …mework-map-generation/fixture-e/run-02/framework-map.json  (节点 9 · 角标 3 · 线 11 · 层内交叉 0→0 · 画布 908×1044)
+  PASS  …mework-map-generation/fixture-e/run-03/framework-map.json  (节点 13 · 角标 3 · 线 14 · 层内交叉 3→3 · 画布 1220×888)
+  PASS  …ts/semantic-grounding/fixture-d/run-01/framework-map.json  (节点 35 · 角标 46 · 线 40 · 层内交叉 14→14 · 画布 3092×1248)
+  PASS  …ts/semantic-grounding/fixture-d/run-04/framework-map.json  (节点 10 · 角标 3 · 线 12 · 层内交叉 0→0 · 画布 1220×504)
+  PASS  …ts/semantic-grounding/fixture-e/run-05/framework-map.json  (节点 8 · 角标 5 · 线 12 · 层内交叉 0→0 · 画布 908×1044)
+  PASS  …ts/semantic-grounding/fixture-e/run-06/framework-map.json  (节点 6 · 角标 7 · 线 7 · 层内交叉 0→0 · 画布 908×504)
+  PASS  …ts/semantic-grounding/fixture-e/run-08/framework-map.json  (节点 7 · 角标 5 · 线 8 · 层内交叉 0→0 · 画布 908×504)
+  PASS  …ts/semantic-grounding/fixture-e/run-10/framework-map.json  (节点 7 · 角标 5 · 线 7 · 层内交叉 0→0 · 画布 908×684)
+  PASS  …ts/semantic-grounding/fixture-e/run-11/framework-map.json  (节点 8 · 角标 4 · 线 8 · 层内交叉 0→0 · 画布 908×684)
+  PASS  用户感受 3：D 的节点标题是 UserProfile / PlanBundle 聚合，不再是 E-UserProfile 这种机器 ID
+  PASS  用户感受 3：id 仍然保留在数据里（data-element-id / badge），只是不进第一眼标题
+  PASS  用户感受 1：D 是网状 —— 关系被画成线，不是靠卡片文字；且有分叉（不是一条链）
+  PASS  用户感受 2：约束不再抢主视觉 —— 有 edge 的约束才是节点，其余降为宿主角标（不丢）
+  PASS  E 是分叉不是链：存在 ≥2 个后继的节点，且分层 ≥2 层
+  PASS  自环样本：自环被画成自环，且没有变成主线
+  PASS  81 元素极端样本：全部渲染、不裁剪、画布有限
+  PASS  只有 edge 才有线：所有样本的线数都严格等于 edge 数
+  PASS  确定性：全部样本两次布局逐字节相同
+
+════════════════════════════════
+L0 Layout 回归: 42/42 通过（覆盖 28 份 map，其中逐份矩阵 28/28）
+✓ 结论：不丢 / 不造线 / 不重叠 / 方向画出来 / 自环仍是自环 / 排序减少交叉 / 逐字节确定
+════════════════════════════════
+===== F08 · L0 预览验收（对生成的 HTML 断言）=====
+
+  PASS  d：element 全部渲染（13）
+  PASS  d：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  d：Review 覆盖全部 element
+  PASS  d：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  d：每条线都有方向箭头（方向是画出来的）
+  PASS  d：每条线都有 relation 类型标签
+  PASS  d：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  d：Reading 不出现机器 ID / type / role
+  PASS  d：节点标题是切开的短名（不是机器 ID）
+  PASS  d：edge 在 Review 逐条渲染（12）
+  PASS  d：attachment 全部渲染（3）
+  PASS  d：topic 全部渲染（21）
+  PASS  d：Review 方向显式（每行都有 —type→）
+  PASS  d：provenance 全部出现（§ref）
+  PASS  d：无未解析引用
+  PASS  d：Topic 默认折叠（导航不是第二篇文档）
+  PASS  e：element 全部渲染（12）
+  PASS  e：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  e：Review 覆盖全部 element
+  PASS  e：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  e：每条线都有方向箭头（方向是画出来的）
+  PASS  e：每条线都有 relation 类型标签
+  PASS  e：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  e：Reading 不出现机器 ID / type / role
+  PASS  e：节点标题是切开的短名（不是机器 ID）
+  PASS  e：edge 在 Review 逐条渲染（8）
+  PASS  e：attachment 全部渲染（5）
+  PASS  e：topic 全部渲染（9）
+  PASS  e：Review 方向显式（每行都有 —type→）
+  PASS  e：provenance 全部出现（§ref）
+  PASS  e：无未解析引用
+  PASS  e：Topic 默认折叠（导航不是第二篇文档）
+  PASS  d-selfloop：element 全部渲染（23）
+  PASS  d-selfloop：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  d-selfloop：Review 覆盖全部 element
+  PASS  d-selfloop：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  d-selfloop：每条线都有方向箭头（方向是画出来的）
+  PASS  d-selfloop：每条线都有 relation 类型标签
+  PASS  d-selfloop：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  d-selfloop：Reading 不出现机器 ID / type / role
+  PASS  d-selfloop：节点标题是切开的短名（不是机器 ID）
+  PASS  d-selfloop：edge 在 Review 逐条渲染（39）
+  PASS  d-selfloop：attachment 全部渲染（5）
+  PASS  d-selfloop：topic 全部渲染（15）
+  PASS  d-selfloop：Review 方向显式（每行都有 —type→）
+  PASS  d-selfloop：provenance 全部出现（§ref）
+  PASS  d-selfloop：无未解析引用
+  PASS  d-selfloop：Topic 默认折叠（导航不是第二篇文档）
+  PASS  d-overbudget：element 全部渲染（81）
+  PASS  d-overbudget：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  d-overbudget：Review 覆盖全部 element
+  PASS  d-overbudget：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  d-overbudget：每条线都有方向箭头（方向是画出来的）
+  PASS  d-overbudget：每条线都有 relation 类型标签
+  PASS  d-overbudget：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  d-overbudget：Reading 不出现机器 ID / type / role
+  PASS  d-overbudget：节点标题是切开的短名（不是机器 ID）
+  PASS  d-overbudget：edge 在 Review 逐条渲染（40）
+  PASS  d-overbudget：attachment 全部渲染（53）
+  PASS  d-overbudget：topic 全部渲染（21）
+  PASS  d-overbudget：Review 方向显式（每行都有 —type→）
+  PASS  d-overbudget：provenance 全部出现（§ref）
+  PASS  d-overbudget：无未解析引用
+  PASS  d-overbudget：Topic 默认折叠（导航不是第二篇文档）
+  PASS  a：element 全部渲染（12）
+  PASS  a：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  a：Review 覆盖全部 element
+  PASS  a：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  a：每条线都有方向箭头（方向是画出来的）
+  PASS  a：每条线都有 relation 类型标签
+  PASS  a：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  a：Reading 不出现机器 ID / type / role
+  PASS  a：节点标题是切开的短名（不是机器 ID）
+  PASS  a：edge 在 Review 逐条渲染（4）
+  PASS  a：attachment 全部渲染（7）
+  PASS  a：topic 全部渲染（5）
+  PASS  a：Review 方向显式（每行都有 —type→）
+  PASS  a：provenance 全部出现（§ref）
+  PASS  a：无未解析引用
+  PASS  a：Topic 默认折叠（导航不是第二篇文档）
+  PASS  e-human：element 全部渲染（13）
+  PASS  e-human：Reading 覆盖全部 element（节点或约束角标，不丢）
+  PASS  e-human：Review 覆盖全部 element
+  PASS  e-human：Reading 线数 == edge 数（不造线、不丢线）
+  PASS  e-human：每条线都有方向箭头（方向是画出来的）
+  PASS  e-human：每条线都有 relation 类型标签
+  PASS  e-human：节点数 == element − 约束角标（约束不抢节点位，但也不消失）
+  PASS  e-human：Reading 不出现机器 ID / type / role
+  PASS  e-human：节点标题是切开的短名（不是机器 ID）
+  PASS  e-human：edge 在 Review 逐条渲染（9）
+  PASS  e-human：attachment 全部渲染（3）
+  PASS  e-human：topic 全部渲染（8）
+  PASS  e-human：Review 方向显式（每行都有 —type→）
+  PASS  e-human：provenance 全部出现（§ref）
+  PASS  e-human：无未解析引用
+  PASS  e-human：Topic 默认折叠（导航不是第二篇文档）
+  PASS  E（分叉）没有被压成链：线逐条独立渲染，没有"链"式合并
+  PASS  >budget 的 map 不被裁（81 elements 全部渲染）
+  PASS  自环边被显式标注（Reading 画成自环 + Review 写「自环」）
+  PASS  relationGap 明确标注「不是 edge」
+  PASS  原则声明在位（Layout organizes space; it does not create semantics）
+  PASS  修正后的原则在位（语义来自线，不来自坐标）—— 但收进折叠的「如何阅读」里
+  PASS  顶部说明默认折叠，且第一屏顺序是「文档定位 → 图」（不是先读设计原则）
+  PASS  Reading 的关系词已中文化（使用 / 产出 / 依赖 …），且原词没丢（data-edge-type）
+  PASS  Review 仍是原词（—consumes→ / —produces→），中文化只发生在显示层
+  PASS  Reading 里没有残留工程词（constraints / Focused Relations / Incoming / Outgoing / Provenance）
+  PASS  节点副标题的收敛是"安全投影"：要么全文、要么前缀+…、要么前两项+共 N 项
+  PASS  回归：cron / 斜杠标识符不会被当成分隔符切坏
+  PASS  标题/副标题的行数规则写死在 CSS（标题 1 行、副标题 2 行）
+  PASS  选中只做加法：CSS 里没有任何"压暗其余内容"的规则（只高光，不隐藏）
+  PASS  约束角标带 data-host-ids（点约束时能把宿主一起点亮）
+  PASS  约束被点亮时有明确样式（点的是 summary / li，不是被自己的底色盖住）
+  PASS  Reading 隐藏一切机器 ID（.eid 在 reading 视图不显示）
+  PASS  Reading / Review 互斥且都在 DOM 里（隐藏 ≠ 删除）
+  PASS  无 element 的 Topic 仍是导航入口（页面上有标注）
+  PASS  约束被降级为角标，但仍在页面上可点
+  PASS  不在任何 edge 上的元素被单独标注（事实，不塞进层里）
+  PASS  没有 edge 的图不画线（不发明主轴）
+  PASS  0-edge 时所有节点都被标成"不在任何 edge 上"（虚线 + 单独一带）
+  PASS  Reading 是默认视图（用户裁决：先看结构，不是先看 WARN）
+  PASS  两个视图的切换都在（Reading / Review tab）
+  PASS  每个 element 都有预渲染的 Focused Relations 面板（可直接静态断言）
+  PASS  Reading 选中后下钻的 slot 在位（Focused Relations 成为 details panel）
+  PASS  每条 edge 在 Review 都有可展开的 qualifier / provenance 区
+  PASS  provenance 是可点链路（data-source-ref），不是死文本
+  PASS  有"清除选择"入口（Esc / 按钮），可回到完整 Overview
+  PASS  Reading 第一眼给出文档定位（"这是什么文档"）
+  PASS  Review 声明分区依据是 element.type（不是关系）
+  PASS  预览真的加载了 renderer 脚本（l0-layout.js → l0-map.js → 内联绑定）
+  PASS  预览是静态 HTML（不依赖 Electron / 不依赖网络）
+
+════════════════════════════════
+L0 预览验收: 130/130 通过（7 份预览）
+✓ 结论：关系被画成线 / 线数 == edge 数 / Reading 无工程 metadata / 约束降级为角标 / 不裁不丢 / 预览真的能跑
+════════════════════════════════
+Doc links: 108 markdown files checked, 0 broken.
+experiments index: 66 units + 17 artifacts, up to date.

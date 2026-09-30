@@ -1,0 +1,10 @@
+P1 block organization observed collapse: [{"mode":"absent","inputHas":false,"outputHas":true,"output":[]},{"mode":"empty","inputHas":true,"outputHas":true,"output":[]},{"mode":"nonempty","inputHas":true,"outputHas":true,"output":["O-01"]}]
+P2 L0 preservation: {"elements":12,"edges":8,"topics":9,"relatesTo":0}
+P3 absent content direct checker (invalid expression input): {"throws":"Cannot read properties of undefined (reading 'lanes')"}
+P4 empty scope checker (plan schema rejects covers empty): {"coverage":{"total":0,"covered":0,"missing":[],"missingCore":[],"missingSupporting":[],"ratio":1},"verdict":"PASS"}
+P5 stage order: {"original":["what","how","prove","boundary"],"reversed":["boundary","prove","how","what"]}
+P6 generated absence (artifact, not Plan identity): {"missing":["O-01"],"generatedCount":20,"planCount":21}
+P7 assembler envelope: {"blocks":21,"fixedFields":["id","title","stage","shape","covers","sourceRefs","reviewObjects","defaultExpanded"],"roles":["normal"]}
+P8 evidence namespace: [{"status":"none","label":"No evidence","detail":"这条判断没有任何来源，人工审核时通常应选择 Needs Evidence。"},{"status":"document-claim-only","label":"Document claim only","detail":"1 条证据全部来自文档主张，尚未由源码核对。"},{"status":"source-verified","label":"Source verified","detail":"1 条证据已由源码 / 测试 / 配置核对。"}]
+P9 source coordinates: {"document":"测试文档/18-context-consumption-semantic-model.md","sectionCount":16,"drift":[],"hasHash":false,"l0Document":"测试文档/fixture-e-f13-f16-runbook.md","sharedLabels":["§1","§2","§3","§4","§5","§6","§7","§8","§9","§10","§11"]}
+P10 plan carrier: {"blocks":21,"sourceUnits":87,"hasRoleProperty":false}

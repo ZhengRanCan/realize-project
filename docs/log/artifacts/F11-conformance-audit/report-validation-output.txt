@@ -1,0 +1,3 @@
+Audit structure: 29 invariants + 6 starting questions; legal statuses and nonempty evidence.
+Site coverage: 269 occurrences; 1 confirmed collapse.
+Evidence locations: 126 file:line references resolve.

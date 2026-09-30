@@ -1,0 +1,42 @@
+[
+  {
+    "command": "node scripts/test-check-plan.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/test-check-block.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/test-check-map.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/test-generate-framework-map.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/test-semantic-grounding.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/test-l0-view-model.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/test-l0-layout.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/test-l0-preview.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/check-doc-links.js",
+    "exit": 0
+  },
+  {
+    "command": "node scripts/index-experiments.js --check",
+    "exit": 0
+  }
+]

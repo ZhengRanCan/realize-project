@@ -1,0 +1,73 @@
+===== F08 · View Model 回归（28 份 framework-map）=====
+
+  PASS  …/F04-l0-framework-map/drafts/context-consumption.map.json
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-b.map.json
+  PASS  …acts/F05-l0-generalization-gate/drafts/fixture-c.map.json
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-d.map.json
+  PASS  …s/F09-contract-adversarial-test/drafts/fixture-e.map.json
+  PASS  …mework-map-generation/fixture-a/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-a/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-a/run-04/framework-map.json
+  PASS  …mework-map-generation/fixture-a/run-05/framework-map.json
+  PASS  …mework-map-generation/fixture-b/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-b/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-b/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-c/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-c/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-c/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-d/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-d/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-d/run-03/framework-map.json
+  PASS  …mework-map-generation/fixture-e/run-01/framework-map.json
+  PASS  …mework-map-generation/fixture-e/run-02/framework-map.json
+  PASS  …mework-map-generation/fixture-e/run-03/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-d/run-01/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-d/run-04/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-05/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-06/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-08/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-10/framework-map.json
+  PASS  …ts/semantic-grounding/fixture-e/run-11/framework-map.json
+  PASS  D（无主轴）能构建：不因"没有主轴"而报错或造主轴
+  PASS  E（分叉 + constraint/attachment）能构建
+  PASS  >12 elements 不被裁剪（E5 失败样本 81 elements）
+  PASS  自环边被保留并显式标注（不是被静默丢弃）
+  PASS  无 element 的 Topic 仍进入导航索引（D T-19/T-20、E T-08/T-11 之类）
+  PASS  relationGap 不被转成 edge
+
+===== 矩阵（A–E + 极端样本）=====
+| map | el | ed | attach | topics | gap | 自环 | 无element Topic | 超预算 | check-map HARD |
+|---|---|---|---|---|---|---|---|---|---|
+| F04-l0-framework-map/drafts/context-consumption.map.json | 12 | 4 | 7 | 5 | 0 | 0 | 0 |  | - |
+| F05-l0-generalization-gate/drafts/fixture-b.map.json | 12 | 6 | 5 | 5 | 1 | 0 | 1 |  | - |
+| F05-l0-generalization-gate/drafts/fixture-c.map.json | 12 | 8 | 4 | 6 | 2 | 0 | 1 |  | - |
+| F09-contract-adversarial-test/drafts/fixture-d.map.json | 12 | 11 | 2 | 7 | 2 | 1 | 1 |  | - |
+| F09-contract-adversarial-test/drafts/fixture-e.map.json | 13 | 9 | 3 | 8 | 2 | 0 | 3 | ⚠️ | - |
+| framework-map-generation/fixture-a/run-02/framework-map.json | 15 | 9 | 4 | 5 | 1 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-a/run-03/framework-map.json | 14 | 5 | 8 | 7 | 3 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-a/run-04/framework-map.json | 15 | 9 | 7 | 6 | 0 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-a/run-05/framework-map.json | 16 | 7 | 9 | 7 | 2 | 0 | 0 | ⚠️ | 0 |
+| framework-map-generation/fixture-b/run-01/framework-map.json | 12 | 12 | 3 | 5 | 0 | 0 | 0 |  | 0 |
+| framework-map-generation/fixture-b/run-02/framework-map.json | 14 | 18 | 2 | 10 | 0 | 0 | 4 | ⚠️ | 0 |
+| framework-map-generation/fixture-b/run-03/framework-map.json | 18 | 15 | 5 | 10 | 0 | 0 | 1 | ⚠️ | 0 |
+| framework-map-generation/fixture-c/run-01/framework-map.json | 18 | 18 | 4 | 15 | 0 | 0 | 4 | ⚠️ | 0 |
+| framework-map-generation/fixture-c/run-02/framework-map.json | 17 | 18 | 2 | 12 | 1 | 0 | 1 | ⚠️ | 0 |
+| framework-map-generation/fixture-c/run-03/framework-map.json | 16 | 16 | 2 | 12 | 1 | 0 | 3 | ⚠️ | 0 |
+| framework-map-generation/fixture-d/run-01/framework-map.json | 23 | 39 | 5 | 15 | 1 | 1 | 3 | ⚠️ | 0 |
+| framework-map-generation/fixture-d/run-02/framework-map.json | 22 | 30 | 3 | 19 | 0 | 1 | 2 | ⚠️ | 0 |
+| framework-map-generation/fixture-d/run-03/framework-map.json | 25 | 29 | 7 | 15 | 0 | 1 | 2 | ⚠️ | 0 |
+| framework-map-generation/fixture-e/run-01/framework-map.json | 16 | 15 | 3 | 11 | 0 | 0 | 1 | ⚠️ | 0 |
+| framework-map-generation/fixture-e/run-02/framework-map.json | 12 | 11 | 3 | 11 | 1 | 0 | 1 |  | 0 |
+| framework-map-generation/fixture-e/run-03/framework-map.json | 16 | 14 | 4 | 11 | 0 | 0 | 2 | ⚠️ | 0 |
+| semantic-grounding/fixture-d/run-01/framework-map.json | 81 | 40 | 53 | 21 | 0 | 0 | 0 | ⚠️ | 0 |
+| semantic-grounding/fixture-d/run-04/framework-map.json | 13 | 12 | 3 | 21 | 0 | 0 | 2 | ⚠️ | 0 |
+| semantic-grounding/fixture-e/run-05/framework-map.json | 13 | 12 | 5 | 11 | 0 | 0 | 2 | ⚠️ | 0 |
+| semantic-grounding/fixture-e/run-06/framework-map.json | 13 | 7 | 7 | 11 | 0 | 0 | 1 | ⚠️ | 0 |
+| semantic-grounding/fixture-e/run-08/framework-map.json | 12 | 8 | 5 | 9 | 0 | 0 | 1 |  | 0 |
+| semantic-grounding/fixture-e/run-10/framework-map.json | 12 | 7 | 5 | 11 | 0 | 0 | 2 |  | 0 |
+| semantic-grounding/fixture-e/run-11/framework-map.json | 12 | 8 | 4 | 11 | 0 | 0 | 3 |  | 0 |
+
+════════════════════════════════
+View Model 回归: 34/34 通过（覆盖 28 份 map）
+✓ 结论：不丢 / 不裁 / 不改 / 不造 / 不崩；renderer 输入语义零修改
+════════════════════════════════

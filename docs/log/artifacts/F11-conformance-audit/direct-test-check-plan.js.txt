@@ -1,0 +1,27 @@
+=== check-plan 自动测试 ===
+
+✓ Gold fixture 通过（PASS WITH WARNINGS）
+✓ core sourceUnit 失去 coverage → FAIL
+✓ 使用未知 shape → FAIL
+✓ covers 引用不存在的 sourceUnit → FAIL
+✓ plan 中出现 source-verified → FAIL
+✓ 把"本文不决定"改成确定设计 → FAIL
+✓ supporting sourceUnit 未被覆盖 → WARNING
+✓ block 覆盖过多 sourceUnit → WARNING
+✓ 两个 block 高度覆盖相同 sourceUnits → WARNING
+✓ 把 Target Design 标成 Current Reality → FAIL
+✓ 同时承载现状与目标却未标注目标侧 → WARNING
+✓ 把「不承诺」写成系统保证 → FAIL
+✓ plan 中写人工审批状态 → FAIL
+✓ Test 1｜kind 写成 "capability-matrix" → FAIL
+✓ Test 2｜kind="boundary" + shape="capability-matrix" → PASS
+✓ Test 3｜kind 写成 "combo" → FAIL
+✓ Test 4｜kind 写成 catalog 外的 "boundary-list" → FAIL
+✓ 原文本身出现过的措辞（如"充分条件"）不算违规
+✓ 标题里的"不承诺的 5 项"不算系统保证
+✓ 缺少必填字段 → FAIL（Schema 层）
+✓ duplicatesMerged 引用不存在的 block → FAIL
+✓ sourceRef 指向不存在的章节 → FAIL
+
+========================================================
+结果：PASSED —— 22 个用例全部通过

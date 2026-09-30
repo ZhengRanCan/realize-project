@@ -65,7 +65,7 @@
   {
     "id": "F11",
     "title": "Current Implementation Conformance Audit",
-    "status": "not_started",
+    "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F11-conformance-audit",
     "version": "v0.1"
   },

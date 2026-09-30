@@ -1,0 +1,1806 @@
+Warning: truncated output (original token count: 27125)
+Total output lines: 2437
+
+{
+  "scope": [
+    "scripts/l0-view-model.js",
+    "scripts/check-map.js",
+    "scripts/check-block.js",
+    "scripts/assemble-overview.js",
+    "scripts/build-preview.js",
+    "app/renderer/l0-map.js",
+    "app/renderer/l0-layout.js",
+    "app/renderer/app.js",
+    "app/shared/semantics.js"
+  ],
+  "patterns": "\\|\\|\\s*\\[\\]|\\?\\?\\s*\\[\\]|\\|\\|\\s*0\\b|\\?\\?\\s*0\\b|\\?\\?\\s*['\"]normal['\"]|if\\s*\\(\\s*![^=]",
+  "sites": [
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 33,
+      "column": 3,
+      "expression": "if (!txt) return null;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：正则捕获/CLI 参数/check 文本缺失检测；不将缺失计数归零（parseCheckMap 使用 null）。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 38,
+      "column": 43,
+      "expression": "const status = (txt.match(/状态:\\s*(.+)/) || [])[1];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：正则捕获/CLI 参数/check 文本缺失检测；不将缺失计数归零（parseCheckMap 使用 null）。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 56,
+      "column": 3,
+      "expression": "if (!map || typeof map !== 'object') throw new Error('framework-map 不是对象');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：非对象输入直接抛错，不输出 KnownEmpty。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 59,
+      "column": 33,
+      "expression": "const elements = map.elements || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：map 集合/element.topics/attachment.attachedTo 在 schema 有合法完整载体，缺失是非法输入，不是 Unknown 编码；产品加载未做 schema 验证另记边界缺口。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 60,
+      "column": 27,
+      "expression": "const edges = map.edges || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：map 集合/element.topics/attachment.attachedTo 在 schema 有合法完整载体，缺失是非法输入，不是 Unknown 编码；产品加载未做 schema 验证另记边界缺口。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 61,
+      "column": 39,
+      "expression": "const attachments = map.attachments || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：map 集合/element.topics/attachment.attachedTo 在 schema 有合法完整载体，缺失是非法输入，不是 Unknown 编码；产品加载未做 schema 验证另记边界缺口。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 62,
+      "column": 29,
+      "expression": "const topics = map.topics || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：map 集合/element.topics/attachment.attachedTo 在 schema 有合法完整载体，缺失是非法输入，不是 Unknown 编码；产品加载未做 schema 验证另记边界缺口。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 63,
+      "column": 39,
+      "expression": "const relationGap = map.relationGap || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：optional relationGap 只记录已声明 gap，不承诺穷尽未知关系。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 75,
+      "column": 27,
+      "expression": "topics: [...(e.topics || [])],",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：map 集合/element.topics/attachment.attachedTo 在 schema 有合法完整载体，缺失是非法输入，不是 Unknown 编码；产品加载未做 schema 验证另记边界缺口。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 77,
+      "column": 39,
+      "expression": "sectionRefs: [...(e.sectionRefs || [])],",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：这是显式来源引用列表；缺一条直接来源路径不等于已声明 Unknown 的 block organization。未从空列表推导 evidence 或 claim 状态。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 78,
+      "column": 43,
+      "expression": "sourceUnitIds: [...(e.sourceUnitIds || [])],",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：这是显式来源引用列表；缺一条直接来源路径不等于已声明 Unknown 的 block organization。未从空列表推导 evidence 或 claim 状态。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 84,
+      "column": 63,
+      "expression": "attachmentAsHost: attachments.filter((a) => (a.attachedTo || []).includes(e.id)).map((a) => ({ elementId: a.elementId, elementLabel: labelOf(a.elementId) })),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：map 集合/element.topics/attachment.attachedTo 在 schema 有合法完整载体，缺失是非法输入，不是 Unknown 编码；产品加载未做 schema 验证另记边界缺口。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 105,
+      "column": 53,
+      "expression": "const linked = elements.filter((e) => (e.topics || []).includes(t.id));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：map 集合/element.topics/attachment.attachedTo 在 schema 有合法完整载体，缺失是非法输入，不是 Unknown 编码；产品加载未做 schema 验证另记边界缺口。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 108,
+      "column": 39,
+      "expression": "sectionRefs: [...(t.sectionRefs || [])],",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：这是显式来源引用列表；缺一条直接来源路径不等于已声明 Unknown 的 block organization。未从空列表推导 evidence 或 claim 状态。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 109,
+      "column": 33,
+      "expression": "blockIds: [...(t.blockIds || [])],",
+      "unknownEmpty": "yes",
+      "status": "Violation",
+      "reason": "topic.blockIds 的 absent=Unknown；输出持久投影字段 []=KnownEmpty，P1 已复现；唯一确认的 S1 backlog。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 118,
+      "column": 120,
+      "expression": ".map((k) => (map.document[k] ? { key: k, text: map.document[k].text, sectionRefs: [...(map.document[k].sectionRefs || [])], sourceUnitIds: [...(map.document[k].sourceUnitIds || [])] } : null))",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：这是显式来源引用列表；缺一条直接来源路径不等于已声明 Unknown 的 block organization。未从空列表推导 evidence 或 claim 状态。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 118,
+      "column": 179,
+      "expression": ".map((k) => (map.document[k] ? { key: k, text: map.document[k].text, sectionRefs: [...(map.document[k].sectionRefs || [])], sourceUnitIds: [...(map.document[k].sourceUnitIds || [])] } : null))",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：这是显式来源引用列表；缺一条直接来源路径不等于已声明 Unknown 的 block organization。未从空列表推导 evidence 或 claim 状态。"
+    },
+    {
+      "file": "scripts/l0-view-model.js",
+      "line": 182,
+      "column": 3,
+      "expression": "if (!mapPath) { console.error('用法: node scripts/l0-view-model.js --map <framework-map.json> [--check <check-map.txt>] [--out <file>]'); process.exit(2); }",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：正则捕获/CLI 参数/check 文本缺失检测；不将缺失计数归零（parseCheckMap 使用 null）。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 58,
+      "column": 7,
+      "expression": "if (!fenceChar) { fenceChar = ch; fenceLen = len; return; }",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 63,
+      "column": 5,
+      "expression": "if (!m) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 69,
+      "column": 67,
+      "expression": "heads.forEach((h) => byLevel.set(h.level, (byLevel.get(h.level) || 0) + 1));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 82,
+      "column": 3,
+      "expression": "if (!input) return null;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 84,
+      "column": 33,
+      "expression": "return { heads: input.heads || [], sectionLevel: input.sectionLevel ?? null, top: input.top || [], all: input.all || [] };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 84,
+      "column": 97,
+      "expression": "return { heads: input.heads || [], sectionLevel: input.sectionLevel ?? null, top: input.top || [], all: input.all || [] };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 84,
+      "column": 119,
+      "expression": "return { heads: input.heads || [], sectionLevel: input.sectionLevel ?? null, top: input.top || [], all: input.all || [] };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 86,
+      "column": 25,
+      "expression": "const top = input.top || [], sub = input.sub || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 86,
+      "column": 48,
+      "expression": "const top = input.top || [], sub = input.sub || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 101,
+      "column": 28,
+      "expression": "const els = map.elements || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 102,
+      "column": 27,
+      "expression": "const edges = map.edges || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 103,
+      "column": 32,
+      "expression": "const atts = map.attachments || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 104,
+      "column": 29,
+      "expression": "const topics = map.topics || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 105,
+      "column": 32,
+      "expression": "const gaps = map.relationGap || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 121,
+      "column": 5,
+      "expression": "if (!TYPE_ENUM.includes(e.type)) hard.push(`H1 ${e.id} type=\"${e.type}\" 不在允许词表内`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 122,
+      "column": 5,
+      "expression": "if (!KNOWN_ROLES.includes(e.role)) unknownRoles.add(`${e.id}:${e.role}`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 131,
+      "column": 3,
+      "expression": "if (!isSection) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：粒度与 source registry 是否可用的分支，缺全集通过 skipped 报告，不报告无引用。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 143,
+      "column": 5,
+      "expression": "if (!sec.top.length) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：粒度与 source registry 是否可用的分支，缺全集通过 skipped 报告，不报告无引用。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 155,
+      "column": 54,
+      "expression": "const provenanceOf = (el) => [...(el.sourceUnitIds || []), ...(el.sectionRefs || [])];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 155,
+      "column": 81,
+      "expression": "const provenanceOf = (el) => [...(el.sourceUnitIds || []), ...(el.sectionRefs || [])];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 162,
+      "column": 7,
+      "expression": "if (!validUnits.has(r)) hard.push(`H3 ${e.id} 的 provenance 指向不存在的位置: ${r}`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 165,
+      "column": 32,
+      "expression": "els.forEach((e) => (e.topics || []).forEach((t) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 166,
+      "column": 5,
+      "expression": "if (!topicIds.has(t)) hard.push(`H3 ${e.id} 的 topics 指向不存在的 topic: ${t}`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 173,
+      "column": 5,
+      "expression": "if (!RELATION_ENUM.includes(ed.type)) hard.push(`H4 ${tag} relation \"${ed.type}\" 是表外词（要表达词表之外的关系请用 relationGap）`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 174,
+      "column": 5,
+      "expression": "if (!byId.has(ed.from)) hard.push(`H3 ${tag} from=\"${ed.from}\" 不存在`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 175,
+      "column": 5,
+      "expression": "if (!byId.has(ed.to)) hard.push(`H3 ${tag} to=\"${ed.to}\" 不存在`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 184,
+      "column": 11,
+      "expression": "if (!QUALIFIER_KEYS.includes(k)) hard.push(`H8 ${tag} qualifiers.${k} 不是已知的结构属性（只允许 ${QUALIFIER_KEYS.join(' / ')}）`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 193,
+      "column": 20,
+      "expression": "else if (!CARDINALITY_ENUM.includes(c[side])) unknownQualifierValues.add(`${tag}.cardinality.${side}=${c[side]}`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 203,
+      "column": 16,
+      "expression": "else if (!OWNERSHIP_KNOWN.includes(o)) unknownQualifierValues.add(`${tag}.ownership=${o}`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 216,
+      "column": 5,
+      "expression": "if (!byId.has(a.elementId)) hard.push(`H3 attachments[${i}] elementId=\"${a.elementId}\" 不存在`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 217,
+      "column": 19,
+      "expression": "(a.attachedTo || []).forEach((x) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 218,
+      "column": 7,
+      "expression": "if (!byId.has(x)) hard.push(`H3 attachments[${i}] attachedTo 含不存在的元素 \"${x}\"`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 222,
+      "column": 95,
+      "expression": "const inAtt = new Set([...atts.map((a) => a.elementId), ...atts.flatMap((a) => a.attachedTo || [])]);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 231,
+      "column": 37,
+      "expression": "topics.forEach((t) => (t.blockIds || []).forEach((b) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：按显式声明验证引用或计算已声明入口数；没有写回 blockIds 或生成 TopicOccurrenceState。导航完整性 HARD 不是宣称 Unknown=Known(0)。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 234,
+      "column": 40,
+      "expression": "topics.forEach((t) => (t.sectionRefs || []).forEach((r) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 240,
+      "column": 75,
+      "expression": "const docUnits = new Set(docEntries.flatMap((d) => [...(d.sourceUnitIds || []), ...(d.sectionRefs || [])]));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 240,
+      "column": 101,
+      "expression": "const docUnits = new Set(docEntries.flatMap((d) => [...(d.sourceUnitIds || []), ...(d.sectionRefs || [])]));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 242,
+      "column": 5,
+      "expression": "if (!validUnits.has(r)) hard.push(`H3 document 入口引用不存在的位置: ${r}`);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 248,
+      "column": 45,
+      "expression": "const nEl = els.filter((e) => (e.topics || []).includes(t.id)).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 249,
+      "column": 30,
+      "expression": "const nNav = (t.blockIds || []).length + (t.sectionRefs || []).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：按显式声明验证引用或计算已声明入口数；没有写回 blockIds 或生成 TopicOccurrenceState。导航完整性 HARD 不是宣称 Unknown=Known(0)。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 249,
+      "column": 61,
+      "expression": "const nNav = (t.blockIds || []).length + (t.sectionRefs || []).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：按显式声明验证引用或计算已声明入口数；没有写回 blockIds 或生成 TopicOccurrenceState。导航完整性 HARD 不是宣称 Unknown=Known(0)。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 254,
+      "column": 66,
+      "expression": "const topicBlockIds = new Set(topics.flatMap((t) => t.blockIds || []));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：按显式声明验证引用或计算已声明入口数；没有写回 blockIds 或生成 TopicOccurrenceState。导航完整性 HARD 不是宣称 Unknown=Known(0)。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 255,
+      "column": 69,
+      "expression": "const topicSections = new Set(topics.flatMap((t) => t.sectionRefs || []));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 258,
+      "column": 5,
+      "expression": "if (!sectionUnresolved) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：粒度与 source registry 是否可用的分支，缺全集通过 skipped 报告，不报告无引用。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 263,
+      "column": 48,
+      "expression": "const ep = (plan && plan.duplicatesMerged) || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 265,
+      "column": 28,
+      "expression": "const cov = b.covers || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 278,
+      "column": 42,
+      "expression": "topics.forEach((t) => (t.sectionRefs || []).forEach((s) => l2Reach.add(s)));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 282,
+      "column": 24,
+      "expression": "if (b) (b.covers || []).forEach((u) => l2Reach.add(u));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 284,
+      "column": 38,
+      "expression": "((plan && plan.duplicatesMerged) || []).forEach((d) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 285,
+      "column": 60,
+      "expression": "if (topicBlockIds.has(d.keptInBlock)) (d.sourceUnits || []).forEach((u) => l2Reach.add(u));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 328,
+      "column": 56,
+      "expression": "flow.forEach((e) => indeg.set(e.to, (indeg.get(e.to) || 0) + 1));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 332,
+      "column": 45,
+      "expression": "const nEl = els.filter((e) => (e.topics || []).includes(t.id)).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 337,
+      "column": 30,
+      "expression": "const nNav = (t.blockIds || []).length + (t.sectionRefs || []).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：按显式声明验证引用或计算已声明入口数；没有写回 blockIds 或生成 TopicOccurrenceState。导航完整性 HARD 不是宣称 Unknown=Known(0)。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 337,
+      "column": 61,
+      "expression": "const nNav = (t.blockIds || []).length + (t.sectionRefs || []).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：按显式声明验证引用或计算已声明入口数；没有写回 blockIds 或生成 TopicOccurrenceState。导航完整性 HARD 不是宣称 Unknown=Known(0)。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 373,
+      "column": 3,
+      "expression": "if (!r.hard.length) L.push('  （无）');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 377,
+      "column": 3,
+      "expression": "if (!r.warn.length) L.push('  （无）');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 381,
+      "column": 3,
+      "expression": "if (!r.info.length) L.push('  （无）');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 390,
+      "column": 3,
+      "expression": "if (!r.skipped.length) L.push('  （无 —— 本次全部检查都已执行）');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-map.js",
+      "line": 405,
+      "column": 3,
+      "expression": "if (!mapPath) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：validator 内部已声明引用集合/解析器/局部计数或错误数组；诊断不作为知识状态输出。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 159,
+      "column": 3,
+      "expression": "if (!content || typeof content !== 'object') return out;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：walker 的空结果是枚举结果；上层 checkBlock 缺 content 会拒绝/抛错（P3），不是支持 Missing 的 coverage API。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 166,
+      "column": 36,
+      "expression": "sourceUnitIds: sourceUnitIds || [],",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 177,
+      "column": 20,
+      "expression": "(content.parts || []).forEach((part, i) => push(`parts[${i}]`, part.text, part.sourceUnitIds, '段落', { variant: part.variant }));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 181,
+      "column": 20,
+      "expression": "(content.lanes || []).forEach((lane, li) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 183,
+      "column": 19,
+      "expression": "(lane.nodes || []).forEach((item, ni) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 200,
+      "column": 22,
+      "expression": "(content.columns || []).forEach((c, i) => push(`columns[${i}]`, c, [], '列标题', { presentation: true }));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 201,
+      "column": 19,
+      "expression": "(content.rows || []).forEach((row, ri) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 202,
+      "column": 12,
+      "expression": "(row || []).forEach((cell, ci) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 212,
+      "column": 20,
+      "expression": "(content.sides || []).forEach((side, si) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 214,
+      "column": 19,
+      "expression": "(side.lines || []).forEach((line, li) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 223,
+      "column": 20,
+      "expression": "(content.tiers || []).forEach((tier, i) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 231,
+      "column": 20,
+      "expression": "(content.steps || []).forEach((step, i) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 238,
+      "column": 20,
+      "expression": "(content.pairs || []).forEach((pair, i) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 244,
+      "column": 21,
+      "expression": "(content.panels || []).forEach((panel, pi) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 246,
+      "column": 20,
+      "expression": "(panel.items || []).forEach((item, ii) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 284,
+      "column": 46,
+      "expression": "const unitById = new Map((plan.sourceUnits || []).map((u) => [u.id, u]));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 285,
+      "column": 34,
+      "expression": "const planBlock = (plan.blocks || []).find((b) => b.id === block.id);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 289,
+      "column": 3,
+      "expression": "if (!planBlock) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 305,
+      "column": 3,
+      "expression": "if (!schemaResult.valid) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 325,
+      "col…7125 tokens truncated…局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 225,
+      "column": 41,
+      "expression": "for (const w of adj.get(v) || []) if (!seen.has(w)) { seen.add(w); queue.push(w); }",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 268,
+      "column": 34,
+      "expression": "const c = color.get(w) || 0;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 299,
+      "column": 28,
+      "expression": "comp.forEach((id) => { if (!rank.has(id)) rank.set(id, 0); }); // 兜底（理论上不可达）",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 304,
+      "column": 7,
+      "expression": "if (!layers.has(r)) layers.set(r, []);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 351,
+      "column": 42,
+      "expression": "const badgeIds = (e.attachmentAsHost || []).map((a) => a.elementId);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 365,
+      "column": 40,
+      "expression": "badgeLabels: (e.attachmentAsHost || []).map((a) => a.elementLabel || a.elementId),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 376,
+      "column": 23,
+      "expression": "hosts: (a.hosts || []).slice(),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 386,
+      "column": 5,
+      "expression": "if (!a || !b) { skippedEdges += 1; continue; }",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 134,
+      "column": 33,
+      "expression": "return (state.model.decisions || []).find((d) => d.id === id) || null;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 138,
+      "column": 37,
+      "expression": "return (state.model.openQuestions || []).find((q) => q.id === id) || null;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 150,
+      "column": 3,
+      "expression": "if (!state.model) return { ready: false, blockers: [] };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 155,
+      "column": 3,
+      "expression": "if (!state.model) return null;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 169,
+      "column": 10,
+      "expression": "(chips || []).forEach((id) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 180,
+      "column": 18,
+      "expression": "(block.sources || []).forEach((label) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 194,
+      "column": 18,
+      "expression": "(content.parts || []).forEach((part) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 204,
+      "column": 18,
+      "expression": "(content.lanes || []).forEach((lane) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 207,
+      "column": 17,
+      "expression": "(lane.nodes || []).forEach((item, index) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 233,
+      "column": 18,
+      "expression": "(content.tiers || []).forEach((tier) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 249,
+      "column": 35,
+      "expression": "const columns = content.columns || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 257,
+      "column": 17,
+      "expression": "(content.rows || []).forEach((row) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 285,
+      "column": 16,
+      "expression": "(panel.items || []).forEach((item) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 297,
+      "column": 33,
+      "expression": "const panels = content.panels || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 309,
+      "column": 18,
+      "expression": "(content.steps || []).forEach((step, index) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 330,
+      "column": 18,
+      "expression": "(content.pairs || []).forEach((pair) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 335,
+      "column": 41,
+      "expression": "const variant = (pair.keyVariants || [])[index];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 352,
+      "column": 18,
+      "expression": "(content.sides || []).forEach((side) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 355,
+      "column": 17,
+      "expression": "(side.lines || []).forEach((line) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 468,
+      "column": 3,
+      "expression": "if (!block) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 481,
+      "column": 3,
+      "expression": "if (!container || state.scrollSpyReady) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 523,
+      "column": 3,
+      "expression": "if (!result || !result.ok) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 563,
+      "column": 3,
+      "expression": "if (!section) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 588,
+      "column": 3,
+      "expression": "if (!state.humanReview.decisions) state.humanReview.decisions = {};",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 589,
+      "column": 3,
+      "expression": "if (!state.humanReview.decisions[id]) state.humanReview.decisions[id] = { status: 'pending', comment: '' };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 609,
+      "column": 3,
+      "expression": "if (!items || items.length === 0) return el('div', 'muted small', emptyText || '（空）');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 652,
+      "column": 3,
+      "expression": "if (!evidence || evidence.length === 0) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：schema required evidence 数组，空表示没有 evidence，不表示 claim 未验证或 Unknown。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 731,
+      "column": 5,
+      "expression": "if (!state.humanReview.openQuestions) state.humanReview.openQuestions = {};",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 810,
+      "column": 5,
+      "expression": "if (!commentOf(d.id)) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 818,
+      "column": 94,
+      "expression": "disclosureSection('decision', d.id, 'alternatives', 'Alternatives', `${(d.alternatives || []).length} 项`, (body) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 823,
+      "column": 90,
+      "expression": "disclosureSection('decision', d.id, 'rationale', 'Full Rationale', `${(d.rationale || []).length} 条`, (body) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 828,
+      "column": 94,
+      "expression": "disclosureSection('decision', d.id, 'consequences', 'Consequences', `${(d.consequences || []).length} 条`, (body) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 843,
+      "column": 82,
+      "expression": "disclosureSection('decision', d.id, 'evidence', 'Evidence', `${(d.evidence || []).length} 条`, (body) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：schema required evidence 数组，空表示没有 evidence，不表示 claim 未验证或 Unknown。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 857,
+      "column": 43,
+      "expression": "const questions = (d.relatedQuestions || []).map((id) => questionById(id)).filter(Boolean);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 870,
+      "column": 26,
+      "expression": "if ((d.dependsOn || []).length > 0) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 899,
+      "column": 24,
+      "expression": "if ((d.affects || []).length > 0) body.appendChild(fieldBlock('Affects', bulletList(d.affects)));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 921,
+      "column": 53,
+      "expression": "const warningCount = (state.model.design.warnings || []).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 926,
+      "column": 34,
+      "expression": "(state.model.design.warnings || []).forEach((w) => ul.appendChild(el('li', '', w)));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 931,
+      "column": 43,
+      "expression": "const decisions = state.model.decisions || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 986,
+      "column": 3,
+      "expression": "if (!state.model && state.view !== 'l0') return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1023,
+      "column": 3,
+      "expression": "if (!state.l0ViewModel) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1055,
+      "column": 3,
+      "expression": "if (!res || !res.ok) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1089,
+      "column": 11,
+      "expression": "(errors || []).forEach((e) => ul.appendChild(el('li', '', e)));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1101,
+      "column": 3,
+      "expression": "if (!result) return { applied: false, reason: 'empty-result' };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1103,
+      "column": 3,
+      "expression": "if (!result.ok) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1121,
+      "column": 49,
+      "expression": "state.model.design.warnings = result.warnings || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1134,
+      "column": 39,
+      "expression": "decisions: (state.model.decisions || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1136,
+      "column": 29,
+      "expression": "gaps: (state.model.gaps || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1137,
+      "column": 47,
+      "expression": "openQuestions: (state.model.openQuestions || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1206,
+      "column": 5,
+      "expression": "if (!target || !target.closest) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1213,
+      "column": 7,
+      "expression": "if (!state.humanReview[bucket]) state.humanReview[bucket] = {};",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1235,
+      "column": 5,
+      "expression": "if (!result.ok) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1236,
+      "column": 36,
+      "expression": "toast(`保存失败：${(result.errors || []).join('; ')}`, true);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1275,
+      "column": 7,
+      "expression": "if (!state.model) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1287,
+      "column": 5,
+      "expression": "if (!action) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1288,
+      "column": 45,
+      "expression": "const decisions = state.model.decisions || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：经 design schema 验证的模型/按 content.type 渲染的已声明列表；缺失非法 required 字段不被当合法 Unknown 输入。"
+    },
+    {
+      "file": "app/renderer/app.js",
+      "line": 1290,
+      "column": 5,
+      "expression": "if (!target) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：DOM/模型是否已加载、UI 操作目标、显示样式或错误结果分支，无 capability 三态写回。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 70,
+      "column": 29,
+      "expression": "return (model.decisions || []).filter((d) => reviewLevelOf(d) === 'root');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 74,
+      "column": 29,
+      "expression": "return (model.decisions || []).filter((d) => reviewLevelOf(d) !== 'root');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 82,
+      "column": 39,
+      "expression": "const decisions = model.decisions || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 88,
+      "column": 7,
+      "expression": "if (!other || seen.has(other.id)) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 93,
+      "column": 25,
+      "expression": "(decision.dependsOn || []).forEach((id) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 97,
+      "column": 7,
+      "expression": "if (!anchor) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 100,
+      "column": 30,
+      "expression": "if ((other.dependsOn || []).includes(anchor.id)) push(other, 'sibling');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 105,
+      "column": 28,
+      "expression": "if ((other.dependsOn || []).includes(decision.id)) push(other, 'downstream');",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 114,
+      "column": 45,
+      "expression": "const byId = new Map((model.decisions || []).map((d) => [d.id, d]));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 119,
+      "column": 28,
+      "expression": "(current.dependsOn || []).forEach((id) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 147,
+      "column": 5,
+      "expression": "if (!isBlockingCategory(categoryOf(question))) return false;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 153,
+      "column": 33,
+      "expression": "return (model.openQuestions || []).filter((q) =>",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 160,
+      "column": 33,
+      "expression": "return (model.openQuestions || []).filter(",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 172,
+      "column": 27,
+      "expression": "const list = evidence || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review-object evidence 是 required array，合法状态只有 Known(0)/Known(n)，不允许 Projection 发明 Unknown。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 221,
+      "column": 35,
+      "expression": "return (decision.consequences || []).slice(0, max);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 226,
+      "column": 47,
+      "expression": "return Math.max(0, (decision.consequences || []).length - max);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 232,
+      "column": 38,
+      "expression": "const byId = new Map((model.gaps || []).map((g) => [g.id, g]));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 233,
+      "column": 44,
+      "expression": "const explicit = (decision.relatedGaps || []).map((id) => byId.get(id)).filter(Boolean);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 238,
+      "column": 24,
+      "expression": "return (model.gaps || [])",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 239,
+      "column": 42,
+      "expression": ".filter((g) => (g.relatedDecisions || []).includes(decision.id))",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 244,
+      "column": 24,
+      "expression": "return (model.gaps || [])",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 269,
+      "column": 29,
+      "expression": "(designReview.decisions || []).forEach((d) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 283,
+      "column": 33,
+      "expression": "(designReview.openQuestions || []).forEach((q) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 285,
+      "column": 7,
+      "expression": "if (!isQuestionBlocking(q, status)) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 295,
+      "column": 24,
+      "expression": "(designReview.gaps || []).forEach((g) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 312,
+      "column": 29,
+      "expression": "(designReview.decisions || []).forEach((d) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 316,
+      "column": 33,
+      "expression": "(designReview.openQuestions || []).forEach((q) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 320,
+      "column": 24,
+      "expression": "(designReview.gaps || []).forEach((g) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 342,
+      "column": 38,
+      "expression": ".sort((a, b) => (a.dependsOn || []).length - (b.dependsOn || []).length);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 342,
+      "column": 67,
+      "expression": ".sort((a, b) => (a.dependsOn || []).length - (b.dependsOn || []).length);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 365,
+      "column": 40,
+      "expression": "const unresolvedGaps = (model.gaps || []).filter((g) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 399,
+      "column": 39,
+      "expression": "const decisions = model.decisions || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 403,
+      "column": 40,
+      "expression": "counts[status] = (counts[status] || 0) + 1;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：本次已知 review 集合的局部计数初始化，不是未知数量。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 411,
+      "column": 29,
+      "expression": "const gaps = model.gaps || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 415,
+      "column": 46,
+      "expression": "gapCounts[status] = (gapCounts[status] || 0) + 1;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：本次已知 review 集合的局部计数初始化，不是未知数量。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 429,
+      "column": 37,
+      "expression": "total: (model.openQuestions || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    },
+    {
+      "file": "app/shared/semantics.js",
+      "line": 433,
+      "column": 48,
+      "expression": "acc[category] = (model.openQuestions || []).filter((q) => categoryOf(q) === category).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：review carrier 的已声明外键/数组、人工状态或控制流；不是 Reading capability Unknown 的编码。"
+    }
+  ]
+}

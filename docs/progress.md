@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-09-29.
-- Active feature: **none** —— `F08` 自 2026-09-27 起为 `blocked`（用户对 UI 表现层不满意，先做一轮 UI 迭代）。
-- Next queued feature: **F11 Current Implementation Conformance Audit** —— 2026-09-29 新登记 F11–F15，
+- Active feature: **none** —— F11 审计已交付，当前 blocked，待人工复核/验收；环境与 Git 已恢复。
+- Next queued feature: **F12 S1 Epistemic Collapse Regression** —— 须先关闭 F11 的流程前置；本轮不启动。2026-09-29 新登记 F11–F15，
   阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -25,7 +25,7 @@
 | F08 | L0 UI | `blocked` | 用户对当前 UI（Reading View 表现层）不满意，先做一轮 UI 迭代；Track A 与 Gate 延后（技术层 34/42/130 + selftest 13 条仍全绿） |
 | F09 | Contract Adversarial Test | `passing` | — |
 | F10 | Semantic Grounding | `blocked` | E3 未关闭（Gate = PARTIAL PASS）；处置未登记 |
-| F11 | Current Implementation Conformance Audit | `not_started` | — |
+| F11 | Current Implementation Conformance Audit | `blocked` | 报告已交付；环境与 Git 已恢复，只读校验口径已统一；待人工复核/验收 |
 | F12 | S1 Epistemic Collapse Regression | `not_started` | — |
 | F13 | Minimal Semantic Projection Boundary (B1) | `not_started` | — |
 | F14 | Adversarial Semantic Tests (B2) | `not_started` | — |
@@ -210,3 +210,19 @@ Source-verified Evidence
 - **harness 是事后接入的**：F01–F10 的合同由历史材料回填，`dependsOn` 只登记 harness 强制前置，
   流程顺序写在各自合同的 `Process preconditions` 里。
 - **仓库根目录还留着 `harness-template/`**（未纳入版本控制）：接入完成后可以删除或移出仓库，避免两个 harness 并存。
+
+## 2026-09-29 — F11 只读审计交付（未关闭）
+
+- 报告：`docs/log/artifacts/F11-conformance-audit/results/conformance-audit.md`；覆盖 §6 全部 29 条 invariant 与六问。
+- 269 个扫描站点，只有 topic.blockIds 投影折叠确证进入 S1 backlog；role 缺省已找到 Stage 2 prompt 依据。
+- 五项 divergence：S1 折叠、preview 缺生成删除主体、stage 数组顺序、L0 跨文档 Source 路由、逐块 generation disclosure 丢失。
+- `test:all` 的 10 个组成脚本用 Node 直接运行均 exit 0；三个 npm 命令启动失败，不能报告 npm 门禁全绿。
+- 原始输出与阻塞：`docs/log/artifacts/F11-conformance-audit/verification-summary.md`。当前无 Git 元数据，未提交/推送。
+- app/scripts/schema/fixtures/experiments 的 373 个既有文件哈希未变。待 reviewer 抽样和用户验收；未开始 F12。
+
+## 2026-09-29 — 本地环境与 Git 恢复
+
+- 当前 Node v24.21.0 / npm 11.19.0 / Electron 31.7.7；npm 标准离线测试与 selftest 均通过。此前失败属于旧安装/旧会话环境记录，不代表当前环境。
+- 真实 Git 历史已接回，当前分支 codex/f11-f21-conformance 跟踪同名 origin 分支；项目级代理指向本机 Clash。603 个既有工作文件恢复前后哈希未变。
+- F11 校验器规则遵从用户只读要求：运行现有文档内结构校验，不新增代码文件。人工验收仍待记录，不启动 F12。
+- 详情：`docs/harness/incidents/2026-09-29-local-environment-recovery.md`；原始门禁输出见 F11 verification-summary。

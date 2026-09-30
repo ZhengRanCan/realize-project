@@ -1,0 +1,57 @@
+===== F10 · 两阶段产物安全 + 中间态保留验证（离线，零模型调用）=====
+沙箱: tmp/f10-selftest
+
+  PASS  run-01（A/B 都成功）退出码 = 0
+  PASS  run-01 产物齐全（两阶段 9 件）
+  PASS  run-01 check-map PASS（HARD 0）
+  PASS  run-01 integrity 干净（覆盖 3/3）
+  PASS  run-01 无 .tmp.json 残留
+  PASS  run-01 repair = none
+  PASS  run-01 两个产物与 raw 逐字节等价（无修补）
+  PASS  run-02（A ok / B 503）退出码 = 2
+  PASS  ★ run-02 的 semantic-inventory.json **保留**
+  PASS  ★ run-02 的 Stage A raw 也保留
+  PASS  run-02 没有 framework-map.json / map-selection.json
+  PASS  run-02 run-meta 记 stage B transport-failed
+  PASS  ★ run-01 的成功产物字节未变
+  PASS  run-03（A ok / B parse fail）退出码 = 2
+  PASS  ★ run-03 保留 semantic-inventory.json
+  PASS  ★ run-03 保留 raw-synthesis-response.txt
+  PASS  run-03 没有 framework-map.json（不猜、不补）
+  PASS  ★ run-01 产物仍未被触碰
+  PASS  run-04（B 缺第二个块）退出码 = 2
+  PASS  run-04 连 framework-map.json 也不产生（两产物同生共死）
+  PASS  run-04 保留 B raw 与 inventory
+  PASS  run-05（A malformed）退出码 = 1
+  PASS  ★ run-05 没有进入 Stage B（无 B request / raw / map）
+  PASS  run-05 保留 malformed inventory 本身（仍是证据）
+  PASS  run-05 run-meta 记 stage-a-shape-invalid + 具体问题
+  PASS  run-06（inventory duplicate id）退出码 = 1
+  PASS  run-06 报 duplicate id 且不进 Stage B
+  PASS  run-07（selection 少一条）退出码 = 1
+  PASS  ★ run-07 产物原样保留（map + selection 都在）
+  PASS  ★ run-07 integrity 报「漏掉 N 条」且**没有自动补**
+  PASS  run-07 run-meta status = success-integrity-fail
+  PASS  run-08（target 指向不存在 element）退出码 = 1
+  PASS  ★ run-08 报「指向不存在的 element」且产物保留
+  PASS  run-09（kind=constraint 指向非 constraint）退出码 = 1
+  PASS  ★ run-09 报「声称 constraint 但 type 是 artifact」
+  PASS  run-10（A 非 JSON）退出码 = 2
+  PASS  run-10 保留 A raw、无 inventory、无 Stage B
+  PASS  run-11（A 传输失败）退出码 = 2
+  PASS  run-11 只有 request / meta，无 inventory
+  PASS  run-12（--stage a）退出码 = 0
+  PASS  run-12 有 inventory，没有 Stage B 任何产物
+  PASS  run-12 run-meta status = stage-a-only
+  PASS  run-13（--stage b 复用 inventory）退出码 = 0
+  PASS  run-13 没有 Stage A 产物，但记录了 inventory 来源与 sha
+  PASS  run-01 重跑（--run 1）被拒绝，退出码 = 3
+  PASS  ★ 被拒绝后 run-01 产物仍字节未变
+  PASS  被拒绝的 run 没有产生 .tmp.json
+  PASS  run 目录为 run-01 … run-13（各阶段独立，无复用）
+
+════════════════════════════════
+F10 两阶段安全验证: 48/48 通过
+✓ 结论：Stage B 失败不会抹掉 Stage A 的证据；malformed inventory 不进 Stage B；integrity FAIL 原样保留且不自动补；全程无修补
+注：本轮全部为 stub 注入，**零模型调用**。正式 run 见 execution-prompt.md Phase 2。
+════════════════════════════════
