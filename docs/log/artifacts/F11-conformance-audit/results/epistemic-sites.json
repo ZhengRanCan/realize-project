@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 27125)
-Total output lines: 2437
-
 {
   "scope": [
     "scripts/l0-view-model.js",
@@ -882,7 +879,641 @@ Total output lines: 2437
     {
       "file": "scripts/check-block.js",
       "line": 325,
-      "col…7125 tokens truncated…局；只决定位置/表示，无知识状态字段。"
+      "column": 34,
+      "expression": "const ids = el.sourceUnitIds || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 328,
+      "column": 7,
+      "expression": "if (!unitById.has(id)) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 330,
+      "column": 50,
+      "expression": "} else if (planBlock && !(planBlock.covers || []).includes(id)) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 333,
+      "column": 47,
+      "expression": "`（本块 covers = ${(planBlock.covers || []).join(', ')}）`",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 364,
+      "column": 50,
+      "expression": "const covers = (planBlock && planBlock.covers) || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改（有效 Plan 范围）：required covers 非空；找不到 planBlock 已 HARD。非法 Plan 输入下 ratio=1 是 Decision F 边界缺口，不能凭此新增 S1 carrier。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 392,
+      "column": 30,
+      "expression": "new Set(el.sourceUnitIds || []).forEach((id) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 393,
+      "column": 36,
+      "expression": "reuse.set(id, (reuse.get(id) || 0) + 1);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：本次遍历中初始化 provenance 复用计数，计数全集已知。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 424,
+      "column": 26,
+      "expression": "(block.content.lanes || []).forEach((lane, li) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 425,
+      "column": 38,
+      "expression": "const ids = lane.sourceUnitIds || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 436,
+      "column": 19,
+      "expression": "(lane.nodes || []).forEach((item, ni) => {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 438,
+      "column": 47,
+      "expression": "const nodeUnits = (node.sourceUnitIds || []).map((id) => unitById.get(id)).filter(Boolean);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 449,
+      "column": 45,
+      "expression": "const variants = (block.content.lanes || []).map((l) => l.variant);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 450,
+      "column": 7,
+      "expression": "if (!variants.includes('current') || !variants.includes('target')) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 460,
+      "column": 43,
+      "expression": "const elUnits = (el.sourceUnitIds || []).map((id) => unitById.get(id)).filter(Boolean);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 472,
+      "column": 66,
+      "expression": "const carriers = elements.filter((el) => (el.sourceUnitIds || []).includes(id));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 486,
+      "column": 51,
+      "expression": "if (elements.some((el) => (el.sourceUnitIds || []).some((id) => unitById.get(id) && unitById.get(id).kind === 'open-question'))) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 498,
+      "column": 66,
+      "expression": "const carriers = elements.filter((el) => (el.sourceUnitIds || []).includes(id));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 514,
+      "column": 35,
+      "expression": "lanes: (block.content.lanes || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 515,
+      "column": 33,
+      "expression": "rows: (block.content.rows || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 516,
+      "column": 35,
+      "expression": "tiers: (block.content.tiers || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 517,
+      "column": 35,
+      "expression": "steps: (block.content.steps || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 518,
+      "column": 35,
+      "expression": "pairs: (block.content.pairs || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 519,
+      "column": 37,
+      "expression": "panels: (block.content.panels || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 520,
+      "column": 39,
+      "expression": "columns: (block.content.columns || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 521,
+      "column": 35,
+      "expression": "parts: (block.content.parts || []).length,",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 522,
+      "column": 57,
+      "expression": "linesPerSide: Math.max(0, ...(block.content.sides || []).map((s) => (s.lines || []).length)),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 522,
+      "column": 84,
+      "expression": "linesPerSide: Math.max(0, ...(block.content.sides || []).map((s) => (s.lines || []).length)),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 523,
+      "column": 57,
+      "expression": "nodesPerLane: Math.max(0, ...(block.content.lanes || []).map((l) => (l.nodes || []).length)),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 523,
+      "column": 84,
+      "expression": "nodesPerLane: Math.max(0, ...(block.content.lanes || []).map((l) => (l.nodes || []).length)),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 524,
+      "column": 59,
+      "expression": "itemsPerPanel: Math.max(0, ...(block.content.panels || []).map((p) => (p.items || []).length)),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 524,
+      "column": 86,
+      "expression": "itemsPerPanel: Math.max(0, ...(block.content.panels || []).map((p) => (p.items || []).length)),",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 562,
+      "column": 12,
+      "expression": "} else if (!argv[i].startsWith('--')) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 595,
+      "column": 3,
+      "expression": "if (!content || content.type !== 'flow' || !Array.isArray(content.lanes)) return { block, notes };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 599,
+      "column": 5,
+      "expression": "if (!Array.isArray(lane.nodes)) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 601,
+      "column": 7,
+      "expression": "if (!entry || typeof entry !== 'object') return entry;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 618,
+      "column": 3,
+      "expression": "if (!args.block) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 631,
+      "column": 34,
+      "expression": "const planBlock = (plan.blocks || []).find((b) => b.id === block.id) || {};",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：content.type 决定合法数组形状；不存在的其他 shape 数组不是 Unknown。错误/CLI 分支不承载认识论状态。"
+    },
+    {
+      "file": "scripts/check-block.js",
+      "line": 643,
+      "column": 69,
+      "expression": "const originProv = result.elements.filter((e) => (e.sourceUnitIds || []).length === 0).length;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：检查已提交 expression 的 provenance 声明；semantic 缺声明 HARD、presentation 豁免；不创造 Evidence。未分类字段不在此 walker，另记无边界。"
+    },
+    {
+      "file": "scripts/assemble-overview.js",
+      "line": 40,
+      "column": 5,
+      "expression": "if (!argv[i].startsWith('--')) continue;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：CLI 参数开关判断，无知识状态。"
+    },
+    {
+      "file": "scripts/assemble-overview.js",
+      "line": 71,
+      "column": 31,
+      "expression": "(design.overview.sections || []).map((s) => [s.id, { title: s.title, purpose: s.purpose }])",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：已声明 stage 元数据/Plan required sourceRefs 展开，非 Unknown carrier。"
+    },
+    {
+      "file": "scripts/assemble-overview.js",
+      "line": 85,
+      "column": 5,
+      "expression": "if (!fs.existsSync(generatedFile)) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：文件不存在显式登记到 missingBlocks，保留 Known Missing；Generated artifact 不含该 expression 不等于 Plan identity 不存在（P6）。"
+    },
+    {
+      "file": "scripts/assemble-overview.js",
+      "line": 94,
+      "column": 5,
+      "expression": "if (!metadata.model && request.model) metadata.model = request.model;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：汇总首个可得 model 元数据；没有将缺值解释为零、正常或 claim verified。"
+    },
+    {
+      "file": "scripts/assemble-overview.js",
+      "line": 95,
+      "column": 5,
+      "expression": "if (!metadata.promptSha256 && request.promptSha256) metadata.promptSha256 = request.promptSha256;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：汇总首个可得 prompt hash；没有将缺值解释为已验证。"
+    },
+    {
+      "file": "scripts/assemble-overview.js",
+      "line": 109,
+      "column": 55,
+      "expression": "const sources = [...new Set((planBlock.sourceRefs || []).map((r) => r.section))];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：已声明 stage 元数据/Plan required sourceRefs 展开，非 Unknown carrier。"
+    },
+    {
+      "file": "scripts/build-preview.js",
+      "line": 35,
+      "column": 5,
+      "expression": "if (!argv[i].startsWith('--')) continue;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：CLI 参数开关判断，无知识状态。"
+    },
+    {
+      "file": "scripts/build-preview.js",
+      "line": 63,
+      "column": 44,
+      "expression": "const meta = (design.overview.sections || []).find((s) => s.id === stageId) || {};",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：stage 元数据/Plan sourceRefs 展开；Generated 主导集合是独立 authority divergence，不是此表达式的三态 carrier。"
+    },
+    {
+      "file": "scripts/build-preview.js",
+      "line": 72,
+      "column": 55,
+      "expression": "sources: [...new Set(((pb && pb.sourceRefs) || []).map((r) => r.section))],",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：stage 元数据/Plan sourceRefs 展开；Generated 主导集合是独立 authority divergence，不是此表达式的三态 carrier。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 80,
+      "column": 3,
+      "expression": "if (!nested) {",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 94,
+      "column": 22,
+      "expression": "const list = (refs || []).filter(Boolean);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 95,
+      "column": 3,
+      "expression": "if (!list.length) return '<span class=\"muted\">（无出处）</span>';",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 102,
+      "column": 3,
+      "expression": "if (!q) return null;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 144,
+      "column": 31,
+      "expression": "const a = (vm.attachments || []).find((x) => x.elementId === id);",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 145,
+      "column": 25,
+      "expression": "return a ? (a.hosts || []).join(',') : '';",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 458,
+      "column": 3,
+      "expression": "if (!root || root.__l0Bound) return;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 551,
+      "column": 7,
+      "expression": "if (!inSummary) ev.preventDefault();",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-map.js",
+      "line": 557,
+      "column": 7,
+      "expression": "if (!inSummary) ev.preventDefault();",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：显示已声明来源/附件、qualifier 可选样式或 DOM disclosure 控制；不输出 claim verification。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 67,
+      "column": 3,
+      "expression": "if (!raw) return { title: String((el && el.id) || ''), subtitle: '' };",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 115,
+      "column": 29,
+      "expression": "const ns = (rel.get(id) || []).filter((x) => refPos.has(x));",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 116,
+      "column": 5,
+      "expression": "if (!ns.length) return null;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 125,
+      "column": 5,
+      "expression": "if (!down) idxs.reverse();",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 128,
+      "column": 7,
+      "expression": "if (!refLayer) continue;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 166,
+      "column": 40,
+      "expression": "const elements = (vm && vm.elements) || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 167,
+      "column": 37,
+      "expression": "const allEdges = (vm && vm.edges) || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 168,
+      "column": 46,
+      "expression": "const attachments = (vm && vm.attachments) || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 183,
+      "column": 86,
+      "expression": "if (a && a.elementId && byId.has(a.elementId)) hostsOf.set(a.elementId, (a.hosts || []).slice());",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 186,
+      "column": 37,
+      "expression": "hostsOf.forEach((_hosts, id) => { if (!onEdge.has(id)) badgeOnly.add(id); });",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 190,
+      "column": 37,
+      "expression": "const hosts = hostsOf.get(id) || [];",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 192,
+      "column": 7,
+      "expression": "if (!anchored) { badgeOnly.delete(id); changed = true; }",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 194,
+      "column": 5,
+      "expression": "if (!changed) break;",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 207,
+      "column": 5,
+      "expression": "if (!cardSet.has(ed.from) || !cardSet.has(ed.to)) { skippedEdges += 1; continue; }",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
+    },
+    {
+      "file": "app/renderer/l0-layout.js",
+      "line": 225,
+      "column": 34,
+      "expression": "for (const w of adj.get(v) || []) if (!seen.has(w)) { seen.add(w); queue.push(w); }",
+      "unknownEmpty": "no",
+      "status": "Compliant",
+      "reason": "合法 fallback，不改：邻接表、DFS 颜色、坐标层或 attachment 展示布局；只决定位置/表示，无知识状态字段。"
     },
     {
       "file": "app/renderer/l0-layout.js",
