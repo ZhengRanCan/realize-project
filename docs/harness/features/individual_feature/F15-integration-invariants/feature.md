@@ -2,7 +2,7 @@
 id: F15
 title: Projection Integration Invariants
 version: v0.1
-status: not_started
+status: active
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/log/artifacts/F15-integration-invariants/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
