@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-09-29.
-- Active feature: **F15 Projection Integration Invariants** —— 保护 renderer、coverage、L1 与 source 集成不变量。
-- Next queued feature: **F16 L2 Block Runtime** —— 须待 F15 关闭。2026-09-29 新登记 F11–F15，
+- Active feature: **none** —— F15 已完成可执行边界测试，但因 Explore/Back 未实现而 blocked。
+- Next queued feature: **F16 L2 Block Runtime** —— 可按流程细化并启动。2026-09-29 新登记 F11–F15，
   阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -29,7 +29,7 @@
 | F12 | S1 Epistemic Collapse Regression | `passing` | Unknown / Known(0) 已在投影、Topic DOM 和真实入口保留差异 |
 | F13 | Minimal Semantic Projection Boundary (B1) | `passing` | 纯边界与八项结构断言已通过 |
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
-| F15 | Projection Integration Invariants | `active` | 五组集成不变量；Explore/Back 人工路径待 F20 实现 |
+| F15 | Projection Integration Invariants | `blocked` | Explore/Back 产品入口尚不存在；其余已执行边界见 F15 evidence |
 | F16 | L2 Block Runtime（第一个产品采纳） | `not_started` | 契约待补（F11–F15 完成后细化） |
 | F17 | L1 Topic Runtime | `not_started` | 契约待补（F11–F16 完成后细化） |
 | F18 | L3 Inspector | `not_started` | 契约待补（F11–F17 完成后细化） |

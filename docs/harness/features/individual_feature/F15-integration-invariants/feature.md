@@ -2,10 +2,11 @@
 id: F15
 title: Projection Integration Invariants
 version: v0.1
-status: active
+status: blocked
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-reading-integration.js"],"docs":["docs/log/artifacts/F15-integration-invariants/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
-evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
+evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"node scripts/test-reading-integration.js","result":"passed","output":"4/4 passed"},{"command":"npm run test:all && npm run selftest","result":"passed","output":"22+31+29+33+48+35+42+131; SELFTEST PASSED"}],"manualSmoke":"L0 product selftest passed; Explore/Back path absent"}
+completionGate: {"version":"v0.1","l3":"required","userPath":["Explore v1 实现后验证 Back 恢复 ReadingAddress"],"integrationEvidence":["npm run selftest 2026-10-01: L0 renderer/interaction path passed"],"knownUnverified":["Explore/Back 不存在，无法验证 Decision B 产品路径"],"humanReviewRequired":[]}
 completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中走一遍：L0 选元素 → 进 Explore 焦点 → Back 回到原 ReadingAddress（不是回首页、不重跑 resolver）","加载 D 的 map 确认 Topic occurrence = Known(0) 时 #block-O-01 仍可打开（canonical landing 不依赖 occurrence）","确认 renderer 没有新增 entity / 新增语义关系 / 升级认识论状态（Indeterminate 未被渲染成 unsupported；Absent 未被补成 unverified）"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
