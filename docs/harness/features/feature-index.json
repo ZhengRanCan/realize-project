@@ -79,7 +79,7 @@
   {
     "id": "F13",
     "title": "Minimal Semantic Projection Boundary (B1)",
-    "status": "not_started",
+    "status": "active",
     "feature_folder": "docs/harness/features/individual_feature/F13-projection-boundary",
     "version": "v0.1"
   },

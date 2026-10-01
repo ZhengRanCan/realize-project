@@ -2,7 +2,7 @@
 id: F13
 title: Minimal Semantic Projection Boundary (B1)
 version: v0.1
-status: not_started
+status: active
 dependsOn: []
 scope: {"code":[],"tests":[],"docs":["docs/log/artifacts/F13-projection-boundary/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
