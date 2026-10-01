@@ -2,11 +2,11 @@
 id: F19
 title: Reading Navigation and Resolver
 version: v0.1
-status: not_started
+status: blocked
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F19-navigation-resolver/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中：从 T-05 的 occurrence 进入某个 detail → 进 Explore → 点 Open in Reading（走 resolver）→ 再按 Back（必须回到 T-05 的那个 occurrence，不是 canonical landing）"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
+completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中：从 T-05 的 occurrence 进入某个 detail → 进 Explore → 点 Open in Reading（走 resolver）→ 再按 Back（必须回到 T-05 的那个 occurrence，不是 canonical landing）"],"integrationEvidence":[],"knownUnverified":["F18 的 L3 runtime 输入协议未完成；F20 Explore 尚不存在，无法验证 resolver/Back 路径"],"humanReviewRequired":[]}
 ---
 
 # F19 Reading Navigation and Resolver

@@ -114,14 +114,14 @@
   {
     "id": "F18",
     "title": "L3 Inspector (traceability without verification)",
-    "status": "not_started",
+    "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F18-l3-inspector",
     "version": "v0.1"
   },
   {
     "id": "F19",
     "title": "Reading Navigation and Resolver",
-    "status": "not_started",
+    "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F19-navigation-resolver",
     "version": "v0.1"
   },

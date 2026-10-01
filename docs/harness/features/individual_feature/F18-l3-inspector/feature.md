@@ -2,11 +2,11 @@
 id: F18
 title: L3 Inspector (traceability without verification)
 version: v0.1
-status: not_started
+status: blocked
 dependsOn: []
-scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F18-l3-inspector/**","docs/progress.md"]}
+scope: {"code":["app/shared/l3-inspector-projection.js","app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-l3-inspector-projection.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F18-l3-inspector/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中从一个 Block 往下核查：确认能走到 SU → §N → 原文 section，也能走到 review object → evidence；且界面没有出现任何 claim-level 的 Verified / Unverified 结论"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
+completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中从一个 Block 往下核查：确认能走到 SU → §N → 原文 section，也能走到 review object → evidence；且界面没有出现任何 claim-level 的 Verified / Unverified 结论"],"integrationEvidence":[],"knownUnverified":["runtime 缺少 design-review 与 overview-plan 的显式配对输入协议，无法构造 Block → SU → §N 路径"],"humanReviewRequired":[]}
 ---
 
 # F18 L3 Inspector (traceability without verification)
