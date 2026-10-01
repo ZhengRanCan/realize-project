@@ -2,11 +2,11 @@
 id: F11
 title: Current Implementation Conformance Audit
 version: v0.1
-status: blocked
+status: passing
 dependsOn: []
 scope: {"code":[],"tests":[],"docs":["docs/log/artifacts/F11-conformance-audit/**","docs/progress.md","docs/harness/incidents/2026-09-29-local-environment-recovery.md","docs/harness/features/individual_feature/F11-conformance-audit/verification.md"]}
 evidence: {"lastVerifiedAt":"2026-09-29","commands":[{"command":"node scripts/test-check-plan.js + remaining test:all constituent scripts","result":"passed","output":"docs/log/artifacts/F11-conformance-audit/direct-test-results.json"},{"command":"F11 report structure validation (read-only-probes.md second block)","result":"passed","output":"docs/log/artifacts/F11-conformance-audit/report-validation-output.txt"},{"command":"npm run verify:harness; npm run check:docs; npm run test:all","result":"failed","reason":"npm installation missing definitions.js; direct Node equivalents recorded separately"},{"command":"node scripts/harness-gate.mjs","result":"passed","output":"docs/log/artifacts/F11-conformance-audit/final-harness-gate.mjs.txt"},{"command":"node scripts/check-doc-links.js","result":"passed","output":"docs/log/artifacts/F11-conformance-audit/final-check-doc-links.js.txt"},{"command":"npm run test:all","result":"passed","output":"docs/log/artifacts/F11-conformance-audit/environment-test-all.txt"},{"command":"npm run selftest","result":"passed","output":"docs/log/artifacts/F11-conformance-audit/environment-selftest.txt"}],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"not_required","userPath":["reviewer 复核 results/conformance-audit.md：每条结论都附可核证据（文件:行 或 命令输出），并确认没有把 Not Implemented 项读成「必须新增功能」"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":["reviewer 随机抽 3 条独立复核证据并确认没有将未实现项写为功能待办","用户验收尚未记录"]}
+completionGate: {"version":"v0.1","l3":"not_required","userPath":["用户已验收 F11 审计交付；报告中的 Not Implemented / Capability Absent 保持为分类结论，不作为功能待办"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F11 Current Implementation Conformance Audit
@@ -91,3 +91,7 @@ F12 未开始；dependsOn 保持空。
 用户已安装依赖。当前 Node/npm/Electron 正常，标准 test:all 与 selftest 已通过；Git 真实历史和远端上游已恢复，本地文件未覆盖。
 verification.md 按用户更高优先级的只读要求改为执行现有文档内报告校验命令，不新增 scripts 文件；规范/实现不变。
 本轮环境维护扩展仅为上述 incident 与 verification 文档；code/tests scope 及 dependsOn 保持空。人工复核/用户验收仍未记录，F11 不标 passing。
+
+## 2026-10-01 acceptance
+
+用户已确认审计交付并授权推进后续 conformance migration。F11 的人工验收已记录；不改变审计分类与只读范围。

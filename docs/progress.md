@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-09-29.
-- Active feature: **none** —— F11 审计已交付，当前 blocked，待人工复核/验收；环境与 Git 已恢复。
-- Next queued feature: **F12 S1 Epistemic Collapse Regression** —— 须先关闭 F11 的流程前置；本轮不启动。2026-09-29 新登记 F11–F15，
+- Active feature: **none** —— F11 审计已通过用户验收；环境与 Git 已恢复。
+- Next queued feature: **F12 S1 Epistemic Collapse Regression** —— F11 已关闭，可按流程启动。2026-09-29 新登记 F11–F15，
   阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -25,7 +25,7 @@
 | F08 | L0 UI | `blocked` | 用户对当前 UI（Reading View 表现层）不满意，先做一轮 UI 迭代；Track A 与 Gate 延后（技术层 34/42/130 + selftest 13 条仍全绿） |
 | F09 | Contract Adversarial Test | `passing` | — |
 | F10 | Semantic Grounding | `blocked` | E3 未关闭（Gate = PARTIAL PASS）；处置未登记 |
-| F11 | Current Implementation Conformance Audit | `blocked` | 报告已交付；环境与 Git 已恢复，只读校验口径已统一；待人工复核/验收 |
+| F11 | Current Implementation Conformance Audit | `passing` | 报告已交付，用户验收已记录 |
 | F12 | S1 Epistemic Collapse Regression | `not_started` | — |
 | F13 | Minimal Semantic Projection Boundary (B1) | `not_started` | — |
 | F14 | Adversarial Semantic Tests (B2) | `not_started` | — |

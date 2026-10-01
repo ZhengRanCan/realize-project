@@ -11,9 +11,9 @@
 
 ## Manual paths
 
-- [ ] reviewer 复核本目录的 `results/conformance-audit.md`：
+- [x] reviewer 复核本目录的 `results/conformance-audit.md`：
       随机抽 3 条结论，按它给的证据（`文件:行` / 命令）独立复核，确认结论成立。
-- [ ] 确认报告里**没有**把 `Not Implemented` / `Capability Absent` 写成待办功能。
+- [x] 确认报告里**没有**把 `Not Implemented` / `Capability Absent` 写成待办功能。
 
 ## Passing evidence
 
