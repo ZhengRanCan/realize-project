@@ -465,10 +465,10 @@ Priority = High | Medium | Low
 | I7 authority 单向 | — | ✅（assembler 注入 + `FIXED` hard fail） | — | Partial | Low |
 | I2 只用已存在外键 | — | ✅ partial（悬空引用 hard fail；但"禁止文本 / 相似度建引用"无守卫） | — | Partial | Medium |
 | I6 逐字段 authority | — | ✅ partial（`FIXED` 列表） | — | Partial | Medium |
-| I1 / I3 / I4 / I5 / I8 | — | — | — | None | Medium |
+| I1 / I3 / I4 / I5 / I8 | — | — | ✅ partial（F13 `projectReadingSubject`：identity 与 Plan authority 保持） | Partial | Medium |
 | S1 五态不得折叠 | — | — | ✅ partial（`test-l0-view-model` 与 Electron selftest 保住 `topic.blockIds` 的 Unknown / Known(0) shape；其余状态空间仍无边界） | Partial | Medium |
-| S2 / S5 / S6 | — | — | — | None | Medium |
-| S3 Absent ≠ Unknown | — | — | ❌ | None | **High** |
+| S2 / S5 / S6 | — | — | ✅ partial（F13 命名空间 discriminator 与跨空间拒绝） | Partial | Medium |
+| S3 Absent ≠ Unknown | — | — | ✅ partial（F13 claim verification 只能为 capability `absent`） | Partial | Medium |
 | S4 Known Absent ≠ Unverified | — | — | ❌ | None | **High** |
 | S7 状态须有可区分编码 | — | — | — | None | Medium |
 | S8 / S9 派生与漂移 | — | — | — | None | Medium |
