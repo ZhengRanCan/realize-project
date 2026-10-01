@@ -4,7 +4,7 @@
 
 - Date: 2026-09-29.
 - Active feature: **none** —— F16 blocked：当前产品没有契约所述 L2 multi-artifact runtime 输入。
-- Next queued feature: **F17 L1 Topic Runtime** —— 可先细化其契约。2026-09-29 新登记 F11–F15，
+- Next queued feature: **none** —— F17 受 F16 runtime 阻塞；后续产品 feature 依序暂停。2026-09-29 新登记 F11–F15，
   阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -31,7 +31,7 @@
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `blocked` | Explore/Back 产品入口尚不存在；其余已执行边界见 F15 evidence |
 | F16 | L2 Block Runtime（第一个产品采纳） | `blocked` | L2 runtime 输入与加载协议未定义；当前只消费 design-review 内嵌 overview |
-| F17 | L1 Topic Runtime | `not_started` | 契约待补（F11–F16 完成后细化） |
+| F17 | L1 Topic Runtime | `blocked` | F16 L2 runtime 输入协议未定义，Process preconditions 未满足 |
 | F18 | L3 Inspector | `not_started` | 契约待补（F11–F17 完成后细化） |
 | F19 | Reading Navigation and Resolver | `not_started` | 契约待补（F11–F18 完成后细化） |
 | F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
