@@ -4,7 +4,7 @@ title: Projection Integration Invariants
 version: v0.1
 status: active
 dependsOn: []
-scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/log/artifacts/F15-integration-invariants/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
+scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-reading-integration.js"],"docs":["docs/log/artifacts/F15-integration-invariants/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
 completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中走一遍：L0 选元素 → 进 Explore 焦点 → Back 回到原 ReadingAddress（不是回首页、不重跑 resolver）","加载 D 的 map 确认 Topic occurrence = Known(0) 时 #block-O-01 仍可打开（canonical landing 不依赖 occurrence）","确认 renderer 没有新增 entity / 新增语义关系 / 升级认识论状态（Indeterminate 未被渲染成 unsupported；Absent 未被补成 unverified）"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
