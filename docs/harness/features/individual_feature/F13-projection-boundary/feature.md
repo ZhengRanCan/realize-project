@@ -4,7 +4,7 @@ title: Minimal Semantic Projection Boundary (B1)
 version: v0.1
 status: active
 dependsOn: []
-scope: {"code":[],"tests":[],"docs":["docs/log/artifacts/F13-projection-boundary/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
+scope: {"code":["app/shared/reading-projection.js"],"tests":["scripts/test-reading-projection.js"],"docs":["docs/log/artifacts/F13-projection-boundary/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
 completionGate: {"version":"v0.1","l3":"not_required","userPath":["reviewer 复核 tests 输出与 projection API：确认六条高风险 invariant 已各有一个稳定、纯语义、可结构化断言的被测边界，且没有把本 feature 扩张成 L2/L3 功能实现"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
