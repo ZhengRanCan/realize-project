@@ -2,11 +2,11 @@
 id: F16
 title: L2 Block Runtime (first product adoption)
 version: v0.1
-status: blocked
+status: active
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F16-l2-runtime/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"rg overview/generated/plan app/main/main.js app/renderer/app.js","result":"passed","output":"renderer consumes model.overview; no overview-plan/overview.generated product loader found"}],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["先定义 L2 runtime 输入与加载协议，再验证 projection adoption"],"integrationEvidence":[],"knownUnverified":["当前产品仅加载 design-review.json 内嵌 overview，F16 目标所述多 artifact 旁路不存在"],"humanReviewRequired":[]}
+completionGate: {"version":"v0.1","l3":"required","userPath":["审查并实现最小 L2 runtime 输入协议，再验证 projection adoption"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中打开 L2：确认每个 Block 的 identity / 生成完整性 / coverage / occurrence 都来自 projection，而不是 renderer 自己读多份 artifact 后判断","静态搜索确认 renderer / helper 里不再出现对 missing / empty / reviewObjects 关系 / sourceUnitIds 含义的本地判断"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 

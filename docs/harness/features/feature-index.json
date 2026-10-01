@@ -100,7 +100,7 @@
   {
     "id": "F16",
     "title": "L2 Block Runtime (first product adoption)",
-    "status": "blocked",
+    "status": "active",
     "feature_folder": "docs/harness/features/individual_feature/F16-l2-runtime",
     "version": "v0.1"
   },
