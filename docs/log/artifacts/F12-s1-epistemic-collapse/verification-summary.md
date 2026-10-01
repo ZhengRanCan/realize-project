@@ -1,6 +1,6 @@
 # F12 Verification Summary — S1 Epistemic Collapse Regression
 
-状态：**尚未开始**（`not_started`）。
+状态：**进行中**（`active`）。
 
 ## 将要记录的内容
 
@@ -15,7 +15,48 @@
 
 ## 命令记录
 
-（实现后补齐：命令、日期、结果。）
+2026-10-01：先加入结构回归断言，尚未修改投影实现时运行：
+
+```text
+$ node scripts/test-l0-view-model.js
+FAIL  S1：topic.blockIds 的 absent（Unknown）与 []（Known(0））在投影后仍有不同 shape
+→ Unknown blockIds 被投影成已知数组
+View Model 回归: 34/35 通过（覆盖 28 份 map）
+```
+
+最小修复后：
+
+```text
+$ npm run test:all
+22 + 31 + 29 + 33 + 48 + 35 + 42 + 130 通过；Doc links: 109 markdown files checked, 0 broken.
+
+$ npm run selftest
+✓ L0 集成：S1 保留 topic.blockIds 的 Unknown 与 Known(0) 两种 shape
+SELFTEST PASSED
+
+$ npm run verify:harness
+Harness gate: 20 features, 0 errors.
+
+$ npm run check:docs
+Doc links: 109 markdown files checked, 0 broken.
+```
+
+## 最小修改
+
+- `scripts/l0-view-model.js`：仅在输入 topic 自身拥有 `blockIds` 时才投影该字段；不存在时保持字段缺失。
+- `app/renderer/l0-map.js`：分别显示 `L2 blocks: unknown` 与 `L2 blocks: none`，避免消费侧重新合并两态。
+- `app/main/main.js`：selftest 在真实 `loadFrameworkMap` 路径验证 Unknown 和 Known(0) 的对象 shape 不同。
+- `scripts/test-l0-view-model.js`：断言字段存在性及空数组 shape，不以字符串或长度替代状态判断。
+
+## 扫描判定
+
+F11 的 269 个站点逐项判定仍为本 feature 的基线。唯一需要修改的站点是
+`topic.blockIds` 投影；其余站点均是字段没有 Unknown / Empty 区别的合法 fallback，未改动。
+
+## §6 S1 cell
+
+- 之前：`None` / `High`，且记录了运行中的 `blockIds || []` 违反。
+- 现在：`Partial` / `Medium`；该 projection 出口被结构测试与 Electron selftest 保护，完整五态状态空间留给 F13/B1。
 
 ## 已知起点（F11 之前已实测）
 

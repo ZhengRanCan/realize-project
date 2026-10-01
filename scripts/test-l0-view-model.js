@@ -152,6 +152,25 @@ check('relationGap 不被转成 edge', () => {
   return true;
 });
 
+check('S1：topic.blockIds 的 absent（Unknown）与 []（Known(0)）在投影后仍有不同 shape', () => {
+  const map = {
+    mapVersion: 'test', level: 'L0',
+    document: { id: 's1-shape', title: 'S1 shape regression' },
+    elements: [], edges: [], attachments: [], relationGap: [],
+    topics: [
+      { id: 'unknown', title: 'Unknown', proposition: 'blockIds is absent' },
+      { id: 'empty', title: 'Known empty', proposition: 'blockIds is []', blockIds: [] },
+    ],
+  };
+  const vm = buildL0ViewModel(map, { knownRoles: KNOWN_ROLES });
+  const unknown = vm.topics.find((topic) => topic.id === 'unknown');
+  const empty = vm.topics.find((topic) => topic.id === 'empty');
+  const owns = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
+  if (owns(unknown, 'blockIds')) return 'Unknown blockIds 被投影成已知数组';
+  if (!owns(empty, 'blockIds') || !Array.isArray(empty.blockIds) || empty.blockIds.length !== 0) return 'Known(0) blockIds 未保留为空数组';
+  return true;
+});
+
 /* ---------- 汇总矩阵 ---------- */
 console.log(results.join('\n'));
 console.log('\n===== 矩阵（A–E + 极端样本）=====');

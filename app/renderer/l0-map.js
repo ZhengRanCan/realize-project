@@ -385,6 +385,9 @@ function renderReviewBoard(vm, layout) {
  * Topic Navigation（Phase 4.1：默认只显示轻量入口，details 按需展开）
  * ------------------------------------------------------------------ */
 function renderTopicEntry(t) {
+  const blockStatus = Object.prototype.hasOwnProperty.call(t, 'blockIds')
+    ? (t.blockIds.length ? `· L2 blocks: ${esc(t.blockIds.join(', '))}` : '· L2 blocks: none')
+    : '· L2 blocks: unknown';
   return `
 <li class="topic-entry ${t.hasElements ? '' : 'no-element'}" id="topic-${esc(t.id)}" data-topic-id="${esc(t.id)}" data-topic-focus="${esc(t.id)}" data-element-ids="${esc(t.elementIds.join(','))}">
   <details class="topic-fold">
@@ -396,7 +399,7 @@ function renderTopicEntry(t) {
     <div class="topic-body">
       <div class="topic-prop">${esc(t.proposition)}</div>
       <div class="card-row"><span class="k">elements</span><span class="v">${t.elementIds.length ? t.elementIds.map((id, i) => `<button class="chip link" data-focus-target="${esc(id)}">${esc(t.elementLabels[i])}</button>`).join('') : '<span class="muted">（该 Topic 没有 L0 element）</span>'}</span></div>
-      <div class="card-row"><span class="k">出处</span><span class="v">${refChips(t.sectionRefs)}${t.blockIds.length ? `<span class="muted">· L2 blocks: ${esc(t.blockIds.join(', '))}</span>` : ''}</span></div>
+      <div class="card-row"><span class="k">出处</span><span class="v">${refChips(t.sectionRefs)}<span class="muted">${blockStatus}</span></span></div>
     </div>
   </details>
 </li>`;

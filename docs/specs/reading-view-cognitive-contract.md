@@ -466,7 +466,7 @@ Priority = High | Medium | Low
 | I2 只用已存在外键 | — | ✅ partial（悬空引用 hard fail；但"禁止文本 / 相似度建引用"无守卫） | — | Partial | Medium |
 | I6 逐字段 authority | — | ✅ partial（`FIXED` 列表） | — | Partial | Medium |
 | I1 / I3 / I4 / I5 / I8 | — | — | — | None | Medium |
-| S1 五态不得折叠 | — | — | — | None（**且已有一处正在跑的违反**：`scripts/l0-view-model.js:109` 的 `t.blockIds \|\| []` 把 Unknown 折叠成 KnownEmpty） | **High** |
+| S1 五态不得折叠 | — | — | ✅ partial（`test-l0-view-model` 与 Electron selftest 保住 `topic.blockIds` 的 Unknown / Known(0) shape；其余状态空间仍无边界） | Partial | Medium |
 | S2 / S5 / S6 | — | — | — | None | Medium |
 | S3 Absent ≠ Unknown | — | — | ❌ | None | **High** |
 | S4 Known Absent ≠ Unverified | — | — | ❌ | None | **High** |

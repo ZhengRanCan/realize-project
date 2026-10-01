@@ -2,7 +2,7 @@
 id: F12
 title: S1 Epistemic Collapse Regression
 version: v0.1
-status: not_started
+status: active
 dependsOn: []
 scope: {"code":["scripts/l0-view-model.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-view-model.js","scripts/test-l0-preview.js"],"docs":["docs/log/artifacts/F12-s1-epistemic-collapse/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
@@ -32,7 +32,7 @@ scripts/l0-view-model.js:109
 - F11 的审计结论：哪些站点**真的**具有 Unknown / Empty 区别（只有这些进 backlog）。
 - Contract 侧依据：S1 / S7（`reading-view-cognitive-contract.md` §5.3 / §5.5）、
   Layer Contracts §1.3 与 §3.6（L0 不得依赖 `blockIds` 存在；Unknown 与 Known(0) 不得合并成"暂无"）。
-- 注：流程上应在 F11 之后，但**不登记为 `dependsOn`**（F11 不会 `passing`，会让 gate 必然报错），
+- 注：流程上应在 F11 之后，但 `dependsOn` 保持为空；顺序由本段的 Process preconditions 约束，
   见 `docs/harness/features/README.md` 的 `dependsOn` 口径。
 
 ## Scope

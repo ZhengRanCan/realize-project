@@ -106,7 +106,7 @@ function buildL0ViewModel(map, opts = {}) {
     return {
       id: t.id, title: t.title, proposition: t.proposition,
       sectionRefs: [...(t.sectionRefs || [])],
-      blockIds: [...(t.blockIds || [])],
+      ...(Object.prototype.hasOwnProperty.call(t, 'blockIds') ? { blockIds: [...t.blockIds] } : {}),
       elementIds: linked.map((e) => e.id),
       elementLabels: linked.map((e) => e.label),
       // 事实：这个 topic 在图上有落点吗（有就是有，无就是无 —— 不解释）

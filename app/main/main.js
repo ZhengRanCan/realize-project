@@ -481,6 +481,21 @@ async function runSelfTest() {
       if (!l0Loaded.ok || !l0Loaded.viewModel) {
         fail(`L0 加载失败: ${(l0Loaded.errors || []).join('; ')}`);
       } else {
+        const s1Fixture = path.join(PROJECT_ROOT, 'experiments', 'semantic-grounding', 'fixture-d', 'run-04', 'framework-map.json');
+        const s1Unknown = await loadFrameworkMap(s1Fixture);
+        const s1Map = JSON.parse(await fs.readFile(s1Fixture, 'utf8'));
+        const s1KnownEmptyMap = JSON.parse(JSON.stringify(s1Map));
+        s1KnownEmptyMap.topics[0].blockIds = [];
+        const { buildL0ViewModel } = require(path.join(PROJECT_ROOT, 'scripts', 'l0-view-model.js'));
+        const s1KnownEmpty = buildL0ViewModel(s1KnownEmptyMap, { knownRoles: JSON.parse(await fs.readFile(path.join(PROJECT_ROOT, 'schema', 'framework-map.schema.json'), 'utf8')).$defs.element.properties.role['x-known-roles'] });
+        const owns = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
+        const unknownTopic = s1Unknown.viewModel.topics.find((topic) => topic.id === s1Map.topics[0].id);
+        const emptyTopic = s1KnownEmpty.topics.find((topic) => topic.id === s1Map.topics[0].id);
+        if (!owns(unknownTopic, 'blockIds') && owns(emptyTopic, 'blockIds') && Array.isArray(emptyTopic.blockIds) && emptyTopic.blockIds.length === 0) {
+          ok('L0 集成：S1 保留 topic.blockIds 的 Unknown 与 Known(0) 两种 shape');
+        } else {
+          fail('L0 集成：S1 把 Unknown / Known(0) 合并了');
+        }
         const f = l0Loaded.viewModel.facts;
         const seam = await win.webContents.executeJavaScript(`(async () => {
           const out = {};
