@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-09-29.
-- Active feature: **F16 L2 Block Runtime** —— 正在补全最小 runtime 输入协议并迁移 L2。
-- Next queued feature: **none** —— F17 受 F16 runtime 阻塞；后续产品 feature 依序暂停。2026-09-29 新登记 F11–F15，
+- Active feature: **none**.
+- Next queued feature: **F17 L1 Topic Runtime** —— F16 L2 projection 已通过真实 IPC、离线回归与 Electron 自检。2026-09-29 新登记 F11–F15，
   阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -30,8 +30,8 @@
 | F13 | Minimal Semantic Projection Boundary (B1) | `passing` | 纯边界与八项结构断言已通过 |
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `blocked` | Explore/Back 产品入口尚不存在；其余已执行边界见 F15 evidence |
-| F16 | L2 Block Runtime（第一个产品采纳） | `active` | 补全 runtime 输入协议并迁移 L2 |
-| F17 | L1 Topic Runtime | `blocked` | F16 L2 runtime 输入协议未定义，Process preconditions 未满足 |
+| F16 | L2 Block Runtime（第一个产品采纳） | `passing` | L2 projection 经真实 IPC 接入；21 block 自检与全量门禁通过 |
+| F17 | L1 Topic Runtime | `not_started` | F16 precondition 已满足，等待按 Selection 规则启动 |
 | F18 | L3 Inspector | `not_started` | 契约待补（F11–F17 完成后细化） |
 | F19 | Reading Navigation and Resolver | `not_started` | 契约待补（F11–F18 完成后细化） |
 | F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |

@@ -2,11 +2,10 @@
 id: F17
 title: L1 Topic Runtime
 version: v0.1
-status: blocked
+status: not_started
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F17-l1-runtime/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"2026-10-01","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["先解除 F16 的 L2 runtime 输入协议阻塞"],"integrationEvidence":[],"knownUnverified":["F16 未完成；L1 不能建立在未运行的 L2 projection 产品路径之上"],"humanReviewRequired":[]}
 completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中进入一个 Topic：确认看到的是它的语义边界（成员 / 内部关系 / 穿越边界的关系），而不是 Topic 内部被裁出来的 L0 子图"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 

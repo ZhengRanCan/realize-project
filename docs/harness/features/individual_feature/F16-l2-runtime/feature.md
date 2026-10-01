@@ -2,12 +2,11 @@
 id: F16
 title: L2 Block Runtime (first product adoption)
 version: v0.1
-status: active
+status: passing
 dependsOn: []
-scope: {"code":["app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F16-l2-runtime/**","docs/progress.md"]}
-evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"rg overview/generated/plan app/main/main.js app/renderer/app.js","result":"passed","output":"renderer consumes model.overview; no overview-plan/overview.generated product loader found"}],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["审查并实现最小 L2 runtime 输入协议，再验证 projection adoption"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中打开 L2：确认每个 Block 的 identity / 生成完整性 / coverage / occurrence 都来自 projection，而不是 renderer 自己读多份 artifact 后判断","静态搜索确认 renderer / helper 里不再出现对 missing / empty / reviewObjects 关系 / sourceUnitIds 含义的本地判断"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
+scope: {"code":["app/shared/reading-projection.js","app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-reading-runtime.js"],"docs":["docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F16-l2-runtime/**","docs/progress.md"]}
+evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"node scripts/test-reading-runtime.js","result":"passed","output":"reading runtime tests passed: 8 assertions"},{"command":"npm run selftest","result":"passed","output":"SELFTEST PASSED; L2 projection 已由主进程生成（21 个 block）"},{"command":"npm run test:all","result":"passed","output":"22 + 31 + 29 + 33 + 48 + 35 + 42 + 131 assertions; docs 113/0; experiments index up to date"},{"command":"npm run verify:harness && npm run check:docs","result":"passed","output":"Harness gate: 20 features, 0 errors. Doc links: 113 markdown files checked, 0 broken."}],"manualSmoke":"Electron selftest exercises preload → IPC → main projection → renderer and renders 21 L2 blocks."}
+completionGate: {"version":"v0.1","l3":"required","userPath":[],"integrationEvidence":["主进程在 validation 后生成 L2ViewModel；renderer 只消费该投影。","结构测试确认 identity/content/source parity 与 absent/empty review link 区分。","Electron selftest 通过真实 IPC 路径渲染 21 blocks。"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F16 L2 Block Runtime (first product adoption)
@@ -69,11 +68,11 @@ F16 才是把 `artifact → renderer` 改成 `artifact → semantic projection �
 
 ## Acceptance Criteria
 
-- [ ] projection 在 `ARCHITECTURE.md` 被登记为正式 **architecture boundary**，
+- [x] projection 在 `ARCHITECTURE.md` 被登记为正式 **architecture boundary**，
       不再是 test helper（第 2 项工程动作）。
-- [ ] 真实 L2 renderer 消费 projection 输出，**不再分别读取多份 artifact 自行解释**。
-- [ ] **behavior parity**：迁移前后正常内容零丢失（逐块对比 + 现有回归全绿）。
-- [ ] **消除旁路（最重要）**：semantic interpretation **只发生在 projection 层**。
+- [x] 真实 L2 renderer 消费 projection 输出，**不再分别读取多份 artifact 自行解释**。
+- [x] **behavior parity**：迁移前后正常内容零丢失（逐块对比 + 现有回归全绿）。
+- [x] **消除旁路（最重要）**：semantic interpretation **只发生在 projection 层**。
 
       **F16 是否完成，不看"L2 页面出来了"，而看 renderer / helper 里还有没有人在自己回答这四个问题：**
 
@@ -86,8 +85,8 @@ F16 才是把 `artifact → renderer` 改成 `artifact → semantic projection �
 
       只要这些解释仍散落在 renderer / helper 里，**F16 就没有真正完成** ——
       它只是把新路径接上了，却把旧解释留在了原地。
-- [ ] 契约 §6 矩阵 cell 更新（只更新 cell，Priority 不整行搬迁）。
-- [ ] 独立审查记录已写入 artifact 目录。
+- [x] 契约 §6 矩阵 cell 更新（只更新 cell，Priority 不整行搬迁）。
+- [x] 独立审查记录已写入 artifact 目录。
 
 ## Risks and compatibility
 

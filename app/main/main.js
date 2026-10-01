@@ -18,6 +18,7 @@ const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const { validate } = require('../shared/schema-validator');
 const { semanticCheck } = require('../shared/review-model');
 const semantics = require('../shared/semantics');
+const { projectL2Overview } = require('../shared/reading-projection');
 const { evaluateGate, buildHumanReviewSkeleton } = semantics;
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -111,10 +112,14 @@ async function loadDesignReview(modelPath, humanReviewPath) {
   ['decisions', 'openQuestions', 'gaps'].forEach((bucket) => {
     effectiveHuman[bucket] = Object.assign({}, skeleton[bucket], effectiveHuman[bucket] || {});
   });
+  // L2 delivery is fed by one projection boundary.  The raw model remains for
+  // review/Gate semantics only and is never interpreted by the renderer.
+  const l2ViewModel = projectL2Overview(model.overview);
 
   state = {
     modelPath: resolvedModel,
     model,
+    l2ViewModel,
     humanReviewPath: resolvedHuman,
     humanReview: effectiveHuman,
   };
@@ -127,6 +132,7 @@ async function loadDesignReview(modelPath, humanReviewPath) {
     humanReviewPath: resolvedHuman,
     humanReviewExists,
     model,
+    l2ViewModel,
     humanReview: effectiveHuman,
     gate: evaluateGate(model, effectiveHuman),
     summary: semantics.reviewSummary(model, effectiveHuman),
@@ -392,6 +398,11 @@ async function runSelfTest() {
     const load = await loadDesignReview(DEFAULT_FIXTURE, DEFAULT_HUMAN_REVIEW);
     if (!load.ok) throw new Error(`fixture 加载失败: ${(load.errors || []).join('; ')}`);
     ok(`fixture 加载: decisions=${load.model.decisions.length} gaps=${load.model.gaps.length} openQuestions=${load.model.openQuestions.length}`);
+    if (load.l2ViewModel && load.l2ViewModel.kind === 'L2ViewModel' && load.l2ViewModel.sections.length === load.model.overview.sections.length) {
+      ok(`L2 projection 已由主进程生成（${load.l2ViewModel.sections.flatMap((section) => section.blocks).length} 个 block）`);
+    } else {
+      fail('L2 projection 未随 design-review load result 返回');
+    }
     ok(
       `reviewLevel 分布: root=${load.summary.decisions.rootTotal} supporting=${load.model.decisions.filter((d) => d.reviewLevel === 'supporting').length} derived=${load.model.decisions.filter((d) => d.reviewLevel === 'derived').length}`
     );

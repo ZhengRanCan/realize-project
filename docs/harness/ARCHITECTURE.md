@@ -4,9 +4,9 @@
 
 | Area | Owns | Must not own |
 | --- | --- | --- |
-| `app/renderer/`（UI / delivery） | 两页导航、四段 Overview、决策卡片、Source 回查面板、L0/L1/L2 渲染布局 | 文件访问、契约判定、模型调用 |
-| `app/main/`（Electron main） | 文件读写、Schema 与一致性校验、`human-review.json` 的原子保存与合并、自检入口 | 领域判定逻辑、UI 决策 |
-| `app/shared/`（shared semantics） | Gate / reviewLevel / category / Evidence 级别的**单一事实来源**；极简 draft-07 校验器；一致性检查 | 框架特有展示细节、文件 I/O |
+| `app/renderer/`（UI / delivery） | 两页导航、四段 Overview、决策卡片、Source 回查面板、L0/L1/L2 渲染布局 | 文件访问、契约判定、模型调用；不得读取 `model.overview` 或解释 source / review relationship 状态 |
+| `app/main/`（Electron main） | 文件读写、Schema 与一致性校验、`human-review.json` 的原子保存与合并、自检入口；将已验证 Overview 交给 L2 projection | 领域判定逻辑、UI 决策 |
+| `app/shared/`（shared semantics） | Gate / reviewLevel / category / Evidence 级别的**单一事实来源**；极简 draft-07 校验器；一致性检查；L2 semantic projection | 框架特有展示细节、文件 I/O |
 | `schema/`（contracts） | 各阶段产物结构（design-review / overview-plan / stage2-block / framework-map / map-selection / semantic-inventory） | 判断层规则（放在契约文档与 validator 里） |
 | `scripts/`（pipeline + validators） | 抽取、校验、生成、装配、报告：`check-*`、`ai-*`、`assemble-overview`、`full-run-report`、`harness-gate` | UI 渲染 |
 | `ai/`（prompts） | Stage A/B 与 Stage 1/2 的提示词文本 | 产物结构定义（以 `schema/` 为准） |
@@ -24,6 +24,7 @@
    ↓ Stage 1   overview plan            schema/overview-plan.schema.json + scripts/check-plan.js
    ↓ Stage 2   逐 block 生成            schema/stage2-block.schema.json + scripts/check-block.js
    ↓ assemble  overview.generated.json  scripts/assemble-overview.js + scripts/check-overview.js
+   ↓ project   L2 View Model              app/shared/reading-projection.js
    ↓ render    Electron / 静态 Preview   app/renderer/*
    ↓ human     human-review.json        app/shared/semantics.js 判定 Gate
 ```
@@ -41,6 +42,14 @@
 
 > **HTML / UI 由确定性 renderer 生成，AI 不直接生成最终页面。** 这是本项目最不可让路的分工，
 > 对应的禁止事项写在 `CONSTRAINTS.md`；F08 的 L0 界面同样遵守（预览与产品共用同一份 renderer 模块）。
+
+### L2 runtime boundary
+
+`loadDesignReview()` 先完成 schema 与 semantic validation，随后调用
+`projectL2Overview(model.overview)`。其输出 `L2ViewModel` 是 renderer 的唯一 Overview
+输入：它保留 block identity、内容、source refs 与 `reviewObjectLinks` 的 `unknown` /
+`empty` / `known` 状态；`related` 仅表示 review adjacency，绝不升级为 evidence 或
+support。原始 `model` 仍只供 Gate 和人工审核语义使用。
 
 ### 关键数据产物
 

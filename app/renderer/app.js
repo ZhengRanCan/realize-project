@@ -58,6 +58,8 @@ const state = {
   view: 'overview',
   /** Feature 08 · L0 Framework Map（view model 由主进程算好；renderer 只渲染） */
   l0ViewModel: null,
+  /** Feature 16 · L2 semantic projection（renderer 只交付，不解释 source/relation 状态）。 */
+  l2ViewModel: null,
   l0Path: null,
   l0View: 'reading',
   /** 区块折叠状态：blockId -> boolean。初始值来自 defaultExpanded。 */
@@ -157,7 +159,7 @@ function currentSummary() {
 }
 
 function allBlocks() {
-  return (state.model.overview ? state.model.overview.sections : []).flatMap((s) => s.blocks);
+  return (state.l2ViewModel ? state.l2ViewModel.sections : []).flatMap((s) => s.blocks);
 }
 
 /* ================================================================== *
@@ -166,7 +168,7 @@ function allBlocks() {
 
 function renderChipRow(chips) {
   const row = el('div', 'chip-row');
-  (chips || []).forEach((id) => {
+  chips.forEach((id) => {
     const chip = el('span', 'obj-chip', id);
     chip.dataset.objId = id;
     chip.title = id.startsWith('DEC-') ? '点击查看这条决策' : '本条判断的编号';
@@ -177,7 +179,7 @@ function renderChipRow(chips) {
 
 function renderSourceTags(block, onOpen) {
   const row = el('div', 'src-tags');
-  (block.sources || []).forEach((label) => {
+  block.sourceRefs.forEach((label) => {
     const chip = el('button', 'src-chip', `Source: ${label}`);
     const section = state.source.sections.find((s) => s.label === label);
     chip.title = section ? `${section.title}（原文 L${section.startLine}-${section.endLine}）` : label;
@@ -383,6 +385,7 @@ function renderBlock(block) {
   section.id = `block-${block.id}`;
   section.dataset.blockId = block.id;
   section.dataset.stage = block.stage;
+  section.dataset.reviewObjectsState = block.reviewObjectLinks.state;
 
   const head = el('div', 'block-head');
   head.appendChild(el('span', 'block-id', block.id));
@@ -410,10 +413,10 @@ function renderBlock(block) {
     } else {
       body.appendChild(el('div', 'muted small', `未知承载形式：${block.content.type}`));
     }
-    if (block.reviewObjects && block.reviewObjects.length > 0) {
+    if (block.reviewObjectLinks.state === 'known') {
       const foot = el('div', 'block-foot');
       foot.appendChild(el('span', 'block-foot-label', '关联'));
-      foot.appendChild(renderChipRow(block.reviewObjects));
+      foot.appendChild(renderChipRow(block.reviewObjectLinks.values));
       body.appendChild(foot);
     }
   }
@@ -428,7 +431,7 @@ function renderBlock(block) {
 function buildToc() {
   const toc = clear($('#toc'));
   toc.appendChild(el('div', 'toc-title', '文档目录'));
-  (state.model.overview ? state.model.overview.sections : []).forEach((stage) => {
+  (state.l2ViewModel ? state.l2ViewModel.sections : []).forEach((stage) => {
     const group = el('div', 'toc-group');
     group.dataset.stage = stage.id;
     const head = el('button', 'toc-stage', stage.title);
@@ -500,7 +503,7 @@ function setupScrollSpy() {
 function viewOverview() {
   const main = clear($('#main'));
   main.appendChild(el('div', 'stage-indicator-start'));
-  (state.model.overview ? state.model.overview.sections : []).forEach((stage) => {
+  (state.l2ViewModel ? state.l2ViewModel.sections : []).forEach((stage) => {
     const header = el('div', `stage-head stage-${stage.id}`);
     header.appendChild(el('div', 'stage-title', stage.title));
     header.appendChild(el('div', 'stage-purpose', stage.purpose));
@@ -1106,6 +1109,7 @@ function applyLoadResult(result) {
   }
   clearError();
   state.model = result.model;
+  state.l2ViewModel = result.l2ViewModel;
   state.humanReview = result.humanReview;
   state.modelPath = result.modelPath;
   state.humanReviewPath = result.humanReviewPath;
@@ -1137,7 +1141,7 @@ function applyLoadResult(result) {
     openQuestions: (state.model.openQuestions || []).length,
     blockingQuestions: summary.questions.blocking,
     overviewBlocks: blocks.length,
-    overviewStages: state.model.overview ? state.model.overview.sections.length : 0,
+    overviewStages: state.l2ViewModel ? state.l2ViewModel.sections.length : 0,
     summary,
     gate: currentGate(),
     modelPath: state.modelPath,
