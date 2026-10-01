@@ -2,9 +2,9 @@
 id: F14
 title: Adversarial Semantic Tests (B2)
 version: v0.1
-status: not_started
+status: active
 dependsOn: []
-scope: {"code":[],"tests":[],"docs":["docs/log/artifacts/F14-adversarial-semantic-tests/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
+scope: {"code":[],"tests":["scripts/test-reading-adversarial.js"],"docs":["docs/log/artifacts/F14-adversarial-semantic-tests/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
 completionGate: {"version":"v0.1","l3":"not_required","userPath":["reviewer 逐条复核六组 adversarial 断言：确认每组只增强一个诱惑来源、断言是结构级、且测试名与旁注能说明它防的是哪一种非法语义升级"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---

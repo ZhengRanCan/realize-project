@@ -86,7 +86,7 @@
   {
     "id": "F14",
     "title": "Adversarial Semantic Tests (B2)",
-    "status": "not_started",
+    "status": "active",
     "feature_folder": "docs/harness/features/individual_feature/F14-adversarial-semantic-tests",
     "version": "v0.1"
   },
