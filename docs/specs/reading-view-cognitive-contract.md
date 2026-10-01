@@ -469,14 +469,14 @@ Priority = High | Medium | Low
 | S1 五态不得折叠 | — | — | ✅ partial（`test-l0-view-model` 与 Electron selftest 保住 `topic.blockIds` 的 Unknown / Known(0) shape；其余状态空间仍无边界） | Partial | Medium |
 | S2 / S5 / S6 | — | — | ✅ partial（F13 命名空间 discriminator 与跨空间拒绝） | Partial | Medium |
 | S3 Absent ≠ Unknown | — | — | ✅ partial（F13 claim verification 只能为 capability `absent`） | Partial | Medium |
-| S4 Known Absent ≠ Unverified | — | — | ❌ | None | **High** |
+| S4 Known Absent ≠ Unverified | — | — | ✅ partial（F14 对抗测试保持 Indeterminate，不升级为 Unsupported） | Partial | Medium |
 | S7 状态须有可区分编码 | — | — | — | None | Medium |
 | S8 / S9 派生与漂移 | — | — | — | None | Medium |
 | N1 / N2 / N3 | — | — | — | None | Medium |
 | N4 / N5 | — | — | — | None | Medium |
-| N6 坐标重叠 ⇏ 语义关系 | — | — | ❌ | None | **High** |
-| N7 source-verified ⇏ verified | — | — | ❌ | None | **High** |
-| N8 approved/reviewed/PASS ⇏ verified | — | — | ❌ | None | **High** |
+| N6 坐标重叠 ⇏ 语义关系 | — | — | ✅ partial（F14 exact-containment 对抗测试） | Partial | Medium |
+| N7 source-verified ⇏ verified | — | — | ✅ partial（F14 evidence-level 对抗测试） | Partial | Medium |
+| N8 approved/reviewed/PASS ⇏ verified | — | — | ✅ partial（F14 独立状态汇总对抗测试） | Partial | Medium |
 | N9 / N10 / N11 / N12 | — | — | — | None | Medium |
 
 > 说明：`Protection coverage = None` **不自动**等于 `Priority = High`。

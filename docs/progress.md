@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-09-29.
-- Active feature: **F14 Adversarial Semantic Tests (B2)** —— 为六条高风险 invariant 建立隔离对抗测试。
-- Next queued feature: **F15 Projection Integration Invariants** —— 须待 F14 关闭。2026-09-29 新登记 F11–F15，
+- Active feature: **none** —— F14 的六组隔离对抗测试已通过审查。
+- Next queued feature: **F15 Projection Integration Invariants** —— F14 已关闭，可按流程启动。2026-09-29 新登记 F11–F15，
   阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -28,7 +28,7 @@
 | F11 | Current Implementation Conformance Audit | `passing` | 报告已交付，用户验收已记录 |
 | F12 | S1 Epistemic Collapse Regression | `passing` | Unknown / Known(0) 已在投影、Topic DOM 和真实入口保留差异 |
 | F13 | Minimal Semantic Projection Boundary (B1) | `passing` | 纯边界与八项结构断言已通过 |
-| F14 | Adversarial Semantic Tests (B2) | `active` | 六组隔离对抗断言 |
+| F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `not_started` | — |
 | F16 | L2 Block Runtime（第一个产品采纳） | `not_started` | 契约待补（F11–F15 完成后细化） |
 | F17 | L1 Topic Runtime | `not_started` | 契约待补（F11–F16 完成后细化） |

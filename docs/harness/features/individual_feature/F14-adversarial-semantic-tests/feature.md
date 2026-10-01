@@ -2,10 +2,10 @@
 id: F14
 title: Adversarial Semantic Tests (B2)
 version: v0.1
-status: active
+status: passing
 dependsOn: []
 scope: {"code":[],"tests":["scripts/test-reading-adversarial.js"],"docs":["docs/log/artifacts/F14-adversarial-semantic-tests/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
-evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
+evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"node scripts/test-reading-adversarial.js","result":"passed","output":"6/6 passed"},{"command":"npm run verify:harness && npm run check:docs","result":"passed","output":"20 features, 0 errors; 111 markdown files checked, 0 broken"}],"manualSmoke":"用户授权 Codex 审查隔离 fixture 与结构断言"}
 completionGate: {"version":"v0.1","l3":"not_required","userPath":["reviewer 逐条复核六组 adversarial 断言：确认每组只增强一个诱惑来源、断言是结构级、且测试名与旁注能说明它防的是哪一种非法语义升级"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
@@ -54,28 +54,28 @@ N8  approved / reviewed / PASS ⇏ claim verified
 
 ## Acceptance Criteria
 
-- [ ] 六条 invariant **各有独立 fixture**，并遵循通用方法：
+- [x] 六条 invariant **各有独立 fixture**，并遵循通用方法：
       **每个 fixture 只增强它正在测试的那一个诱惑来源，其余输入保持最低强度基线。**
-- [ ] **N7 与 N8 不共用 fixture**（防"万能状态汇总"的 N8 必须与防"Evidence 升级"的 N7 分开，
+- [x] **N7 与 N8 不共用 fixture**（防"万能状态汇总"的 N8 必须与防"Evidence 升级"的 N7 分开，
       否则 N8 会因错误的原因通过）。
-- [ ] 断言是**结构级**（字段 / 边的有无），**不是**字符串断言；不重复 F08 的教训
+- [x] 断言是**结构级**（字段 / 边的有无），**不是**字符串断言；不重复 F08 的教训
       （静态预览未加载 renderer，而断言只查文字）。
-- [ ] 测试名表达**为什么不连 / 不升级**，并在测试旁注明对应 invariant。
+- [x] 测试名表达**为什么不连 / 不升级**，并在测试旁注明对应 invariant。
       例如 N6 使用 `does_not_create_semantic_evidence_link_from_coordinate_overlap_alone`。
-- [ ] N6 fixture 把诱惑做到最大：same file + same section + **exact containment**
+- [x] N6 fixture 把诱惑做到最大：same file + same section + **exact containment**
       （SU `§3` = 95–125 / Decision evidence = 100–110）仍断言无 semantic link；
       只有真实外键（`block.reviewObjects`）才允许 `Block related-to ReviewObject`。
-- [ ] S3 fixture 断言**不得存在 claim verification value carrier** ——
+- [x] S3 fixture 断言**不得存在 claim verification value carrier** ——
       注意不能全局禁止字符串 `verification`（`claimVerificationCapability` 本身合法），
       要断言的是那类"值载体"不存在。
-- [ ] S4 fixture：`flowNode.state = "target"` 且 provenance policy 未分类 ⇒
+- [x] S4 fixture：`flowNode.state = "target"` 且 provenance policy 未分类 ⇒
       `ProvenanceAssurance = Indeterminate`，且不出现 `Unsupported` / `No evidence` /
       `Missing evidence` / `Verified`。
-- [ ] S1 三态（absent / `[]` / values）作为**长期 adversarial suite** 保留，
+- [x] S1 三态（absent / `[]` / values）作为**长期 adversarial suite** 保留，
       并补充 `Known Missing` ≠ `Present(UNKNOWN)` ≠ 外层 `Unknown` 的区分。
-- [ ] 契约 §6 矩阵 N6 / N7 / N8 / S3 / S4 的 `Projection test` cell 更新为 ✅，
+- [x] 契约 §6 矩阵 N6 / N7 / N8 / S3 / S4 的 `Projection test` cell 更新为 ✅，
       `Protection coverage` 随判据重算，**Priority 不做整行搬迁**。
-- [ ] 独立审查记录已写入 artifact 目录。
+- [x] 独立审查记录已写入 artifact 目录。
 
 ## Risks and compatibility
 
