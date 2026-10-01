@@ -1,0 +1,13 @@
+'use strict';
+const assert = require('node:assert/strict');
+const { projectTopic } = require('../app/shared/l1-topic-projection');
+const map = { topics: [{ id: 'T-1', title: 'T', proposition: 'p', blockIds: [] }], elements: [{ id: 'A', label: 'A', topics: ['T-1'] }, { id: 'B', label: 'B', topics: [] }], edges: [{ id: 'i', from: 'A', to: 'A', type: 'contains' }, { id: 'o', from: 'A', to: 'B', type: 'produces' }, { id: 'r', from: 'B', to: 'A', type: 'relates-to' }] };
+const view = projectTopic(map, 'T-1');
+assert.equal(view.inside.length, 1); assert.deepEqual(view.relations.map((r) => r.role), ['internal', 'outbound', 'crossing']); assert.equal(view.blockOrganization.state, 'empty');
+assert.deepEqual(view.relationClasses.inbound, []); assert.deepEqual(view.relationClasses.outbound, ['o']);
+const absent = projectTopic({ ...map, topics: [{ id: 'T-1', title: 'T', proposition: 'p' }] }, 'T-1'); assert.equal(absent.blockOrganization.state, 'unknown');
+const empty = projectTopic({ ...map, edges: [] }, 'T-1'); assert.equal(empty.representation, 'boundary-summary');
+const fs = require('node:fs');
+const main = fs.readFileSync(require.resolve('../app/main/main.js'), 'utf8'); const renderer = fs.readFileSync(require.resolve('../app/renderer/app.js'), 'utf8'); const l0 = fs.readFileSync(require.resolve('../app/renderer/l0-map.js'), 'utf8');
+assert.match(main, /l1Topics/); assert.match(renderer, /function viewL1/); assert.match(renderer, /onTopic:/); assert.match(l0, /opts\.onTopic/);
+console.log('L1 topic projection/runtime tests passed: 9 assertions');

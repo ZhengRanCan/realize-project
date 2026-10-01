@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-09-29.
-- Active feature: **none**.
-- Next queued feature: **F17 L1 Topic Runtime** —— F16 L2 projection 已通过真实 IPC、离线回归与 Electron 自检。2026-09-29 新登记 F11–F15，
+- Active feature: **F17 L1 Topic Runtime** —— 正在建立 Topic semantic boundary runtime。
+- Next queued feature: **none**. 2026-09-29 新登记 F11–F15，
   阶段从「架构规范形成」切到「现有实现向规范收敛」（路线见下方「下一阶段路线」）。
 - Latest completed feature: `F09` Contract Adversarial Test（2026-09-26，Gate = PASS）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；

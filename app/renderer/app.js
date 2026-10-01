@@ -58,6 +58,8 @@ const state = {
   view: 'overview',
   /** Feature 08 · L0 Framework Map（view model 由主进程算好；renderer 只渲染） */
   l0ViewModel: null,
+  l1Topics: null,
+  l1Topic: null,
   /** Feature 16 · L2 semantic projection（renderer 只交付，不解释 source/relation 状态）。 */
   l2ViewModel: null,
   l0Path: null,
@@ -986,7 +988,7 @@ function renderGateBadge() {
 }
 
 function render() {
-  if (!state.model && state.view !== 'l0') return;
+  if (!state.model && state.view !== 'l0' && state.view !== 'l1') return;
   const summary = state.model ? currentSummary() : null;
 
   $('#design-title').textContent = (state.view === 'l0')
@@ -1009,9 +1011,10 @@ function render() {
   $('#screen-review').classList.toggle('l0-mode', state.view === 'l0');
 
   renderGateBadge();
-  if (state.view !== 'l0') buildToc();
+  if (state.view !== 'l0' && state.view !== 'l1') buildToc();
 
   if (state.view === 'l0') viewL0();
+  else if (state.view === 'l1') viewL1();
   else if (state.view === 'overview') viewOverview();
   else viewDecisions();
 }
@@ -1032,6 +1035,7 @@ function viewL0() {
     view: state.l0View || 'reading',
     // provenance → 打开右侧 Source 面板的对应章节（复用现有原文回查能力）
     onSourceRef: (ref) => { openSource(ref); },
+    onTopic: (id) => { state.l1Topic = state.l1Topics[id]; state.view = 'l1'; render(); },
   });
   // Reading / Review 切换后保持视图状态（不重新计算任何数据）
   host.querySelectorAll('[data-l0-view]').forEach((btn) => {
@@ -1041,6 +1045,14 @@ function viewL0() {
       if (root) root.setAttribute('data-view', state.l0View);
     });
   });
+}
+
+function viewL1() {
+  const topic = state.l1Topic;
+  if (!topic) { $('#main').innerHTML = '<div class="l0-empty">未选择 Topic。</div>'; return; }
+  const relationRows = topic.relations.map((r) => `<li data-l1-role="${r.role}">${r.from} —${r.type}→ ${r.to} (${r.role})</li>`).join('') || '<li>无可绘制关系；这是 Topic boundary summary。</li>';
+  $('#main').innerHTML = `<section class="block" data-l1-topic="${topic.topic.id}"><button class="btn" id="l1-back">返回 L0</button><h2>${topic.topic.title}</h2><p>${topic.topic.proposition}</p><h3>成员</h3><ul>${topic.inside.map((e) => `<li>${e.label}</li>`).join('') || '<li>无成员</li>'}</ul><h3>边界关系</h3><ul>${relationRows}</ul><p data-block-organization="${topic.blockOrganization.state}">Block Organization: ${topic.blockOrganization.state}</p></section>`;
+  $('#l1-back').addEventListener('click', () => { state.view = 'l0'; render(); });
 }
 
 /**
@@ -1061,6 +1073,7 @@ async function loadL0(mapPath) {
     return null;
   }
   state.l0ViewModel = res.viewModel;
+  state.l1Topics = res.l1Topics;
   state.l0Path = res.mapPath;
   state.l0View = 'reading'; // 用户裁决：Reading 为默认
   if ($('#l0-info')) $('#l0-info').textContent = `已加载：${res.mapPath}${res.checkMapPath ? '（含 check-map 结论）' : ''}`;

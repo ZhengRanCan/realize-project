@@ -554,6 +554,7 @@ function bindInteractions(root, opts = {}) {
     if (edgeEl) { ev.preventDefault(); focusEdge(edgeEl); return; }
     const topicRow = ev.target.closest('[data-topic-focus]');
     if (topicRow && !ev.target.closest('[data-focus-target][data-element-id]')) {
+      if (opts.onTopic) { ev.preventDefault(); opts.onTopic(topicRow.dataset.topicFocus); return; }
       if (!inSummary) ev.preventDefault();
       focusTopic(topicRow);
       return;

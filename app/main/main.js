@@ -19,6 +19,7 @@ const { validate } = require('../shared/schema-validator');
 const { semanticCheck } = require('../shared/review-model');
 const semantics = require('../shared/semantics');
 const { projectL2Overview } = require('../shared/reading-projection');
+const { projectTopic } = require('../shared/l1-topic-projection');
 const { evaluateGate, buildHumanReviewSkeleton } = semantics;
 
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
@@ -181,7 +182,8 @@ async function loadFrameworkMap(mapPath) {
     checkMapText,
     knownRoles: schema.$defs.element.properties.role['x-known-roles'],
   });
-  return { ok: true, mapPath: p, checkMapPath: checkMapText ? siblingCheck : null, viewModel };
+  const l1Topics = Object.fromEntries(map.topics.map((topic) => [topic.id, projectTopic(map, topic.id)]));
+  return { ok: true, mapPath: p, checkMapPath: checkMapText ? siblingCheck : null, viewModel, l1Topics };
 }
 
 function registerIpc() {  ipcMain.handle('app:paths', () => ({
@@ -600,6 +602,18 @@ async function runSelfTest() {
             state.model = savedModel;
             return blocked;
           })();
+          // F17：从真实 L0 Topic 入口进入 L1，不能把 Topic 当作 L0 子图裁剪。
+          const topicEntry = document.querySelector('.topic-entry');
+          topicEntry?.querySelector('summary')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          out.l1 = {
+            view: state.view,
+            topic: document.querySelector('[data-l1-topic]')?.getAttribute('data-l1-topic'),
+            members: document.querySelectorAll('[data-l1-topic] h3 + ul li').length,
+            relationRoles: [...document.querySelectorAll('[data-l1-role]')].map((n) => n.getAttribute('data-l1-role')),
+            blockState: document.querySelector('[data-block-organization]')?.getAttribute('data-block-organization'),
+          };
+          document.getElementById('l1-back')?.click();
+          out.l1Back = state.view === 'l0' && !!document.querySelector('.l0-root');
           // ⑥ 复原，保证后续断言仍在 overview 视图
           state.view = 'overview';
           state.l0ViewModel = null;
@@ -621,6 +635,8 @@ async function runSelfTest() {
         else fail('L0 集成：真实入口把 S1 的 Unknown / Known(0) 合并了');
         if (seam.preloadOk) ok('L0 集成：preload API → IPC → main.loadFrameworkMap 链路可用（走真实入口 loadL0(path)）');
         else fail('L0 集成：preload/IPC 链路不可用');
+        if (seam.l1 && seam.l1.view === 'l1' && seam.l1.topic && seam.l1.members >= 0 && seam.l1Back) ok(`L1 集成：真实 Topic 点击进入边界视图（${seam.l1.topic}，relations=${seam.l1.relationRoles.length}，block=${seam.l1.blockState}）并可返回 L0`);
+        else fail(`L1 Topic 入口异常: ${JSON.stringify(seam.l1)}`);
         if (seam.reviewVisible && seam.startHidden && seam.view === 'l0') {
           ok('L0 集成：加载后真的切屏了（首屏隐藏 → Review 屏显示，view=l0）');
         } else {

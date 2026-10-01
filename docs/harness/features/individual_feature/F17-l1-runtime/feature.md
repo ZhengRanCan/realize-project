@@ -2,10 +2,10 @@
 id: F17
 title: L1 Topic Runtime
 version: v0.1
-status: not_started
+status: passing
 dependsOn: []
-scope: {"code":["app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F17-l1-runtime/**","docs/progress.md"]}
-evidence: {"lastVerifiedAt":"2026-10-01","commands":[],"manualSmoke":""}
+scope: {"code":["app/shared/l1-topic-projection.js","app/renderer/l0-map.js","app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-l1-topic-projection.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F17-l1-runtime/**","docs/progress.md"]}
+evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"node scripts/test-l1-topic-projection.js","result":"passed","output":"9 assertions passed"},{"command":"npm run selftest","result":"passed","output":"Topic to L1 to Back passed"}],"manualSmoke":"Electron selftest passed."}
 completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中进入一个 Topic：确认看到的是它的语义边界（成员 / 内部关系 / 穿越边界的关系），而不是 Topic 内部被裁出来的 L0 子图"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
@@ -54,18 +54,18 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 
 ## Acceptance Criteria
 
-- [ ] membership 由 `element.topics` 反向推导；**一个 element 属于多个 Topic 合法**，不得强制单一 owner。
-- [ ] 边界分类是**纯集合运算**：Internal / Crossing / External；只有 relation contract 明确有方向语义时
+- [x] membership 由 `element.topics` 反向推导；**一个 element 属于多个 Topic 合法**，不得强制单一 owner。
+- [x] 边界分类是**纯集合运算**：Internal / Crossing / External；只有 relation contract 明确有方向语义时
       才拆 Inbound / Outbound；`relates-to` **不得**被方向化。
-- [ ] `Inside(T) = ∅` 是合法 `Known(0)`：不得解释为"Topic 无效"，也不得从 crossing edge 自动补元素。
-- [ ] Block Organization 三态（`Unknown` / `Known(0)` / `Known(n)`）**不得合并**；
+- [x] `Inside(T) = ∅` 是合法 `Known(0)`：不得解释为"Topic 无效"，也不得从 crossing edge 自动补元素。
+- [x] Block Organization 三态（`Unknown` / `Known(0)` / `Known(n)`）**不得合并**；
       Unknown 与 Known(0) 的用户结果都是"没有 Block 入口"，但**不得合并成同一句话**。
-- [ ] 为空的 boundary relation class 保持空语义，但**不要求为它绘制空画布**（knowledge state ≠ visual footprint）。
-- [ ] **内部关系为空时不得伪造**（实测 D 的 21 个 Topic 里 16 个 internal = 0）。
-- [ ] 退化规则成立：无任何可绘制 relation 时，L1 退化为 Topic boundary summary ——
+- [x] 为空的 boundary relation class 保持空语义，但**不要求为它绘制空画布**（knowledge state ≠ visual footprint）。
+- [x] **内部关系为空时不得伪造**（实测 D 的 21 个 Topic 里 16 个 internal = 0）。
+- [x] 退化规则成立：无任何可绘制 relation 时，L1 退化为 Topic boundary summary ——
       改变 representation，**不改变 L1 identity**，也不表示数据缺失。
-- [ ] §6 矩阵对应 cell 更新。
-- [ ] 独立审查记录已写入 artifact 目录。
+- [x] §6 矩阵对应 cell 更新。
+- [x] 独立审查记录已写入 artifact 目录。
 
 ## Risks and compatibility
 
