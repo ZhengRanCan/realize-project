@@ -20,6 +20,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { buildOne, SET } = require('./build-l0-preview.js');
+const { buildL0ViewModel } = require('./l0-view-model.js');
+const { renderL0MapHTML } = require('../app/renderer/l0-map.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const results = [];
@@ -317,6 +319,20 @@ check('无 element 的 Topic 仍是导航入口（页面上有标注）', () => 
   const b = byName('d');
   if (!b.r.facts.topicsWithoutElements.length) return '样本没有无 element topic';
   return b.html.includes('无 L0 element —— 仍是导航入口') ? true : '未标注';
+});
+check('S1：Topic 导航为 Unknown 与 Known(0) 输出不同的结构状态', () => {
+  const map = {
+    mapVersion: 'test', level: 'L0', document: { id: 's1-preview', title: 'S1 preview' },
+    elements: [], edges: [], attachments: [], relationGap: [],
+    topics: [
+      { id: 'unknown', title: 'Unknown', proposition: 'absent' },
+      { id: 'empty', title: 'Empty', proposition: 'known empty', blockIds: [] },
+    ],
+  };
+  const html = renderL0MapHTML(buildL0ViewModel(map), { view: 'reading' });
+  const unknown = (html.match(/data-block-ids-state="unknown"/g) || []).length;
+  const empty = (html.match(/data-block-ids-state="empty"/g) || []).length;
+  return unknown === 1 && empty === 1 ? true : `unknown=${unknown} empty=${empty}`;
 });
 check('约束被降级为角标，但仍在页面上可点', () => {
   const b = byName('d');

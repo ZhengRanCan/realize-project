@@ -385,11 +385,14 @@ function renderReviewBoard(vm, layout) {
  * Topic Navigation（Phase 4.1：默认只显示轻量入口，details 按需展开）
  * ------------------------------------------------------------------ */
 function renderTopicEntry(t) {
-  const blockStatus = Object.prototype.hasOwnProperty.call(t, 'blockIds')
-    ? (t.blockIds.length ? `· L2 blocks: ${esc(t.blockIds.join(', '))}` : '· L2 blocks: none')
-    : '· L2 blocks: unknown';
+  const blockIdsState = Object.prototype.hasOwnProperty.call(t, 'blockIds')
+    ? (t.blockIds.length ? 'known' : 'empty')
+    : 'unknown';
+  const blockStatus = blockIdsState === 'known'
+    ? `· L2 blocks: ${esc(t.blockIds.join(', '))}`
+    : `· L2 blocks: ${blockIdsState === 'empty' ? 'none' : 'unknown'}`;
   return `
-<li class="topic-entry ${t.hasElements ? '' : 'no-element'}" id="topic-${esc(t.id)}" data-topic-id="${esc(t.id)}" data-topic-focus="${esc(t.id)}" data-element-ids="${esc(t.elementIds.join(','))}">
+<li class="topic-entry ${t.hasElements ? '' : 'no-element'}" id="topic-${esc(t.id)}" data-topic-id="${esc(t.id)}" data-topic-focus="${esc(t.id)}" data-element-ids="${esc(t.elementIds.join(','))}" data-block-ids-state="${blockIdsState}">
   <details class="topic-fold">
     <summary class="topic-head">
       <span class="eid">${esc(t.id)}</span>

@@ -11,9 +11,9 @@
 
 ## Manual paths
 
-- [ ] 在 Electron 中加载 `experiments/semantic-grounding/fixture-d/run-04/framework-map.json`
+- [x] 在 Electron 中加载 `experiments/semantic-grounding/fixture-d/run-04/framework-map.json`
       （`blockIds` absent）与一份 `blockIds: []` 的 map，确认界面没有把两者渲染成同一种说法。
-- [ ] 确认没有用户可见的回归：点选 / 高光 / 约束角标 / 预览仍与修改前一致。
+- [x] 确认没有用户可见的回归：点选 / 高光 / 约束角标 / 预览仍与修改前一致。
 
 ## Passing evidence
 

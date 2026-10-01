@@ -2,11 +2,11 @@
 id: F12
 title: S1 Epistemic Collapse Regression
 version: v0.1
-status: active
+status: passing
 dependsOn: []
-scope: {"code":["scripts/l0-view-model.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-view-model.js","scripts/test-l0-preview.js"],"docs":["docs/log/artifacts/F12-s1-epistemic-collapse/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md"]}
-evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中运行 npm run selftest，确认新增的三态断言通过（blockIds 的 Unknown / Known(0) / Known(n) 经 preload → IPC → main → view model 后仍可区分）","加载 experiments/semantic-grounding/fixture-d/run-04 的 map 与一份 blockIds: [] 的 map，确认界面没有任何地方把两者的差别渲染成同一种说法"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
+scope: {"code":["scripts/l0-view-model.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-view-model.js","scripts/test-l0-preview.js"],"docs":["docs/log/artifacts/F12-s1-epistemic-collapse/**","docs/specs/reading-view-cognitive-contract.md","docs/progress.md","docs/harness/features/individual_feature/F12-s1-epistemic-collapse/verification.md"]}
+evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"npm run test:all","result":"passed","output":"22 + 31 + 29 + 33 + 48 + 35 + 42 + 131"},{"command":"npm run selftest","result":"passed","output":"真实 preload → IPC → main → view model 三态断言通过；点选/高光/角标/预览回归通过"},{"command":"npm run verify:harness && npm run check:docs","result":"passed","output":"20 features, 0 errors; 110 markdown files checked, 0 broken"}],"manualSmoke":"用户授权 Codex 审查验收；真实 Electron 自测覆盖两份 map 的入口加载及既有交互回归"}
+completionGate: {"version":"v0.1","l3":"required","userPath":["用户授权 Codex 完成 F12 审查验收；Unknown 与 Known(0) 在真实入口和 Topic DOM 中保持可区分"],"integrationEvidence":["npm run selftest 2026-10-01：真实 preload → IPC → main → view model 三态断言通过"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F12 S1 Epistemic Collapse Regression
@@ -55,15 +55,15 @@ scripts/l0-view-model.js:109
 
 ## Acceptance Criteria
 
-- [ ] **先写会失败的测试**：断言当前实现下 `blockIds` absent 与 `[]` 经投影后不可区分，确认失败。
-- [ ] 投影输出保留三态且互不相等；断言是**结构级**（状态或 shape 不同），
+- [x] **先写会失败的测试**：断言当前实现下 `blockIds` absent 与 `[]` 经投影后不可区分，确认失败。
+- [x] 投影输出保留三态且互不相等；断言是**结构级**（状态或 shape 不同），
       **不是** `result.length` 或字符串断言（后者会再次把 Unknown 与 empty 折叠掉）。
-- [ ] 最小修改后：新断言通过，且 `test-l0-view-model`（34）、`test-l0-layout`（42）、
-      `test-l0-preview`（130）、`npm run selftest`（13 条 L0）全部继续通过。
-- [ ] epistemic-collapse 扫描的**每个站点都有判定**，含明确写下的"合法 fallback，不改"结论。
-- [ ] 契约 §6 矩阵 S1 行的 cell 更新（`Protection coverage` 与 `Projection test`），
+- [x] 最小修改后：新断言通过，且 `test-l0-view-model`（35）、`test-l0-layout`（42）、
+      `test-l0-preview`（131）、`npm run selftest` 全部继续通过。
+- [x] epistemic-collapse 扫描的**每个站点都有判定**，含明确写下的"合法 fallback，不改"结论。
+- [x] 契约 §6 矩阵 S1 行的 cell 更新（`Protection coverage` 与 `Projection test`），
       Priority 按判据重算，**不做整行搬迁**。
-- [ ] 独立审查记录已写入 artifact 目录。
+- [x] 独立审查记录已写入 artifact 目录。
 
 ## Risks and compatibility
 

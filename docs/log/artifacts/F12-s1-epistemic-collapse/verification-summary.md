@@ -1,6 +1,6 @@
 # F12 Verification Summary — S1 Epistemic Collapse Regression
 
-状态：**进行中**（`active`）。
+状态：**已通过**（`passing`）。
 
 ## 将要记录的内容
 
@@ -28,7 +28,7 @@ View Model 回归: 34/35 通过（覆盖 28 份 map）
 
 ```text
 $ npm run test:all
-22 + 31 + 29 + 33 + 48 + 35 + 42 + 130 通过；Doc links: 109 markdown files checked, 0 broken.
+22 + 31 + 29 + 33 + 48 + 35 + 42 + 131 通过；Doc links: 110 markdown files checked, 0 broken.
 
 $ npm run selftest
 ✓ L0 集成：S1 保留 topic.blockIds 的 Unknown 与 Known(0) 两种 shape
@@ -57,6 +57,21 @@ F11 的 269 个站点逐项判定仍为本 feature 的基线。唯一需要修�
 
 - 之前：`None` / `High`，且记录了运行中的 `blockIds || []` 违反。
 - 现在：`Partial` / `Medium`；该 projection 出口被结构测试与 Electron selftest 保护，完整五态状态空间留给 F13/B1。
+
+## 2026-10-01 审查验收
+
+用户授权 Codex 完成审查验收。审查首先发现 Known(0) 分支曾只直调 view model，未覆盖
+preload / IPC；已改为使用临时 map 经 `window.designReview.l0.loadPath` 走真实链路，随后再走一次
+`loadL0` 保留既有交互验收。临时 map 在 selftest 中删除。
+
+最终 Electron 输出确认：
+
+```text
+✓ L0 集成：真实 preload → IPC → main → view model 链路保留 S1 的 Unknown 与 Known(0) shape
+✓ L0 集成：点 Reading 节点 → 只高光相关项（命中 13 处 · 含 2 条线），其余不压暗（dim=0）
+✓ L0 集成：点约束 → 角标自身有高光 + 2 个宿主一起点亮（不压暗任何东西）
+SELFTEST PASSED
+```
 
 ## 已知起点（F11 之前已实测）
 

@@ -72,7 +72,7 @@
   {
     "id": "F12",
     "title": "S1 Epistemic Collapse Regression",
-    "status": "active",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F12-s1-epistemic-collapse",
     "version": "v0.1"
   },
