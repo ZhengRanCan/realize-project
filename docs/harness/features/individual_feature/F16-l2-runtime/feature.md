@@ -2,7 +2,7 @@
 id: F16
 title: L2 Block Runtime (first product adoption)
 version: v0.1
-status: not_started
+status: active
 dependsOn: []
 scope: {"code":["app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F16-l2-runtime/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
