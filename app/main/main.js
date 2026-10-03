@@ -160,7 +160,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 960,
-    minWidth: 1024,
+    minWidth: 640,
     minHeight: 720,
     backgroundColor: '#12161c',
     title: 'Design Review',
@@ -1204,6 +1204,7 @@ async function runSelfTest() {
     ok(await require('../../scripts/test-reading-bundle-electron').runBundleIntegration(win));
     ok(await require('../../scripts/test-reading-navigation-electron').runNavigationIntegration(win));
     ok(await require('../../scripts/test-explore-electron').runExploreIntegration(win));
+    ok(await require('../../scripts/test-product-maturity-electron').runMaturityIntegration(win));
 
     emit();
     const failedCount = report.filter((line) => line.startsWith('✗')).length;
@@ -1270,6 +1271,8 @@ async function runVerifyPreview(filePath) {
         ok(await require('../../scripts/test-reading-navigation-electron').exerciseNavigation(win));
         await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
         ok(await require('../../scripts/test-explore-electron').exerciseExplore(win));
+        await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
+        ok(await require('../../scripts/test-product-maturity-electron').exerciseMaturity(win));
       } else {
         const nav=await win.webContents.executeJavaScript("(()=>{window.__closeInspection();const n=window.__readingNavigation;const origin=n.snapshot().current;const calls=n.snapshot().resolverCalls;n.resolve({kind:'block',id:'O-01'});n.back();return n.snapshot().resolverCalls===calls+1&&JSON.stringify(origin.address)===JSON.stringify(n.snapshot().current.address);})()");
         if(!nav)throw new Error('Preview Back/Resolve');ok('Preview no-map canonical Block and Back isolation');

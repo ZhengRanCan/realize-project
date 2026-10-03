@@ -473,7 +473,8 @@ Priority = High | Medium | Low
 | S7 状态须有可区分编码 | — | — | — | None | Medium |
 | S8 / S9 派生与漂移 | — | ✅ partial（资料包文件哈希、registry 重建和 Generated 的 Plan fingerprint；运行时 source 漂移降级） | ✅ partial（搬迁、错误配对与漂移；coverage 只作本次派生） | Partial | Medium |
 | N1 / N2 / N3 | — | — | — | None | Medium |
-| N4 / N5 | — | — | — | None | Medium |
+| N4 | — | — | — | None | Medium |
+| N5 crossing ⇏ direction | — | — | ✅ partial（L1集合分类、Reading SVG/文本与Explore无方向关系回归） | Partial | Medium |
 | N6 坐标重叠 ⇏ 语义关系 | — | — | ✅ partial（F14 exact-containment 对抗测试） | Partial | Medium |
 | N7 source-verified ⇏ verified | — | — | ✅ partial（F14 evidence-level 对抗测试） | Partial | Medium |
 | N8 approved/reviewed/PASS ⇏ verified | — | — | ✅ partial（F14 独立状态汇总对抗测试） | Partial | Medium |
@@ -491,6 +492,7 @@ Priority = High | Medium | Low
   投影与对抗测试覆盖 identity、authority、能力缺失及禁止跨链语义升级；范围以表中 partial cell 为限。
 - 资料包会检查配对与原文坐标一致性；这不提供历史版本追踪，也不构成 provenance assurance 或 claim verification。
 - canonical Element/Block resolver 与 occurrence-aware Back 已有共享模块及真实 Electron / Preview 保护；Explore 的 typed Focus准入、声明关系及共享Back/Resolve已有纯投影和真实产品路径保护；durable fragment identity仍不在当前边界。各次实现的过程和命令结果仅记录在 feature artifacts。
+- F21 对原生键盘、输入保护、焦点恢复、窄窗口披露及公开有限压力输入建立产品回归；性能预算只描述本机测量，不保证无界输入或主观阅读体验。
 
 ---
 

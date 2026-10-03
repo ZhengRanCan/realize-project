@@ -706,3 +706,40 @@ table.matrix .rowhead { background: var(--bg-2); }
 .explore-neighbors.direction-self,.explore-neighbors.direction-undirected,.explore-neighbors.direction-membership { grid-column:1 / -1; }
 .explore-relation { border:1px solid var(--line);padding:12px;margin-bottom:10px;border-radius:8px;overflow-wrap:anywhere; }
 .explore-view pre { white-space:pre-wrap;overflow-wrap:anywhere; }
+
+/* F21: shared tools, keyboard focus and recoverable narrow-window disclosure. */
+:focus-visible { outline:3px solid var(--accent);outline-offset:3px; }
+.topbar { flex-wrap:wrap;gap:12px; }
+.topbar-left,.topbar-right { min-width:0; }
+.topbar-right { flex-wrap:wrap; }
+.doc-title,.doc-meta { overflow-wrap:anywhere; }
+.reading-tools { padding:8px 24px;border-bottom:1px solid var(--line); }
+.explore-entry { display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:6px 0;border:0; }
+.explore-entry label,.explore-entry select,.explore-entry p { margin:0; }
+.explore-entry select { width:auto;flex:1;min-width:160px; }
+.explore-entry p { flex-basis:100%; }
+#reading-location { color:var(--fg-dim);font-size:12px; }
+.source-pane { min-height:0; }
+.source-head { flex-shrink:0; }
+.source-head-inner { min-width:0;overflow-wrap:anywhere; }
+.source-text { overflow:auto; }
+@media(max-width:900px) {
+ .topbar { padding:12px; }
+ .topbar-left,.topbar-right { width:100%; }
+ .view-switch { flex-wrap:wrap; }
+ .reading-tools { padding:6px 12px; }
+ .doc-meta .mono { overflow-wrap:anywhere; }
+ .toc-pane { width:160px; }
+ .main { padding:12px; }
+ #screen-review.with-source .source-pane { position:fixed;z-index:20;right:8px;top:12px;bottom:12px;width:min(460px,calc(100vw - 24px));box-shadow:0 4px 24px #0004; }
+ .explore-graph { grid-template-columns:minmax(0,1fr); }
+ .explore-graph > * { grid-column:1 !important;grid-row:auto !important; }
+ .card-grid,.lane-grid,.cl-grid,.combo-row,.diff,.gap-diff { grid-template-columns:minmax(0,1fr); }
+ .rung { grid-template-columns:1fr; }
+ .start-card { max-width:100%; }
+ #screen-start { padding:12px; }
+}
+
+.doc-meta { flex-wrap:wrap; }
+
+#screen-review[data-view="explore"] .toc-pane,#screen-review[data-view="l1"] .toc-pane { display:none; }

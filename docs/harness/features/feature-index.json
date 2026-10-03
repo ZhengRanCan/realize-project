@@ -135,7 +135,7 @@
   {
     "id": "F21",
     "title": "Product Maturity (UX, performance, accessibility)",
-    "status": "not_started",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F21-product-maturity",
     "version": "v0.1"
   },

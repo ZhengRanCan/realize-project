@@ -82,6 +82,7 @@ const state = {
   focusedDecisionId: null,
   onlyPending: false,
   /** 原文回查面板 */
+  sourceReturnFocus: null,
   source: { loaded: false, document: null, sections: [], labels: [], error: null },
   activeBlockId: null,
   dirty: false,
@@ -106,6 +107,7 @@ function el(tag, className, text) {
 }
 
 function clear(node) {
+  node.__l0Abort?.abort();
   while (node.firstChild) node.removeChild(node.firstChild);
   return node;
 }
@@ -129,6 +131,7 @@ function toast(message, isError) {
   const existing = document.querySelector('.toast');
   if (existing) existing.remove();
   const node = el('div', `toast${isError ? ' error' : ''}`, message);
+  node.setAttribute('role',isError?'alert':'status');node.setAttribute('aria-live',isError?'assertive':'polite');
   document.body.appendChild(node);
   if (state.toastTimer) clearTimeout(state.toastTimer);
   state.toastTimer = setTimeout(() => node.remove(), 3600);
@@ -560,23 +563,25 @@ async function ensureSourceLoaded() {
 }
 
 async function openSource(label,{namespace='plan-section',key=label}={}) {
+  const returnFocus=domLocation(document.activeElement);
   const request=++state.inspectionRequest;
   if(state.sessionToken) {
     const token=state.sessionToken,result=await api.bundle.source({sessionToken:token,namespace,key});
     if(token!==state.sessionToken || request!==state.inspectionRequest) return;
-    closeInspection(false);const body=clear($('#source-body'));clear($('#source-head')).textContent=label;
+    closeInspection(false);state.sourceReturnFocus=returnFocus;const body=clear($('#source-body'));clear($('#source-head')).textContent=label;
     $('#source-panel').classList.remove('hidden');$('#screen-review').classList.add('with-source');
-    showCoordinate(body,result.coordinate||{state:'unavailable',reason:(result.errors||[]).join('; ')});return;
+    showCoordinate(body,result.coordinate||{state:'unavailable',reason:(result.errors||[]).join('; ')});$('#source-close').focus({preventScroll:true});return;
   }
   await ensureSourceLoaded();
   if(request!==state.inspectionRequest) return;
-  renderSourcePanel(label);
+  state.sourceReturnFocus=returnFocus;renderSourcePanel(label);$('#source-close').focus({preventScroll:true});
 }
 
-function closeSource() {
+function closeSource(restoreFocus=false) {
   state.inspectionRequest++;
   $('#source-panel').classList.add('hidden');
   $('#screen-review').classList.remove('with-source');
+  if(restoreFocus)locateDOM(state.sourceReturnFocus)?.focus({preventScroll:true});state.sourceReturnFocus=null;
 }
 
 function renderSourcePanel(label) {
@@ -1028,7 +1033,7 @@ function render() {
     : state.model.design.title;
   $('#design-id').textContent = state.model ? state.model.design.id : 'L0';
   $('#design-status').textContent = state.model ? state.model.design.status : '';
-  $('#model-path').textContent = (state.view === 'l0') ? (state.l0Path || '') : (state.modelPath || '');
+  $('#model-path').textContent = (state.view === 'l0') ? (state.bundleInfo?.manifestPath || state.l0Path || '') : (state.modelPath || '');
   $('#nav-decision-count').textContent = summary ? `待决定 ${summary.decisions.counts.pending}/${summary.decisions.total}` : '';
   if ($('#nav-l0-state')) {
     $('#nav-l0-state').textContent = state.l0ViewModel
@@ -1050,7 +1055,7 @@ function render() {
   else if (state.view === 'overview') viewOverview();
   else if (state.view === 'explore') viewExplore();
   else viewDecisions();
-  updateExploreEntry();
+  updateExploreEntry();updateNavigationControls();
 }
 
 /* ================================================================== *
@@ -1088,7 +1093,7 @@ function viewL1() {
  const back=el('button','btn','返回');back.id='l1-back';back.addEventListener('click',()=>navigation.back());wrap.append(back,el('h2','',topic.topic.title),el('p','',topic.topic.proposition));
  wrap.append(el('h3','','成员'));for(const member of topic.inside)wrap.append(el('p','',member.label));
  wrap.append(el('h3','','边界关系'));if(!topic.relations.length)wrap.append(el('p','','无可绘制关系；这是 Topic boundary summary。'));
- for(const relation of topic.relations){const row=el('p','',relation.from+' —'+relation.type+'→ '+relation.to+' ('+relation.role+')');row.dataset.l1Role=relation.role;wrap.append(row);}
+ for(const relation of topic.relations){const row=el('p','',relation.from+' —'+relation.type+(relation.type==='relates-to'?'— ':'→ ')+relation.to+' ('+relation.role+')');row.dataset.l1Role=relation.role;wrap.append(row);}
  const organization=el('p','',topic.blockOrganization.state==='unknown'?'尚未声明区块关联。':topic.blockOrganization.state==='empty'?'已明确没有关联区块。':'相关解释区块');organization.dataset.blockOrganization=topic.blockOrganization.state;wrap.append(organization);
  for(const entry of topic.blockEntries||[]) {const button=el('button','btn',entry.id+' · '+entry.title);button.dataset.l1Block=entry.id;button.addEventListener('click',()=>navigation.enter({type:'block',id:entry.id,topicId:topic.topic.id}));wrap.append(button);}
  host.append(wrap);
@@ -1171,7 +1176,7 @@ function applyLoadResult(result) {
   state.inspectionRequest++;state.inspectionOrigin=null;
   state.sessionToken=result.sessionToken||null;state.bundleInfo=result.bundleInfo||null;
   state.source={loaded:false,document:null,sections:[],labels:[],error:null};
-  state.l0ViewModel=result.l0ViewModel||null;state.l1Topics=result.l1Topics||null;state.l1Topic=null;
+  state.l0Path=null;state.l0ViewModel=result.l0ViewModel||null;state.l1Topics=result.l1Topics||null;state.l1Topic=null;
   state.model = result.model;
   state.l2ViewModel = result.l2ViewModel;
   state.humanReview = result.humanReview;
@@ -1301,7 +1306,7 @@ function bindReviewScreen() {
     }
   });
 
-  $('#source-close').addEventListener('click',()=>state.inspectionOrigin?closeInspection():closeSource());
+  $('#source-close').addEventListener('click',()=>state.inspectionOrigin?closeInspection():closeSource(true));
 
   $('#btn-save').addEventListener('click', async () => {
     const token=state.sessionToken,model=state.model;
@@ -1341,15 +1346,15 @@ function bindReviewScreen() {
   });
 
   document.addEventListener('keydown', (event) => {
-    if(event.key==='Escape' && state.inspectionOrigin){event.preventDefault();closeInspection();return;}
     if ($('#screen-review').classList.contains('hidden')) return;
-    const tag = (event.target && event.target.tagName) || '';
-    if (tag === 'TEXTAREA' || tag === 'INPUT') return;
-    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if(event.isComposing || event.ctrlKey || event.metaKey || event.altKey || event.target?.closest('input,textarea,select,[contenteditable]'))return;
     const key = event.key.toLowerCase();
     if (key === 'escape') {
-      closeSource();
-      return;
+      if(state.inspectionOrigin)closeInspection();
+      else if(!$('#source-panel').classList.contains('hidden'))closeSource(true);
+      else if(state.view==='explore')navigation.back(true);
+      else if(navigation.size)navigation.back();
+      event.preventDefault();return;
     }
     if (key === 'g' || key === 'd') {
       // 与导航同一守卫：L0 可以独立打开，另外两页需要 design-review.json
@@ -1476,7 +1481,12 @@ function captureReadingFrame(){
   focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
  return {address,context};
 }
-function updateNavigationControls(){for(const back of document.querySelectorAll('#reading-back,#l1-back'))back.hidden=!navigation.size;}
+function updateNavigationControls(){
+ for(const back of document.querySelectorAll('#reading-back,#l1-back'))back.hidden=!navigation.size;
+ const node=document.getElementById('reading-location');if(!node)return;
+ const label=state.inspectionSubject?'出处 · '+state.inspectionSubject.blockId:state.view==='explore'?'探索关系 · '+state.focusRef?.id:state.view==='l1'?'主题 · '+state.l1Topic?.topic.title:state.view==='l0'?'框架图':state.view==='decisions'?'决策清单':'解释区块'+(state.readingBlockId?' · '+state.readingBlockId:'');
+ if(node.textContent!==label)node.textContent=label;
+}
 function showReadingAction(action){
  if(action.type==='explore'){
   const vm=state.exploreProjection?.project(action.ref);if(!vm?.ok)return vm||{ok:false,reason:'no-map'};

@@ -3,9 +3,9 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: none；F20完成，继续F21。
-- Next queued feature: **F20 Explore v1**，随后 F21；用户授权按顺序补齐合同并完成。
-- Latest completed feature: `F22` Entry and Repository Layout（2026-10-03）；首页、目录迁移、真实路径与独立审查通过。
+- Active feature: **F15 遗留集成验收收口**（F19–F21 已完成）。
+- Next queued feature: 无；核对 F11–F21 的遗留验收记录后推送开发分支。
+- Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
 - Git strategy: 用户确认 F22 完成；本轮提交并推送到 `codex/f11-f21-conformance`，F11–F21 全部完成并通过验收后再合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
@@ -35,7 +35,7 @@
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
 | F19 | Reading Navigation and Resolver | `passing` | 统一导航/定位、真实逐层返回、便携Preview与独立审查通过；Explore组合路径由F20验证 |
 | F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
-| F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
+| F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 
 ### 阶段划分（2026-09-29 登记）
@@ -48,7 +48,7 @@ Phase D  Product Maturity           是否好用、快、清晰、可维护？  
 ```
 
 **Phase B 的 F18 路径已接入。** 资料包明确消费 Plan + Generated，首屏为框架图；
-L3 保持两条独立核查路径，缺失与漂移明确降级。完整 Back / Resolve 与 Explore 仍属后续范围。
+L3 保持两条独立核查路径，缺失与漂移明确降级。F19/F20 已补齐共享 Back / Resolve 与 Explore；F21 的键盘、窄窗口和性能验收通过。
 
 ### Reading v1 的完成判据（不是 B2 全绿）
 
@@ -289,3 +289,7 @@ Source-verified Evidence
 
 - [F20 verification](log/artifacts/F20-explore-v1/verification-summary.md)：真实Explore组合路径已建立，四层原现场恢复；2项P2修正后无剩余P1/P2。
 - 继续F21的有限成熟度收口；不冒称F08历史Track A手工验收已完成。
+
+## F21 Shared changes
+
+- renderer键盘/live/响应式最小变化和N5无方向交付修正；纯输入/validator口径不改。真实键盘、压力/性能、15轮循环与portablePreview验证。

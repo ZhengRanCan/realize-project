@@ -75,9 +75,10 @@ for (const item of SET) {
     const n = countOf(reading, '<path class="l0-edge');
     return n === (map.edges || []).length || `线 ${n} ≠ edge ${(map.edges || []).length}`;
   });
-  check(`${item.name}：每条线都有方向箭头（方向是画出来的）`, () => {
+  check(`${item.name}：有向关系带箭头，relates-to不获得方向`, () => {
     const n = countOf(reading, 'marker-end="url(#l0-arrow)"');
-    return n === (map.edges || []).length || `箭头 ${n} ≠ edge ${(map.edges || []).length}`;
+    const directional=(map.edges||[]).filter(e=>e.type!=='relates-to').length;
+    return n === directional || `箭头 ${n} ≠ 有向edge ${directional}`;
   });
   check(`${item.name}：每条线都有 relation 类型标签`, () => {
     const n = countOf(reading, 'class="l0-edge-label"');

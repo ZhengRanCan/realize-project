@@ -54,3 +54,7 @@ Topic/SU/Review/Evidence/fragment 不新增 canonical landing；资料切换成�
 ## Explore v1 interaction
 
 Reading各层可显式选择Map Element/Topic探索关系，图只展示已声明邻接。返回阅读恢复原现场；在阅读中打开Element走统一resolver，Topic无canonical landing时明确不可用。attachment-only constraint作为注释，不能成为Focus。
+
+## F21 maturity interaction
+
+工具行提供显式Explore入口与live阅读位置；顶部导航继续复用原页面。Map节点完整accessible name与选中状态，键盘披露不依赖hover。Escape只处理当前顶层，编辑/选择/IME/修饰键受保护。640×720窄窗口允许图独立滚动，Source可关闭恢复；不隐藏语义。relates-to在所有读法都无方向。焦点可见并随Back恢复，性能预算与证据在F21合同。

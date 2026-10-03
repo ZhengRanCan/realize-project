@@ -59,16 +59,11 @@
         </div>
       </div>
       <div class="topbar-right">
-        <nav class="view-switch">
+        <nav class="view-switch" aria-label="阅读视图">
           <button class="nav-item active" data-view="overview">方案总览</button>
           <button class="nav-item" data-view="decisions">决策清单 <span id="nav-decision-count" class="nav-count"></span></button>
           <button class="nav-item" data-view="l0">L0 框架图 <span id="nav-l0-state" class="nav-count"></span></button>
-          <div class="explore-entry" id="explore-entry">
-            <label for="explore-entity">探索对象</label>
-            <select id="explore-entity" aria-describedby="explore-availability"></select>
-            <button id="btn-explore" class="btn">探索关系</button>
-            <p id="explore-availability" class="muted small"></p>
-          </div>
+
         </nav>
         <div id="gate-badge" class="gate-badge pending">—</div>
         <button id="btn-save" class="btn primary">保存 human-review.json</button>
@@ -77,22 +72,32 @@
       </div>
     </header>
 
+    <div class="reading-tools">
+          <div id="save-state" class="muted small" role="status" aria-live="polite">未保存</div>
+      <div id="reading-location" role="status" aria-live="polite" aria-atomic="true"></div>
+          <div class="explore-entry" id="explore-entry">
+            <label for="explore-entity">探索对象</label>
+            <select id="explore-entity" aria-describedby="explore-availability"></select>
+            <button id="btn-explore" class="btn">探索关系</button>
+            <p id="explore-availability" class="muted small"></p>
+          </div>
+    </div>
     <div class="layout">
       <aside class="toc-pane">
-        <nav id="toc" class="toc"></nav>
+        <nav id="toc" class="toc" aria-label="解释区块目录"></nav>
         <div class="toc-foot">
           <div id="stage-indicator" class="stage-indicator">当前阅读：—</div>
-          <div id="save-state" class="muted small">未保存</div>
+
           <button id="btn-reveal" class="link-btn">打开 human-review.json 位置</button>
         </div>
       </aside>
 
-      <main id="main" class="main"></main>
+      <main id="main" class="main" aria-label="阅读内容"></main>
 
-      <aside id="source-panel" class="source-pane hidden">
+      <aside id="source-panel" class="source-pane hidden" role="region" aria-label="原文与出处">
         <div class="source-head">
           <div id="source-head" class="source-head-inner"></div>
-          <button id="source-close" class="btn tiny ghost">关闭</button>
+          <button id="source-close" class="btn tiny ghost" aria-label="关闭原文与出处">关闭</button>
         </div>
         <div id="source-body" class="source-body"></div>
       </aside>

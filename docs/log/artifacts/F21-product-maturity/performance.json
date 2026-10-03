@@ -1,0 +1,56 @@
+{
+  "measuredAt": "2026-10-03T09:26:29.717Z",
+  "platform": "win32",
+  "versions": {
+    "node": "20.18.0",
+    "electron": "31.7.7",
+    "chrome": "126.0.6478.234"
+  },
+  "budgets": {
+    "projectionMs": 250,
+    "layoutRenderMs": 1500,
+    "navigationMs": 2000
+  },
+  "viewport": {
+    "desktop": [
+      1280,
+      900
+    ],
+    "narrow": [
+      640,
+      720
+    ]
+  },
+  "rows": [
+    {
+      "name": "Gold pure",
+      "elements": 12,
+      "edges": 4,
+      "projectionMs": 0.24,
+      "layoutRenderMs": 2.44
+    },
+    {
+      "name": "Gold navigation",
+      "rounds": 15,
+      "maxNavigationMs": 14.8,
+      "mapDOM": 1908
+    },
+    {
+      "name": "stress pure",
+      "elements": 80,
+      "edges": 160,
+      "projectionMs": 0.87,
+      "layoutRenderMs": 4.25
+    },
+    {
+      "name": "stress",
+      "elements": 80,
+      "edges": 160,
+      "loadValidateMountMs": 30.35,
+      "actualRenderMs": 17,
+      "maxNavigationMs": 37.24,
+      "rounds": 15,
+      "mapDOM": 14325
+    }
+  ]
+}
