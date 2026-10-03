@@ -46,4 +46,26 @@ function projectL2Overview(overview) {
   }));
   return Object.freeze({ kind: 'L2ViewModel', sections: Object.freeze(sections) });
 }
-module.exports = { knowledge, capability, generated, provenance, assertSpace, claimVerificationCapability, projectReadingSubject, projectL2Overview };
+const STAGE_ORDER = ['what','how','prove','boundary'];
+function projectReadingBundle(input) {
+  const {plan,generated:expression,frameworkMap}=input;
+  const {normalizeGeneratedBlock}=require('./generated-expression');
+  const {collectElements}=require('../../scripts/check-block');
+  const {projectTopic}=require('./l1-topic-projection');
+  const sections=STAGE_ORDER.map(stage=>({id:stage,title:stage,purpose:'',blocks:plan.blocks.filter(p=>p.stage===stage).map(p=>{
+    const raw=expression?.blocks.find(b=>b.id===p.id), content=raw?normalizeGeneratedBlock(raw).block.content:null;
+    const fragmentEntries=content?collectElements(content):[];
+    const realized=new Set(fragmentEntries.filter(f=>!f.presentation).flatMap(f=>f.sourceUnitIds));
+    const report=input.reports?.generated?.blockResults[p.id];
+    const missing=p.covers.filter(id=>!realized.has(id));
+    const integrity=raw?{space:'GenerationIntegrity',state:'present',verdict:report?(report.errors.length?'FAIL':report.warnings.length?'PASS_WITH_WARNINGS':'PASS'):(raw.generation?.verdict||'UNKNOWN'),errors:report?.errors||[],warnings:report?.warnings||[]}:{space:'GenerationIntegrity',state:'unavailable'};
+    return Object.freeze({id:p.id,title:p.title,stage:p.stage,shape:p.shape,covers:[...p.covers],role:'primary',defaultExpanded:p.defaultExpanded,content,
+      sourceRefs:[...new Set(p.sourceRefs.map(r=>r.section))],reviewObjectLinks:{space:'KnowledgeState',state:p.reviewObjects.length?'known':'empty',relation:'related-to',values:[...p.reviewObjects]},
+      generatedExpression:generated(expression===undefined?'unknown':raw?'present':'missing'),generationIntegrity:integrity,
+      realizedCoverage:!raw?{space:'RealizedCoverage',state:'unavailable'}:!p.covers.length?{space:'RealizedCoverage',state:'not-applicable'}:{space:'RealizedCoverage',state:'available',total:p.covers.length,covered:p.covers.length-missing.length,missing},
+      provenanceAssurance:provenance('indeterminate'),fragmentEntries});
+  })}));
+  const l1Topics=frameworkMap?Object.fromEntries(frameworkMap.topics.map(t=>[t.id,projectTopic(frameworkMap,t.id,{plan})])):null;
+  return {l2ViewModel:Object.freeze({kind:'L2ViewModel',sections}),l1Topics};
+}
+module.exports = { knowledge, capability, generated, provenance, assertSpace, claimVerificationCapability, projectReadingSubject, projectL2Overview, projectReadingBundle, STAGE_ORDER };
