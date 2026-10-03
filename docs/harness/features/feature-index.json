@@ -121,7 +121,7 @@
   {
     "id": "F19",
     "title": "Reading Navigation and Resolver",
-    "status": "blocked",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F19-navigation-resolver",
     "version": "v0.1"
   },

@@ -20,6 +20,11 @@ Plan / Generated / Map 保留各自 identity；来源 registry 随资料包绑�
 
 ## Repository path compatibility
 
+F19 的 Reading 导航由 `app/shared/reading-navigation.js` 维护类型化地址、内存返回栈和 canonical resolver；
+`app/renderer/reading-navigation.js` 负责捕获/恢复渲染现场。身份集合来自已验证 projection，
+Back 不调用 resolver。Electron 与资料包 Preview 共用同一模块，F20 直接复用而不新增私有栈。
+成功载入重建导航 session；失败或取消保留；导航不写用户文件、不提升任何 landing 能力。
+
 仓库工具的明确旧路径映射只在 scripts/helpers/repository-layout 使用；相对默认值锚定仓库，绝对外部路径不改写。运行时清单内相对路径仍由 reading-bundle 验证，不注入兼容层，不猜文件名。workspace 本地数据除 README 外忽略 Git。
 
 ## Pipeline

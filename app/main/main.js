@@ -1202,6 +1202,7 @@ async function runSelfTest() {
     else fail('F22 搬迁包审核路径异常');
     }
     ok(await require('../../scripts/test-reading-bundle-electron').runBundleIntegration(win));
+    ok(await require('../../scripts/test-reading-navigation-electron').runNavigationIntegration(win));
 
     emit();
     const failedCount = report.filter((line) => line.startsWith('✗')).length;
@@ -1263,6 +1264,13 @@ async function runVerifyPreview(filePath) {
       })()`);
       if(result.blocks!==21 || result.text<80)throw new Error('Preview content');
       ok('bundle inspection: 默认视图 / SU section / Known Absent / 只读审核通过');
+      if(await win.webContents.executeJavaScript('Boolean(window.__state.l0ViewModel)')) {
+        await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
+        ok(await require('../../scripts/test-reading-navigation-electron').exerciseNavigation(win));
+      } else {
+        const nav=await win.webContents.executeJavaScript("(()=>{window.__closeInspection();const n=window.__readingNavigation;const origin=n.snapshot().current;const calls=n.snapshot().resolverCalls;n.resolve({kind:'block',id:'O-01'});n.back();return n.snapshot().resolverCalls===calls+1&&JSON.stringify(origin.address)===JSON.stringify(n.snapshot().current.address);})()");
+        if(!nav)throw new Error('Preview Back/Resolve');ok('Preview no-map canonical Block and Back isolation');
+      }
       emit();process.stdout.write('VERIFY PREVIEW PASSED\n');app.exit(0);return;
     }
     const dom = await win.webContents.executeJavaScript(

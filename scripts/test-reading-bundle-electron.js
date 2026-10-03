@@ -4,11 +4,11 @@ const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelativ
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict');
 const {makeBundleFixture}=require('./helpers/reading-bundle-fixture');
 const {buildSourceRegistry,sha256}=require('../app/shared/source-coordinates');
-function holdNextRead(target) {
+function holdNextRead(target,skip=0) {
  const original=fs.readFile;let notify,release,held=false;
  const blocked=new Promise(resolve=>notify=resolve),gate=new Promise(resolve=>release=resolve);
  fs.readFile=async(file,...args)=>{
-  if(!held && resolveRepositoryPath(String(file))===resolveRepositoryPath(target)){held=true;notify();await gate;}
+  if(!held && resolveRepositoryPath(String(file))===resolveRepositoryPath(target)){if(skip>0)skip--;else{held=true;notify();await gate;}}
   return original(file,...args);
  };
  return {blocked,release,restore(){release();fs.readFile=original;}};
@@ -130,4 +130,4 @@ async function runBundleIntegration(win) {
   return '真实资料包 → Map → Topic → Block → SU/section 与独立 Evidence；fragment/返回/跨文档/取消/旧加载与 Source 回复/独立 Map 隔离/漂移/无自动保存均通过';
  }finally{assert.ok(resolveRepositoryPath(root).startsWith(resolveRepositoryPath(os.tmpdir())+path.sep));await fs.rm(root,{recursive:true,force:true});}
 }
-module.exports={runBundleIntegration};
+module.exports={runBundleIntegration,holdNextRead};

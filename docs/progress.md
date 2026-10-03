@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: none；F22 已完成。
-- Next queued feature: **F19 Reading Navigation and Resolver**；本轮未启动。
+- Active feature: none；F19 完成，继续 F20。
+- Next queued feature: **F20 Explore v1**，随后 F21；用户授权按顺序补齐合同并完成。
 - Latest completed feature: `F22` Entry and Repository Layout（2026-10-03）；首页、目录迁移、真实路径与独立审查通过。
 - Git strategy: 用户确认 F22 完成；本轮提交并推送到 `codex/f11-f21-conformance`，F11–F21 全部完成并通过验收后再合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -33,7 +33,7 @@
 | F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 既有 Overview projection；Plan + Generated runtime 补齐的独立证据在 F18 |
 | F17 | L1 Topic Runtime | `passing` | Topic boundary projection、真实入口和 Back 自检通过 |
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
-| F19 | Reading Navigation and Resolver | `blocked` | F18 前置已就绪；完整 canonical resolver 与跨层导航尚未实施 |
+| F19 | Reading Navigation and Resolver | `passing` | 统一导航/定位、真实逐层返回、便携Preview与独立审查通过；Explore组合路径由F20验证 |
 | F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
@@ -267,3 +267,15 @@ Source-verified Evidence
 - 完整回归、真实 Electron 新首屏与搬迁既有包路径、portable Preview、命令/文档/索引/harness 门禁通过；原有 Overview warnings 保留。
 - 独立审查发现的默认/显式 CLI 路径、原子 journal、旧根审核兼容均修正，无剩余 P1/P2。用户路径是自动化实测，不声称手工验收。
 - 证据：[F22 Verification Summary](log/artifacts/F22-entry-and-repository-layout/verification-summary.md)。F19–F21 未启动。
+
+## 2026-10-03 — F19–F21 autonomous completion
+
+- 用户同意 F19 范围修正，随后授权补齐 F19–F21 占位合同并按顺序实施/验收；不等待逐项许可，沿用 Native + 独立审查。
+- F19 新增 shared 导航和 renderer 现场适配、Preview 内联与真实 Electron 测试；职责/文件范围已在合同登记。
+- F19 验收 Reading 内 Back/Resolve，F20 验收真实 Explore 组合路径，不以测试入口冒充页面。
+- BMad render_skill.py 在本仓库缺失，沿用现有 Harness；不新增第二套流程或依赖。
+
+## 2026-10-03 — F19 Complete
+
+- [F19 verification](log/artifacts/F19-navigation-resolver/verification-summary.md)：共享地址/栈/resolver已产品接入，Back保留occurrence与现场；独立审查4项P2修正后无剩余P1/P2。
+- Electron/搬迁Preview/完整离线suite/既有input gates通过；F20继续复用同一导航，不新增identity/私有栈。

@@ -2,75 +2,69 @@
 id: F19
 title: Reading Navigation and Resolver
 version: v0.1
-status: blocked
-dependsOn: []
-scope: {"code":["app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js"],"docs":["docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F19-navigation-resolver/**","docs/progress.md"]}
-evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中：从 T-05 的 occurrence 进入某个 detail → 进 Explore → 点 Open in Reading（走 resolver）→ 再按 Back（必须回到 T-05 的那个 occurrence，不是 canonical landing）"],"integrationEvidence":[],"knownUnverified":["F18 的 L3 runtime 输入协议未完成；F20 Explore 尚不存在，无法验证 resolver/Back 路径"],"humanReviewRequired":[]}
+status: passing
+dependsOn: ["F16","F17","F18"]
+scope: {"code":["app/shared/reading-navigation.js","app/renderer/reading-navigation.js","app/renderer/app.js","app/renderer/l0-map.js","app/renderer/l0-map.css","app/renderer/index.html","app/renderer/styles.css","app/main/main.js","scripts/build-preview.js","package.json"],"tests":["scripts/test-reading-navigation.js","scripts/test-reading-navigation-electron.js","scripts/test-reading-bundle-electron.js","scripts/test-l0-preview.js","scripts/test-reading-bundle-preview.js","scripts/helpers/reading-bundle-fixture.js"],"docs":["docs/harness/ARCHITECTURE.md","docs/harness/DESIGN.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F19-navigation-resolver/**","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F19-navigation-resolver/**","docs/progress.md"]}
+evidence: {"lastVerifiedAt":"2026-10-03","commands":[{"command":"npm run test:all","result":"passed"},{"command":"npm run selftest","result":"passed"},{"command":"npm run verify-preview","result":"passed"}],"manualSmoke":"User delegated completion; real Electron automated input/IPC paths passed, not claimed as human manual acceptance."}
+completionGate: {"version":"v0.1","l3":"required","userPath":["真实 Electron：Map → Topic occurrence → Block → fragment inspection → 逐层 Back，恢复展开、滚动、选中与焦点","共享定位入口打开 Element / Block 唯一 canonical landing，再 Back 回原 occurrence；Known(0) Block 仍可打开","搬迁 Preview 复用同一导航模块；不将测试入口描述成实际 Explore 页面"],"integrationEvidence":["2026-10-03 real Electron and relocated portable Preview navigation passed","Native independent review: 4 P2 fixed, no remaining P1/P2"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F19 Reading Navigation and Resolver
 
-> **契约待补**：详细契约在 **F11–F18 完成后**再补全。此处只固定职责边界与不可让步的约束。
-
 ## Goal
 
-把 **Decision B 产品化**。当 L0–L3 真的连起来以后，主要问题不再是"画什么"，而是：
+把 Decision B 产品化：下钻后可以回到刚才的具体阅读现场，从另一上下文打开实体时可以到达统一固定落点。
+ReadingAddress、NavigationStack、CanonicalReadingResolver 必须由 F20 直接复用。
 
-```text
-用户从哪里来？现在看的是谁？点进去之后还能不能回到原来的上下文？
-```
-
-引入三项正式结构：**ReadingAddress**（我从哪里来）· **NavigationStack**（怎么回去）·
-**CanonicalReadingResolver**（从零打开这个实体时在哪）。
-
-这三项构成 Reading 与 Explore **共享的 identity / navigation substrate** ——
-本 feature 必须把它设计成**可被 F20（Explore）复用**，而不是只有 Reading 能用的私有结构。
-否则 Explore 会自己长出第二套 identity / navigation（见 F20 的验收）。
+用户于 2026-10-03 批准修正范围，并授权补齐合同后按 F19 → F20 → F21 自主实施、验证与审查。
+F19 验收 Reading 内导航和共享定位动作；真实 Explore 页面及跨投影组合路径由 F20 验收。
+设计见 [Navigation Design](../../../../log/artifacts/F19-navigation-resolver/navigation-design.md)。
 
 ## Process preconditions
 
-- F16 / F17 / F18 已完成（四层已经真的连起来，否则本 feature 没有真实场景）。
-- 契约侧依据：§3.3 导航纪律、Decision B、I4（三级 identity 能力）、N10。
-- 注：顺序上在 F16–F18 之后，**不登记为 `dependsOn`**。
+- F16 / F17 / F18 已 passing，登记为强制前置。
+- 依据 Reading 主契约 §3.3、Decision B / E、I4 / I5 / N10，以及各层下钻与返回纪律。
+- F20 不反向作为 F19 的完成前置。
 
 ## Scope
 
 ### Allowed changes
 
-- `app/renderer/app.js`、`app/renderer/l0-map.js`、`app/main/main.js`。
-- `scripts/test-l0-preview.js`（共用模块约定未被破坏）。
-- `docs/specs/reading-view-cognitive-contract.md` —— **仅**当 Topic / review object 的 landing
-  状态发生变化时（见 Risks）。
-- 本 feature 的 artifact 目录、`docs/progress.md`。
+- frontmatter 所列共享纯导航模块、renderer 现场适配器、真实入口、最小样式、加载与 selftest 集成。
+- Preview 内联同一实现；离线结构测试、真实 DOM/键盘/IPC 验证与 suite 接入。
+- architecture/design 更新模块职责；主契约仅更新机器保障边界，不提升实体 landing 能力。
+- 本 feature 合同、索引、dashboard 和证据目录。共享改动的原因与验证同时登记 dashboard。
 
 ### Out of scope
 
-- 不做 Explore 本身（F20）；不做 UI 打磨（F21）。
-- 不为 SU / review object 发明 landing（它们的 landing 仍是 Deferred，除非先改契约）。
+- Explore 页面/Focus graph（F20）；视觉系统改版、zoom/pan 与遥测。
+- Topic/SU/Review/Evidence canonical landing、fragment durable identity。
+- Schema/validator 口径、模型任务、原文/Gold/历史实验数据修改。
+- 文本、标题、章节交集或布局匹配补关系/归属。
 
 ## Acceptance Criteria
 
-- [ ] **`Back` ≠ `Resolve`**：`Back` 严格恢复 `NavigationStack` 里的 **ReadingAddress**
-      （含 occurrence：`level` / `topicId?` / `blockId?` / `elementId?` / `anchor?`），
-      **不重跑** canonical resolver，也不回首页。
-- [ ] **`Open in Reading(id)` 走 resolver**：对 element 解析到唯一 `#element-<id>`；
-      对 Block 解析到唯一 `#block-<id>`；多个 Topic occurrence 是**上下文**，不是多个 landing。
-- [ ] **canonical landing 不依赖 occurrence**：`TopicOccurrenceState = Known(0)` 时
-      `#block-O-01` 仍然存在（Decision E 的产品落点）。
-- [ ] identity ≠ occurrence：同一 element 出现在多个 Topic / Block 中时，仍然只有**一个** landing。
-- [ ] 未提升 landing 的实体（`SU-xxx` / review object）不得被实现"事实上"赋予 landing；
-      `Open in Reading(SU)` / `Open in Reading(DEC-005)` 在契约未提升前仍不可用。
-- [ ] 独立审查记录已写入 artifact 目录。
+- [x] Back 只 pop 原 ReadingAddress 与现场，不调用 resolver、不回首页。
+- [x] L0 → L1 → L2 → L3 可逐层返回；保存 occurrence、展开、选中、滚动与焦点。
+- [x] Element / Block 定位到唯一、可见、可聚焦的 `#element-<id>` / `#block-<id>`。
+- [x] canonical landing 不依赖 occurrence、Generated 或 Evidence；Known(0) 与缺生成的 Block 仍可打开。
+- [x] 多 Topic/图节点/attachment 宿主不复制 canonical identity 或 landing；不推断 canonical ownership。
+- [x] Topic/SU/Review/Evidence/fragment 固定定位明确不可用，inspection 保持可用。
+- [x] 未知实体、空栈、旧 session、旧请求不污染现页；成功切换清空栈，失败/取消保留现场。
+- [x] 所有固定定位复用唯一 resolver，F20 可直接调用；不提前做 Explore UI。
+- [x] Electron 与搬迁 Preview 共用模块；旧入口继续可用，导航不自动保存人工审核。
+- [x] 命令、真实用户路径自动化与独立审查通过，harness 门禁通过。
 
 ## Risks and compatibility
 
-- **最危险的退化**：把 `Back` 实现成"调用 resolver 回到 canonical landing" —— 那会让用户
-  丢失 occurrence 上下文，而且看起来"也能用"。验收第一条就是为它设的。
-- 若确实需要给 SU / review object 加 landing，**先改契约**（Decision B 的 scope 会扩大），
-  再改代码。不允许实现先跑在前面。
+- Back 调 resolver 会丢 occurrence：检查调用次数和实际地址/现场恢复。
+- anchor 在隐藏 Review 卡片上不算成功：检查唯一性、可见性、焦点与 attachment-only Element。
+- 异步布局/inspection 回复可能覆盖新现场：恢复限定当前 session 与导航 generation。
+- 地址是内存状态，不新增文件协议；同名 ID 不能跨包恢复。
+- F20 必须复验真实 Explore 组合路径，不能把接口测试写成 Explore 已实测。
 
 ## Completion evidence
 
-- Verification evidence: 本目录的 `verification-summary.md`
-- Independent review: 本目录的 `subagent-review.md`（代码变更必需）
+- `docs/log/artifacts/F19-navigation-resolver/verification-summary.md`。
+- `docs/log/artifacts/F19-navigation-resolver/subagent-review.md`，代码完成后独立审查必需。
+- 成功检查仅登记结果与关键证据，不新增永久 txt。

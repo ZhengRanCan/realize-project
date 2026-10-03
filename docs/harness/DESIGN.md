@@ -13,6 +13,11 @@ Block 或临时 fragment 可打开查出处面板，原文链与相关审阅材�
 
 ## Baseline
 
+F19 增加逐层返回：Topic、Block、出处关闭恢复进入前的具体现场，包括展开、滚动与键盘焦点。
+Element / Block 固定定位到唯一可见 subject 位置；Topic occurrence 不被解释为归属。
+Reading 内使用“返回”“查看区块”“查出处”；“Open in Reading”保留给 F20 的 Explore。
+Topic/SU/Review/Evidence/fragment 不新增 canonical landing；资料切换成功才清空历史。
+
 - 视觉系统：Electron 桌面应用，深浅两套基础样式集中在 `app/renderer/styles.css`，L0 界面另有
   `app/renderer/l0-map.css`。图与流程由离线随包的 Mermaid（`app/renderer/vendor/mermaid.min.js`）与
   自有渲染函数产出，不引入外部 CDN 或在线字体。

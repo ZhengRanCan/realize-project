@@ -238,7 +238,7 @@ function renderElementCard(e, vm) {
     + e.attachmentAsHost.map((a) => `<li><span class="rel">⇐ 挂靠</span> <span class="node">${esc(a.elementLabel)}</span></li>`).join('');
 
   return `
-<article class="card type-${esc(e.type)}" id="element-${esc(e.id)}" data-element-id="${esc(e.id)}" data-focus-target="${esc(e.id)}" tabindex="0">
+<article class="card type-${esc(e.type)}" id="review-element-${esc(e.id)}" data-element-id="${esc(e.id)}" data-focus-target="${esc(e.id)}" tabindex="0">
   <header class="card-head">
     <span class="eid">${esc(e.id)}</span>
     <span class="card-label">${esc(e.label)}</span>
@@ -441,6 +441,7 @@ function renderL0MapHTML(vm, opts = {}) {
     <main class="l0-main">
       ${renderReading(vm, layout)}
       ${renderReviewBoard(vm, layout)}
+      <div class="canonical-subjects">${vm.elements.map(e=>`<section id="element-${esc(e.id)}" data-canonical-element="${esc(e.id)}" tabindex="-1" hidden><h2>${esc(e.label)}</h2>${renderFocusPanel(e).replace(' hidden','').replace('data-focus-for','data-canonical-focus').replace('class="focus-panel"','class="canonical-relations"')}</section>`).join('')}</div>
     </main>
 
     <aside class="l0-nav" id="topic-nav">
@@ -461,13 +462,17 @@ function renderL0MapHTML(vm, opts = {}) {
  * Phase 4 · 交互（selection / focus）—— 只切换 class 与 hidden，不改数据
  * ------------------------------------------------------------------ */
 function bindInteractions(root, opts = {}) {
-  if (!root || root.__l0Bound) return;
-  root.__l0Bound = true;
+  if (!root) return;
+  // mount replaces the render tree: remove closures owning the previous tree.
+  root.__l0Abort?.abort();root.__l0Abort=new AbortController();
+  const signal=root.__l0Abort.signal;
   // mount() 的宿主可能是 #main（Electron），而状态 class 的 CSS 作用域是 `.l0-root`：
   // 必须把 class 加到真正的 .l0-root 上，否则降噪/命中样式在 Electron 下不生效。
   const stateRoot = root.classList && root.classList.contains('l0-root') ? root : (root.querySelector('.l0-root') || root);
 
   const clear = () => {
+    stateRoot.__selection = null;
+    root.querySelectorAll('[data-canonical-element]').forEach(p=>{p.hidden=true;});
     stateRoot.classList.remove('has-focus', 'focus-element', 'focus-edge', 'focus-topic');
     root.querySelectorAll('[data-focus-for]').forEach((p) => { p.hidden = true; });
     root.querySelectorAll('.is-hit,.is-open').forEach((n) => n.classList.remove('is-hit', 'is-open'));
@@ -494,6 +499,7 @@ function bindInteractions(root, opts = {}) {
 
   function focusElement(id) {
     clear();
+    stateRoot.__selection={kind:'element',id};
     stateRoot.classList.add('has-focus', 'focus-element');
     // ① 这个 element 在两个视图 / 角标里的所有表现
     root.querySelectorAll(`[data-element-id="${id}"]`).forEach((n) => {
@@ -526,6 +532,7 @@ function bindInteractions(root, opts = {}) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-edge');
     const id = el.dataset.edgeId;
+    stateRoot.__selection={kind:'edge',id};
     edgeNodes(id).forEach(hitNode);
     [el.dataset.from, el.dataset.to].forEach((eid) => {
       hitAll(`[data-element-id="${eid}"]`);
@@ -536,6 +543,7 @@ function bindInteractions(root, opts = {}) {
 
   function focusTopic(row) {
     clear();
+    stateRoot.__selection={kind:'topic',id:row.dataset.topicId};
     stateRoot.classList.add('has-focus', 'focus-topic');
     hitNode(row);
     (row.dataset.elementIds || '').split(',').filter(Boolean).forEach((id) => {
@@ -544,6 +552,12 @@ function bindInteractions(root, opts = {}) {
     });
   }
 
+  root.__l0Interaction={clear,focusElement,restore(selection){
+    if(!selection){clear();return;}
+    if(selection.kind==='element')focusElement(selection.id);
+    if(selection.kind==='edge'){const edge=edgeNodes(selection.id)[0];if(edge)focusEdge(edge);}
+    if(selection.kind==='topic'){const row=[...root.querySelectorAll('.topic-entry')].find(n=>n.dataset.topicId===selection.id);if(row)focusTopic(row);}
+  }};
   root.addEventListener('click', (ev) => {
     const src = ev.target.closest('[data-source-ref]');
     if (src) { ev.preventDefault(); if (opts.onSourceRef) opts.onSourceRef(src.getAttribute('data-source-ref')); else src.classList.add('is-hit'); return; }
@@ -567,7 +581,7 @@ function bindInteractions(root, opts = {}) {
     }
     const chipEl = ev.target.closest('[data-focus-target]');
     if (chipEl) { ev.preventDefault(); focusElement(chipEl.getAttribute('data-focus-target')); }
-  });
+  },{signal});
 
   root.addEventListener('keydown', (ev) => {
     if (ev.key === 'Escape') clear();
@@ -576,7 +590,7 @@ function bindInteractions(root, opts = {}) {
       ev.preventDefault();
       focusElement(ev.target.getAttribute('data-focus-target'));
     }
-  });
+  },{signal});
 }
 
 /* 双模：Node（构建期 SSR）与浏览器（Electron / 预览） */
@@ -584,6 +598,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = { renderL0
 if (typeof window !== 'undefined') {
   window.L0Map = {
     renderL0MapHTML, bindInteractions,
+    getSelection(root){return structuredClone(root.querySelector('.l0-root')?.__selection||null);},
+    restoreSelection(root,selection){root.__l0Interaction?.restore(selection);},
+    revealElement(root,id){root.__l0Interaction?.focusElement(id);const target=[...root.querySelectorAll('[data-canonical-element]')].find(n=>n.dataset.canonicalElement===id);if(target){target.hidden=false;}return target;},
     mount(root, vm, opts = {}) {
       root.innerHTML = renderL0MapHTML(vm, opts);
       bindInteractions(root, opts);

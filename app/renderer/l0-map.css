@@ -24,6 +24,9 @@
   margin: 0 auto;
 }
 
+.canonical-subjects > section { border:1px solid var(--line);border-radius:8px;padding:16px;margin-top:16px; }
+.canonical-subjects > section[hidden] { display:none; }
+
 .l0-root h1 { font-size: 20px; margin: 0 0 4px; }
 .l0-root h2 { font-size: 15px; margin: 0 0 10px; letter-spacing: .01em; }
 .l0-root h3 { font-size: 13px; margin: 0 0 6px; }

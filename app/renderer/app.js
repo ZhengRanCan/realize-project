@@ -54,6 +54,10 @@ const state = {
   bundleInfo: null,
   inspectionOrigin: null,
   inspectionRequest: 0,
+  inspectionSubject: null,
+  inspectionCoordinate: null,
+  readingTopicId: null,
+  readingBlockId: null,
   model: null,
   humanReview: null,
   modelPath: null,
@@ -81,6 +85,9 @@ const state = {
   toastTimer: null,
   scrollSpyReady: false,
 };
+
+const navigation=window.ReadingNavigationUI.createController({capture:captureReadingFrame,show:showReadingAction,restore:restoreReadingFrame,onChange:updateNavigationControls,onNavigate:()=>{state.inspectionRequest++;}});
+let legacyNavigationSession=0;
 
 /* ------------------------------------------------------------------ *
  * 工具
@@ -511,6 +518,7 @@ function setupScrollSpy() {
 
 function viewOverview() {
   const main = clear($('#main'));
+  const nav=el('div','reading-nav');const back=el('button','btn','返回');back.id='reading-back';back.hidden=!navigation.size;back.addEventListener('click',()=>navigation.back());nav.append(back);main.append(nav);
   main.appendChild(el('div', 'stage-indicator-start'));
   (state.l2ViewModel ? state.l2ViewModel.sections : []).forEach((stage) => {
     const header = el('div', `stage-head stage-${stage.id}`);
@@ -1056,8 +1064,9 @@ function viewL0() {
     view: state.l0View || 'reading',
     // provenance → 打开右侧 Source 面板的对应章节（复用现有原文回查能力）
     onSourceRef: (ref) => { state.sessionToken ? openSource(ref,{namespace:'heading',key:ref.replace(/^§/,'')}) : openSource(ref); },
-    onTopic: (id) => { state.l1Topic = state.l1Topics[id]; state.view = 'l1'; render(); },
+    onTopic: (id) => navigation.enter({type:'topic',id}),
   });
+  const toolbar=el('div','reading-nav'),back=el('button','btn','返回');back.id='reading-back';back.hidden=!navigation.size;back.addEventListener('click',()=>navigation.back());toolbar.append(back);host.prepend(toolbar);
   // Reading / Review 切换后保持视图状态（不重新计算任何数据）
   host.querySelectorAll('[data-l0-view]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1071,12 +1080,12 @@ function viewL0() {
 function viewL1() {
  const topic=state.l1Topic,host=clear($('#main'));if(!topic){host.textContent='未选择 Topic。';return;}
  const wrap=el('section','block');wrap.dataset.l1Topic=topic.topic.id;
- const back=el('button','btn','返回框架图');back.id='l1-back';back.addEventListener('click',()=>{state.view='l0';render();});wrap.append(back,el('h2','',topic.topic.title),el('p','',topic.topic.proposition));
+ const back=el('button','btn','返回');back.id='l1-back';back.addEventListener('click',()=>navigation.back());wrap.append(back,el('h2','',topic.topic.title),el('p','',topic.topic.proposition));
  wrap.append(el('h3','','成员'));for(const member of topic.inside)wrap.append(el('p','',member.label));
  wrap.append(el('h3','','边界关系'));if(!topic.relations.length)wrap.append(el('p','','无可绘制关系；这是 Topic boundary summary。'));
  for(const relation of topic.relations){const row=el('p','',relation.from+' —'+relation.type+'→ '+relation.to+' ('+relation.role+')');row.dataset.l1Role=relation.role;wrap.append(row);}
  const organization=el('p','',topic.blockOrganization.state==='unknown'?'尚未声明区块关联。':topic.blockOrganization.state==='empty'?'已明确没有关联区块。':'相关解释区块');organization.dataset.blockOrganization=topic.blockOrganization.state;wrap.append(organization);
- for(const entry of topic.blockEntries||[]) {const button=el('button','btn',entry.id+' · '+entry.title);button.dataset.l1Block=entry.id;button.addEventListener('click',()=>{state.view='overview';state.blockExpanded[entry.id]=true;render();document.getElementById('block-'+entry.id)?.scrollIntoView({block:'start'});});wrap.append(button);}
+ for(const entry of topic.blockEntries||[]) {const button=el('button','btn',entry.id+' · '+entry.title);button.dataset.l1Block=entry.id;button.addEventListener('click',()=>navigation.enter({type:'block',id:entry.id,topicId:topic.topic.id}));wrap.append(button);}
  host.append(wrap);
 }
 
@@ -1107,6 +1116,7 @@ async function loadL0(mapPath) {
   state.l1Topics = res.l1Topics;
   state.l0Path = res.mapPath;
   state.l0View = 'reading'; // 用户裁决：Reading 为默认
+  state.l1Topic=null;resetReadingNavigation();
   if ($('#l0-info')) $('#l0-info').textContent = `已加载：${res.mapPath}${res.checkMapPath ? '（含 check-map 结论）' : ''}`;
 
   // 与 design-review.json 加载路径一致的**真实屏切换**（首屏 → Review 屏）
@@ -1168,6 +1178,7 @@ function applyLoadResult(result) {
   state.focusedDecisionId = null;
   state.activeBlockId = null;
   state.view = result.bundleInfo && result.l0ViewModel ? 'l0' : 'overview';
+  resetReadingNavigation();
   state.dirty = false;
   state.scrollSpyReady = false;
   setSaveState(result.humanReviewExists ? '已加载 human-review.json' : '尚未保存（human-review.json 不存在）');
@@ -1253,8 +1264,7 @@ function bindReviewScreen() {
         toast('请先在首屏加载「结构化分析结果」（design-review.json）', true);
         return;
       }
-      state.view = next;
-      render();
+      navigation.enter({type:'view',view:next});
     });
   });
 
@@ -1321,6 +1331,7 @@ function bindReviewScreen() {
     if (state.dirty && !window.confirm('有未保存的人工审核修改，返回会丢弃它们。继续？')) return;
     $('#screen-review').classList.add('hidden');
     $('#screen-start').classList.remove('hidden');
+    resetReadingNavigation();closeInspection(false);
   });
 
   document.addEventListener('keydown', (event) => {
@@ -1342,8 +1353,7 @@ function bindReviewScreen() {
         return;
       }
       event.preventDefault();
-      state.view = key === 'g' ? 'overview' : 'decisions';
-      render();
+      navigation.enter({type:'view',view:key==='g'?'overview':'decisions'});
       return;
     }
     if (state.view !== 'decisions') return;
@@ -1393,24 +1403,25 @@ function showCoordinate(host,coordinate) {
  if(coordinate.state!=='known'){host.appendChild(el('p','',coordinate.reason||'当前来源无法定位。'));return;}
  host.append(el('p','source-meta',coordinate.title+' · 原文 L'+coordinate.range.startLine+'-'+coordinate.range.endLine),el('pre','source-text',coordinate.text));
 }
-async function openInspection(blockId,fragmentPath) {
+async function showInspection(blockId,fragmentPath) {
  const token=state.sessionToken,request=++state.inspectionRequest;
- const origin=state.inspectionOrigin||{view:state.view,topic:state.l1Topic,blockExpanded:{...state.blockExpanded},scroll:$('#main').scrollTop,windowScroll:window.scrollY};
  const result=await api.bundle.inspect({sessionToken:token,blockId,...(fragmentPath!==undefined?{fragmentPath}:{})});
- if(token!==state.sessionToken || request!==state.inspectionRequest)return result;
+ if(token!==state.sessionToken || request!==state.inspectionRequest)return {ok:false,stale:true};
  if(!result.ok){toast((result.errors||[]).join('; '));return result;}
- state.inspectionOrigin=origin;$('#source-panel').classList.remove('hidden');$('#screen-review').classList.add('with-source');clear($('#source-head')).textContent='查出处';
+ state.inspectionOrigin=true;state.inspectionSubject={blockId,...(fragmentPath!==undefined?{fragmentPath}:{})};$('#source-panel').classList.remove('hidden');$('#screen-review').classList.add('with-source');clear($('#source-head')).textContent='查出处';
  let coordinateRequest=0;
  window.DesignReviewL3.mountL3Inspector($('#source-body'),result.viewModel,{onClose:()=>closeInspection(),onFragment:()=>openInspection(blockId),onSource:async unit=>{
+  state.inspectionCoordinate={namespace:'plan-section',key:unit.section};
   const coordinateToken=++coordinateRequest;
   const source=await api.bundle.source({sessionToken:token,namespace:'plan-section',key:unit.section});
   if(token!==state.sessionToken || request!==state.inspectionRequest || coordinateToken!==coordinateRequest)return;
   showCoordinate($('#l3-source-coordinate'),source.coordinate||{state:'unavailable',reason:(source.errors||[]).join('; ')});
- }});return result;
+ }});$('#l3-close')?.focus({preventScroll:true});return result;
 }
+function openInspection(blockId,fragmentPath){return navigation.enter({type:'inspection',blockId,fragmentPath});}
 function closeInspection(restore=true) {
- const origin=state.inspectionOrigin;state.inspectionRequest++;state.inspectionOrigin=null;closeSource();
- if(origin && restore){state.view=origin.view;state.l1Topic=origin.topic;state.blockExpanded=origin.blockExpanded;render();$('#main').scrollTop=origin.scroll;window.scrollTo(0,origin.windowScroll);}
+ if(restore)return navigation.back();
+ state.inspectionRequest++;state.inspectionOrigin=null;state.inspectionSubject=null;state.inspectionCoordinate=null;closeSource();
 }
 function bindFragmentInspection(host,block) {
  const target=path=>{
@@ -1429,3 +1440,84 @@ function bindFragmentInspection(host,block) {
  for(const fragment of block.fragmentEntries||[]){if(!fragment.sourceUnitIds.length)continue;const element=target(fragment.path);if(!element)continue;const button=el('button','fragment-inspect','出处');button.dataset.fragmentPath=fragment.path;button.setAttribute('aria-label','查看'+fragment.kind+'出处');button.addEventListener('click',event=>{event.stopPropagation();openInspection(block.id,fragment.path);});element.append(button);}
 }
 window.__loadBundle=loadBundle;window.__openInspection=openInspection;window.__closeInspection=closeInspection;
+
+function resetReadingNavigation(){
+ state.inspectionOrigin=null;state.inspectionSubject=null;state.inspectionCoordinate=null;state.readingTopicId=null;state.readingBlockId=null;
+ navigation.reset({key:state.sessionToken||'legacy-'+(++legacyNavigationSession),elementIds:state.l0ViewModel?.elements.map(e=>e.id)||[],blockIds:allBlocks().map(b=>b.id)});
+}
+function domLocation(node){
+ if(!node||node===document.body)return null;
+ if(node.id)return {id:node.id};
+ const root=node.closest('#main,#source-body,#screen-review');if(!root)return null;
+ const path=[];let current=node;while(current!==root){path.unshift([...current.parentElement.children].indexOf(current));current=current.parentElement;}
+ return {root:root.id,path};
+}
+function locateDOM(location){
+ if(!location)return null;if(location.id)return document.getElementById(location.id);
+ let node=document.getElementById(location.root);for(const i of location.path)node=node?.children[i];return node;
+}
+function captureReadingFrame(){
+ const blockId=state.inspectionSubject?.blockId||state.readingBlockId||state.activeBlockId||allBlocks()[0]?.id;
+ const address={sessionKey:navigation.sessionKey,level:state.inspectionSubject?'L3':state.view==='l1'?'L1':state.view==='overview'&&blockId?'L2':'L0'};
+ if(state.readingTopicId||state.l1Topic?.topic.id)address.topicId=state.readingTopicId||state.l1Topic.topic.id;
+ if(['L2','L3'].includes(address.level))address.blockId=blockId;
+ const selected=window.L0Map.getSelection($('#main'));if(selected?.kind==='element')address.elementId=selected.id;
+ const context={view:state.view,topicId:state.l1Topic?.topic.id||null,readingTopicId:state.readingTopicId,readingBlockId:state.readingBlockId,
+  l0View:state.l0View,selection:selected,canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
+  activeBlockId:state.activeBlockId,inspection:state.inspectionSubject?{...state.inspectionSubject}:null,coordinate:state.inspectionCoordinate?{...state.inspectionCoordinate}:null,
+  details:[...document.querySelectorAll('#main details,#source-body details')].map(n=>({location:domLocation(n),open:n.open})),
+  focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
+ return {address,context};
+}
+function updateNavigationControls(){for(const back of document.querySelectorAll('#reading-back,#l1-back'))back.hidden=!navigation.size;}
+function showReadingAction(action){
+ if(action.type==='inspection')return showInspection(action.blockId,action.fragmentPath);
+ if(action.type==='topic'&&!state.l1Topics?.[action.id])return {ok:false,reason:'unknown-topic'};
+ if(action.type==='block'&&!allBlocks().some(b=>b.id===action.id))return {ok:false,reason:'unknown-block'};
+ if(!['topic','block','canonical','view'].includes(action.type))return {ok:false,reason:'unsupported'};
+ closeInspection(false);
+ if(action.type==='topic'){
+  const topic=state.l1Topics?.[action.id];if(!topic)return {ok:false,reason:'unknown-topic'};
+  state.l1Topic=topic;state.readingTopicId=action.id;state.readingBlockId=null;state.view='l1';render();$('#l1-back')?.focus({preventScroll:true});return {ok:true};
+ }
+ if(action.type==='block'||(action.type==='canonical'&&action.address.level==='L2')){
+  const id=action.id||action.address.blockId;if(!allBlocks().some(b=>b.id===id))return {ok:false,reason:'unknown-block'};
+  state.readingTopicId=action.topicId||null;state.l1Topic=action.topicId?state.l1Topics[action.topicId]:null;state.readingBlockId=id;state.view='overview';state.blockExpanded[id]=true;render();
+  const target=document.getElementById('block-'+id);target.tabIndex=-1;target.focus({preventScroll:true});target.scrollIntoView({block:'start'});return {ok:true};
+ }
+ if(action.type==='canonical'){
+  state.readingTopicId=null;state.l1Topic=null;state.readingBlockId=null;state.view='l0';state.l0View='reading';render();
+  const target=window.L0Map.revealElement($('#main'),action.address.elementId);if(!target)return {ok:false,reason:'unavailable'};
+  target.focus({preventScroll:true});target.scrollIntoView({block:'start'});return {ok:true};
+ }
+ if(action.type==='view'){state.view=action.view;state.readingTopicId=null;state.l1Topic=null;state.readingBlockId=null;render();return {ok:true};}
+ return {ok:false,reason:'unsupported'};
+}
+function restoreReadingFrame(frame,isCurrent){
+ const c=frame.context;state.view=c.view;state.l1Topic=c.topicId?state.l1Topics?.[c.topicId]:null;
+ state.readingTopicId=c.readingTopicId;state.readingBlockId=c.readingBlockId;state.l0View=c.l0View;state.blockExpanded={...c.blockExpanded};state.expanded={...c.expanded};
+ state.onlyPending=c.onlyPending;state.focusedDecisionId=c.focusedDecisionId;state.activeBlockId=c.activeBlockId;closeInspection(false);render();
+ const generation=navigation.generation;
+ const finish=()=>{
+  if(!isCurrent()||generation!==navigation.generation)return {ok:false,reason:'stale'};
+  window.L0Map.restoreSelection($('#main'),c.selection);
+  // A canonical element is a visible subject, not just the hidden Review card.
+  if(c.canonicalElementId)window.L0Map.revealElement($('#main'),c.canonicalElementId);
+  for(const detail of c.details){const node=locateDOM(detail.location);if(node?.tagName==='DETAILS')node.open=detail.open;}
+  locateDOM(c.focus)?.focus({preventScroll:true});
+  const scroll=()=>{if(!isCurrent()||generation!==navigation.generation)return;for(const item of c.scroll){const node=locateDOM(item.location);if(node){node.scrollTop=item.top;node.scrollLeft=item.left;}}window.scrollTo(c.windowScroll.x,c.windowScroll.y);};
+  scroll();requestAnimationFrame(scroll);return {ok:true};
+ };
+ if(c.inspection)return showInspection(c.inspection.blockId,c.inspection.fragmentPath).then(async result=>{
+  if(!isCurrent()||generation!==navigation.generation||!result.ok)return {ok:false,reason:'stale'};
+  if(c.coordinate){
+   state.inspectionCoordinate=c.coordinate;const request=state.inspectionRequest,coordinate=state.inspectionCoordinate;
+   const response=await api.bundle.source({sessionToken:state.sessionToken,...c.coordinate});
+   if(!isCurrent()||generation!==navigation.generation||request!==state.inspectionRequest||coordinate!==state.inspectionCoordinate||!$('#l3-source-coordinate'))return {ok:false,reason:'stale'};
+   showCoordinate($('#l3-source-coordinate'),response.coordinate||{state:'unavailable'});
+  }
+  return finish();
+ });
+ return finish();
+}
+window.__readingNavigation=navigation;
