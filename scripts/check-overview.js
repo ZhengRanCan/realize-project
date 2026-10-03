@@ -82,26 +82,13 @@ const FORBIDDEN_PHRASES = [
  * 工具：与 check-block 相同的"扁平节点"归一化
  * ------------------------------------------------------------------ */
 
-function normalizeFlatNodes(input) {
-  const block = JSON.parse(JSON.stringify(input));
-  const content = block.content;
-  if (!content || content.type !== 'flow' || !Array.isArray(content.lanes)) return block;
-  content.lanes.forEach((lane) => {
-    if (!Array.isArray(lane.nodes)) return;
-    lane.nodes = lane.nodes.map((entry) => {
-      if (!entry || typeof entry !== 'object' || entry.node || !entry.title) return entry;
-      const { edge, ...rest } = entry;
-      return edge ? { node: rest, edge } : { node: rest };
-    });
-  });
-  return block;
-}
+function normalizeFlatNodes(input) {return require('../app/shared/generated-expression').normalizeGeneratedBlock(input).block;}
 
 function parseArgs(argv) {
   const args = { overview: DEFAULT_OVERVIEW, plan: DEFAULT_PLAN };
   for (let i = 0; i < argv.length; i += 1) {
-    if (argv[i] === '--plan') {
-      args.plan = path.resolve(ROOT, argv[i + 1]);
+    if (['--plan','--source-sections','--source'].includes(argv[i])) {
+      args[{'--plan':'plan','--source-sections':'sourceSections','--source':'source'}[argv[i]]] = path.resolve(ROOT, argv[i + 1]);
       i += 1;
     } else if (!argv[i].startsWith('--')) {
       args.overview = path.resolve(argv[i]);
@@ -110,16 +97,13 @@ function parseArgs(argv) {
   return args;
 }
 
-function main() {
-  const args = parseArgs(process.argv.slice(2));
-  const overview = JSON.parse(fs.readFileSync(args.overview, 'utf8'));
-  const plan = JSON.parse(fs.readFileSync(args.plan, 'utf8'));
-  const source = JSON.parse(fs.readFileSync(SOURCE_SECTIONS, 'utf8'));
-  const sourceText = source.sections.map((s) => s.text).join('\n');
-  const allowedPhrases = new Set(FORBIDDEN_PHRASES.filter((p) => sourceText.includes(p)));
-
+function checkOverview(overview,plan,{sourceSections:source,sourceText}={}) {
+sourceText=sourceText??source?.sections.map(s=>s.text).join('\n')??'';
+const allowedPhrases=new Set(FORBIDDEN_PHRASES.filter(p=>sourceText.includes(p)));
   const errors = [];
   const warnings = [];
+  const structuralErrors=[];
+  const structureFail=m=>{errors.push(m);structuralErrors.push(m);};
   const hardFail = (m) => errors.push(m);
   const warn = (m) => warnings.push(m);
 
@@ -139,7 +123,7 @@ function main() {
 
   const extra = blocks.filter((b) => !planById.has(b.id)).map((b) => b.id);
   if (extra.length > 0) {
-    hardFail(`[覆盖] generated overview 出现 Plan 中不存在的 block：${extra.join(', ')}`);
+    structureFail(`[覆盖] generated overview 出现 Plan 中不存在的 block：${extra.join(', ')}`);
   }
 
   /* ---------------- 3. 重复 block ---------------- */
@@ -148,7 +132,7 @@ function main() {
   blocks.forEach((b) => seen.set(b.id, (seen.get(b.id) || 0) + 1));
   const duplicated = [...seen.entries()].filter(([, n]) => n > 1).map(([id, n]) => `${id}×${n}`);
   if (duplicated.length > 0) {
-    hardFail(`[覆盖] 同一个 Plan block 出现多次：${duplicated.join(', ')}`);
+    structureFail(`[覆盖] 同一个 Plan block 出现多次：${duplicated.join(', ')}`);
   }
 
   /* ---------------- 4. 顺序 / stage 归属 ---------------- */
@@ -162,7 +146,7 @@ function main() {
     const pb = planById.get(b.id);
     if (!pb) return;
     if (b.stage !== pb.stage) {
-      hardFail(`[顺序] ${b.id} 的 stage 归属异常：generated=${b.stage}，plan=${pb.stage}`);
+      structureFail(`[顺序] ${b.id} 的 stage 归属异常：generated=${b.stage}，plan=${pb.stage}`);
     }
   });
 
@@ -174,12 +158,12 @@ function main() {
     const FIXED = ['id', 'title', 'stage', 'defaultExpanded'];
     FIXED.forEach((f) => {
       if (JSON.stringify(b[f]) !== JSON.stringify(pb[f])) {
-        hardFail(`[固定字段] ${b.id}.${f} 被修改：generated=${JSON.stringify(b[f])}，plan=${JSON.stringify(pb[f])}`);
+        structureFail(`[固定字段] ${b.id}.${f} 被修改：generated=${JSON.stringify(b[f])}，plan=${JSON.stringify(pb[f])}`);
       }
     });
     (['covers', 'reviewObjects']).forEach((f) => {
       if (b[f] !== undefined && JSON.stringify(b[f]) !== JSON.stringify(pb[f])) {
-        hardFail(`[固定字段] ${b.id}.${f} 被修改：generated=${JSON.stringify(b[f])}，plan=${JSON.stringify(pb[f])}`);
+        structureFail(`[固定字段] ${b.id}.${f} 被修改：generated=${JSON.stringify(b[f])}，plan=${JSON.stringify(pb[f])}`);
       }
     });
   });
@@ -193,6 +177,7 @@ function main() {
     const checkable = normalizeFlatNodes({ ...pb, content: b.content });
     const result = checkBlock(checkable, plan, { allowedPhrases });
     blockResults.set(b.id, result);
+    structuralErrors.push(...result.structuralErrors);
     if (result.errors.length > 0) {
       hardFail(`[块级] ${b.id} 的 check-block = FAIL：${result.errors[0].slice(0, 110)}`);
     }
@@ -377,6 +362,15 @@ function main() {
 
   const verdict = errors.length > 0 ? 'FAIL' : warnings.length + allWarnings.length > 0 ? 'PASS WITH WARNINGS' : 'PASS';
 
+
+return {errors,warnings,structuralErrors,missingBlockIds:missing,blockResults:Object.fromEntries(blockResults),stats:{verdict,failedBlocks,coreCovered,coreUnits,supportingCovered,supportingUnits,allUnits,shapeCounts,stageStats,warningCategories,semanticWithProv,semanticElements}};
+}
+function main() {
+const args=parseArgs(process.argv.slice(2));
+const overview=JSON.parse(fs.readFileSync(args.overview,'utf8')),plan=JSON.parse(fs.readFileSync(args.plan,'utf8')),source=JSON.parse(fs.readFileSync(args.sourceSections||SOURCE_SECTIONS,'utf8'));
+const result=checkOverview(overview,plan,{sourceSections:source,sourceText:args.source?fs.readFileSync(args.source,'utf8'):undefined});
+const {errors,warnings}=result;const {verdict,failedBlocks,coreCovered,coreUnits,supportingCovered,supportingUnits,allUnits,shapeCounts,stageStats,warningCategories,semanticWithProv,semanticElements}=result.stats;
+const blocks=overview.blocks||[],planBlocks=plan.blocks;
   console.log('=== check-overview ===');
   console.log(`overview  ${path.relative(ROOT, args.overview)}`);
   console.log(`plan      ${path.relative(ROOT, args.plan)}（${overview.generation ? overview.generation.plan : '?'}）`);
@@ -405,14 +399,14 @@ function main() {
     if (errors.length > 40) console.log(`  … 另有 ${errors.length - 40} 条`);
     console.log('');
     console.log('结果：FAIL —— 完整 Overview 没有完整实现 Plan。');
-    process.exit(1);
+    return 1;
   }
   if (verdict === 'PASS WITH WARNINGS') {
     console.log('结果：PASS WITH WARNINGS —— Overview 完整实现了 Plan，但见上方 warning。');
-    process.exit(0);
+    return 0;
   }
   console.log('结果：PASS —— Overview 完整实现了 Plan。');
-  process.exit(0);
+  return 0;
 }
-
-main();
+module.exports={checkOverview};
+if(require.main===module) {try{process.exitCode=main();}catch(error){console.error(error.message);process.exitCode=1;}}

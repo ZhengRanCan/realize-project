@@ -2,16 +2,18 @@
 id: F18
 title: L3 Inspector (traceability without verification)
 version: v0.1
-status: blocked
+status: active
 dependsOn: []
-scope: {"code":["app/shared/l3-inspector-projection.js","app/renderer/app.js","app/renderer/l0-map.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-l3-inspector-projection.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F18-l3-inspector/**","docs/progress.md"]}
+scope: {"code":["app/main/**","app/shared/**","app/renderer/**","scripts/check-*.js","scripts/extract-source-sections.js","scripts/export-reading-bundle.js","scripts/assemble-overview.js","scripts/build-preview.js","scripts/helpers/reading-bundle-fixture.js","schema/reading-bundle.schema.json","schema/stage2-block.schema.json","package.json",".gitignore"],"tests":["scripts/test-*.js"],"docs":["docs/specs/reading-bundle-contract.md","docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F18-l3-inspector/**","docs/harness/features/individual_feature/F18-l3-inspector/**","docs/harness/features/feature-index.json","docs/harness/incidents/2026-10-03-f18-runtime-input.md","docs/harness/ARCHITECTURE.md","docs/harness/DESIGN.md","docs/harness/INITIALIZATION_CONTRACT.md","docs/progress.md","docs/README.md","README.md","agent.md","bundles/README.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
 completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中从一个 Block 往下核查：确认能走到 SU → §N → 原文 section，也能走到 review object → evidence；且界面没有出现任何 claim-level 的 Verified / Unverified 结论"],"integrationEvidence":[],"knownUnverified":["runtime 缺少 design-review 与 overview-plan 的显式配对输入协议，无法构造 Block → SU → §N 路径"],"humanReviewRequired":[]}
 ---
 
 # F18 L3 Inspector (traceability without verification)
 
-> **契约待补**：详细契约在 **F11–F17 完成后**再补全。此处只固定职责边界与不可让步的约束。
+> 用户已批准资料包设计与实施计划；本轮补齐 F16 的 Plan + Generated 输入，并实施 F18 完整路径。
+
+允许范围以 frontmatter 为准：共享模块、校验 CLI、离线 exporter、manifest、preload、renderer 与 Preview 共同构成同一个加载和 inspection 路径。旧入口兼容，历史产物不修改。
 
 ## Goal
 

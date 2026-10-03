@@ -100,21 +100,21 @@
   {
     "id": "F16",
     "title": "L2 Block Runtime (first product adoption)",
-      "status": "passing",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F16-l2-runtime",
     "version": "v0.1"
   },
   {
     "id": "F17",
     "title": "L1 Topic Runtime",
-      "status": "passing",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F17-l1-runtime",
     "version": "v0.1"
   },
   {
     "id": "F18",
     "title": "L3 Inspector (traceability without verification)",
-    "status": "blocked",
+    "status": "active",
     "feature_folder": "docs/harness/features/individual_feature/F18-l3-inspector",
     "version": "v0.1"
   },

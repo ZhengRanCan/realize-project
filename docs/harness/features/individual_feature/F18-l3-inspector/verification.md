@@ -1,6 +1,11 @@
 # F18 Verification
 
-> 契约待补：详细验证口径在 F11–F17 完成后补全。
+执行已批准实施计划；新增 source、bundle、projection、session、Preview 套件全部加入 test:all。
+必须覆盖中文/空格路径搬迁、错误配对与目录越界、跨包审核隔离、异步旧回复、Generated Unknown/Missing、
+真实框架图首屏和 Topic → Block → 两条 inspection 路径。无人工自动写入；旧 fixture 与 CLI 回归保持。
+
+Task 1: `node scripts/test-source-coordinates.js`、`npm run test:plan`、`npm run test:block`、`npm run test:map`。
+Task 2–6 的具体输入和命令见 `docs/log/artifacts/F18-l3-inspector/drafts/implementation-plan.md`。
 
 ## Required commands
 

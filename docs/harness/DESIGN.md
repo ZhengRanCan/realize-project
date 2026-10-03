@@ -1,5 +1,12 @@
 # Design
 
+## Reading Bundle Interaction
+
+F18 增加“打开分析资料包”，用户选择一份 reading-bundle.json 即加载同目录配套资料。
+正常包默认显示框架图；Topic 先展示成员与边界，仅明确声明的 Block 关联可下钻。缺少 Map 时披露缺失并允许独立 Block 阅读。
+Block 或临时 fragment 可打开查出处面板，原文链与相关审阅材料分开展示；关闭恢复原阅读位置。
+有未保存审核时，由用户选择继续当前阅读或放弃改动后切换；不会自动保存。人工文件只在点击保存后写入当前包。
+
 ## Baseline
 
 - 视觉系统：Electron 桌面应用，深浅两套基础样式集中在 `app/renderer/styles.css`，L0 界面另有

@@ -10,7 +10,7 @@
 
 **Spec:** [Approved design](../runtime-bundle-design.md)，2026-10-03 用户认可其当前版本。
 
-**Status:** 待用户审阅实施计划；本文件列出的产品文件尚未创建或修改。
+**Status:** Approved；用户于 2026-10-03 选择当前会话按项目现有流程顺序实施，末尾独立审查。
 
 ## Global Constraints
 
@@ -259,7 +259,7 @@ Create `scripts/test-reading-bundle-preview.js`。必要时调整 `.gitignore` �
 - [x] 旧 CLI / projector / 独立 L0 与人工保存路径有回归保护；不把当前历史证据改写成新验收。
 - [x] 五条 Review Focus 已落到各自任务测试；不复用未知或不同命名空间的引用。
 - [x] 计划没有实现完整函数体或另外增加一个文档体系；本目录 drafts 表示尚未审阅的计划。
-- [ ] 用户完成计划审阅并选择执行方法。
+- [x] 用户完成计划审阅并选择 Native，按本项目现有 harness 顺序实施（2026-10-03）。
 
 ## Execution Handoff
 

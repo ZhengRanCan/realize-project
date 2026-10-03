@@ -159,16 +159,7 @@ const FORBIDDEN_PHRASES = [
 ];
 
 /** 从原文中收集"已经出现过的措辞"，用于把禁用词表变成"仅在新增时才拦"。 */
-function collectAllowedPhrases() {
-  let text = '';
-  try {
-    text = fs.readFileSync(path.join(ROOT, sourceData.document.path), 'utf8');
-  } catch (error) {
-    return new Set();
-  }
-  return new Set(FORBIDDEN_PHRASES.filter((p) => text.includes(p)));
-}
-
+function collectAllowedPhrases(text) { return new Set(FORBIDDEN_PHRASES.filter(p => text.includes(p))); }
 
 /** 允许在 statement 中出现的代码路径来源（其余一律视为事实声明）。 */
 const CODE_PATH_RE = /(?:^|[\s（(`'"])((?:app|lib|src|packages|tests?)\/[\w./-]+)/;
@@ -186,42 +177,12 @@ const KNOWN_DOCUMENTED_PATHS = [
  * 载入
  * ================================================================== */
 
-const planPath = process.argv[2] ? path.resolve(process.argv[2]) : DEFAULT_PLAN;
-
-const errors = [];
-const warnings = [];
-const hardFail = (message) => errors.push(message);
-const warn = (message) => warnings.push(message);
-
-function loadJson(file) {
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
-}
-
-let plan;
-try {
-  plan = loadJson(planPath);
-} catch (error) {
-  console.error(`✗ 无法读取 plan：${planPath}`);
-  console.error(`  ${error.message}`);
-  process.exit(1);
-}
-
+function checkPlan(plan,{design,sourceSections:sourceData,sourceText=''}) {
 const schema = loadJson(SCHEMA);
-const sourceData = loadJson(SOURCE_SECTIONS);
-const validSections = new Set(sourceData.sections.map((s) => s.label));
-
-const designPath = path.join(ROOT, (plan.designRef && plan.designRef.path) || 'fixtures/context-consumption.json');
-let design = null;
-try {
-  design = loadJson(designPath);
-} catch (error) {
-  hardFail(`designRef.path 指向的文件无法读取：${plan.designRef && plan.designRef.path}（${error.message}）`);
-}
-
-/* ================================================================== *
- * 第一层：Schema
- * ================================================================== */
-
+const errors=[],warnings=[],structuralErrors=[];let structural=true;
+const hardFail=message=>{errors.push(message);if(structural) structuralErrors.push(message);};
+const warn=message=>warnings.push(message);
+const validSections=new Set(sourceData.sections.map(s=>s.label));
 const schemaResult = validate(schema, plan);
 if (!schemaResult.valid) {
   schemaResult.errors.slice(0, 40).forEach((e) => hardFail(`[schema] ${e}`));
@@ -230,6 +191,7 @@ if (!schemaResult.valid) {
   }
 }
 
+if (!Array.isArray(plan.sourceUnits) || !Array.isArray(plan.blocks)) return {errors,warnings,structuralErrors:[...errors],stats:{}};
 const units = Array.isArray(plan.sourceUnits) ? plan.sourceUnits : [];
 const blocks = Array.isArray(plan.blocks) ? plan.blocks : [];
 const merges = Array.isArray(plan.duplicatesMerged) ? plan.duplicatesMerged : [];
@@ -246,6 +208,7 @@ blocks.forEach((b) => {
   blockById.set(b.id, b);
 });
 
+units.forEach(u => { if (!validSections.has(u.section)) hardFail(`[导航] ${u.id} 指向不存在的章节：${u.section}`); });
 const SHAPE_WHITELIST = new Set(schema.definitions.block.properties.shape.enum);
 
 /* ================================================================== *
@@ -290,6 +253,8 @@ merges.forEach((m, i) => {
 /* ================================================================== *
  * 第三层：覆盖完整性
  * ================================================================== */
+
+structural = false;
 
 /** 被任一 block 覆盖的单元（区分"只在 covers 里"与"被登记为合并"）。 */
 const coveredIds = new Set();
@@ -433,16 +398,14 @@ blocks.forEach((b) => {
 });
 
 // 陷阱 5：禁用措辞（原文已用过的除外）
-const allowedPhrases = collectAllowedPhrases();
+const allowedPhrases = collectAllowedPhrases(sourceText);
 units.forEach((u) => {
   const hit = FORBIDDEN_PHRASES.filter((p) => !allowedPhrases.has(p)).find((p) => (u.statement || '').includes(p));
   if (hit) {
     hardFail(`[陷阱] ${u.id} 的 statement 新增了禁用措辞「${hit}」：${u.statement.slice(0, 56)}…`);
   }
 });
-if (allowedPhrases.size > 0) {
-  console.log(`（原文本身出现过、因此放行的措辞：${[...allowedPhrases].join('、')}）\n`);
-}
+
 
 // 陷阱 6：编造代码事实（Phase 2 没有源码输入）
 units.forEach((u) => {
@@ -604,6 +567,18 @@ if (designOverviewPath) {
  * 输出
  * ================================================================== */
 
+
+return {errors,warnings,structuralErrors,stats:{units:units.length,blocks:blocks.length,shapeCount,covered:coveredIds.size,merged:mergedIds.size,merges:merges.length,core:units.filter(u=>u.importance==='core').length}};
+}
+function loadJson(file) {return JSON.parse(fs.readFileSync(file,'utf8'));}
+function main() {
+const argv=process.argv.slice(2), option=name=>{const i=argv.indexOf(name);return i>=0?argv[i+1]:null;};
+const planPath=argv[0]&&!argv[0].startsWith('--')?path.resolve(argv[0]):DEFAULT_PLAN;
+const plan=loadJson(planPath), sourceData=loadJson(option('--source-sections')||SOURCE_SECTIONS);
+const design=loadJson(option('--design')||path.join(ROOT,plan.designRef?.path||'fixtures/context-consumption.json'));
+const sourceText=fs.readFileSync(option('--source')||path.join(ROOT,sourceData.document.path),'utf8');
+const {errors,warnings,stats}=checkPlan(plan,{design,sourceSections:sourceData,sourceText});
+const units=plan.sourceUnits||[],blocks=plan.blocks||[],merges=plan.duplicatesMerged||[],shapeCount=stats.shapeCount||{},coveredIds={size:stats.covered||0},mergedIds={size:stats.merged||0};
 const coreCount = units.filter((u) => u.importance === 'core').length;
 console.log('=== overview-plan 验收 ===');
 console.log(`plan      ${path.relative(ROOT, planPath)}`);
@@ -629,13 +604,17 @@ if (errors.length > 0) {
   errors.forEach((e) => console.log(`  ✗ ${e}`));
   console.log('');
   console.log('结果：FAIL —— 不允许进入 Stage 2（逐块生成视觉内容）。');
-  process.exit(1);
+  return 1;
 }
 
 if (warnings.length > 0) {
   console.log('结果：PASS WITH WARNINGS —— 可以进入 Stage 2，但请先处理或确认上面的 warning。');
-  process.exit(0);
+  return 0;
 }
 
 console.log('结果：PASS —— 可以进入 Stage 2（逐块生成视觉内容）。');
-process.exit(0);
+return 0;
+
+}
+module.exports={checkPlan};
+if(require.main===module) {try {process.exitCode=main();}catch(error){console.error(error.message);process.exitCode=1;}}

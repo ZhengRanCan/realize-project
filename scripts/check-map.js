@@ -46,35 +46,7 @@ const GAP_DENSITY_MIN_RATIO = 0.5;
  * sectionLevel = 最浅的、且至少有 2 个标题的那一层（跳过孤零零的文档大标题）。
  */
 function readDocHeadings(sourcePath) {
-  const txt = fs.readFileSync(path.resolve(ROOT, sourcePath), 'utf8');
-  const heads = [];
-  // 围栏代码块内的 `#` 是注释，不是标题 —— 必须按 Markdown 语义跳过，
-  // 否则 runbook 里的 shell 注释（"# 期望: 无输出"）会被当成 level-1 标题。
-  let fenceChar = null, fenceLen = 0;
-  txt.split(/\r?\n/).forEach((line, i) => {
-    const f = line.match(/^[ \t]{0,3}(`{3,}|~{3,})/);
-    if (f) {
-      const ch = f[1][0], len = f[1].length;
-      if (!fenceChar) { fenceChar = ch; fenceLen = len; return; }
-      if (ch === fenceChar && len >= fenceLen) { fenceChar = null; fenceLen = 0; return; }
-    }
-    if (fenceChar) return;
-    const m = line.match(/^(#{1,6})[ \t]+(.*\S)[ \t]*$/);
-    if (!m) return;
-    const text = m[2].trim();
-    const num = text.match(/^(\d+(?:\.\d+)*)[.、]?[ \t]/);
-    heads.push({ level: m[1].length, text, key: num ? num[1] : text, line: i + 1 });
-  });
-  const byLevel = new Map();
-  heads.forEach((h) => byLevel.set(h.level, (byLevel.get(h.level) || 0) + 1));
-  const levels = [...byLevel.keys()].sort((a, b) => a - b);
-  const sectionLevel = levels.find((l) => byLevel.get(l) >= 2) ?? levels[0] ?? null;
-  return {
-    heads,
-    sectionLevel,
-    top: heads.filter((h) => h.level === sectionLevel).map((h) => h.key),
-    all: heads.map((h) => h.key),
-  };
+  return require('../app/shared/source-coordinates').parseDocHeadings(fs.readFileSync(path.resolve(ROOT, sourcePath), 'utf8'));
 }
 
 /** 兼容旧调用方直接传入 `{top, sub}`（测试用）。 */

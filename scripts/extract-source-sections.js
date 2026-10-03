@@ -22,74 +22,10 @@ const ROOT = path.resolve(__dirname, '..');
 const DOC = path.join(ROOT, '测试文档', '18-context-consumption-semantic-model.md');
 const OUT = path.join(ROOT, 'docs', 'source-sections.json');
 
-const CN_DIGITS = { 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
-
-function cnToNumber(text) {
-  if (text === '十') return 10;
-  if (text.startsWith('十')) return 10 + (CN_DIGITS[text[1]] || 0);
-  if (text.endsWith('十')) return (CN_DIGITS[text[0]] || 0) * 10;
-  if (text.includes('十')) {
-    const [tens, ones] = text.split('十');
-    return (CN_DIGITS[tens] || 0) * 10 + (CN_DIGITS[ones] || 0);
-  }
-  return CN_DIGITS[text] || 0;
-}
-
-const lines = fs.readFileSync(DOC, 'utf8').split(/\r?\n/);
-
-/** @type {{label:string,title:string,startLine:number,endLine:number,lines:string[]}[]} */
-const raw = [];
-let current = { label: '§0', title: '文档头（定位与非目标声明）', startLine: 1, lines: [] };
-
-const flush = (endLine) => {
-  current.endLine = endLine;
-  raw.push(current);
-};
-
-lines.forEach((line, index) => {
-  const h2 = line.match(/^##\s+(.+)$/);
-  const h1 = line.match(/^#\s+(.+)$/);
-  if (h1 && !h2) {
-    // 文档大标题：并入 §0，不单独成节
-    current.lines.push(line);
-    return;
-  }
-  if (h2) {
-    flush(index); // 上一节到本行之前结束
-    const label = h2[1].trim();
-    const m = label.match(/^([一二三四五六七八九十]+)、\s*(.*)$/);
-    current = {
-      label: m ? `§${cnToNumber(m[1])}` : `§?${label}`,
-      title: m ? m[2].trim() : label,
-      startLine: index + 1,
-      lines: [line],
-    };
-    return;
-  }
-  current.lines.push(line);
-});
-flush(lines.length);
-
-const sections = raw
-  .filter((s) => s.lines.some((l) => l.trim() !== ''))
-  .map((s) => ({
-    label: s.label,
-    title: s.title,
-    startLine: s.startLine,
-    endLine: s.endLine,
-    lines: s.endLine - s.startLine + 1,
-    text: s.lines.join('\n').replace(/\s+$/, ''),
-  }));
-
-const payload = {
-  document: {
-    path: path.relative(ROOT, DOC).replace(/\\/g, '/'),
-    title: lines[0].replace(/^#\s*/, '').trim(),
-    totalLines: lines.length,
-  },
-  sections,
-};
-
+const {buildSourceRegistry}=require('../app/shared/source-coordinates');
+const registry=buildSourceRegistry(fs.readFileSync(DOC,'utf8'),{sourcePath:path.relative(ROOT,DOC).replace(/\\/g,'/')});
+const payload={document:{path:registry.document.path,title:registry.document.title,totalLines:registry.document.totalLines},sections:registry.sections};
+const sections=payload.sections,lines={length:payload.document.totalLines};
 fs.writeFileSync(OUT, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 
 console.log(`已写出 ${path.relative(ROOT, OUT)}：${sections.length} 节，覆盖 ${lines.length} 行`);

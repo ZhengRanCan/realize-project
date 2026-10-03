@@ -2,6 +2,10 @@
 
 ## Module boundaries
 
+F18 的加载协议见 `docs/specs/reading-bundle-contract.md`。main 读取资料包并注入显式校验上下文，
+shared 只投影已验证的数据；两阶段 prepare/commit 保证加载失败、取消或过期回复不切换 session。
+Plan / Generated / Map 保留各自 identity；来源 registry 随资料包绑定。离线导出复用校验链，保留输入原始字节。
+
 | Area | Owns | Must not own |
 | --- | --- | --- |
 | `app/renderer/`（UI / delivery） | 两页导航、四段 Overview、决策卡片、Source 回查面板、L0/L1/L2 渲染布局 | 文件访问、契约判定、模型调用；不得读取 `model.overview` 或解释 source / review relationship 状态 |

@@ -197,7 +197,7 @@ function collectElements(content) {
   }
 
   if (type === 'matrix') {
-    (content.columns || []).forEach((c, i) => push(`columns[${i}]`, c, [], '列标题', { presentation: true }));
+    (content.columns || []).forEach((c, i) => push(`columns[${i}]`, typeof c==='string'?c:c.text, [], '列标题', { presentation: true }));
     (content.rows || []).forEach((row, ri) => {
       (row || []).forEach((cell, ci) => {
         const text = typeof cell === 'string' ? cell : cell.text;
@@ -277,6 +277,8 @@ function loadJson(file) {
 function checkBlock(block, plan, options = {}) {
   const errors = [];
   const warnings = [];
+  const structuralErrors=[];
+  const structureFail=m=>{errors.push(m);structuralErrors.push(m);};
   const hardFail = (m) => errors.push(m);
   const warn = (m) => warnings.push(m);
 
@@ -287,14 +289,14 @@ function checkBlock(block, plan, options = {}) {
   /* ---------------- 1. 固定字段不得被修改 ---------------- */
 
   if (!planBlock) {
-    hardFail(`[plan] 找不到 id = ${block && block.id} 的 plan block —— 无法校验固定字段`);
+    structureFail(`[plan] 找不到 id = ${block && block.id} 的 plan block —— 无法校验固定字段`);
   } else {
     const FIXED = ['id', 'title', 'stage', 'shape', 'covers', 'sourceRefs', 'reviewObjects', 'defaultExpanded'];
     FIXED.forEach((field) => {
       const fromPlan = JSON.stringify(planBlock[field]);
       const fromBlock = JSON.stringify(block[field]);
       if (fromBlock !== fromPlan) {
-        hardFail(`[plan] 固定字段被修改：${field}\n        plan:  ${fromPlan}\n        block: ${fromBlock}`);
+        structureFail(`[plan] 固定字段被修改：${field}\n        plan:  ${fromPlan}\n        block: ${fromBlock}`);
       }
     });
   }
@@ -303,16 +305,26 @@ function checkBlock(block, plan, options = {}) {
 
   const schemaResult = validate(schema, { shape: block.shape, content: block.content });
   if (!schemaResult.valid) {
-    schemaResult.errors.slice(0, 20).forEach((e) => hardFail(`[schema] ${e}`));
-    if (schemaResult.errors.length > 20) hardFail(`[schema] 另有 ${schemaResult.errors.length - 20} 条结构错误未列出`);
+    schemaResult.errors.slice(0, 20).forEach((e) => structureFail(`[schema] ${e}`));
+    if (schemaResult.errors.length > 20) structureFail(`[schema] 另有 ${schemaResult.errors.length - 20} 条结构错误未列出`);
   }
 
+  const branch=schema.oneOf.find(candidate=>candidate.properties.shape.const===block.shape || candidate.properties.shape.enum?.includes(block.shape));
+  if (branch) {
+    const selected=validate({...branch,definitions:schema.definitions}, {shape:block.shape,content:block.content});
+    selected.errors.forEach(e=>structureFail('[schema] '+e));
+  }
+  if(!schemaResult.valid || (branch && validate({...branch,definitions:schema.definitions}, {shape:block.shape,content:block.content}).valid===false)) {
+    if(block.content?.type && SHAPE_TO_CONTENT_TYPE[block.shape]!==block.content.type) structureFail('[shape] shape 与 content.type 不一致');
+    if(/"source-verified"|"sourceVerified"\s*:\s*true/.test(JSON.stringify(block))) hardFail('[陷阱] content 中出现 source-verified / sourceVerified');
+    return {verdict:'FAIL',errors,warnings,structuralErrors,coverage:{},elements:[],missing:[]};
+  }
   /* ---------------- 3. shape ↔ content.type 一致 ---------------- */
 
   const expectedType = SHAPE_TO_CONTENT_TYPE[block.shape];
   const actualType = block.content && block.content.type;
   if (expectedType && actualType && expectedType !== actualType) {
-    hardFail(`[shape] shape 与 content.type 不一致：shape=${block.shape} 期望 content.type=${expectedType}，实际 ${actualType}`);
+    structureFail(`[shape] shape 与 content.type 不一致：shape=${block.shape} 期望 content.type=${expectedType}，实际 ${actualType}`);
   }
 
   /* ---------------- 4. provenance 合法性 + Block Semantic Coverage ---------------- */
@@ -326,9 +338,9 @@ function checkBlock(block, plan, options = {}) {
     ids.forEach((id) => {
       provenanceIds.add(id);
       if (!unitById.has(id)) {
-        hardFail(`[provenance] ${el.path} 引用了不存在的 sourceUnit：${id}`);
+        structureFail(`[provenance] ${el.path} 引用了不存在的 sourceUnit：${id}`);
       } else if (planBlock && !(planBlock.covers || []).includes(id)) {
-        hardFail(
+        structureFail(
           `[provenance] ${el.path} 引用了不在 block.covers 中的 sourceUnit：${id}` +
             `（本块 covers = ${(planBlock.covers || []).join(', ')}）`
         );
@@ -542,7 +554,7 @@ function checkBlock(block, plan, options = {}) {
   }
 
   const verdict = errors.length > 0 ? 'FAIL' : warnings.length > 0 ? 'PASS WITH WARNINGS' : 'PASS';
-  return { verdict, errors, warnings, coverage, elements, missing };
+  return { verdict, errors, warnings, structuralErrors, coverage, elements, missing };
 }
 
 function contentType(block) {
@@ -588,30 +600,7 @@ function allowedPhrasesFromSource() {
  *
  * 只处理"没有 node 键、但有 title"的条目，避免误伤正确写法。
  */
-function normalizeFlatNodes(input) {
-  const block = JSON.parse(JSON.stringify(input));
-  const notes = [];
-  const content = block.content;
-  if (!content || content.type !== 'flow' || !Array.isArray(content.lanes)) return { block, notes };
-
-  let rewrites = 0;
-  content.lanes.forEach((lane) => {
-    if (!Array.isArray(lane.nodes)) return;
-    lane.nodes = lane.nodes.map((entry) => {
-      if (!entry || typeof entry !== 'object') return entry;
-      if (entry.node || !entry.title) return entry;
-      const { edge, ...nodeFields } = entry;
-      rewrites += 1;
-      return edge ? { node: nodeFields, edge } : { node: nodeFields };
-    });
-  });
-  if (rewrites > 0) {
-    notes.push(
-      `[契约] 检测到 ${rewrites} 个"扁平节点"写法（nodes[] 直接放 title/detail），已按 renderer 契约归一为 { node: {...}, edge: {...} } —— 这是结构差异，不是语义错误`
-    );
-  }
-  return { block, notes };
-}
+function normalizeFlatNodes(input) {return require('../app/shared/generated-expression').normalizeGeneratedBlock(input);}
 
 function main() {
   const args = parseArgs(process.argv.slice(2));

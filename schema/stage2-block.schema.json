@@ -52,7 +52,7 @@
       "properties": {
         "text": { "type": "string", "minLength": 1 },
         "note": { "type": "string" },
-        "variant": { "enum": ["ok", "bad", "muted", "plain", "warn", "info"] },
+        "variant": { "$ref": "#/definitions/variant" },
         "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
       }
     },
@@ -62,7 +62,7 @@
       "additionalProperties": false,
       "properties": {
         "title": { "type": "string" },
-        "variant": { "enum": ["plain", "ok", "bad", "warn", "info"] },
+        "variant": { "$ref": "#/definitions/variant" },
         "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" },
         "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/checklistItem" } }
       }
@@ -97,7 +97,7 @@
       "additionalProperties": false,
       "properties": {
         "label": { "type": "string", "minLength": 1 },
-        "variant": { "enum": ["plain", "current", "target"] },
+        "variant": { "$ref": "#/definitions/variant" },
         "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" },
         "nodes": {
           "type": "array",
@@ -193,7 +193,7 @@
           "additionalProperties": false,
           "properties": {
             "type": { "const": "matrix" },
-            "columns": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+            "columns": { "type": "array", "minItems": 2, "items": { "type": ["string", "object"], "minLength": 1, "required": ["text"], "additionalProperties": false, "properties": { "text": { "type": "string", "minLength": 1 }, "variant": { "$ref": "#/definitions/variant" } } } },
             "note": { "type": "string" },
             "rows": {
               "type": "array",
@@ -318,7 +318,7 @@
               "additionalProperties": false,
               "properties": {
                 "text": { "type": "string", "minLength": 1 },
-                "variant": { "enum": ["ok", "warn", "bad", "info", "plain"] },
+                "variant": { "$ref": "#/definitions/variant" },
                 "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
               }
             }
@@ -349,7 +349,7 @@
                   "key": { "type": "string", "minLength": 1 },
                   "keyVariants": { "type": "array", "items": { "type": "string" } },
                   "value": { "type": "string", "minLength": 1 },
-                  "variant": { "enum": ["plain", "ok", "warn", "bad", "info"] },
+                  "variant": { "$ref": "#/definitions/variant" },
                   "sourceUnitIds": { "$ref": "#/definitions/sourceUnitIds" }
                 }
               }

@@ -254,7 +254,7 @@ function contentMatrix(content) {
   const table = el('table', `matrix cols-${columns.length}`);
   const thead = el('thead');
   const headRow = el('tr');
-  columns.forEach((label) => headRow.appendChild(el('th', '', label)));
+  columns.forEach((label) => headRow.appendChild(el('th', '', typeof label === 'string' ? label : label.text)));
   thead.appendChild(headRow);
   table.appendChild(thead);
   const tbody = el('tbody');
