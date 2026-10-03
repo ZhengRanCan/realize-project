@@ -752,7 +752,7 @@ table.matrix .rowhead { background: var(--bg-2); }
 .l1-workspace { display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start; }
 .l1-graph-wrap { min-width:0;max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--bg-2); }
 .l1-graph { position:relative;isolation:isolate; }
-.l1-boundary-zone { position:absolute;border:1px solid var(--accent-line);border-radius:12px;background:var(--accent-bg);opacity:.5;pointer-events:none; }
+.l1-boundary-zone { position:absolute;border:1px solid var(--accent-line);border-radius:12px;background:var(--accent-bg);pointer-events:none; }
 .l1-boundary-zone > span { position:absolute;top:-32px;left:12px;white-space:nowrap;color:var(--fg);font-size:13px; }
 .l1-outside-zone { border-style:dashed;background:var(--bg-3);border-color:var(--line-strong); }
 .l1-lines { position:absolute;inset:0;pointer-events:none;overflow:visible; }

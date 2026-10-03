@@ -28,7 +28,8 @@ const {createReadingSessionController,inspectReadingSession,sourceReadingSession
 const bundleSessions=createReadingSessionController();
 
 const PROJECT_ROOT = resolveRepositoryPath(__dirname, '..', '..');
-const SELF_TEST = process.argv.includes('--selftest');
+const BOUNDARY_TEST = process.argv.includes('--selftest-l1-boundary');
+const SELF_TEST = process.argv.includes('--selftest') || BOUNDARY_TEST;
 /** `--verify-preview <file>`：加载生成的 preview HTML 并断言 DOM（实验性验证，不改 UI）。 */
 const VERIFY_PREVIEW = (() => {
   const i = process.argv.indexOf('--verify-preview');
@@ -421,6 +422,10 @@ async function runSelfTest() {
       win.webContents.once('did-finish-load', resolve);
     });
 
+    if (BOUNDARY_TEST) {
+      ok(await require('../../scripts/test-l1-boundary-view-electron').runBoundaryIntegration(win));
+      emit();app.exit(0);return;
+    }
     const domCheck = await win.webContents.executeJavaScript(
       `(() => ({
          hasApi: typeof window.designReview === 'object',
@@ -1206,6 +1211,7 @@ async function runSelfTest() {
     ok(await require('../../scripts/test-explore-electron').runExploreIntegration(win));
     ok(await require('../../scripts/test-product-maturity-electron').runMaturityIntegration(win));
     ok(await require('../../scripts/test-reading-integration-electron').runIntegrationInvariants(win));
+    ok(await require('../../scripts/test-l1-boundary-view-electron').runBoundaryIntegration(win));
 
     emit();
     const failedCount = report.filter((line) => line.startsWith('✗')).length;
@@ -1276,6 +1282,8 @@ async function runVerifyPreview(filePath) {
         ok(await require('../../scripts/test-product-maturity-electron').exerciseMaturity(win));
         await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
         ok(await require('../../scripts/test-reading-integration-electron').exerciseIntegration(win));
+        await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
+        ok(await require('../../scripts/test-l1-boundary-view-electron').exerciseBoundaryView(win));
       } else {
         const nav=await win.webContents.executeJavaScript("(()=>{window.__closeInspection();const n=window.__readingNavigation;const origin=n.snapshot().current;const calls=n.snapshot().resolverCalls;n.resolve({kind:'block',id:'O-01'});n.back();return n.snapshot().resolverCalls===calls+1&&JSON.stringify(origin.address)===JSON.stringify(n.snapshot().current.address);})()");
         if(!nav)throw new Error('Preview Back/Resolve');ok('Preview no-map canonical Block and Back isolation');

@@ -1,6 +1,7 @@
 'use strict';
 
 const directional = new Set(['consumes', 'produces', 'depends-on', 'contains', 'validates', 'controls', 'constrains', 'transforms-to']);
+const {resolveSourceCoordinate} = require('./source-coordinates');
 // The display projection owns its copies, including optional nested metadata.
 function copyFrozen(value) {
   if (Array.isArray(value)) return Object.freeze(value.map(copyFrozen));
@@ -10,7 +11,7 @@ function copyFrozen(value) {
 function pick(value, keys) {
   return Object.fromEntries(keys.filter(key => Object.prototype.hasOwnProperty.call(value, key)).map(key => [key, value[key]]));
 }
-function projectTopic(map, topicId, {plan}={}) {
+function projectTopic(map, topicId, {plan,sourceSections,sourceIntegrity}={}) {
   const topic = map.topics.find((item) => item.id === topicId);
   if (!topic) throw new Error(`unknown topic ${topicId}`);
   const inside = map.elements.filter((element) => element.topics.includes(topicId));
@@ -30,6 +31,14 @@ function projectTopic(map, topicId, {plan}={}) {
     : { state: 'unknown' };
   const outsideIds = new Set(relations.filter(r => r.role !== 'internal').flatMap(({edge}) => [edge.from, edge.to]).filter(id => !ids.has(id)));
   const elementFields = ['id', 'label', 'type', 'sectionRefs', 'sourceUnitIds'];
+  // These are loaded-coordinate capabilities, not provenance assurances. Reading
+  // the original still goes through the session API and its live integrity guard.
+  const sourceReferences = [...new Set([topic,...inside,...map.elements.filter(e=>outsideIds.has(e.id))].flatMap(e=>e.sectionRefs||[]))].map(ref=>{
+    const address={namespace:'heading',key:ref.replace(/^§/,'')};
+    if(sourceIntegrity!=='consistent')return {ref,...address,state:'unavailable',reason:sourceIntegrity==='drifted'?'原文或坐标已漂移，无法可靠定位':'当前未加载可核对的原文资料'};
+    const coordinate=resolveSourceCoordinate(sourceSections,address);
+    return {ref,...address,state:coordinate.state,...(coordinate.reason?{reason:coordinate.reason}:{})};
+  });
   const result = {
     kind: 'L1TopicViewModel',
     document: pick(map.document || {}, ['id', 'title', 'sourcePath', 'role']),
@@ -37,7 +46,7 @@ function projectTopic(map, topicId, {plan}={}) {
     inside: inside.map(e => pick(e, elementFields)),
     outside: map.elements.filter(e => outsideIds.has(e.id)).map(e => pick(e, elementFields)),
     relations: relations.map(({edge, role}) => ({...pick(edge, ['id', 'from', 'to', 'type', 'label', 'qualifiers', 'note']), role})),
-    relationClasses, blockOrganization,
+    relationClasses, blockOrganization, sourceReferences,
     representation: relations.length ? 'boundary-map' : 'boundary-summary',
   };
   if(plan && blockOrganization.state==='known') {

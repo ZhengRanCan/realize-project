@@ -8,12 +8,70 @@ const L1TopicView = (() => {
   const LABEL_W = 148, LABEL_H = 44;
   const overlaps = (a,b) => a.x < b.x+b.w+8 && a.x+a.w+8 > b.x && a.y < b.y+b.h+8 && a.y+a.h+8 > b.y;
 
+  // Route through open channels around cards. The first and final short segments
+  // follow the port normal, so arrows always enter the target from outside.
+  function routeBetween(start,end,nodes,{avoidPoint,used=[]}={}) {
+    const obstacles=nodes.map(n=>({x:n.x-24,y:n.y-24,w:n.w+48,h:n.h+48}));
+    if(avoidPoint)obstacles.push({x:avoidPoint.x-8,y:avoidPoint.y-8,w:16,h:16});
+    const xs=[...new Set([16,start.x,end.x,...used.flatMap(p=>[p.x-24,p.x,p.x+24]),...obstacles.flatMap(n=>[n.x,n.x+n.w])])].sort((a,b)=>a-b);
+    const ys=[...new Set([76,start.y,end.y,...used.flatMap(p=>[p.y-24,p.y,p.y+24]),...obstacles.flatMap(n=>[n.y,n.y+n.h])])].sort((a,b)=>a-b);
+    const clear=(a,b)=>!obstacles.some(n=>a.x===b.x
+      ?a.x>n.x&&a.x<n.x+n.w&&Math.max(a.y,b.y)>n.y&&Math.min(a.y,b.y)<n.y+n.h
+      :a.y>n.y&&a.y<n.y+n.h&&Math.max(a.x,b.x)>n.x&&Math.min(a.x,b.x)<n.x+n.w)
+      &&!used.slice(1).some((d,i)=>{
+        const c=used[i],horizontal=a.y===b.y,otherHorizontal=c.y===d.y;
+        if(horizontal===otherHorizontal)return horizontal
+          ?a.y===c.y&&Math.max(Math.min(a.x,b.x),Math.min(c.x,d.x))<Math.min(Math.max(a.x,b.x),Math.max(c.x,d.x))
+          :a.x===c.x&&Math.max(Math.min(a.y,b.y),Math.min(c.y,d.y))<Math.min(Math.max(a.y,b.y),Math.max(c.y,d.y));
+        const cross=horizontal?{x:c.x,y:a.y}:{x:a.x,y:c.y};
+        if(cross.x===start.x&&cross.y===start.y)return false;
+        return cross.x>=Math.min(a.x,b.x)&&cross.x<=Math.max(a.x,b.x)&&cross.y>=Math.min(a.y,b.y)&&cross.y<=Math.max(a.y,b.y)
+          &&cross.x>=Math.min(c.x,d.x)&&cross.x<=Math.max(c.x,d.x)&&cross.y>=Math.min(c.y,d.y)&&cross.y<=Math.max(c.y,d.y);
+      });
+    const initial={x:xs.indexOf(start.x),y:ys.indexOf(start.y),dir:0,cost:0,prev:null};
+    const heuristic=p=>Math.abs(xs[p.x]-end.x)+Math.abs(ys[p.y]-end.y);
+    const queue=[initial],best=new Map();
+    while(queue.length) {
+      queue.sort((a,b)=>(a.cost+heuristic(a))-(b.cost+heuristic(b)));
+      const p=queue.shift(),key=`${p.x},${p.y},${p.dir}`;
+      if(best.has(key)&&best.get(key)<p.cost)continue;
+      if(xs[p.x]===end.x&&ys[p.y]===end.y) {
+        const points=[];for(let step=p;step;step=step.prev)points.unshift({x:xs[step.x],y:ys[step.y]});return points;
+      }
+      for(const [dx,dy,dir]of [[-1,0,1],[1,0,1],[0,-1,2],[0,1,2]]) {
+        const x=p.x+dx,y=p.y+dy;if(x<0||y<0||x>=xs.length||y>=ys.length)continue;
+        const a={x:xs[p.x],y:ys[p.y]},b={x:xs[x],y:ys[y]};if(!clear(a,b))continue;
+        const cost=p.cost+Math.abs(a.x-b.x)+Math.abs(a.y-b.y)+(p.dir&&p.dir!==dir?12:0),nextKey=`${x},${y},${dir}`;
+        if(best.has(nextKey)&&best.get(nextKey)<=cost)continue;
+        best.set(nextKey,cost);queue.push({x,y,dir,cost,prev:p});
+      }
+    }
+    throw new Error('L1 has no clear route between ports');
+  }
+  function routeEdge(s,t,label,a,b,nodes) {
+    const outsidePort=(p,n)=>p.x===n.x?{x:p.x-24,y:p.y}:p.x===n.x+n.w?{x:p.x+24,y:p.y}
+      :p.y===n.y?{x:p.x,y:p.y-24}:{x:p.x,y:p.y+24};
+    const start=outsidePort(s,a),end=outsidePort(t,b);
+    const first=routeBetween(start,label,nodes,{avoidPoint:end});
+    const raw=[s,...first,...routeBetween(label,end,nodes,{used:first}).slice(1),t],points=[];
+    for(const p of raw) {
+      const last=points.at(-1);if(last&&last.x===p.x&&last.y===p.y)continue;
+      const prev=points.at(-2);
+      if(prev&&((prev.x===last.x&&last.x===p.x&&(last.y-prev.y)*(p.y-last.y)>=0)||(prev.y===last.y&&last.y===p.y&&(last.x-prev.x)*(p.x-last.x)>=0)))points.pop();
+      points.push(p);
+    }
+    return points;
+  }
+
   function computeTopicLayout(vm) {
     if (!vm.relations.length) return {nodes:[],edges:[],bounds:{width:0,height:0},insideBounds:null,outsideBounds:null};
     const internal = vm.relations.filter(r => r.role === 'internal');
-    const base = layoutAPI.computeL0Layout({elements:vm.inside,edges:internal,attachments:[]}, {grid:{NODE_H:104,COL_GAP:176,ROW_GAP:124,PAD:100,ORPHAN_COLS:2}});
-    const nodes = base.nodes.map(n => ({...n,scope:'inside',y:n.y+52}));
-    const insideWidth = base.bounds.width+80;
+    const base = layoutAPI.computeL0Layout({elements:vm.inside,edges:internal,attachments:[]}, {grid:{NODE_W:216,NODE_H:104,COL_GAP:176,ROW_GAP:124,PAD:96,ORPHAN_COLS:(vm.outside||[]).length?1:2}});
+    // L0's isolated-member band reserves space below the main graph. In a
+    // crossing-only Topic there is no main graph, so remove that leading gap.
+    const shiftY=internal.length?52:152-Math.min(...base.nodes.map(n=>n.y));
+    const nodes = base.nodes.map(n => ({...n,scope:'inside',y:n.y+shiftY}));
+    const insideWidth = base.bounds.width+48;
     const byId = new Map(nodes.map(n => [n.id,n]));
     let lastBottom = 72;
     const outside = (vm.outside || []).map((e,index) => {
@@ -21,7 +79,7 @@ const L1TopicView = (() => {
       return {e,index,y:peers.length?peers.reduce((sum,n)=>sum+n.y,0)/peers.length:100};
     }).sort((a,b)=>a.y-b.y||a.index-b.index);
     for(const {e,y} of outside) {
-      const node={...e,scope:'outside',x:insideWidth+248,y:Math.max(lastBottom+40,y),w:236,h:104};
+      const node={...e,scope:'outside',x:insideWidth+184,y:Math.max(lastBottom+40,y),w:216,h:104};
       lastBottom=node.y+node.h;nodes.push(node);byId.set(node.id,node);
     }
     const occupied=nodes.map(n=>({x:n.x,y:n.y,w:n.w,h:n.h}));
@@ -39,9 +97,10 @@ const L1TopicView = (() => {
       let s,t,candidate;
       if(r.role!=='internal') {
         const inner=a.scope==='inside'?a:b,outer=a.scope==='outside'?a:b;
-        const p={x:inner.x+inner.w/2,y:inner.y+inner.h},q={x:outer.x,y:outer.y+outer.h/2};
+        const blocked=nodes.some(n=>n.scope==='inside'&&n.id!==inner.id&&n.x>=inner.x+inner.w&&n.y<inner.y+inner.h/2&&n.y+n.h>inner.y+inner.h/2);
+        const p=blocked?{x:inner.x+inner.w/2,y:inner.y+inner.h}:{x:inner.x+inner.w,y:inner.y+inner.h/2},q={x:outer.x,y:outer.y+outer.h/2};
         [s,t]=a.scope==='inside'?[p,q]:[q,p];
-        candidate={x:insideWidth+124,y:(p.y+q.y)/2+ordinal*56};
+        candidate={x:insideWidth+92,y:Math.max(blocked?inner.y+inner.h+44:100,(p.y+q.y)/2)+ordinal*56};
       } else if(a.id===b.id) {
         s={x:a.x+a.w,y:a.y+26};t={x:a.x+a.w,y:a.y+a.h-26};
         candidate={x:a.x+a.w+100,y:a.y+a.h/2+ordinal*56};
@@ -55,20 +114,20 @@ const L1TopicView = (() => {
         candidate={x:down?(s.x+t.x)/2:Math.min(a.x,b.x)-80,y:(s.y+t.y)/2+ordinal*56};
       }
       const label=labelSlot(candidate.x,candidate.y);
-      // Each curve passes its own label slot. Paths remain separate for parallel edges.
-      const d=`M ${s.x} ${s.y} C ${s.x} ${label.y}, ${label.x-32} ${label.y}, ${label.x} ${label.y} C ${label.x+32} ${label.y}, ${t.x} ${label.y}, ${t.x} ${t.y}`;
-      return {...r,relationIndex:index,d,labelX:label.x,labelY:label.y,labelW:LABEL_W,labelH:LABEL_H,directed:r.type!=='relates-to'};
+      const points=routeEdge(s,t,label,a,b,nodes);
+      const d=points.map((p,i)=>`${i?'L':'M'} ${p.x} ${p.y}`).join(' ');
+      return {...r,relationIndex:index,d,points,labelX:label.x,labelY:label.y,labelW:LABEL_W,labelH:LABEL_H,directed:r.type!=='relates-to'};
     });
     const bottom=Math.max(...occupied.map(r=>r.y+r.h))+72;
-    const right=Math.max(...occupied.map(r=>r.x+r.w))+72;
-    return {nodes,edges,bounds:{width:right,height:bottom},insideBounds:{x:12,y:52,width:insideWidth-12,height:bottom-68},outsideBounds:outside.length?{x:insideWidth+232,y:52,width:268,height:bottom-68}:null};
+    const right=Math.max(...occupied.map(r=>r.x+r.w+48),insideWidth+12,outside.length?insideWidth+448:0);
+    return {nodes,edges,bounds:{width:right,height:bottom},insideBounds:{x:12,y:52,width:insideWidth-12,height:bottom-68},outsideBounds:outside.length?{x:insideWidth+168,y:52,width:248,height:bottom-68}:null};
   }
 
   function provenance(e,options) {
     const refs=[...(e.sectionRefs||[]),...(e.sourceUnitIds||[])];
     return refs.length?refs.map(ref=>options.canSourceRef?.(ref)
       ?`<button class="chip link" data-l1-source="${esc(ref)}">${esc(ref)}</button>`
-      :`<span class="chip mono">${esc(ref)}</span>`).join(' ') : '<span class="muted">未提供可解析出处。</span>';
+      :`<span class="chip mono">${esc(ref)}</span>${options.sourceRefReason?.(ref)?`<span class="muted small">（${esc(options.sourceRefReason(ref))}）</span>`:''}`).join(' ') : '<span class="muted">未提供可解析出处。</span>';
   }
   function elementDetail(e,scope,options) {
     return `<h3>${esc(e.label)}</h3><p class="mono">${esc(e.id)} · ${scope==='outside'?'主题外部对象':'本主题成员'}</p>
@@ -116,6 +175,7 @@ const L1TopicView = (() => {
   function getSelection(host) {return host.querySelector('.l1-topic-view')?.__selection||null;}
   function restoreSelection(host,selection) {host.querySelector('.l1-topic-view')?.__select?.(selection);}
   function mount(host,vm,options={}) {
+    const priorRoot=host.querySelector('.l1-topic-view'),priorSelection=priorRoot?.dataset.l1Topic===vm.topic.id?getSelection(host):null;
     host.__l1Abort?.abort();host.__l1Abort=new AbortController();
     const signal=host.__l1Abort.signal;
     host.innerHTML=renderTopicHTML(vm,options);
@@ -142,6 +202,7 @@ const L1TopicView = (() => {
       else if(button.hasAttribute('data-l1-block'))options.onBlock?.(button.dataset.l1Block);
       else if(button.hasAttribute('data-l1-source'))options.onSourceRef?.(button.dataset.l1Source);
     },{signal});
+    if(priorSelection)restoreSelection(host,priorSelection);
   }
   return {computeTopicLayout,renderTopicHTML,mount,getSelection,restoreSelection};
 })();

@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-03T13:29:14.978Z",
+  "input": "public context-consumption Gold; schema/check-map-valid test copies",
+  "shots": [
+    {
+      "file": "internal-diagram.png",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "crossing-diagram.png",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "internal-narrow.png",
+      "width": 640,
+      "height": 720
+    },
+    {
+      "file": "boundary-summary.png",
+      "width": 640,
+      "height": 720
+    }
+  ],
+  "report": "F23 real internal/crossing diagram, native keys, full identity/edges and Block/Element/Explore Back passed"
+}

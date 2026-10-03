@@ -3,10 +3,10 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: F23 L1 Topic Boundary View，展示设计已确认、实施计划待审阅；F17 保持 blocked，F24 为 not_started。
-- Next queued feature: F23 完成后继续 F24；当前已开始 F23 设计，未改产品代码。
+- Active feature: none；F23 技术实现、完整回归与独立审查完成，blocked 等待用户查看实际图；F17 保持同一验收阻塞，F24 为 not_started。
+- Next queued feature: 用户确认 F23 实际界面后关闭 F23/F17，再继续 F24。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
-- Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；登记与展示设计作为本地文档检查点提交，未推送；不提前合并 main。
+- Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
   （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
@@ -31,13 +31,13 @@
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `passing` | F19–F21后补真实模块/DOM、Back与Known(0)落点证据，独立审查通过 |
 | F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 仅数据投影接入完成；独立单 Block 展示由 F24 补齐 |
-| F17 | L1 Topic Runtime | `blocked` | 投影/入口已通过；有关系时仍为文字列表，待 F23 补齐图并实际验收 |
+| F17 | L1 Topic Runtime | `blocked` | 投影/入口已通过；F23 已补齐图及自动化回归；待实际用户验收 |
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
 | F19 | Reading Navigation and Resolver | `passing` | 统一导航/定位、真实逐层返回、便携Preview与独立审查通过；Explore组合路径由F20验证 |
 | F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
-| F23 | L1 Topic Boundary View | `active` | 展示设计已确认，实施计划已写待审阅；图实现与实际界面验收待做 |
+| F23 | L1 Topic Boundary View | `blocked` | 图、出处能力、真实回归与独立审查完成；只待用户实际图理解性验收 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
 
 ### 阶段划分（2026-09-29 登记）
@@ -325,3 +325,16 @@ Source-verified Evidence
 - 用户确认展示设计（“可以，做吧”），[实施计划](log/artifacts/F23-l1-topic-boundary-view/drafts/implementation-plan.md)已写并自查；沿用 Native，未重新选择执行方式。
 - 三个任务：显示投影、图形与披露 renderer、真实产品/Preview 接入与返回现场验证。
 - 计划待审阅后实施；产品代码和未来测试尚未创建，实际界面验收待实现后进行。
+
+## F23 Shared changes and review repairs
+
+- 用户已批准实施计划，Native 实施中。L1 图模块与真实产品/Preview 接入已完成初轮验证。
+- 独立审查发现平行关系穿过卡片及 Source 按标签前缀误启用的问题，先记录再修正。
+- 共享 reading-projection 仅将包内已加载 sourceSections / sourceIntegrity 传给 L1；复用现有 coordinate resolver 判断入口可用性，原文仍由已有受 session/integrity 保护的 API 读取。补充 pure projection 与真实 Source 回归，不改 schema/validator 或 L2/L3 语义。
+
+## 2026-10-03 — F23 Technical Delivery
+
+- 用户批准设计及 Native 实施计划；局部/边界图、外部身份、关系完整披露、真实原文能力与 occurrence 返回现场已接入 Electron / 共用 Preview。
+- 完整 test:all、单独 full selftest、输入 gates、静态检查通过；新路径覆盖公共 5 Map/31 Topic/66 关系、1–6 条 parallel/self/inbound/outbound/symmetric、640×720、合法 summary、Unknown/Known(0)/无 Plan 与 Source 缺失/重复/漂移。最终 docs/harness 同步检查通过。
+- 独立审查的三项 P2（卡片穿越/目标箭头方向、虚假 Source 能力、标签处线路折返）均修复；复查无剩余 P1/P2。证据：[F23 verification](log/artifacts/F23-l1-topic-boundary-view/verification-summary.md)。
+- 用户尚未查看实际实现并确认可理解性；F23/F17 保持 blocked，F24 未启动。只读预览 workspace/previews/f23-reading-preview.html 供试用，正式数据与审核不改；临时测试输出已按任务清理，无新增永久 txt 日志。继续开发分支，不合并 main。

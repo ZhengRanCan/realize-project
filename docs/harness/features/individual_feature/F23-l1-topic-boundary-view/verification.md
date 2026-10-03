@@ -2,13 +2,13 @@
 
 ## Required commands
 
-登记阶段只执行文档/harness 检查。下列实现测试文件是本合同允许新增的目标，创建并接入 suite 后才执行，不声称现在已经存在或通过。
+下列实现测试已创建并接入 suite；自动化与独立审查通过，用户对实际图可理解性的验收仍待记录。结果见 feature artifact 中的 verification-summary。
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |
 | Static | 对修改/新增 JS 逐个 node --check；git diff --check | yes | 静态检查结果 |
 | Projection | node scripts/test-l1-topic-projection.js | yes | membership、边界分类、三态、纯度 |
-| View | 新增界面结构测试，接入 test:all 后执行 | yes after implementation | 完整 identity/edge 集合、内外端点、方向及退化；不能只查字符串 |
+| View | node scripts/test-l1-boundary-view.js | yes | 完整 identity/edge 集合、内外端点、方向及退化；不能只查字符串 |
 | System | npm run selftest，接入 test-l1-boundary-view-electron.js | yes | 实际 Topic 入口、图几何可见/可操作、返回与键盘 |
 | Preview | npm run test:all（含搬迁资料包的真实 Preview） | yes | 共用 renderer；只读及退化一致 |
 | Compatibility | npm run validate / npm run audit / npm run check-overview | yes | 既有数据 verdict 保持 |
@@ -30,3 +30,5 @@
 - 实现后将命令结果、关键截图和人工判断记入本 feature 的 verification-summary；截图需写明输入、窗口和路径。
 - 代码独立审查发现项处理完毕；humanReviewRequired 不因自动化通过而清空。
 - 只有验收和必跑检查通过才关闭 knownUnverified、同步 F17 复核结论和 F23 passing。
+
+技术用户路径由真实 Electron/Preview 自动化执行，不将这些断言勾选成用户已手动验收。原文入口另覆盖唯一 heading、缺失、重复、漂移和 Escape 焦点返回。

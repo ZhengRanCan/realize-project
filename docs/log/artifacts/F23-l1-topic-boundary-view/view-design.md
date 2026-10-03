@@ -73,7 +73,7 @@
 
 ## 模块与数据流
 
-`projectTopic(map, topicId, {plan})` 保留现有字段及分类，增加显示所需的原始信息副本：Map document、Topic sectionRefs（若存在）、Inside 的 type/来源字段、所有 crossing 外部端点的 id/label/type/来源字段，以及关系的可选 label/qualifiers/note。输出与输入不共享可写的嵌套对象；不新增语义推断、状态合并或落盘字段。
+`projectTopic(map, topicId, {plan, sourceSections, sourceIntegrity})` 保留现有字段及分类，增加显示所需的原始信息副本：Map document、Topic sectionRefs（若存在）、Inside 的 type/来源字段、所有 crossing 外部端点的 id/label/type/来源字段，以及关系的可选 label/qualifiers/note。输出与输入不共享可写的嵌套对象；不新增语义推断、状态合并或落盘字段。可选 sourceSections/sourceIntegrity 来自已有资料包校验，复用 coordinate resolver 生成 sourceReferences 的入口状态与不可用原因，不携带原文内容、不将坐标能力变成 provenance assurance。
 
 新增 `l1-topic-view.js`（纯布局和渲染）位于合同允许的 `app/renderer/l1-topic-view.*`。接口计划为 `computeTopicLayout(topicVM)`、`renderTopicHTML(topicVM, options)` 与 `mount(host, topicVM, options)`。前两者供离线结构与几何测试；mount 绑定原生 button/details 与选中披露。回调包括 onBack、onElement、onBlock、onSourceRef，调用者传入当前 Plan 的 canReadBlock 判定，不另建导航逻辑。
 
@@ -98,4 +98,4 @@
 
 ## 审阅与实施边界
 
-此方案已获用户确认。[实施计划](drafts/implementation-plan.md)已写，待用户审阅；沿用本项目先前选定的 Native 执行和独立审查，计划审阅完成后才改产品代码。F23 当前开始设计，不代表已经实现边界图，也不触发 F24 或合并 main。
+此方案及[实施计划](drafts/implementation-plan.md)已获用户确认（“可以，做吧” / “看着没问题，实施咯”），按 Native 实施并独立复查。实现与回归结果见 [验证记录](verification-summary.md)；实际界面理解性仍待用户确认，不以设计审批代替，也不触发 F24 或合并 main。

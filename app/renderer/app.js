@@ -108,6 +108,7 @@ function el(tag, className, text) {
 
 function clear(node) {
   node.__l0Abort?.abort();
+  node.__l1Abort?.abort();
   while (node.firstChild) node.removeChild(node.firstChild);
   return node;
 }
@@ -1065,6 +1066,7 @@ function render() {
 
 function viewL0() {
   const host = $('#main');
+  host.__l1Abort?.abort();
   if (!state.l0ViewModel) {
     host.innerHTML = '<div class="l0-empty"><p>尚未加载 L0 Framework Map。</p>'
       + '<p class="muted">返回首屏用「打开 framework-map.json」选择一份已通过 check-map 的图。</p></div>';
@@ -1088,15 +1090,17 @@ function viewL0() {
 }
 
 function viewL1() {
- const topic=state.l1Topic,host=clear($('#main'));if(!topic){host.textContent='未选择 Topic。';return;}
- const wrap=el('section','block');wrap.dataset.l1Topic=topic.topic.id;
- const back=el('button','btn','返回');back.id='l1-back';back.addEventListener('click',()=>navigation.back());wrap.append(back,el('h2','',topic.topic.title),el('p','',topic.topic.proposition));
- wrap.append(el('h3','','成员'));for(const member of topic.inside)wrap.append(el('p','',member.label));
- wrap.append(el('h3','','边界关系'));if(!topic.relations.length)wrap.append(el('p','','无可绘制关系；这是 Topic boundary summary。'));
- for(const relation of topic.relations){const row=el('p','',relation.from+' —'+relation.type+(relation.type==='relates-to'?'— ':'→ ')+relation.to+' ('+relation.role+')');row.dataset.l1Role=relation.role;wrap.append(row);}
- const organization=el('p','',topic.blockOrganization.state==='unknown'?'尚未声明区块关联。':topic.blockOrganization.state==='empty'?'已明确没有关联区块。':'相关解释区块');organization.dataset.blockOrganization=topic.blockOrganization.state;wrap.append(organization);
- for(const entry of topic.blockEntries||[]) {const button=el('button','btn',entry.id+' · '+entry.title);button.dataset.l1Block=entry.id;button.addEventListener('click',()=>navigation.enter({type:'block',id:entry.id,topicId:topic.topic.id}));wrap.append(button);}
- host.append(wrap);
+ const topic=state.l1Topic,host=$('#main');if(!topic){clear(host).textContent='未选择 Topic。';return;}
+ host.__l0Abort?.abort();
+ window.L1TopicView.mount(host,topic,{
+  onBack:()=>navigation.back(),
+  onElement:id=>navigation.resolve({kind:'element',id}),
+  onBlock:id=>navigation.enter({type:'block',id,topicId:topic.topic.id}),
+  canReadBlock:id=>allBlocks().some(b=>b.id===id),
+  canSourceRef:ref=>Boolean(state.sessionToken)&&topic.sourceReferences?.some(r=>r.ref===ref&&r.state==='known'),
+  sourceRefReason:ref=>topic.sourceReferences?.find(r=>r.ref===ref)?.reason,
+  onSourceRef:ref=>openSource(ref,{namespace:'heading',key:ref.replace(/^§/,'')}),
+ });
 }
 
 /**
@@ -1475,10 +1479,10 @@ function captureReadingFrame(){
  if(['L2','L3'].includes(address.level))address.blockId=blockId;
  const selected=window.L0Map.getSelection($('#main'));if(selected?.kind==='element')address.elementId=selected.id;
  const context={view:state.view,focusRef:state.focusRef?{...state.focusRef}:null,readingAddress:state.readingAddress?{...state.readingAddress}:null,topicId:state.l1Topic?.topic.id||null,readingTopicId:state.readingTopicId,readingBlockId:state.readingBlockId,
-  l0View:state.l0View,selection:selected,canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
+  l0View:state.l0View,selection:selected,l1Selection:window.L1TopicView.getSelection($('#main')),canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
   activeBlockId:state.activeBlockId,inspection:state.inspectionSubject?{...state.inspectionSubject}:null,coordinate:state.inspectionCoordinate?{...state.inspectionCoordinate}:null,
   details:[...document.querySelectorAll('#main details,#source-body details')].map(n=>({location:domLocation(n),open:n.open})),
-  focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
+  focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#main .l1-graph-wrap,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
  return {address,context};
 }
 function updateNavigationControls(){
@@ -1523,6 +1527,7 @@ function restoreReadingFrame(frame,isCurrent){
  const finish=()=>{
   if(!isCurrent()||generation!==navigation.generation)return {ok:false,reason:'stale'};
   window.L0Map.restoreSelection($('#main'),c.selection);
+  window.L1TopicView.restoreSelection($('#main'),c.l1Selection);
   // A canonical element is a visible subject, not just the hidden Review card.
   if(c.canonicalElementId)window.L0Map.revealElement($('#main'),c.canonicalElementId);
   for(const detail of c.details){const node=locateDOM(detail.location);if(node?.tagName==='DETAILS')node.open=detail.open;}
@@ -1558,6 +1563,7 @@ function updateExploreEntry(){
  $('#explore-availability').textContent=available?'显式选择图中的对象，不推断它与区块的关系。':'未提供可探索的框架图。';
 }
 function viewExplore(){
+ $('#main').__l1Abort?.abort();
  const vm=state.exploreProjection.project(state.focusRef);if(!vm.ok){clear($('#main')).textContent='当前对象不可探索。';return;}
  window.ExploreView.mount($('#main'),vm,{onFocus:openExplore,onBack:()=>navigation.back(true),onPrevious:()=>navigation.back(),canPrevious:navigation.size>0,
   onReading:ref=>navigation.resolve(ref),canReadBlock:id=>allBlocks().some(b=>b.id===id),onBlock:id=>{const result=navigation.resolve({kind:'block',id});if(result?.ok===false)toast('当前未加载这个区块的阅读资料。');return result;}});

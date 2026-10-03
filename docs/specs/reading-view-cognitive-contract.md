@@ -489,7 +489,7 @@ Priority = High | Medium | Low
 
 - validator 校验源制品和明确输入上下文；投影输出由结构断言与真实 renderer 集成检查保护。
 - L0 / L1、Plan + Generated 的 L2 与从 Block/fragment 发起的 L3 已有产品入口。
-  当前 L1 仍为文字列表，L2 仍在整篇 Overview 中定位 Block；这些入口与投影证据不证明主题边界图或独立 Block 视图已落实，分层阅读展示尚未完成验收。
+  L1 已接入主题内部及跨边界图；回归检查完整端点/关系、路线避开卡片、方向、退化与返回现场。L2 仍在整篇 Overview 中定位 Block；独立 Block 视图未落实，整体分层阅读展示及 L1 可理解性尚未完成用户验收。
   投影与对抗测试覆盖 identity、authority、能力缺失及禁止跨链语义升级；范围以表中 partial cell 为限。
 - 资料包会检查配对与原文坐标一致性；这不提供历史版本追踪，也不构成 provenance assurance 或 claim verification。
 - canonical Element/Block resolver 与 occurrence-aware Back 已有共享模块及真实 Electron / Preview 保护；Explore 的 typed Focus准入、声明关系及共享Back/Resolve已有纯投影和真实产品路径保护；durable fragment identity仍不在当前边界。各次实现的过程和命令结果仅记录在 feature artifacts。
