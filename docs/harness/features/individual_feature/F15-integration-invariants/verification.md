@@ -1,23 +1,17 @@
 # F15 Verification
 
-## Required commands
+| 层 | 命令或真实路径 | 结果 |
+| --- | --- | --- |
+| Static | main与两份F15测试逐个node --check | exit0 |
+| Feature | node scripts/test-reading-integration.js | 真实projection/L1/registry/L3四组通过 |
+| Product | npm run selftest | F15 DOM身份、状态、Back和L1方向；F19 Known(0)落点；F20四层返回 |
+| Regression | npm run test:all | 全部suite及搬迁Preview |
+| Preview | npm run verify-preview | 共用renderer离线只读路径 |
+| Gates | verify:harness / check:docs / check:experiments | 无错误/漂移 |
 
-| Layer | Command | Required | Evidence |
-| --- | --- | --- | --- |
-| L1 static | `node --check app/renderer/l0-map.js app/renderer/app.js app/main/main.js` | yes | command output |
-| L2 feature | `node` + 新增的 `test-reading-integration.js`（放在 `scripts/`） | yes | 五组集成不变量断言全绿 |
-| L3 system | `npm run selftest` | yes — `completionGate.l3 = required` | Electron 内跑通导航（Back）/ landing / renderer 纪律断言 |
-| Harness | `npm run verify:harness` | yes before `passing` | command output |
+- [x] L0选择→Explore→Back原现场、无resolver；O-01有效Known(0)bundlecanonical与Element唯一落点。
+- [x] L2/L3真实DOM身份与Absent/Indeterminate、输入纯度；L1无方向关系。
+- [x] 独立审查完成，没有剩余P1/P2。
 
-## Manual paths
-
-- [ ] 在 Electron 中：L0 选元素 → 进 Explore 焦点 → `Back` 回到原 ReadingAddress（不回首页）。
-- [ ] 加载 `experiments/semantic-grounding/fixture-d/run-04`：确认 `Known(0)` occurrence 的 Block
-      仍有 `#block-O-01`，且多 occurrence 的 element 只有一个 canonical landing。
-- [ ] 确认 renderer 没有升级认识论状态（`Indeterminate` 未被渲染成 `unsupported`）。
-
-## Passing evidence
-
-- 把命令日期与结果记录到本目录的 `verification-summary.md`。
-- 代码有变更 ⇒ 独立审查记录到本目录的 `subagent-review.md`。
-- 标为 `passing` 之前，保持 `knownUnverified` 与 `humanReviewRequired` 为空。
+用户授权自主收口，以上是Electron自动化，不冒称用户手工验收。
+fixtureD无Plan，不要求无依据的O-01；Known(0)落点依据F19有效临时bundle。

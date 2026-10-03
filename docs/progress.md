@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: **F15 遗留集成验收收口**（F19–F21 已完成）。
-- Next queued feature: 无；核对 F11–F21 的遗留验收记录后推送开发分支。
+- Active feature: 无；F11–F21 与 F22 均 passing。
+- Next queued feature: 无；开发分支交付，等待用户体验后决定合并。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
 - Git strategy: 用户确认 F22 完成；本轮提交并推送到 `codex/f11-f21-conformance`，F11–F21 全部完成并通过验收后再合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -29,7 +29,7 @@
 | F12 | S1 Epistemic Collapse Regression | `passing` | Unknown / Known(0) 已在投影、Topic DOM 和真实入口保留差异 |
 | F13 | Minimal Semantic Projection Boundary (B1) | `passing` | 纯边界与八项结构断言已通过 |
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
-| F15 | Projection Integration Invariants | `blocked` | Explore/Back 产品入口尚不存在；其余已执行边界见 F15 evidence |
+| F15 | Projection Integration Invariants | `passing` | F19–F21后补真实模块/DOM、Back与Known(0)落点证据，独立审查通过 |
 | F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 既有 Overview projection；Plan + Generated runtime 补齐的独立证据在 F18 |
 | F17 | L1 Topic Runtime | `passing` | Topic boundary projection、真实入口和 Back 自检通过 |
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
@@ -293,3 +293,13 @@ Source-verified Evidence
 ## F21 Shared changes
 
 - renderer键盘/live/响应式最小变化和N5无方向交付修正；纯输入/validator口径不改。真实键盘、压力/性能、15轮循环与portablePreview验证。
+
+## 2026-10-03 — F21 Complete and F15 Closure
+
+- F21三个有限职责收口：原生键盘/输入保护/焦点/live状态，真正640×720披露，Gold与80elements/160edges预算及15轮稳定性。公开截图与JSON在F21 artifacts；普通测试不写永久日志/反复改写证据。
+- 修正Reading与Topic/Explore的relates-to无方向；Topic/Explore不沿用旧区块目录，全局工具仍提供四层显式入口。
+- Native独立审查的窄窗口证据P2已修正；截图尺寸断言和双RAF等待已加入，最终无P1/P2。
+- F15旧占位验收收口：重复completionGate删除，4条toy测试替换为真实projection/L1/registry/L3；实际L2/L3身份集合与Absent/Indeterminate、Back不Resolve、L1无方向DOM通过。
+- fixtureD无Plan不补造O-01；Known(0)Block落点由F19有效bundle验证。独立审查的身份集合漏检P2已修正，最终无P1/P2。
+- F11–F21/F22全部passing；历史F04–F08/F10的人工Track A/模型质量记录仍独立。未运行任何模型/API或提交用户资料包/审核，成功txt不留存。
+- 完整test:all、selftest、portablePreview、input gates、harness/docs/experiments通过；check-overview既有warnings保留。继续用户指定开发分支，不在本轮直接合并main。

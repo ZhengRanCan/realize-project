@@ -93,7 +93,7 @@
   {
     "id": "F15",
     "title": "Projection Integration Invariants",
-    "status": "blocked",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F15-integration-invariants",
     "version": "v0.1"
   },
