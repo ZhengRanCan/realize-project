@@ -3,7 +3,7 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: F23 L1 Topic Boundary View，展示设计待用户审阅；F17 保持 blocked，F24 为 not_started。
+- Active feature: F23 L1 Topic Boundary View，展示设计已确认、实施计划待审阅；F17 保持 blocked，F24 为 not_started。
 - Next queued feature: F23 完成后继续 F24；当前已开始 F23 设计，未改产品代码。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；登记与展示设计作为本地文档检查点提交，未推送；不提前合并 main。
@@ -37,7 +37,7 @@
 | F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
-| F23 | L1 Topic Boundary View | `active` | 展示设计已写，待审阅后细化计划；图实现与实际界面验收待做 |
+| F23 | L1 Topic Boundary View | `active` | 展示设计已确认，实施计划已写待审阅；图实现与实际界面验收待做 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
 
 ### 阶段划分（2026-09-29 登记）
@@ -319,3 +319,9 @@ Source-verified Evidence
 - [展示设计](log/artifacts/F23-l1-topic-boundary-view/view-design.md)：内部成员图与外部端点在同一画布，区块入口在下方；公开样本 T-02 验内部连接，T-03 验 crossing，不补造演示关系。
 - projection 计划只补原始显示字段；L1 模块复用 L0 纯布局和既有导航，返回现场需要增加 L1 选择与独立图滚动。产品代码未修改。
 - 按 brainstorming 的书面设计审阅步骤等待用户反馈，再细化实施计划；沿用此前 Native 执行选择。BMad runtime 缺失，本轮未安装或替代其工作流。
+
+## 2026-10-03 — F23 Design Approved / Plan Written
+
+- 用户确认展示设计（“可以，做吧”），[实施计划](log/artifacts/F23-l1-topic-boundary-view/drafts/implementation-plan.md)已写并自查；沿用 Native，未重新选择执行方式。
+- 三个任务：显示投影、图形与披露 renderer、真实产品/Preview 接入与返回现场验证。
+- 计划待审阅后实施；产品代码和未来测试尚未创建，实际界面验收待实现后进行。

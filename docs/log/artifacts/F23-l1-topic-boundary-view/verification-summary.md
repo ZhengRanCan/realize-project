@@ -25,3 +25,9 @@ Date: 2026-10-03. Status: not_started.
 发现 projectTopic 已提供 membership 和边界分类，但 renderer 只写段落；外部端点名称、关系元数据和 L1 图滚动现场需要在实现中补齐。T-02 只用于内部机制，T-03 具有真实 crossing。设计检查和登记检查均不作为功能完成证据。
 
 本轮设计文档检查：check:docs 146 markdown / 0 broken；verify:harness 23 features / 0 errors；git diff --check 通过。自查覆盖布局、退化、导航、模块接口和验收；书面设计与实施计划的用户审阅仍未完成。
+
+## Design approved / Plan written — 2026-10-03
+
+用户回复“可以，做吧”，确认展示设计。[实施计划](drafts/implementation-plan.md)已写并自查，沿用先前 Native 选择，待计划审阅。未改产品代码，未创建新 renderer/测试；实际界面 acceptance 仍未完成。
+
+计划阶段检查：check:docs 146 markdown / 0 broken；verify:harness 23 features / 0 errors；既有 test-l1-topic-projection 9 assertions 通过；git diff --check 通过。既有测试仅是投影基线，不是新图实现证据。

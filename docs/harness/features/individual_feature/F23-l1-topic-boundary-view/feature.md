@@ -20,7 +20,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["资料包 → L0 
 - 用户于 2026-10-03 批准新建 F23/F24，用来补齐分层阅读体验；随后用户要求“开始 F23”，当前开始设计与实施准备；实际界面验收仍待实现后记录。
 - F17 的 membership、边界分类和三态投影作为已有基线；F17 因展示缺口重新打开，不能作为本任务的 passing 前置，否则形成关闭循环。
 - 强制前置是已验证的数据接入、资料包/溯源和共享导航（F16/F18/F19）；沿用 F17 已有投影，不重新推断关系。
-- 已核对 Reading 主契约、Layer Contracts §2 与 harness DESIGN；[展示设计](../../../../log/artifacts/F23-l1-topic-boundary-view/view-design.md)待用户审阅，确认后编写实施计划。产品代码尚未修改。
+- 已核对 Reading 主契约、Layer Contracts §2 与 harness DESIGN；[展示设计](../../../../log/artifacts/F23-l1-topic-boundary-view/view-design.md)已获用户确认（2026-10-03，“可以，做吧”）；[实施计划](../../../../log/artifacts/F23-l1-topic-boundary-view/drafts/implementation-plan.md)已写，待审阅，沿用 Native。产品代码尚未修改。
 - 反馈与原 feature 完成范围修正在 [incident](../../../incidents/2026-10-03-l1-l2-reading-gap.md)。
 
 ## Scope
@@ -62,6 +62,6 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["资料包 → L0 
 
 ## Completion evidence
 
-本任务处于展示设计审阅阶段，产品代码尚未修改。证据登记在 `docs/log/artifacts/F23-l1-topic-boundary-view/`。
+本任务已确认展示设计，处于实施计划审阅阶段，产品代码尚未修改。证据登记在 `docs/log/artifacts/F23-l1-topic-boundary-view/`。
 只保留书面设计、计划、verification-summary、独立审查和必要截图；不保留成功校验的 txt 日志。
 F23 完成后按 F17 重新打开的验收项复核并记录关闭依据，不自动覆盖历史证据。
