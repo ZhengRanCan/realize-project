@@ -5,7 +5,7 @@
 - Date: 2026-10-03.
 - Active feature: **none**.
 - Next queued feature: **F18 L3 Inspector**，先补齐资料包输入协议与 F16 的 Plan + Generated 关联。
-  用户已选择清单加载与同目录整理；书面设计待审阅，尚未修改产品代码。
+  用户已选择清单加载与同目录整理，并认可书面设计；实施计划待审阅，尚未修改产品代码。
 - Latest completed feature: `F17` L1 Topic Runtime（分支完成记录：2026-10-01）。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
@@ -32,7 +32,7 @@
 | F15 | Projection Integration Invariants | `blocked` | Explore/Back 产品入口尚不存在；其余已执行边界见 F15 evidence |
 | F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 既有 Overview projection 经真实 IPC 接入；Plan + Generated runtime 缺口在 F18 前置补齐中处理 |
 | F17 | L1 Topic Runtime | `passing` | Topic boundary projection、真实入口和 Back 自检通过 |
-| F18 | L3 Inspector | `blocked` | 缺少运行时资料配对；资料包书面设计已形成，待审阅后细化合同与实施计划 |
+| F18 | L3 Inspector | `blocked` | 缺少运行时资料配对；书面设计已认可，实施计划待审阅和选择执行方式 |
 | F19 | Reading Navigation and Resolver | `blocked` | 等待 F18 真实 inspection 路径完成 |
 | F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
@@ -232,7 +232,7 @@ Source-verified Evidence
 - 当前分支：`codex/f11-f21-conformance`，拉取时 HEAD 为 `baa459c`。
 - 用户已选定：只打开一份清单，配套资料在同一个分析目录；开发过程中显式选定输入，随后整理目录说明。
 - 设计：[Reading Bundle and L3 Runtime Design](log/artifacts/F18-l3-inspector/runtime-bundle-design.md)。
-  本文件为待审阅实施设计；尚未实现清单加载、目录导出或 L3 UI。
+  用户于 2026-10-03 认可当前设计；[实施计划](log/artifacts/F18-l3-inspector/drafts/implementation-plan.md) 已形成，待审阅和选择执行方式。尚未实现清单加载、目录导出或 L3 UI。
 - F18 范围需要补充：manifest Schema、离线 exporter、preload、包目录 Source binding、共享验证与 projection、
   静态 Preview、suite 接入，以及 architecture / design / 初始化 / 目录规范。审阅后在 F18 合同中登记允许文件。
 - 改动原因：现有 runtime 只将 model.overview 投影到 L2；Plan.covers / sourceUnits 未加载，

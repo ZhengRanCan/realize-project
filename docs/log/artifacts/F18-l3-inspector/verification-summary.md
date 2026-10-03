@@ -2,7 +2,8 @@
 
 状态：**blocked**。运行时资料配对与 L3 产品入口尚未完成。
 用户于 2026-10-03 选定“资料清单 + 同一分析目录”方案；
-[书面设计](runtime-bundle-design.md) 已形成，等待审阅后细化合同和实施计划。
+[书面设计](runtime-bundle-design.md) 已获用户认可；[实施计划](drafts/implementation-plan.md) 待审阅并选择执行方式。
+当前只更新文档，未实现资料包或完整 L3 路径。
 
 | 项 | 位置 |
 |---|---|
