@@ -1203,6 +1203,7 @@ async function runSelfTest() {
     }
     ok(await require('../../scripts/test-reading-bundle-electron').runBundleIntegration(win));
     ok(await require('../../scripts/test-reading-navigation-electron').runNavigationIntegration(win));
+    ok(await require('../../scripts/test-explore-electron').runExploreIntegration(win));
 
     emit();
     const failedCount = report.filter((line) => line.startsWith('✗')).length;
@@ -1267,6 +1268,8 @@ async function runVerifyPreview(filePath) {
       if(await win.webContents.executeJavaScript('Boolean(window.__state.l0ViewModel)')) {
         await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
         ok(await require('../../scripts/test-reading-navigation-electron').exerciseNavigation(win));
+        await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
+        ok(await require('../../scripts/test-explore-electron').exerciseExplore(win));
       } else {
         const nav=await win.webContents.executeJavaScript("(()=>{window.__closeInspection();const n=window.__readingNavigation;const origin=n.snapshot().current;const calls=n.snapshot().resolverCalls;n.resolve({kind:'block',id:'O-01'});n.back();return n.snapshot().resolverCalls===calls+1&&JSON.stringify(origin.address)===JSON.stringify(n.snapshot().current.address);})()");
         if(!nav)throw new Error('Preview Back/Resolve');ok('Preview no-map canonical Block and Back isolation');

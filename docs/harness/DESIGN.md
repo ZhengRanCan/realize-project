@@ -50,3 +50,7 @@ Topic/SU/Review/Evidence/fragment 不新增 canonical landing；资料切换成�
 - 视觉、交互与可访问性修改属于"先更新或确认 harness 文档再改代码"的范围：先改本文件或对应 feature 合同，
   再动 `app/renderer/**`。
 - UI 缺陷、构建失败与用户返工反馈先记入 `docs/harness/incidents/`，可复用的预防措施再写入 `docs/harness/lessons.jsonl`。
+
+## Explore v1 interaction
+
+Reading各层可显式选择Map Element/Topic探索关系，图只展示已声明邻接。返回阅读恢复原现场；在阅读中打开Element走统一resolver，Topic无canonical landing时明确不可用。attachment-only constraint作为注释，不能成为Focus。

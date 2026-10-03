@@ -694,3 +694,15 @@ table.matrix .rowhead { background: var(--bg-2); }
   border-left: 2px solid var(--line); margin-left: 5px;
 }
 .field-hint { font-size: 11px; color: var(--fg-mute); margin-left: 6px; text-transform: none; letter-spacing: 0; }
+
+.reading-nav { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px; }
+.explore-entry { padding:12px 0;border-top:1px solid var(--line); }
+.explore-entry label { display:block;margin-bottom:6px; }
+.explore-entry select { width:100%;max-width:100%;margin-bottom:8px; }
+.explore-graph { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start; }
+.explore-focus-node { grid-column:2;grid-row:1;padding:20px;border:2px solid var(--accent);border-radius:10px;overflow-wrap:anywhere; }
+.explore-neighbors.direction-incoming { grid-column:1;grid-row:1; }
+.explore-neighbors.direction-outgoing { grid-column:3;grid-row:1; }
+.explore-neighbors.direction-self,.explore-neighbors.direction-undirected,.explore-neighbors.direction-membership { grid-column:1 / -1; }
+.explore-relation { border:1px solid var(--line);padding:12px;margin-bottom:10px;border-radius:8px;overflow-wrap:anywhere; }
+.explore-view pre { white-space:pre-wrap;overflow-wrap:anywhere; }

@@ -63,6 +63,12 @@
           <button class="nav-item active" data-view="overview">方案总览</button>
           <button class="nav-item" data-view="decisions">决策清单 <span id="nav-decision-count" class="nav-count"></span></button>
           <button class="nav-item" data-view="l0">L0 框架图 <span id="nav-l0-state" class="nav-count"></span></button>
+          <div class="explore-entry" id="explore-entry">
+            <label for="explore-entity">探索对象</label>
+            <select id="explore-entity" aria-describedby="explore-availability"></select>
+            <button id="btn-explore" class="btn">探索关系</button>
+            <p id="explore-availability" class="muted small"></p>
+          </div>
         </nav>
         <div id="gate-badge" class="gate-badge pending">—</div>
         <button id="btn-save" class="btn primary">保存 human-review.json</button>
@@ -97,6 +103,8 @@
   <script src="../shared/semantics.js"></script>
   <script src="../shared/reading-navigation.js"></script>
   <script src="reading-navigation.js"></script>
+  <script src="../shared/explore-projection.js"></script>
+  <script src="explore.js"></script>
   <script src="l0-layout.js"></script>
 <script src="l0-map.js"></script>
   <script src="l3-inspector.js"></script>

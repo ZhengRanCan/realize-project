@@ -92,3 +92,7 @@ support。原始 `model` 仍只供 Gate 和人工审核语义使用。
   `docs/specs/framework-map-contract.md`，再改 schema 与 validator。
 
 旧单文件入口兼容已有根目录 human-review.json：存在时继续读取并保存该文件；没有旧审核时，新结果写入 workspace/legacy-review。资料包人工审核仍只在当前包内。
+
+## Explore runtime boundary
+
+F20纯projection消费已验证L0 VM的身份、edges、membership与attachment。renderer只交付Focus graph和已声明外键，不补关系；F19同一地址/栈/resolver承担跨投影导航。annotation与relationGap不作为邻接。

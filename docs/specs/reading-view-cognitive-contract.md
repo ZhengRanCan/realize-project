@@ -490,7 +490,7 @@ Priority = High | Medium | Low
 - L0 / L1、Plan + Generated 的 L2 与从 Block/fragment 发起的 L3 已有产品入口。
   投影与对抗测试覆盖 identity、authority、能力缺失及禁止跨链语义升级；范围以表中 partial cell 为限。
 - 资料包会检查配对与原文坐标一致性；这不提供历史版本追踪，也不构成 provenance assurance 或 claim verification。
-- canonical Element/Block resolver 与 occurrence-aware Back 已有共享模块及真实 Electron / Preview 保护；Explore 与 durable fragment identity 仍不在当前边界。各次实现的过程和命令结果仅记录在 feature artifacts。
+- canonical Element/Block resolver 与 occurrence-aware Back 已有共享模块及真实 Electron / Preview 保护；Explore 的 typed Focus准入、声明关系及共享Back/Resolve已有纯投影和真实产品路径保护；durable fragment identity仍不在当前边界。各次实现的过程和命令结果仅记录在 feature artifacts。
 
 ---
 
@@ -500,14 +500,14 @@ Priority = High | Medium | Low
 
 | 能力 | 状态 |
 |---|---|
-| Explore 投影的实现 | Deferred（仅冻结架构边界：Decision A） |
+| Explore 投影的实现 | Present（Element/Topic Focus；attachment仅annotation；共享Reading导航） |
 | Claim-level verification | **Known Absent** —— 模型无载体 |
 | Review object 的 Reading landing（`#decision-…`） | Deferred（identity 与外键存在，landing 不存在） |
 | L1 作为独立 Reading route（`Open in Reading(T-xx)` / Topic canonical landing） | Deferred（stable identity 与 local DOM anchor 存在，canonical landing 不存在 —— 见 §2.3） |
 | Fragment 的 durable identity / 深链 / 评论锚点 | Deferred（不得制造 synthetic ID） |
 | `source-verified` 整合 | Deferred（当前 36/36 evidence 均为 `document-claim`） |
 | 交互可用性（zoom / pan / 自定义节点 / 评论） | Deferred |
-| L2/L3 的产品级投影实现 | Present（资料包 Plan + Generated、Block/fragment inspection）；canonical Element/Block navigation Present；Explore 组合路径仍 Deferred |
+| L2/L3 的产品级投影实现 | Present（资料包 Plan + Generated、Block/fragment inspection）；canonical Element/Block navigation Present；Explore 组合路径 Present |
 | 文档去重（PRODUCT_SPEC / DESIGN / F03 brief 的旧表述） | Deferred（由 §1.2 scoped precedence 覆盖，属文档维护任务） |
 
 **明确不做**：不为满足 UI 需要而在投影期补造 identity、关系、证据或 verification；

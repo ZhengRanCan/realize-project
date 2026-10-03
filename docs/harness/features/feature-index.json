@@ -128,7 +128,7 @@
   {
     "id": "F20",
     "title": "Explore v1 (reusing the Reading identity substrate)",
-    "status": "not_started",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F20-explore-v1",
     "version": "v0.1"
   },

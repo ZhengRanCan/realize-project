@@ -3,7 +3,7 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: none；F19 完成，继续 F20。
+- Active feature: none；F20完成，继续F21。
 - Next queued feature: **F20 Explore v1**，随后 F21；用户授权按顺序补齐合同并完成。
 - Latest completed feature: `F22` Entry and Repository Layout（2026-10-03）；首页、目录迁移、真实路径与独立审查通过。
 - Git strategy: 用户确认 F22 完成；本轮提交并推送到 `codex/f11-f21-conformance`，F11–F21 全部完成并通过验收后再合并 main。
@@ -34,7 +34,7 @@
 | F17 | L1 Topic Runtime | `passing` | Topic boundary projection、真实入口和 Back 自检通过 |
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
 | F19 | Reading Navigation and Resolver | `passing` | 统一导航/定位、真实逐层返回、便携Preview与独立审查通过；Explore组合路径由F20验证 |
-| F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
+| F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 
@@ -279,3 +279,13 @@ Source-verified Evidence
 
 - [F19 verification](log/artifacts/F19-navigation-resolver/verification-summary.md)：共享地址/栈/resolver已产品接入，Back保留occurrence与现场；独立审查4项P2修正后无剩余P1/P2。
 - Electron/搬迁Preview/完整离线suite/既有input gates通过；F20继续复用同一导航，不新增identity/私有栈。
+
+## F20 Shared changes
+
+- 新增纯Explore projection与确定性renderer，消费已验证L0 VM；F19 controller复用同一栈恢复Reading。
+- 原由单页私有返回逻辑承载的交互改为共用controller，四层/便携Preview/旧入口/保存隔离验证。
+
+## 2026-10-03 — F20 Complete
+
+- [F20 verification](log/artifacts/F20-explore-v1/verification-summary.md)：真实Explore组合路径已建立，四层原现场恢复；2项P2修正后无剩余P1/P2。
+- 继续F21的有限成熟度收口；不冒称F08历史Track A手工验收已完成。

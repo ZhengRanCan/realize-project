@@ -58,6 +58,9 @@ const state = {
   inspectionCoordinate: null,
   readingTopicId: null,
   readingBlockId: null,
+  focusRef: null,
+  readingAddress: null,
+  exploreProjection: null,
   model: null,
   humanReview: null,
   modelPath: null,
@@ -1017,10 +1020,10 @@ function renderGateBadge() {
 
 function render() {
   if(state.inspectionOrigin) closeInspection(false);
-  if (!state.model && state.view !== 'l0' && state.view !== 'l1') return;
+  if (!state.model && !['l0','l1','explore'].includes(state.view)) return;
   const summary = state.model ? currentSummary() : null;
 
-  $('#design-title').textContent = (state.view === 'l0' || state.view === 'l1')
+  $('#design-title').textContent = ['l0','l1','explore'].includes(state.view)
     ? ((state.l0ViewModel && state.l0ViewModel.document.title) || 'L0 Framework Map')
     : state.model.design.title;
   $('#design-id').textContent = state.model ? state.model.design.id : 'L0';
@@ -1040,12 +1043,14 @@ function render() {
   $('#screen-review').classList.toggle('l0-mode', state.view === 'l0');
 
   renderGateBadge();
-  if (state.view !== 'l0' && state.view !== 'l1') buildToc();
+  if (!['l0','l1','explore'].includes(state.view)) buildToc();
 
   if (state.view === 'l0') viewL0();
   else if (state.view === 'l1') viewL1();
   else if (state.view === 'overview') viewOverview();
+  else if (state.view === 'explore') viewExplore();
   else viewDecisions();
+  updateExploreEntry();
 }
 
 /* ================================================================== *
@@ -1255,6 +1260,7 @@ function bindStartScreen() {
 }
 
 function bindReviewScreen() {
+  $('#btn-explore').addEventListener('click',()=>{const item=state.exploreProjection?.catalog.find(e=>e.ref.kind+':'+e.ref.id===$('#explore-entity').value);if(item)openExplore(item.ref);});
   document.querySelectorAll('.nav-item').forEach((btn) => {
     btn.addEventListener('click', () => {
       const next = btn.dataset.view;
@@ -1444,6 +1450,7 @@ window.__loadBundle=loadBundle;window.__openInspection=openInspection;window.__c
 function resetReadingNavigation(){
  state.inspectionOrigin=null;state.inspectionSubject=null;state.inspectionCoordinate=null;state.readingTopicId=null;state.readingBlockId=null;
  navigation.reset({key:state.sessionToken||'legacy-'+(++legacyNavigationSession),elementIds:state.l0ViewModel?.elements.map(e=>e.id)||[],blockIds:allBlocks().map(b=>b.id)});
+ state.focusRef=null;state.readingAddress=null;state.exploreProjection=window.ExploreProjection.createExploreProjection(state.l0ViewModel);populateExploreEntry();
 }
 function domLocation(node){
  if(!node||node===document.body)return null;
@@ -1458,11 +1465,11 @@ function locateDOM(location){
 }
 function captureReadingFrame(){
  const blockId=state.inspectionSubject?.blockId||state.readingBlockId||state.activeBlockId||allBlocks()[0]?.id;
- const address={sessionKey:navigation.sessionKey,level:state.inspectionSubject?'L3':state.view==='l1'?'L1':state.view==='overview'&&blockId?'L2':'L0'};
+ const address=state.view==='explore'&&state.readingAddress?{...state.readingAddress}:{sessionKey:navigation.sessionKey,level:state.inspectionSubject?'L3':state.view==='l1'?'L1':state.view==='overview'&&blockId?'L2':'L0'};
  if(state.readingTopicId||state.l1Topic?.topic.id)address.topicId=state.readingTopicId||state.l1Topic.topic.id;
  if(['L2','L3'].includes(address.level))address.blockId=blockId;
  const selected=window.L0Map.getSelection($('#main'));if(selected?.kind==='element')address.elementId=selected.id;
- const context={view:state.view,topicId:state.l1Topic?.topic.id||null,readingTopicId:state.readingTopicId,readingBlockId:state.readingBlockId,
+ const context={view:state.view,focusRef:state.focusRef?{...state.focusRef}:null,readingAddress:state.readingAddress?{...state.readingAddress}:null,topicId:state.l1Topic?.topic.id||null,readingTopicId:state.readingTopicId,readingBlockId:state.readingBlockId,
   l0View:state.l0View,selection:selected,canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
   activeBlockId:state.activeBlockId,inspection:state.inspectionSubject?{...state.inspectionSubject}:null,coordinate:state.inspectionCoordinate?{...state.inspectionCoordinate}:null,
   details:[...document.querySelectorAll('#main details,#source-body details')].map(n=>({location:domLocation(n),open:n.open})),
@@ -1471,6 +1478,11 @@ function captureReadingFrame(){
 }
 function updateNavigationControls(){for(const back of document.querySelectorAll('#reading-back,#l1-back'))back.hidden=!navigation.size;}
 function showReadingAction(action){
+ if(action.type==='explore'){
+  const vm=state.exploreProjection?.project(action.ref);if(!vm?.ok)return vm||{ok:false,reason:'no-map'};
+  if(state.view!=='explore')state.readingAddress=captureReadingFrame().address;
+  closeInspection(false);state.focusRef={...action.ref};state.view='explore';render();return {ok:true};
+ }
  if(action.type==='inspection')return showInspection(action.blockId,action.fragmentPath);
  if(action.type==='topic'&&!state.l1Topics?.[action.id])return {ok:false,reason:'unknown-topic'};
  if(action.type==='block'&&!allBlocks().some(b=>b.id===action.id))return {ok:false,reason:'unknown-block'};
@@ -1494,7 +1506,7 @@ function showReadingAction(action){
  return {ok:false,reason:'unsupported'};
 }
 function restoreReadingFrame(frame,isCurrent){
- const c=frame.context;state.view=c.view;state.l1Topic=c.topicId?state.l1Topics?.[c.topicId]:null;
+ const c=frame.context;state.view=c.view;state.focusRef=c.focusRef;state.readingAddress=c.readingAddress;state.l1Topic=c.topicId?state.l1Topics?.[c.topicId]:null;
  state.readingTopicId=c.readingTopicId;state.readingBlockId=c.readingBlockId;state.l0View=c.l0View;state.blockExpanded={...c.blockExpanded};state.expanded={...c.expanded};
  state.onlyPending=c.onlyPending;state.focusedDecisionId=c.focusedDecisionId;state.activeBlockId=c.activeBlockId;closeInspection(false);render();
  const generation=navigation.generation;
@@ -1521,3 +1533,23 @@ function restoreReadingFrame(frame,isCurrent){
  return finish();
 }
 window.__readingNavigation=navigation;
+
+function openExplore(ref){
+ const available=state.exploreProjection?.project(ref);if(!available?.ok){toast('这个对象当前不能作为探索焦点。');return available||{ok:false,reason:'no-map'};}
+ const result=navigation.enter({type:'explore',ref});if(result?.ok===false)toast('这个对象当前不能作为探索焦点。');return result;
+}
+function populateExploreEntry(){
+ const select=clear($('#explore-entity'));for(const item of state.exploreProjection?.catalog||[]){const option=el('option','',item.label+(item.available?'':'（不可作为焦点）'));option.value=item.ref.kind+':'+item.ref.id;option.disabled=!item.available;select.append(option);}
+ const first=state.exploreProjection?.catalog.find(e=>e.available);if(first)select.value=first.ref.kind+':'+first.ref.id;
+ updateExploreEntry();
+}
+function updateExploreEntry(){
+ const available=Boolean(state.exploreProjection?.catalog.some(e=>e.available));$('#btn-explore').disabled=!available;$('#explore-entity').disabled=!available;
+ $('#explore-availability').textContent=available?'显式选择图中的对象，不推断它与区块的关系。':'未提供可探索的框架图。';
+}
+function viewExplore(){
+ const vm=state.exploreProjection.project(state.focusRef);if(!vm.ok){clear($('#main')).textContent='当前对象不可探索。';return;}
+ window.ExploreView.mount($('#main'),vm,{onFocus:openExplore,onBack:()=>navigation.back(true),onPrevious:()=>navigation.back(),canPrevious:navigation.size>0,
+  onReading:ref=>navigation.resolve(ref),canReadBlock:id=>allBlocks().some(b=>b.id===id),onBlock:id=>{const result=navigation.resolve({kind:'block',id});if(result?.ok===false)toast('当前未加载这个区块的阅读资料。');return result;}});
+}
+window.__openExplore=openExplore;

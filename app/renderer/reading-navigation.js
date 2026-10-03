@@ -12,9 +12,10 @@
    };
    const result=show(action);return result&&typeof result.then==='function'?result.then(finish):finish(result);
   }
-  function back(){
+  function back(toReading=false){
    ++generation;onNavigate();if(!stack)return {ok:false,reason:'no-session'};
-   const frame=stack.pop();if(!frame){onChange();return {ok:false,reason:'empty'};}
+   let frame=stack.pop();if(toReading)while(frame?.context.view==='explore')frame=stack.pop();
+   if(!frame){onChange();return {ok:false,reason:'empty'};}
    const result=restore(frame,()=>frame.address.sessionKey===sessionKey);onChange();return result||{ok:true};
   }
   return {enter,back,resolve(ref){resolverCalls++;const result=resolver?.resolve(ref)||{ok:false,reason:'no-session'};return result.ok?enter({type:'canonical',address:result.address}):result;},

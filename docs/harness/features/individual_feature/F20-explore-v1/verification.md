@@ -1,24 +1,25 @@
 # F20 Verification
 
-> 契约待补：详细验证口径在 F11–F19 完成后补全。
-
 ## Required commands
 
-| Layer | Command | Required | Evidence |
-| --- | --- | --- | --- |
-| L1 static | `node --check app/renderer/app.js app/renderer/l0-map.js app/main/main.js` | yes | command output |
-| L2 feature | Addressability 准入与"不新增第二套 identity/resolver"的断言 | yes | 断言全绿 |
-| L3 system | `npm run selftest` | yes — `completionGate.l3 = required` | Electron 内从 Reading 进入 Explore 再 Back 的集成路径 |
-| Harness | `npm run verify:harness` | yes before `passing` | command output |
+| Layer | Command | Evidence |
+| --- | --- | --- |
+| Static | 修改/新增JS逐个node --check | exit 0 |
+| Feature | node scripts/test-explore-projection.js | addressability、authority、input purity通过 |
+| Regression | npm run test:all | 全部离线suite与搬迁Preview通过 |
+| System | npm run selftest | L0–L3实际Explore组合/键盘/Back/Resolve/session通过 |
+| Preview | npm run verify-preview | 共用renderer通过；搬迁包由test:all覆盖 |
+| Harness/docs | npm run verify:harness / check:docs / check:experiments | 无错误/漂移 |
 
-## Manual paths
+## Automated user paths (real Electron)
 
-- [ ] 从任意 Reading 深度进 Explore（Focus = Element / Topic），确认走同一套 identity 与 resolver。
-- [ ] 确认 attachment-only 的 constraint 只能作 annotation，不能成为 Focus。
-- [ ] 确认 `Back` 与 `Open in Reading` 行为不同。
+- [x] 四个Reading深度进入Explore；切换Focus；返回阅读恢复原occurrence、disclosure、展开、selection、scroll、focus。
+- [x] 从T-05 occurrence进入Block/inspection→Explore→Open in Reading(Element)→Back返回Explore→Back to Reading返回原T-05现场。
+- [x] attachment-only constraint不可Focus；semantic edge/membership可遍历；self-loop/annotation/relationGap披露。
+- [x] Topic canonical按钮不可用；Topic blockIds三态保持；unknown/unsupported不污染现页/历史。
+- [x] 缺Map、独立Map、切包与保存隔离；搬迁Preview同实现完整路径。
 
 ## Passing evidence
 
-- 把命令日期与结果记录到本目录的 `verification-summary.md`。
-- 代码有变更 ⇒ 独立审查记录到本目录的 `subagent-review.md`。
-- 标为 `passing` 之前，保持 `knownUnverified` 与 `humanReviewRequired` 为空。
+记录命令日期/结果及关键路径到F20 verification-summary，Native独立审查到subagent-review。
+路径是自动化操作，不冒称用户手工验收；acceptance全部满足后同步passing。
