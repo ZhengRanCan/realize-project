@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 08 · Phase 4.1 · L0 graph layout 回归
  *
@@ -24,8 +26,8 @@ const crypto = require('node:crypto');
 const { buildL0ViewModel } = require('./l0-view-model.js');
 const { computeL0Layout, displayFields } = require('../app/renderer/l0-layout.js');
 
-const ROOT = path.resolve(__dirname, '..');
-const SCHEMA = JSON.parse(fs.readFileSync(path.join(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const SCHEMA = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
 const KNOWN_ROLES = SCHEMA.$defs.element.properties.role['x-known-roles'];
 
 const results = [];
@@ -40,12 +42,12 @@ function check(name, fn) {
 
 function collectMaps() {
   const out = [];
-  for (const base of ['experiments', 'docs']) {
-    const abs = path.join(ROOT, base);
+  for (const base of ['artifacts/experiments', 'samples', 'docs']) {
+    const abs = joinRepositoryPath(ROOT, base);
     if (!fs.existsSync(abs)) continue;
     const walk = (d) => {
       for (const name of fs.readdirSync(d)) {
-        const p = path.join(d, name);
+        const p = joinRepositoryPath(d, name);
         if (fs.statSync(p).isDirectory()) { walk(p); continue; }
         if (!name.endsWith('.json')) continue;
         if (!/\.map\.json$|framework-map\.json$/.test(name)) continue;
@@ -88,10 +90,10 @@ check('displayFields：label 缺失时不崩', () => {
 /* ---------- 逐份 map ---------- */
 const matrix = [];
 for (const rel of maps) {
-  const raw = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const raw = fs.readFileSync(joinRepositoryPath(ROOT, rel), 'utf8');
   const before = crypto.createHash('sha256').update(raw).digest('hex');
   const map = JSON.parse(raw);
-  const checkPath = path.join(ROOT, path.dirname(rel), 'check-map.txt');
+  const checkPath = joinRepositoryPath(ROOT, path.dirname(rel), 'check-map.txt');
   const vm = buildL0ViewModel(map, {
     checkMapText: fs.existsSync(checkPath) ? fs.readFileSync(checkPath, 'utf8') : null,
     knownRoles: KNOWN_ROLES,
@@ -162,7 +164,7 @@ for (const rel of maps) {
   const again = JSON.stringify(computeL0Layout(vm));
   if (again !== JSON.stringify(layout)) problems.push('两次布局结果不一致（不确定）');
   if (JSON.stringify(vm) !== vmBefore) problems.push('布局修改了 view model 输入');
-  const after = crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, rel), 'utf8')).digest('hex');
+  const after = crypto.createHash('sha256').update(fs.readFileSync(joinRepositoryPath(ROOT, rel), 'utf8')).digest('hex');
   if (before !== after) problems.push('磁盘上的 map 被改动');
 
   // ⑨ 用户第一眼：标题里不许出现机器 ID / 没切开的标点

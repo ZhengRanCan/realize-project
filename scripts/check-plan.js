@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * overview-plan 的机器验收器（Stage 1 → Stage 2 的闸门）。
  *
@@ -9,7 +11,7 @@
  *
  * 用法：
  *   node scripts/check-plan.js [plan.json]
- *   默认校验 fixtures/context-consumption.overview-plan.json
+ *   默认校验 samples/context-consumption/overview-plan.json
  *
  * 退出码：0 = PASS / PASS WITH WARNINGS，1 = FAIL
  */
@@ -19,10 +21,10 @@ const path = require('node:path');
 
 const { validate } = require('../app/shared/schema-validator');
 
-const ROOT = path.resolve(__dirname, '..');
-const DEFAULT_PLAN = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
-const SCHEMA = path.join(ROOT, 'schema', 'overview-plan.schema.json');
-const SOURCE_SECTIONS = path.join(ROOT, 'docs', 'source-sections.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const DEFAULT_PLAN = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
+const SCHEMA = joinRepositoryPath(ROOT, 'schema', 'overview-plan.schema.json');
+const SOURCE_SECTIONS = joinRepositoryPath(ROOT, 'docs', 'source-sections.json');
 
 /* ================================================================== *
  * 阈值集中配置：不要把魔法数字散落在代码里
@@ -573,10 +575,10 @@ return {errors,warnings,structuralErrors,stats:{units:units.length,blocks:blocks
 function loadJson(file) {return JSON.parse(fs.readFileSync(file,'utf8'));}
 function main() {
 const argv=process.argv.slice(2), option=name=>{const i=argv.indexOf(name);return i>=0?argv[i+1]:null;};
-const planPath=argv[0]&&!argv[0].startsWith('--')?path.resolve(argv[0]):DEFAULT_PLAN;
-const plan=loadJson(planPath), sourceData=loadJson(option('--source-sections')||SOURCE_SECTIONS);
-const design=loadJson(option('--design')||path.join(ROOT,plan.designRef?.path||'fixtures/context-consumption.json'));
-const sourceText=fs.readFileSync(option('--source')||path.join(ROOT,sourceData.document.path),'utf8');
+const planPath=argv[0]&&!argv[0].startsWith('--')?resolveRepositoryPath(argv[0]):DEFAULT_PLAN;
+const plan=loadJson(planPath), sourceData=loadJson(resolveRepositoryPath(option('--source-sections')||SOURCE_SECTIONS));
+const design=loadJson(resolveRepositoryPath(option('--design')||joinRepositoryPath(ROOT,plan.designRef?.path||'samples/context-consumption/design-review.json')));
+const sourceText=fs.readFileSync(resolveRepositoryPath(option('--source')||joinRepositoryPath(ROOT,sourceData.document.path)),'utf8');
 const {errors,warnings,stats}=checkPlan(plan,{design,sourceSections:sourceData,sourceText});
 const units=plan.sourceUnits||[],blocks=plan.blocks||[],merges=plan.duplicatesMerged||[],shapeCount=stats.shapeCount||{},coveredIds={size:stats.covered||0},mergedIds={size:stats.merged||0};
 const coreCount = units.filter((u) => u.importance === 'core').length;

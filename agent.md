@@ -29,11 +29,11 @@
 | 查形状词汇表、**framework-map 当前语义**（ontology / relation 三层 / coverage 三分 / parser 规则 / severity）、Overview 覆盖标准 | `docs/specs/{shape-catalog,framework-map-contract,overview-coverage}.md`（**各自 scope 的 NORMATIVE**） |
 | 想知道 Reading **跨层**必须遵守什么（两个投影的关系、identity、Decision A–F、跨层不变量、机器保障） | `docs/specs/reading-view-cognitive-contract.md`（**NORMATIVE**，authority 入口） |
 | 想知道**某一层**（L0 / L1 / L2 / L3）具体必须遵守什么（七字段契约） | `docs/specs/reading-view-layer-contracts.md`（主契约明确纳入的 **normative subordinate**） |
-| 导出、加载或搬迁一篇文章的配套资料 | `docs/specs/reading-bundle-contract.md`（输入协议唯一规范）；使用说明在 `bundles/README.md` |
+| 导出、加载或搬迁一篇文章的配套资料 | `docs/specs/reading-bundle-contract.md`（输入协议唯一规范）；使用说明在 `workspace/README.md` |
 | 想知道某条规则**为什么存在**（实测数据、反例、推导过程、当时的裁决） | Reading：`docs/specs/reading-view-cognitive-contract-evidence.md` · Framework Map：`docs/log/artifacts/F09-contract-adversarial-test/framework-map-contract-history.md` · Overview：`docs/log/artifacts/mvp-phase1/overview-coverage-history.md`（**全部 NON-NORMATIVE**，冲突时以对应规范为准） |
 | 判断某个主题该由哪份文档负责（authority 归属 / 冲突时谁优先） | 各 spec 开头的 **Authority / Scope** 段；Reading 与其它文档的优先级见 `docs/specs/reading-view-cognitive-contract.md` §1.2 的 scoped precedence |
 | 查某个 feature 的需求、结论与验收证据 | `docs/log/artifacts/Fxx-*/`（先看 `brief.md`、`verification-summary.md`） |
-| 查原始实验 run（什么参数下生成了什么、失败留下了什么） | `experiments/README.md` + `experiments/index.json`（逐 run → feature 的归属表） |
+| 查原始实验 run（什么参数下生成了什么、失败留下了什么） | `artifacts/experiments/README.md` + `artifacts/experiments/index.json`（逐 run → feature 的归属表） |
 | 找回规范化之前的旧路径 | `docs/README.md` 的 Path mapping |
 | 记录真实缺陷或用户返工反馈 | `docs/harness/incidents/`；可复用经验进 `docs/harness/lessons.jsonl` |
 | 看形状探索原型、背景材料、改进建议 | `docs/prototypes/`、`docs/notes/` |
@@ -86,7 +86,7 @@
 | Framework map 契约 | `docs/specs/framework-map-contract.md` |
 | Reading View 认知契约 | 跨层：`docs/specs/reading-view-cognitive-contract.md`（NORMATIVE，authority 入口）· 各层：`docs/specs/reading-view-layer-contracts.md`（主契约纳入的 subordinate）· 证据：`-evidence.md`（冲突时以主契约为准） |
 | Validator | `scripts/check-plan.js`、`check-block.js`、`check-map.js`、`check-overview.js` |
-| Gold Fixture | `fixtures/context-consumption.json`、`fixtures/context-consumption.overview-plan.json` |
+| Gold Fixture | `samples/context-consumption/design-review.json`、`samples/context-consumption/overview-plan.json` |
 | Renderer 契约 | `app/renderer/**`（预览与产品共用同一份 renderer 模块） |
 | AI 阶段边界 | Stage A → Stage B → Stage 1b/1 → Stage 2，见 `docs/harness/ARCHITECTURE.md` |
 
@@ -103,7 +103,7 @@ npm run test:all            # 离线单元测试 + 文档/实验索引校验（�
 npm run selftest            # Electron 真实渲染进程内跑通整条链路
 npm run verify:harness      # feature 合同与证据元数据门禁
 npm run check:docs          # 文档引用检查
-npm run check:experiments   # experiments 索引漂移检查（动了 experiments/ 之后必须跑）
+npm run check:experiments   # experiments 索引漂移检查（动了 artifacts/experiments/ 之后必须跑）
 ```
 
 完整的初始化步骤与分层验证命令见 `docs/harness/INITIALIZATION_CONTRACT.md`。

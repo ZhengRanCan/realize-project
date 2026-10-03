@@ -1,0 +1,9 @@
+
+
+===== VERIFY PREVIEW =====
+! 渲染器控制台错误 1 条：
+    %cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy
+✓ bundle inspection: 默认视图 / SU section / Known Absent / 只读审核通过
+===== END =====
+VERIFY PREVIEW PASSED

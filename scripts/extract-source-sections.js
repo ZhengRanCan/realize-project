@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
- * 把原 Markdown 切成"可回查的章节"，产出 docs/source-sections.json。
+ * 把原 Markdown 切成"可回查的章节"，产出 samples/context-consumption/source-sections.json。
  *
  * 用途：Overview 里每个区块的 `Source: §9, §10` 点开时，右侧直接显示对应原文段落
  * —— 平时靠视觉重述理解，怀疑某一点时一键回原文核对。
@@ -18,9 +20,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const DOC = path.join(ROOT, '测试文档', '18-context-consumption-semantic-model.md');
-const OUT = path.join(ROOT, 'docs', 'source-sections.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const DOC = joinRepositoryPath(ROOT, '测试文档', '18-context-consumption-semantic-model.md');
+const OUT = joinRepositoryPath(ROOT, 'docs', 'source-sections.json');
 
 const {buildSourceRegistry}=require('../app/shared/source-coordinates');
 const registry=buildSourceRegistry(fs.readFileSync(DOC,'utf8'),{sourcePath:path.relative(ROOT,DOC).replace(/\\/g,'/')});
@@ -34,7 +36,7 @@ sections.forEach((s) => {
 });
 
 // 自检：fixture 里用到的 sources 标签必须都能在这里找到
-const fixture = JSON.parse(fs.readFileSync(path.join(ROOT, 'fixtures', 'context-consumption.json'), 'utf8'));
+const fixture = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.json'), 'utf8'));
 const used = new Set(fixture.overview.sections.flatMap((sec) => sec.blocks.flatMap((b) => b.sources)));
 const available = new Set(sections.map((s) => s.label));
 const missing = [...used].filter((label) => !available.has(label));

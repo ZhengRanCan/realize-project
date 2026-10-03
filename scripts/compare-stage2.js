@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Stage 2 Pilot 的 Gold 对比报告（人工可读，不做自动评分）。
  *
@@ -21,18 +23,18 @@ const path = require('node:path');
 
 const { checkBlock, contentElements } = require('./check-block.js');
 
-const ROOT = path.resolve(__dirname, '..');
-const PLAN = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
-const DESIGN = path.join(ROOT, 'fixtures', 'context-consumption.json');
-const SOURCE_SECTIONS = path.join(ROOT, 'docs', 'source-sections.json');
-const STAGE2_DIR = path.join(ROOT, 'experiments', 'stage2');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const PLAN = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
+const DESIGN = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.json');
+const SOURCE_SECTIONS = joinRepositoryPath(ROOT, 'docs', 'source-sections.json');
+const STAGE2_DIR = joinRepositoryPath(ROOT, 'experiments', 'stage2');
 
 const LONG_TEXT = 160;
 
 function main() {
   const args = process.argv.slice(2);
   const outIndex = args.indexOf('--out');
-  const outFile = outIndex >= 0 ? path.resolve(ROOT, args[outIndex + 1]) : null;
+  const outFile = outIndex >= 0 ? resolveRepositoryPath(ROOT, args[outIndex + 1]) : null;
 
   const plan = JSON.parse(fs.readFileSync(PLAN, 'utf8'));
   const design = JSON.parse(fs.readFileSync(DESIGN, 'utf8'));
@@ -53,10 +55,10 @@ function main() {
     .readdirSync(STAGE2_DIR, { withFileTypes: true })
     .filter((d) => d.isDirectory() && !d.name.startsWith('_'))
     .map((d) => d.name)
-    .filter((id) => fs.existsSync(path.join(STAGE2_DIR, id, 'block.generated.json')));
+    .filter((id) => fs.existsSync(joinRepositoryPath(STAGE2_DIR, id, 'block.generated.json')));
 
   const rows = blockDirs.map((id) => {
-    const generated = JSON.parse(fs.readFileSync(path.join(STAGE2_DIR, id, 'block.generated.json'), 'utf8'));
+    const generated = JSON.parse(fs.readFileSync(joinRepositoryPath(STAGE2_DIR, id, 'block.generated.json'), 'utf8'));
     const planBlock = plan.blocks.find((b) => b.id === id);
     const gold = goldBlocks.get(id) || null;
 
@@ -79,8 +81,8 @@ function main() {
     const avgLen = lens.length ? lens.reduce((a, b) => a + b, 0) / lens.length : 0;
     const longCount = lens.filter((l) => l > LONG_TEXT).length;
 
-    const request = fs.existsSync(path.join(STAGE2_DIR, id, 'request.json'))
-      ? JSON.parse(fs.readFileSync(path.join(STAGE2_DIR, id, 'request.json'), 'utf8'))
+    const request = fs.existsSync(joinRepositoryPath(STAGE2_DIR, id, 'request.json'))
+      ? JSON.parse(fs.readFileSync(joinRepositoryPath(STAGE2_DIR, id, 'request.json'), 'utf8'))
       : {};
 
     return {
@@ -193,7 +195,7 @@ function main() {
   push('| block | shape | content.type | 主要元素 | 平均文本 | 判定 |');
   push('|---|---|---|---|---|---|');
   rows.forEach((r) => {
-    const g = JSON.parse(fs.readFileSync(path.join(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
+    const g = JSON.parse(fs.readFileSync(joinRepositoryPath(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
     const proseLike = r.avgLen > 120 && r.elements <= 4;
     push(
       `| ${r.id} | ${r.shape} | ${g.content.type} | ${r.elements} | ${r.avgLen.toFixed(0)} 字 | ${
@@ -218,7 +220,7 @@ function main() {
   push('|---|---|---|---|---|');
   rows.forEach((r) => {
     const without = [];
-    const generated = JSON.parse(fs.readFileSync(path.join(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
+    const generated = JSON.parse(fs.readFileSync(joinRepositoryPath(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
     const normalized = JSON.parse(JSON.stringify(generated));
     if (normalized.content && normalized.content.type === 'flow' && Array.isArray(normalized.content.lanes)) {
       normalized.content.lanes.forEach((lane) => {
@@ -245,7 +247,7 @@ function main() {
   } else {
     push('以下 block 存在缺少 provenance 的元素（需要人工确认是"漏标"还是"该元素确实不承载语义"）：');
     noProv.forEach((r) => {
-      const generated = JSON.parse(fs.readFileSync(path.join(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
+      const generated = JSON.parse(fs.readFileSync(joinRepositoryPath(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
       const without = [];
       contentElements(generated.content).forEach((el) => {
         if (!el.sourceUnitIds || el.sourceUnitIds.length === 0) without.push(el.kind);
@@ -266,7 +268,7 @@ function main() {
   push('|---|---|---|---|---|---|');
   rows.forEach((r) => {
     const gold = goldBlocks.get(r.id);
-    const model = JSON.parse(fs.readFileSync(path.join(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
+    const model = JSON.parse(fs.readFileSync(joinRepositoryPath(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
     const goldCount = gold
       ? checkBlock({ ...gold, shape: plan.blocks.find((b) => b.id === r.id).shape }, plan, { allowedPhrases }).elements.length
       : 0;
@@ -292,7 +294,7 @@ function main() {
     'renderer mismatch': (() => {
       const out = [];
       rows.forEach((r) => {
-        const g = JSON.parse(fs.readFileSync(path.join(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
+        const g = JSON.parse(fs.readFileSync(joinRepositoryPath(STAGE2_DIR, r.id, 'block.generated.json'), 'utf8'));
         if (!['flow', 'current-target-flow'].includes(r.shape)) return;
         // 扁平写法：nodes[] 的元素上直接出现 title（正确写法应当是 { node: {...} }）
         const raw = JSON.stringify(g.content.lanes || []);

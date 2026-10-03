@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 'use strict';
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 const fs=require('node:fs/promises'),path=require('node:path');
 const {prepareReadingSession}=require('../app/main/reading-session');
 const {projectReadingBundle}=require('../app/shared/reading-projection');
@@ -7,14 +9,14 @@ const {projectL3}=require('../app/shared/l3-inspector-projection');
 const {buildSourceRegistry,resolveSourceCoordinate,sha256}=require('../app/shared/source-coordinates');
 const {validateBundleData}=require('../app/shared/reading-bundle-validation');
 const semantics=require('../app/shared/semantics');
-const ROOT=path.resolve(__dirname,'..');
+const ROOT=resolveRepositoryPath(__dirname,'..');
 const json=async file=>JSON.parse(await fs.readFile(file,'utf8'));
 const safeJSON=value=>JSON.stringify(value).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
 async function legacySnapshot(options) {
- const planPath=path.resolve(options.plan||path.join(ROOT,'fixtures/context-consumption.overview-plan.json'));
- const input={designReview:await json(path.resolve(options.design||path.join(ROOT,'fixtures/context-consumption.json'))),plan:await json(planPath),generated:await json(path.resolve(options.overview||path.join(ROOT,'experiments/stage2-full/overview.generated.json')))};
- const old=await json(path.resolve(options.rows||path.join(ROOT,'docs/source-sections.json')));
- input.sourceText=await fs.readFile(path.resolve(ROOT,old.document.path),'utf8');input.sourceSections=buildSourceRegistry(input.sourceText,{sourcePath:old.document.path});input.planSha256=sha256(await fs.readFile(planPath));
+ const planPath=resolveRepositoryPath(options.plan||joinRepositoryPath(ROOT,'samples/context-consumption/overview-plan.json'));
+ const input={designReview:await json(resolveRepositoryPath(options.design||joinRepositoryPath(ROOT,'samples/context-consumption/design-review.json'))),plan:await json(planPath),generated:await json(resolveRepositoryPath(options.overview||joinRepositoryPath(ROOT,'experiments/stage2-full/overview.generated.json')))};
+ const old=await json(resolveRepositoryPath(options.rows||joinRepositoryPath(ROOT,'samples/context-consumption/source-sections.json')));
+ input.sourceText=await fs.readFile(resolveRepositoryPath(ROOT,old.document.path),'utf8');input.sourceSections=buildSourceRegistry(input.sourceText,{sourcePath:old.document.path});input.planSha256=sha256(await fs.readFile(planPath));
  input.manifest={bundleVersion:1,analysisId:'legacy-preview',bindings:{designReviewId:input.designReview.design.id},files:{}};
  for(const [key,name]of Object.entries({source:'source.md',sourceSections:'source-sections.json',designReview:'design-review.json',plan:'overview-plan.json',generated:'overview.generated.json'})) input.manifest.files[key]={path:name,sha256:sha256(key==='source'?input.sourceText:JSON.stringify(input[key]))};
  const check=validateBundleData(input);if(check.errors.length)throw new Error(check.errors.join('\n'));input.reports=check.reports;
@@ -33,9 +35,9 @@ async function buildPreview(options={}) {
  }
  const coordinates={'plan-section':{},heading:{}};
  for(const [namespace,list,key]of [['plan-section',input.sourceSections.sections,'label'],['heading',input.sourceSections.headings,'key']])for(const entry of list)coordinates[namespace][entry[key]]=input.reports.sourceIntegrity==='consistent'?resolveSourceCoordinate(input.sourceSections,{namespace,key:entry[key]}):{state:'unavailable',reason:'来源坐标漂移'};
- let html=await fs.readFile(path.join(ROOT,'app/renderer/index.html'),'utf8');
+ let html=await fs.readFile(joinRepositoryPath(ROOT,'app/renderer/index.html'),'utf8');
  html=html.replace(/<meta http-equiv="Content-Security-Policy"[\s\S]*?\/>/,'');
- for(const css of ['styles.css','l0-map.css']) {const styles=await fs.readFile(path.join(ROOT,'app/renderer',css),'utf8');html=html.replace(`<link rel="stylesheet" href="${css}" />`,()=>`<style>${styles}</style>`);}
+ for(const css of ['styles.css','l0-map.css']) {const styles=await fs.readFile(joinRepositoryPath(ROOT,'app/renderer',css),'utf8');html=html.replace(`<link rel="stylesheet" href="${css}" />`,()=>`<style>${styles}</style>`);}
  const snapshot={loadResult,inspections,coordinates};
  const shim=`<script>
 window.__PREVIEW__=${safeJSON(snapshot)};
@@ -52,9 +54,9 @@ window.designReview={paths:async()=>({defaultFixture:'(preview)'}),loadFixture:a
 </script>`;
  html=html.replace('<script src="vendor/mermaid.min.js"></script>',()=>shim+'\n<script src="vendor/mermaid.min.js"></script>');
  const scripts=['vendor/mermaid.min.js','../shared/semantics.js','l0-layout.js','l0-map.js','l3-inspector.js','app.js'];
- for(const file of scripts){const code=await fs.readFile(path.resolve(ROOT,'app/renderer',file),'utf8');html=html.replace(`<script src="${file}"></script>`,()=>`<script>${code.replace(/<\/script/gi,'<\\/script')}</script>`);}
+ for(const file of scripts){const code=await fs.readFile(resolveRepositoryPath(ROOT,'app/renderer',file),'utf8');html=html.replace(`<script src="${file}"></script>`,()=>`<script>${code.replace(/<\/script/gi,'<\\/script')}</script>`);}
  html=html.replace(/<\/body>\s*<\/html>\s*$/,()=>`<script>window.__applyLoadResult(window.__PREVIEW__.loadResult);document.getElementById('btn-save').disabled=true;document.getElementById('btn-save').textContent='静态预览 · 审核保存不可用';</script>\n</body></html>`);
- const out=path.resolve(options.out||path.join(ROOT,'experiments/stage2-full/overview-preview.html'));await fs.mkdir(path.dirname(out),{recursive:true});await fs.writeFile(out,html,'utf8');return {out,blocks:input.plan.blocks.length};
+ const out=resolveRepositoryPath(options.out||repositoryPath('workspace/previews/overview.html'));await fs.mkdir(path.dirname(out),{recursive:true});await fs.writeFile(out,html,'utf8');return {out,blocks:input.plan.blocks.length};
 }
 function parseArgs(argv){const args={};for(let i=0;i<argv.length;i++){if(!argv[i].startsWith('--')||!argv[i+1])throw new Error('参数必须为 --name value');args[argv[i].slice(2)]=argv[++i];}return args;}
 module.exports={buildPreview};

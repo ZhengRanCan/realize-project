@@ -13,15 +13,19 @@ Plan / Generated / Map 保留各自 identity；来源 registry 随资料包绑�
 | `app/shared/`（shared semantics） | Gate / reviewLevel / category / Evidence 级别的**单一事实来源**；极简 draft-07 校验器；一致性检查；L2 semantic projection | 框架特有展示细节、文件 I/O |
 | `schema/`（contracts） | 各阶段产物结构（design-review / overview-plan / stage2-block / framework-map / map-selection / semantic-inventory） | 判断层规则（放在契约文档与 validator 里） |
 | `scripts/`（pipeline + validators） | 抽取、校验、生成、装配、报告：`check-*`、`ai-*`、`assemble-overview`、`full-run-report`、`harness-gate` | UI 渲染 |
-| `ai/`（prompts） | Stage A/B 与 Stage 1/2 的提示词文本 | 产物结构定义（以 `schema/` 为准） |
-| `fixtures/` | Gold 输入与期望产物（`context-consumption.json`、`.overview-plan.json`、`human-review.sample.json`） | 运行时人工结果（`human-review.json` 在仓库根目录且不入库） |
-| `experiments/` | 原始 run 产物与报告（每个 run 一个独立目录） | 被产品直接读取的数据 |
+| `prompts/`（prompts） | Stage A/B 与 Stage 1/2 的提示词文本 | 产物结构定义（以 `schema/` 为准） |
+| `samples/` | 按文章归拢的原文、Gold、Map、坐标与期望产物（`context-consumption/design-review.json`、`overview-plan.json`、`human-review.sample.json`） | 运行时人工结果（资料包内或 workspace/legacy-review 下，且不入库） |
+| `artifacts/experiments/` | 原始 run 产物与报告（每个 run 一个独立目录） | 被产品直接读取的数据 |
 | `docs/log/artifacts/` | 每个 feature 的耐久证据与历史材料 | 体积大的生成产物 |
+
+## Repository path compatibility
+
+仓库工具的明确旧路径映射只在 scripts/helpers/repository-layout 使用；相对默认值锚定仓库，绝对外部路径不改写。运行时清单内相对路径仍由 reading-bundle 验证，不注入兼容层，不猜文件名。workspace 本地数据除 README 外忽略 Git。
 
 ## Pipeline
 
 ```text
-测试文档/*.md（Fixture A–E）
+samples/*/source.md（Fixture A–E）
    ↓ Stage A   semantic inventory      schema/semantic-inventory.schema.json
    ↓ Stage B   framework map（L0）      schema/framework-map.schema.json + scripts/check-map.js
    ↓ Stage 1b  map selection            schema/map-selection.schema.json
@@ -59,22 +63,21 @@ support。原始 `model` 仍只供 Gate 和人工审核语义使用。
 
 | 产物 | 表示什么 | 谁写 |
 | --- | --- | --- |
-| `overview-plan.json` | 原文有哪些 Semantic Unit，以及它们如何被组织成 Visual Block | Stage 1（`fixtures/` 下是 Gold） |
+| `overview-plan.json` | 原文有哪些 Semantic Unit，以及它们如何被组织成 Visual Block | Stage 1（`samples/` 下是 Gold） |
 | `overview.generated.json` | Stage 2 生成并装配后的完整视觉化 Overview 数据 | Stage 2 + `scripts/assemble-overview.js` |
-| `framework-map.json` / `map-selection.json` / `semantic-inventory.json` | L0 机制图、选择结果、Stage A 中间态 | Stage A / B（逐 run 落在 `experiments/`） |
+| `framework-map.json` / `map-selection.json` / `semantic-inventory.json` | L0 机制图、选择结果、Stage A 中间态 | Stage A / B（逐 run 落在 `artifacts/experiments/`） |
 | `human-review.json` | 用户**真实**的人工审核结果 | 只由用户在 UI 中显式保存 |
 
 > AI 不得覆盖人工审批状态：`design-review.json` 侧 `decisions[].status` 恒为 `pending`，
-> 人工结果单独落在仓库根目录的 `human-review.json`（不入库）。
+> 人工结果落在当前资料包或旧入口的 workspace/legacy-review 下的 human-review.json（不入库）。
 
 ## Data ownership
 
-- `docs/source-sections.json` 由 `npm run source` 从被审 Markdown 切分生成，是 Source 回查的唯一定位数据；
-  `app/main/main.js` 与多个 `scripts/check-*.js` 直接按该路径读取，因此保留在 `docs/` 根目录。
-- `fixtures/context-consumption.json` 是人工抽取的 Gold（12 Decision / 6 Gap / 10 Open Question / 36 Evidence），
+- `samples/context-consumption/source-sections.json` 由 `npm run source` 从被审 Markdown 切分生成，是旧样本的 Source 定位数据；资料包使用随清单绑定的坐标副本。
+- `samples/context-consumption/design-review.json` 是人工抽取的 Gold（12 Decision / 6 Gap / 10 Open Question / 36 Evidence），
   由 `scripts/backfill-overview-blocks.js` 等脚本按 `scripts/backfill-overview-plan.js` 的口径再生；
   **不要手改**其中由脚本生成的派生字段。
-- 每个 feature 的原始 run 产物属于 `experiments/`，产品侧只读取装配后的 `overview.generated.json` 与手工 fixture。
+- 每个 feature 的原始 run 产物属于 `artifacts/experiments/`，产品侧只读取装配后的 `overview.generated.json` 与手工 fixture。
 
 ## Constraints on change
 
@@ -82,3 +85,5 @@ support。原始 `model` 仍只供 Gate 和人工审核语义使用。
   F01–F10 期间的经验是：`check-*` 的口径一改，历史产物会成批变红，因此改口径要单独一轮。
 - 新 shape / 新元素类型 / 新关系词都属**受控词汇表扩张**，先改 `docs/specs/shape-catalog.md` 或
   `docs/specs/framework-map-contract.md`，再改 schema 与 validator。
+
+旧单文件入口兼容已有根目录 human-review.json：存在时继续读取并保存该文件；没有旧审核时，新结果写入 workspace/legacy-review。资料包人工审核仍只在当前包内。

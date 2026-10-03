@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 07 · AI Framework Map Generation —— 生成器（Phase 1 harness）
  *
@@ -47,21 +49,21 @@ const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 
 /** 五篇已验收 Fixture。D / E 必须使用 F09 冻结的测试副本（测试文档/ 下那两份）。 */
 const FIXTURES = {
-  a: { doc: '测试文档/18-context-consumption-semantic-model.md', label: 'A · Concept / Architecture heavy' },
-  b: { doc: '测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md', label: 'B · Data / transformation heavy' },
-  c: { doc: '测试文档/fixture-c-candidate-inbox-driven-profile-pipeline.md', label: 'C · Process heavy' },
-  d: { doc: '测试文档/fixture-d-goal-plan-task-state-model.md', label: 'D · ER-heavy / multi-entity network' },
-  e: { doc: '测试文档/fixture-e-f13-f16-runbook.md', label: 'E · Operational Runbook' },
+  a: { doc: 'samples/context-consumption/source.md', label: 'A · Concept / Architecture heavy' },
+  b: { doc: 'samples/canonical-hash-integrity/source.md', label: 'B · Data / transformation heavy' },
+  c: { doc: 'samples/candidate-inbox-profile/source.md', label: 'C · Process heavy' },
+  d: { doc: 'samples/goal-plan-task-state/source.md', label: 'D · ER-heavy / multi-entity network' },
+  e: { doc: 'samples/operational-runbook/source.md', label: 'E · Operational Runbook' },
 };
 
 const DEFAULTS = {
-  out: path.join('experiments', 'framework-map-generation'),
-  prompt: path.join('ai', 'framework-map-generation.prompt.md'),
-  schema: path.join('schema', 'framework-map.schema.json'),
+  out: joinRepositoryPath('experiments', 'framework-map-generation'),
+  prompt: joinRepositoryPath('ai', 'framework-map-generation.prompt.md'),
+  schema: joinRepositoryPath('schema', 'framework-map.schema.json'),
   model: 'gpt-5.6-sol',
   maxTokens: 32000,
   temperature: 1,
@@ -105,12 +107,12 @@ function usage(msg) {
 if (!fixtureId || !FIXTURES[fixtureId]) usage(`--fixture 必须是 a / b / c / d / e（收到：${fixtureId || '(空)'}）`);
 
 const fixture = FIXTURES[fixtureId];
-const docPath = path.resolve(ROOT, fixture.doc);
+const docPath = resolveRepositoryPath(ROOT, fixture.doc);
 if (!fs.existsSync(docPath)) usage(`fixture 文档不存在：${fixture.doc}`);
 
-const outBase = path.resolve(ROOT, String(args.out));
-const promptPath = path.resolve(ROOT, String(args.prompt));
-const schemaPath = path.resolve(ROOT, String(args.schema));
+const outBase = resolveRepositoryPath(ROOT, String(args.out));
+const promptPath = resolveRepositoryPath(ROOT, String(args.prompt));
+const schemaPath = resolveRepositoryPath(ROOT, String(args.schema));
 
 /* ------------------------------------------------------------------ *
  * 工具
@@ -127,9 +129,9 @@ const writeText = (file, text) => fs.writeFileSync(file, text, 'utf8');
  * 编号也不会被复用，run 号与时间顺序始终一致。失败重跑自动落到下一个编号。
  */
 function allocateRunDir() {
-  const base = path.join(outBase, `fixture-${fixtureId}`);
+  const base = joinRepositoryPath(outBase, `fixture-${fixtureId}`);
   if (args.run) {
-    const dir = path.join(base, `run-${String(args.run).padStart(2, '0')}`);
+    const dir = joinRepositoryPath(base, `run-${String(args.run).padStart(2, '0')}`);
     if (fs.existsSync(dir)) {
       console.error(`✗ 拒绝覆盖：${rel(dir)} 已存在。`);
       console.error('  每次 run 必须独立 —— 换一个 --run 编号，或先人工确认后再删除。');
@@ -145,7 +147,7 @@ function allocateRunDir() {
       if (m) max = Math.max(max, Number(m[1]));
     }
   }
-  return path.join(base, `run-${String(max + 1).padStart(2, '0')}`);
+  return joinRepositoryPath(base, `run-${String(max + 1).padStart(2, '0')}`);
 }
 
 /**
@@ -153,9 +155,9 @@ function allocateRunDir() {
  * 任何一步失败都不产生 framework-map.json，因此既有成功产物不可能被破坏。
  */
 function writeJsonAtomically(dir, fileName, obj, protocol) {
-  const finalPath = path.join(dir, fileName);
+  const finalPath = joinRepositoryPath(dir, fileName);
   if (fs.existsSync(finalPath)) throw new Error(`拒绝覆盖已存在的 ${fileName}`);
-  const tmpPath = path.join(dir, fileName.replace(/\.json$/, '.tmp.json'));
+  const tmpPath = joinRepositoryPath(dir, fileName.replace(/\.json$/, '.tmp.json'));
   const text = `${JSON.stringify(obj, null, 2)}\n`;
 
   writeText(tmpPath, text);
@@ -207,7 +209,7 @@ function extractJson(content) {
  * ------------------------------------------------------------------ */
 
 function readSettings() {
-  const file = path.join(os.homedir(), '.dsh', 'settings.yaml');
+  const file = joinRepositoryPath(os.homedir(), '.dsh', 'settings.yaml');
   if (!fs.existsSync(file)) return {};
   const text = fs.readFileSync(file, 'utf8');
   const url = text.match(/apiUrl:\s*(\S+)/);
@@ -393,7 +395,7 @@ function stubCall() {
     const status = Number(args.stubHttp);
     return { error: new Error(`HTTP ${status}：模拟网关错误（stub）`) };
   }
-  const file = path.resolve(ROOT, String(args.stubContent));
+  const file = resolveRepositoryPath(ROOT, String(args.stubContent));
   if (!fs.existsSync(file)) usage(`--stub-content 文件不存在：${args.stubContent}`);
   const text = fs.readFileSync(file, 'utf8');
   let content = text;
@@ -461,7 +463,7 @@ async function main() {
     userMessageChars: userMessage.length,
     startedAt: nowIso(),
   };
-  writeText(path.join(runDir, 'request.json'), `${JSON.stringify(requestRecord, null, 2)}\n`);
+  writeText(joinRepositoryPath(runDir, 'request.json'), `${JSON.stringify(requestRecord, null, 2)}\n`);
 
   console.log('=== F07 framework-map generation ===');
   console.log(`fixture    ${fixtureId}（${fixture.label}）`);
@@ -511,7 +513,7 @@ async function main() {
     meta.status = 'transport-failed';
     meta.error = error.message;
     meta.finishedAt = nowIso();
-    writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
+    writeText(joinRepositoryPath(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
     console.error(`\n✗ 调用失败：${error.message}`);
     console.error(`  产物安全：本 run 目录只有 request.json / run-meta.json；`);
     console.error(`  未产生 framework-map.json，**既有任何 run 的产物都未被触碰**。`);
@@ -525,7 +527,7 @@ async function main() {
   console.log(`完成：${result.latencyMs != null ? `${(result.latencyMs / 1000).toFixed(1)}s，` : ''}finish_reason=${result.finishReason}`);
 
   // 1) 原始输出**永远**先落盘（这是最重要的原始证据）
-  writeText(path.join(runDir, 'raw-response.txt'), result.content ?? '');
+  writeText(joinRepositoryPath(runDir, 'raw-response.txt'), result.content ?? '');
   protocol.rawResponseSaved = true;
 
   // 2) 抠 JSON（失败也只记录，不猜测、不修补）
@@ -537,7 +539,7 @@ async function main() {
     meta.status = 'parse-failed';
     meta.error = error.message;
     meta.finishedAt = nowIso();
-    writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
+    writeText(joinRepositoryPath(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
     console.error(`\n✗ 解析失败：${error.message}`);
     console.error('  raw-response.txt 已保留；没有生成 framework-map.json（不做任何自动修补）。');
     process.exit(EXIT.FAILED);
@@ -551,7 +553,7 @@ async function main() {
     meta.status = 'write-protocol-failed';
     meta.error = error.message;
     meta.finishedAt = nowIso();
-    writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
+    writeText(joinRepositoryPath(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
     console.error(`\n✗ 写入协议失败：${error.message}`);
     process.exit(EXIT.FAILED);
   }
@@ -566,15 +568,15 @@ async function main() {
       summary: { hard: null, warn: null, info: null, status: 'INVALID（结构不可校验）' },
     }
     : runValidator(map, rel(mapFile));
-  writeText(path.join(runDir, 'check-map.txt'), v.out);
+  writeText(joinRepositoryPath(runDir, 'check-map.txt'), v.out);
   protocol.checkMapExecuted = true;
   meta.validator = { exitCode: v.exitCode, ...v.summary };
   meta.status = v.exitCode === 0 ? 'success' : 'success-validator-fail';
   meta.finishedAt = nowIso();
-  writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
+  writeText(joinRepositoryPath(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
 
   // request.json 补上结局（同一 run 目录内，不影响产物安全）
-  writeText(path.join(runDir, 'request.json'), `${JSON.stringify({
+  writeText(joinRepositoryPath(runDir, 'request.json'), `${JSON.stringify({
     ...requestRecord, finishedAt: meta.finishedAt, status: meta.status, error: meta.error,
   }, null, 2)}\n`);
 

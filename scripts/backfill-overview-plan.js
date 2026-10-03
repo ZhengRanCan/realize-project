@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 手工建立 overview-plan 的 Gold Fixture。
  *
- * 依据：docs/specs/overview-coverage.md（O-01 ~ O-14 覆盖表）+ 已人工确认的 fixtures/context-consumption.json。
+ * 依据：docs/specs/overview-coverage.md（O-01 ~ O-14 覆盖表）+ 已人工确认的 samples/context-consumption/design-review.json。
  * 不重新自由设计：sourceUnits 的切分依据现有 20 个区块实际承载的语义，逐条回推到原文。
  *
  * 产出的 fixture 用于：
@@ -17,8 +19,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const OUT = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const OUT = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
 
 /* ------------------------------------------------------------------ *
  * sourceUnits
@@ -517,7 +519,7 @@ const DUPLICATES = [
 
 const plan = {
   planVersion: 1,
-  designRef: { id: 'DESIGN-CONTEXT-CONSUMPTION', path: 'fixtures/context-consumption.json' },
+  designRef: { id: 'DESIGN-CONTEXT-CONSUMPTION', path: 'samples/context-consumption/design-review.json' },
   shapeVocabularyVersion: 'shape-catalog-v1',
   sourceUnits: RAW_UNITS.map(([section, kind, importance, statement, id]) => ({
     id,
@@ -534,12 +536,12 @@ const plan = {
  * 展示层同步：title / stage / defaultExpanded / 顺序 以 design fixture 的 overview 为准
  *
  * 这些是"展示决策"，权威来源是 backfill-overview-blocks.js 产出的
- * fixtures/context-consumption.json；plan 只负责语义覆盖，但两处的展示字段必须一致，
+ * samples/context-consumption/design-review.json；plan 只负责语义覆盖，但两处的展示字段必须一致，
  * 否则 Stage 2 的输入（plan）与人工 Overview（fixture）会对不上。
  * O-16 不在 fixture 的 overview 中（它是回推发现的缺口），因此单独处理。
  * ------------------------------------------------------------------ */
 
-const designForSync = JSON.parse(fs.readFileSync(path.join(ROOT, plan.designRef.path), 'utf8'));
+const designForSync = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, plan.designRef.path), 'utf8'));
 const fixtureBlocks = new Map(
   designForSync.overview.sections.flatMap((sec) => sec.blocks.map((b) => [b.id, { ...b, stage: sec.id }]))
 );
@@ -607,7 +609,7 @@ if (uncovered.length > 0) {
 }
 
 // 自检 3：reviewObjects 引用真实存在
-const dr = JSON.parse(fs.readFileSync(path.join(ROOT, plan.designRef.path), 'utf8'));
+const dr = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, plan.designRef.path), 'utf8'));
 const validObjects = new Set(
   [...dr.decisions, ...dr.facts, ...dr.gaps, ...dr.openQuestions].map((x) => x.id)
 );
@@ -619,8 +621,8 @@ plan.blocks.forEach((b) => {
 });
 if (badObjects.length > 0) throw new Error(`reviewObjects 引用不存在：${badObjects.join(', ')}`);
 
-// 自检 4：section 标签都能在 docs/source-sections.json 里找到
-const sections = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs', 'source-sections.json'), 'utf8'));
+// 自检 4：section 标签都能在 samples/context-consumption/source-sections.json 里找到
+const sections = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'docs', 'source-sections.json'), 'utf8'));
 const validSections = new Set(sections.sections.map((s) => s.label));
 const badSections = new Set();
 plan.sourceUnits.forEach((u) => { if (!validSections.has(u.section)) badSections.add(u.section); });

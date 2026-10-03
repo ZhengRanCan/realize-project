@@ -62,3 +62,7 @@
   `docs/harness/ARCHITECTURE.md` 中登记原因。
 - Consequences: 规范化没有触及模型调用链与校验链的输入路径，`npm run test:all` 的行为不变。
 - Revisit when: 有人愿意把该路径抽成单一常量并统一所有读写方。
+
+## 2026-10-03 — F22 repository locations
+
+用户批准按用途分区并按文章归拢配套资料。当前默认目录改为 samples、prompts、artifacts/experiments、workspace；该位置决策更新此前“实验留在原目录”的约定。历史请求、Plan、Generated、原文、提示词与人工审核保持内容，路径字段通过集中明确映射读取。新测试输出进入 workspace/tmp/tests，避免覆盖迁移保留的临时材料。首页以资料包为主入口，旧开发入口默认折叠。

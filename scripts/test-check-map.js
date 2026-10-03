@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
 /**
  * check-map 的测试（Feature 06）
  *
@@ -31,7 +32,7 @@ function baseMap(over = {}) {
     mapVersion: 2,
     level: 'L0',
     document: {
-      id: 'D-TEST', title: 'T', sourcePath: '测试文档/18-context-consumption-semantic-model.md', role: 'target',
+      id: 'D-TEST', title: 'T', sourcePath: 'samples/context-consumption/source.md', role: 'target',
       scope: { text: 'scope', sectionRefs: ['§1'] },
     },
     elements: [
@@ -205,7 +206,7 @@ t('没有主轴 → INFORMATIONAL', () => {
 // ── section parser：Markdown heading tree（不是数字章节语法）───
 t('非数字标题（## Goal）也能解析为小节全集', () => {
   const { readDocHeadings } = require('./check-map');
-  const h = readDocHeadings('测试文档/fixture-d-goal-plan-task-state-model.md');
+  const h = readDocHeadings('samples/goal-plan-task-state/source.md');
   if (h.sectionLevel !== 2) return 'sectionLevel=' + h.sectionLevel;
   if (!h.top.includes('Goal')) return 'top 里没有 Goal: ' + h.top.join(', ');
   if (!h.top.includes('FocusSession, TaskResult and DailyReview')) return '带逗号的长标题没解析出来';
@@ -214,7 +215,7 @@ t('非数字标题（## Goal）也能解析为小节全集', () => {
 
 t('围栏代码块里的 # 注释不是标题（runbook 场景）', () => {
   const { readDocHeadings } = require('./check-map');
-  const h = readDocHeadings('测试文档/fixture-e-f13-f16-runbook.md');
+  const h = readDocHeadings('samples/operational-runbook/source.md');
   if (h.sectionLevel !== 2) return 'sectionLevel=' + h.sectionLevel + '（被代码注释压到了 level 1）';
   const polluted = h.all.filter((k) => /期望|CloudBase CLI|目录下/.test(k));
   if (polluted.length) return '代码注释被当成标题: ' + polluted.join(', ');

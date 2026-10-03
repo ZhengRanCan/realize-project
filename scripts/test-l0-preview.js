@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 08 · L0 预览验收（Phase 2 → Phase 4.1 → Phase 5 regression 的自动化部分）
  *
@@ -23,7 +25,7 @@ const { buildOne, SET } = require('./build-l0-preview.js');
 const { buildL0ViewModel } = require('./l0-view-model.js');
 const { renderL0MapHTML } = require('../app/renderer/l0-map.js');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 const results = [];
 let failures = 0;
 function check(name, fn) {
@@ -47,9 +49,9 @@ console.log('===== F08 · L0 预览验收（对生成的 HTML 断言）=====\n')
 
 const built = [];
 for (const item of SET) {
-  const r = buildOne({ map: item.map, out: `tmp/l0-preview-check/${item.name}.html`, view: 'reading', note: item.note });
-  const html = fs.readFileSync(path.join(ROOT, r.out), 'utf8');
-  const map = JSON.parse(fs.readFileSync(path.join(ROOT, item.map), 'utf8'));
+  const r = buildOne({ map: item.map, out: `workspace/tmp/tests/l0-preview-check/${item.name}.html`, view: 'reading', note: item.note });
+  const html = fs.readFileSync(joinRepositoryPath(ROOT, r.out), 'utf8');
+  const map = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, item.map), 'utf8'));
   const reading = slice(html, 'id="l0-reading"', 'id="l0-review-board"');
   const review = slice(html, 'id="l0-review-board"');
   built.push({ item, r, html, map, reading, review });
@@ -144,17 +146,17 @@ for (const item of SET) {
 
 /* ---------- 不发明主轴：真的造一份"没有 edge"的 map 来验（不靠"本预览集恰好没有"） ---------- */
 {
-  const flatMap = JSON.parse(fs.readFileSync(path.join(ROOT, SET[0].map), 'utf8'));
+  const flatMap = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, SET[0].map), 'utf8'));
   flatMap.edges = [];
   flatMap.attachments = [];
   flatMap.relationGap = [];
-  const flatPath = path.join(ROOT, 'tmp/l0-preview-check/no-edge.map.json');
+  const flatPath = joinRepositoryPath(ROOT, 'workspace/tmp/tests/l0-preview-check/no-edge.map.json');
   fs.mkdirSync(path.dirname(flatPath), { recursive: true });
   fs.writeFileSync(flatPath, JSON.stringify(flatMap, null, 2), 'utf8');
-  const flatBuilt = buildOne({ map: 'tmp/l0-preview-check/no-edge.map.json', out: 'tmp/l0-preview-check/nospine.html', view: 'reading', note: '0-edge 合成样本 · 不发明主轴' });
-  const flatHtml = fs.readFileSync(path.join(ROOT, flatBuilt.out), 'utf8');
+  const flatBuilt = buildOne({ map: 'workspace/tmp/tests/l0-preview-check/no-edge.map.json', out: 'workspace/tmp/tests/l0-preview-check/nospine.html', view: 'reading', note: '0-edge 合成样本 · 不发明主轴' });
+  const flatHtml = fs.readFileSync(joinRepositoryPath(ROOT, flatBuilt.out), 'utf8');
   built.push({
-    item: { name: 'nospine', map: 'tmp/l0-preview-check/no-edge.map.json', note: '0-edge 合成样本' },
+    item: { name: 'nospine', map: 'workspace/tmp/tests/l0-preview-check/no-edge.map.json', note: '0-edge 合成样本' },
     r: flatBuilt, html: flatHtml, map: flatMap,
     reading: slice(flatHtml, 'id="l0-reading"', 'id="l0-review-board"'),
     review: slice(flatHtml, 'id="l0-review-board"'),
@@ -269,13 +271,13 @@ check('回归：cron / 斜杠标识符不会被当成分隔符切坏', () => {
   return true;
 });
 check('标题/副标题的行数规则写死在 CSS（标题 1 行、副标题 2 行）', () => {
-  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  const css = fs.readFileSync(joinRepositoryPath(ROOT, 'app/renderer/l0-map.css'), 'utf8');
   const title = /\.l0-node \.node-title \{[^}]*-webkit-line-clamp: 1[^}]*\}/.test(css);
   const sub = /\.l0-node \.node-sub \{[^}]*?-webkit-line-clamp: 2[^}]*\}/.test(css);
   return (title && sub) || `title1=${title} sub2=${sub}`;
 });
 check('选中只做加法：CSS 里没有任何"压暗其余内容"的规则（只高光，不隐藏）', () => {
-  const rawCss = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  const rawCss = fs.readFileSync(joinRepositoryPath(ROOT, 'app/renderer/l0-map.css'), 'utf8');
   const css = rawCss.replace(/\/\*[\s\S]*?\*\//g, ''); // 注释里提到旧规则不算规则
   const dimRule = /\.is-dim\s*\{[^}]*opacity/.test(css) || /has-focus[^{]*\.is-dim/.test(css);
   if (dimRule) return 'CSS 里仍有 is-dim 的压暗规则';
@@ -297,18 +299,18 @@ check('约束角标带 data-host-ids（点约束时能把宿主一起点亮）',
   return true;
 });
 check('约束被点亮时有明确样式（点的是 summary / li，不是被自己的底色盖住）', () => {
-  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  const css = fs.readFileSync(joinRepositoryPath(ROOT, 'app/renderer/l0-map.css'), 'utf8');
   return (css.includes('.node-attach.is-hit > summary') && css.includes('.attach-item.is-hit'))
     || 'CSS 缺少角标高光规则（约束会看起来"没反应"）';
 });
 check('Reading 隐藏一切机器 ID（.eid 在 reading 视图不显示）', () => {
-  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  const css = fs.readFileSync(joinRepositoryPath(ROOT, 'app/renderer/l0-map.css'), 'utf8');
   if (!css.includes('.l0-root[data-view="reading"] .eid { display: none; }')) return 'CSS 缺少 Reading 隐藏 eid 的规则';
   const b = byName('d');
   return b.reading.includes('class="eid"') ? 'Reading 标记里仍有 eid' : true;
 });
 check('Reading / Review 互斥且都在 DOM 里（隐藏 ≠ 删除）', () => {
-  const css = fs.readFileSync(path.join(ROOT, 'app/renderer/l0-map.css'), 'utf8');
+  const css = fs.readFileSync(joinRepositoryPath(ROOT, 'app/renderer/l0-map.css'), 'utf8');
   const ok = css.includes('.l0-root[data-view="reading"] .l0-review-board { display: none; }')
     && css.includes('.l0-root[data-view="review"] .l0-reading { display: none; }');
   if (!ok) return 'CSS 缺少视图互斥规则';

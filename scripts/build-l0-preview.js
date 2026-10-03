@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 08 · L0 静态预览构建器（Phase 2）
  *
@@ -21,8 +23,8 @@ const path = require('node:path');
 const { buildL0ViewModel } = require('./l0-view-model.js');
 const { renderL0MapHTML } = require('../app/renderer/l0-map.js');
 
-const ROOT = path.resolve(__dirname, '..');
-const SCHEMA = JSON.parse(fs.readFileSync(path.join(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const SCHEMA = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
 const KNOWN_ROLES = SCHEMA.$defs.element.properties.role['x-known-roles'];
 
 /** 标准预览集：刻意包含两端与两个极端 */
@@ -31,20 +33,20 @@ const SET = [
   { name: 'e', map: 'experiments/semantic-grounding/fixture-e/run-08/framework-map.json', note: 'E · Runbook · 分叉 + constraint/attachment（F10 high）' },
   { name: 'd-selfloop', map: 'experiments/framework-map-generation/fixture-d/run-01/framework-map.json', note: 'D 旧臂 · 含 task→task 自环（F07）' },
   { name: 'd-overbudget', map: 'experiments/semantic-grounding/fixture-d/run-01/framework-map.json', note: 'E5 失败样本 · 81 elements（>budget 必须照常渲染）' },
-  { name: 'a', map: 'docs/log/artifacts/F04-l0-framework-map/drafts/context-consumption.map.json', note: 'A · sourceUnit 粒度 · 人类 candidate' },
-  { name: 'e-human', map: 'docs/log/artifacts/F09-contract-adversarial-test/drafts/fixture-e.map.json', note: 'E · 人类 candidate · 含 relationGap' },
+  { name: 'a', map: 'samples/context-consumption/framework-map.json', note: 'A · sourceUnit 粒度 · 人类 candidate' },
+  { name: 'e-human', map: 'samples/operational-runbook/framework-map.json', note: 'E · 人类 candidate · 含 relationGap' },
 ];
 
 function buildOne({ map, check, out, view = 'reading', note = '' }) {
-  const mapAbs = path.resolve(ROOT, map);
+  const mapAbs = resolveRepositoryPath(ROOT, map);
   const mapJson = JSON.parse(fs.readFileSync(mapAbs, 'utf8'));
-  const checkAbs = check ? path.resolve(ROOT, check) : path.join(path.dirname(mapAbs), 'check-map.txt');
+  const checkAbs = check ? resolveRepositoryPath(ROOT, check) : joinRepositoryPath(path.dirname(mapAbs), 'check-map.txt');
   const vm = buildL0ViewModel(mapJson, {
     checkMapText: fs.existsSync(checkAbs) ? fs.readFileSync(checkAbs, 'utf8') : null,
     knownRoles: KNOWN_ROLES,
   });
   const body = renderL0MapHTML(vm, { view });
-  const outAbs = path.resolve(ROOT, out);
+  const outAbs = resolveRepositoryPath(ROOT, out);
   // 用相对路径引 CSS，保证 file:// 直接打开可用（F07 的教训）
   const rel = (path.relative(path.dirname(outAbs), ROOT) || '.').replace(/\\/g, '/');
   const html = `<!doctype html>
@@ -100,7 +102,7 @@ function main() {
     for (const item of SET) {
       const r = buildOne({
         map: item.map,
-        out: `experiments/l0-ui/preview-${item.name}.html`,
+        out: `workspace/previews/l0/preview-${item.name}.html`,
         // 用户裁决：**默认 Reading View**（先回答"讲什么 / 从哪进去"，不是"有多少 WARN"）
         view: 'reading',
         note: item.note,
@@ -116,7 +118,7 @@ function main() {
   }
   const map = arg('--map');
   if (!map) { console.error('需要 --map，或用 --set 生成标准预览集'); process.exit(2); }
-  const r = buildOne({ map, check: arg('--check'), out: arg('--out') || 'experiments/l0-ui/preview.html', view: arg('--view') || 'reading', note: arg('--note') || '' });
+  const r = buildOne({ map, check: arg('--check'), out: arg('--out') || 'workspace/previews/l0/preview.html', view: arg('--view') || 'reading', note: arg('--note') || '' });
   console.log(`wrote ${r.out} (${(r.bytes / 1024).toFixed(1)} KB) el=${r.facts.elementCount} ed=${r.facts.edgeCount}`);
 }
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Overview 级验收器：`npm run check-overview`
  *
@@ -19,10 +21,10 @@ const path = require('node:path');
 
 const { checkBlock, contentElements } = require('./check-block.js');
 
-const ROOT = path.resolve(__dirname, '..');
-const DEFAULT_OVERVIEW = path.join(ROOT, 'experiments', 'stage2-full', 'overview.generated.json');
-const DEFAULT_PLAN = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
-const SOURCE_SECTIONS = path.join(ROOT, 'docs', 'source-sections.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const DEFAULT_OVERVIEW = joinRepositoryPath(ROOT, 'experiments', 'stage2-full', 'overview.generated.json');
+const DEFAULT_PLAN = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
+const SOURCE_SECTIONS = joinRepositoryPath(ROOT, 'docs', 'source-sections.json');
 
 /* ================================================================== *
  * 阈值集中配置
@@ -88,10 +90,10 @@ function parseArgs(argv) {
   const args = { overview: DEFAULT_OVERVIEW, plan: DEFAULT_PLAN };
   for (let i = 0; i < argv.length; i += 1) {
     if (['--plan','--source-sections','--source'].includes(argv[i])) {
-      args[{'--plan':'plan','--source-sections':'sourceSections','--source':'source'}[argv[i]]] = path.resolve(ROOT, argv[i + 1]);
+      args[{'--plan':'plan','--source-sections':'sourceSections','--source':'source'}[argv[i]]] = resolveRepositoryPath(ROOT, argv[i + 1]);
       i += 1;
     } else if (!argv[i].startsWith('--')) {
-      args.overview = path.resolve(argv[i]);
+      args.overview = resolveRepositoryPath(argv[i]);
     }
   }
   return args;

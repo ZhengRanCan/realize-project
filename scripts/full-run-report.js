@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Full Run 报告：把 overview.generated.json + 各 block 的 check-block 结果汇总成人工可读的报告。
  *
@@ -16,13 +18,13 @@ const path = require('node:path');
 
 const { checkBlock, contentElements } = require('./check-block.js');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 
 const DEFAULTS = {
-  overview: path.join('experiments', 'stage2-full', 'overview.generated.json'),
-  plan: path.join('fixtures', 'context-consumption.overview-plan.json'),
-  blocksDir: path.join('experiments', 'stage2-full', 'blocks'),
-  out: path.join('experiments', 'stage2-full', 'full-run-report.md'),
+  overview: joinRepositoryPath('experiments', 'stage2-full', 'overview.generated.json'),
+  plan: joinRepositoryPath('fixtures', 'context-consumption.overview-plan.json'),
+  blocksDir: joinRepositoryPath('experiments', 'stage2-full', 'blocks'),
+  out: joinRepositoryPath('experiments', 'stage2-full', 'full-run-report.md'),
   longText: 160,
   overCompressChars: 60,
   overCompressUnits: 4,
@@ -61,12 +63,12 @@ function normalizeFlatNodes(input) {
 }
 
 function main() {
-  const overviewPath = path.resolve(ROOT, args.overview);
-  const blocksDir = path.resolve(ROOT, args.blocksDir);
-  const outPath = path.resolve(ROOT, args.out);
-  const plan = JSON.parse(fs.readFileSync(path.resolve(ROOT, args.plan), 'utf8'));
+  const overviewPath = resolveRepositoryPath(ROOT, args.overview);
+  const blocksDir = resolveRepositoryPath(ROOT, args.blocksDir);
+  const outPath = resolveRepositoryPath(ROOT, args.out);
+  const plan = JSON.parse(fs.readFileSync(resolveRepositoryPath(ROOT, args.plan), 'utf8'));
   const overview = JSON.parse(fs.readFileSync(overviewPath, 'utf8'));
-  const sectionsDoc = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs', 'source-sections.json'), 'utf8'));
+  const sectionsDoc = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'docs', 'source-sections.json'), 'utf8'));
   const sourceText = sectionsDoc.sections.map((s) => s.text).join('\n');
 
   const FORBIDDEN = ['只能算', '等价于', '已被证明', '充分条件', '就是充分', '应当改为', '必须使用', '一定正确', '课程一定有效', '学生一定学会', '已实现', '已经实现', '已上线', '已验证', '源码已确认', '实际代码已', '经核实', '实测证明'];
@@ -88,9 +90,9 @@ function main() {
     const overCompressed = els.filter(
       (e) => (e.sourceUnitIds || []).length >= args.overCompressUnits && (e.text || '').length <= args.overCompressChars
     );
-    const checkFile = path.join(blocksDir, b.id, 'check-block.txt');
+    const checkFile = joinRepositoryPath(blocksDir, b.id, 'check-block.txt');
     const checkText = fs.existsSync(checkFile) ? fs.readFileSync(checkFile, 'utf8') : '';
-    const requestFile = path.join(blocksDir, b.id, 'request.json');
+    const requestFile = joinRepositoryPath(blocksDir, b.id, 'request.json');
     const request = fs.existsSync(requestFile) ? JSON.parse(fs.readFileSync(requestFile, 'utf8')) : {};
     return {
       id: b.id,

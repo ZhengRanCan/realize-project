@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 文档引用检查（docs / experiments / 根 README）
  *
@@ -15,7 +17,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 const SKIP_DIR = /(^|\/)(node_modules|tmp|harness-template|\.git)(\/|$)/;
 /**
  * 第三方参考材料（`docs/ref/`，浅克隆进来的外部文档 + 索引 README）。
@@ -28,14 +30,14 @@ const HISTORICAL_NOTE = /规范化前|规范化之前/;
 const PLACEHOLDER = /Fxx/;
 const RAW_DOC = /\/raw\.md$/;
 
-const PREFIX = 'docs|scripts|schema|app|fixtures|experiments|ai';
+const PREFIX = 'docs|scripts|schema|app|fixtures|experiments|ai|samples|prompts|artifacts|workspace|测试文档|bundles';
 const BOUNDARY = '[\\s`(（：:"\']';
 const TAIL = '[A-Za-z0-9_\\-./\\u4e00-\\u9fff]+';
 const PATTERN = new RegExp('(?:^|' + BOUNDARY + ')((?:' + PREFIX + ')/' + TAIL + ')', 'g');
 
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
+    const full = joinRepositoryPath(dir, entry.name);
     const rel = path.relative(ROOT, full).replace(/\\/g, '/');
     if (SKIP_DIR.test(rel) || SKIP_REF.test(rel)) continue;
     if (entry.isDirectory()) walk(full, out);
@@ -45,8 +47,11 @@ function walk(dir, out = []) {
 }
 
 const files = [
-  ...walk(path.join(ROOT, 'docs')),
-  ...walk(path.join(ROOT, 'experiments')),
+  ...walk(joinRepositoryPath(ROOT, 'docs')),
+  ...walk(joinRepositoryPath(ROOT, 'experiments')),
+  ...walk(joinRepositoryPath(ROOT, 'samples')),
+  ...walk(joinRepositoryPath(ROOT, 'prompts')),
+  'workspace/README.md',
   'README.md',
   'agent.md',
 ];
@@ -55,9 +60,11 @@ const findings = [];
 let checked = 0;
 
 for (const file of files) {
-  if (LEGACY_ONLY.test(file) || RAW_DOC.test(file)) continue;
+  // Raw documents and byte-preserved model templates are inputs, not current project docs.
+  // Their integrity is checked separately; prompts/README owns current consumer links.
+  if (LEGACY_ONLY.test(file) || RAW_DOC.test(file) || /^samples\/[^/]+\/source\.md$/.test(file) || /^prompts\/[^/]+\.prompt\.md$/.test(file)) continue;
   checked += 1;
-  const lines = fs.readFileSync(path.join(ROOT, file), 'utf8').split('\n');
+  const lines = fs.readFileSync(joinRepositoryPath(ROOT, file), 'utf8').split('\n');
   let inHistoricalSection = false;
   lines.forEach((line, index) => {
     if (/^##\s/.test(line)) inHistoricalSection = /规范化前|规范化之前|Path mapping|路径对照/.test(line);
@@ -66,7 +73,7 @@ for (const file of files) {
       const target = match[1].replace(/[.,;:：、）)]+$/, '');
       if (/[*{}<>$|]/.test(target) || PLACEHOLDER.test(target)) continue;
       if (target.endsWith('/') || !path.extname(target)) continue;
-      if (fs.existsSync(path.join(ROOT, target))) continue;
+      if (fs.existsSync(joinRepositoryPath(ROOT, target))) continue;
       findings.push(file + ':' + (index + 1) + '  →  ' + target);
     }
   });

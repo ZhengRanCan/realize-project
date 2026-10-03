@@ -1,10 +1,12 @@
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const { projectL2Overview } = require('../app/shared/reading-projection');
 
-const fixture = JSON.parse(fs.readFileSync(require.resolve('../fixtures/context-consumption.json'), 'utf8'));
+const fixture = JSON.parse(fs.readFileSync(require.resolve('../samples/context-consumption/design-review.json'), 'utf8'));
 const view = projectL2Overview(fixture.overview);
 const sourceBlocks = fixture.overview.sections.flatMap((section) => section.blocks);
 const projectedBlocks = view.sections.flatMap((section) => section.blocks);

@@ -1,5 +1,9 @@
 # Design
 
+## Start Screen
+
+F22 首屏突出“打开分析资料包”。Markdown、测试样本、独立 Review/Map 归入原生 details“开发与旧版入口”，默认关闭，支持键盘展开；删除未启用的 Source 选择与旧 Phase 占位说明。下钻与阅读视角沿用 Reading 契约。
+
 ## Reading Bundle Interaction
 
 F18 增加“打开分析资料包”，用户选择一份 reading-bundle.json 即加载同目录配套资料。

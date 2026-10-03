@@ -1,0 +1,32 @@
+{
+  "files": {
+    "测试文档/18-context-consumption-semantic-model.md": "samples/context-consumption/source.md",
+    "测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md": "samples/canonical-hash-integrity/source.md",
+    "测试文档/fixture-c-candidate-inbox-driven-profile-pipeline.md": "samples/candidate-inbox-profile/source.md",
+    "测试文档/fixture-d-goal-plan-task-state-model.md": "samples/goal-plan-task-state/source.md",
+    "测试文档/fixture-e-f13-f16-runbook.md": "samples/operational-runbook/source.md",
+    "测试文档/README.md": "samples/README.md",
+    "fixtures/context-consumption.json": "samples/context-consumption/design-review.json",
+    "fixtures/context-consumption.overview-plan.json": "samples/context-consumption/overview-plan.json",
+    "fixtures/human-review.sample.json": "samples/context-consumption/human-review.sample.json",
+    "docs/source-sections.json": "samples/context-consumption/source-sections.json",
+    "docs/log/artifacts/F04-l0-framework-map/drafts/context-consumption.map.json": "samples/context-consumption/framework-map.json",
+    "docs/log/artifacts/F05-l0-generalization-gate/drafts/fixture-b.map.json": "samples/canonical-hash-integrity/framework-map.json",
+    "docs/log/artifacts/F05-l0-generalization-gate/drafts/fixture-c.map.json": "samples/candidate-inbox-profile/framework-map.json",
+    "docs/log/artifacts/F09-contract-adversarial-test/drafts/fixture-d.map.json": "samples/goal-plan-task-state/framework-map.json",
+    "docs/log/artifacts/F09-contract-adversarial-test/drafts/fixture-e.map.json": "samples/operational-runbook/framework-map.json",
+    "ai/analysis-protocol.phase2.md": "docs/notes/legacy/analysis-protocol.phase2.md",
+    "ai/stage1-plan.prompt.md": "prompts/stage1-plan.prompt.md",
+    "ai/stage2-blocks.prompt.md": "prompts/stage2-blocks.prompt.md",
+    "ai/framework-map-generation.prompt.md": "prompts/framework-map-generation.prompt.md",
+    "ai/semantic-inventory.prompt.md": "prompts/semantic-inventory.prompt.md",
+    "ai/framework-map-synthesis.prompt.md": "prompts/framework-map-synthesis.prompt.md",
+    "bundles/README.md": "workspace/README.md"
+  },
+  "prefixes": {
+    "experiments": "artifacts/experiments",
+    "bundles": "workspace/analyses",
+    "tmp": "workspace/tmp",
+    "docs/ref": "workspace/references"
+  }
+}

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Overview 覆盖审计：把 docs/specs/overview-coverage.md 的验收标准变成可重复执行的检查。
  *
@@ -17,9 +19,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const FIXTURE = path.join(ROOT, 'fixtures', 'context-consumption.json');
-const DOC = path.join(ROOT, '测试文档', '18-context-consumption-semantic-model.md');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const FIXTURE = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.json');
+const DOC = joinRepositoryPath(ROOT, '测试文档', '18-context-consumption-semantic-model.md');
 
 const model = JSON.parse(fs.readFileSync(FIXTURE, 'utf8'));
 const overview = model.overview;

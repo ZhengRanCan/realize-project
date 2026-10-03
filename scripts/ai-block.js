@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Stage 2 runner —— 逐块把已固定的 Visual Block Plan 转成该 Shape 所需的结构化 content。
  *
@@ -26,14 +28,14 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 
 const DEFAULTS = {
-  plan: path.join('fixtures', 'context-consumption.overview-plan.json'),
-  design: path.join('fixtures', 'context-consumption.json'),
-  prompt: path.join('ai', 'stage2-blocks.prompt.md'),
-  catalog: path.join('docs', 'specs', 'shape-catalog.md'),
-  outDir: path.join('experiments', 'stage2'),
+  plan: joinRepositoryPath('fixtures', 'context-consumption.overview-plan.json'),
+  design: joinRepositoryPath('fixtures', 'context-consumption.json'),
+  prompt: joinRepositoryPath('ai', 'stage2-blocks.prompt.md'),
+  catalog: joinRepositoryPath('docs', 'specs', 'shape-catalog.md'),
+  outDir: joinRepositoryPath('experiments', 'stage2'),
   model: 'gpt-5.6-sol',
   maxTokens: 16000,
   temperature: 1,
@@ -70,7 +72,7 @@ const args = parseArgs(process.argv.slice(2));
  * ------------------------------------------------------------------ */
 
 function readSettings() {
-  const file = path.join(os.homedir(), '.dsh', 'settings.yaml');
+  const file = joinRepositoryPath(os.homedir(), '.dsh', 'settings.yaml');
   if (!fs.existsSync(file)) return {};
   const text = fs.readFileSync(file, 'utf8');
   const url = text.match(/apiUrl:\s*(\S+)/);
@@ -347,7 +349,7 @@ async function runBlock(blockId, ctx) {
     .filter(Boolean);
 
   const userMessage = buildPrompt({ planBlock, units, excerpts, catalog, template });
-  const outDir = path.join(ROOT, args.outDir, blockId);
+  const outDir = joinRepositoryPath(resolveRepositoryPath(ROOT, args.outDir), blockId);
   fs.mkdirSync(outDir, { recursive: true });
 
   console.log(`\n=== ${blockId}｜shape=${planBlock.shape}｜covers=${units.length} units｜sections=${sections.join(',')} ===`);
@@ -364,7 +366,7 @@ async function runBlock(blockId, ctx) {
     shape: planBlock.shape,
     covers: planBlock.covers,
     expectedContentType: SHAPE_HINT[planBlock.shape],
-    promptPath: path.relative(ROOT, path.resolve(ROOT, args.prompt)).replace(/\\/g, '/'),
+    promptPath: path.relative(ROOT, resolveRepositoryPath(ROOT, args.prompt)).replace(/\\/g, '/'),
     promptSha256: sha(template),
     userMessageSha256: sha(userMessage),
     planSha256: planSha,
@@ -378,20 +380,20 @@ async function runBlock(blockId, ctx) {
   try {
     result = await callModel(credentials, template, userMessage);
   } catch (error) {
-    fs.writeFileSync(path.join(outDir, 'request.json'), `${JSON.stringify({ ...requestRecord, error: error.message }, null, 2)}\n`, 'utf8');
+    fs.writeFileSync(joinRepositoryPath(outDir, 'request.json'), `${JSON.stringify({ ...requestRecord, error: error.message }, null, 2)}\n`, 'utf8');
     console.log(`  ✗ 调用失败：${error.message}`);
     return { blockId, failed: true, reason: error.message };
   }
 
   console.log(`  完成 ${(result.latencyMs / 1000).toFixed(0)}s｜finish=${result.finishReason || '(empty)'}${result.truncated ? '｜被截断' : ''}`);
-  fs.writeFileSync(path.join(outDir, 'raw.md'), result.content, 'utf8');
+  fs.writeFileSync(joinRepositoryPath(outDir, 'raw.md'), result.content, 'utf8');
 
   let aiResult;
   try {
     aiResult = extractJson(result.content);
   } catch (error) {
     fs.writeFileSync(
-      path.join(outDir, 'request.json'),
+      joinRepositoryPath(outDir, 'request.json'),
       `${JSON.stringify(
         {
           ...requestRecord,
@@ -426,10 +428,10 @@ async function runBlock(blockId, ctx) {
     assembled.__shapeMismatch = { fromAI: aiResult.shape, fromPlan: planBlock.shape };
   }
 
-  const blockFile = path.join(outDir, 'block.generated.json');
+  const blockFile = joinRepositoryPath(outDir, 'block.generated.json');
   fs.writeFileSync(blockFile, `${JSON.stringify(assembled, null, 2)}\n`, 'utf8');
   fs.writeFileSync(
-    path.join(outDir, 'request.json'),
+    joinRepositoryPath(outDir, 'request.json'),
     `${JSON.stringify(
       {
         ...requestRecord,
@@ -451,14 +453,14 @@ async function runBlock(blockId, ctx) {
   let checkOut = '';
   let checkCode = 0;
   try {
-    checkOut = execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'check-block.js'), blockFile, '--plan', path.resolve(ROOT, args.plan)], {
+    checkOut = execFileSync(process.execPath, [joinRepositoryPath(ROOT, 'scripts', 'check-block.js'), blockFile, '--plan', resolveRepositoryPath(ROOT, args.plan)], {
       encoding: 'utf8',
     });
   } catch (error) {
     checkOut = `${error.stdout || ''}${error.stderr || ''}`;
     checkCode = error.status === undefined ? 1 : error.status;
   }
-  fs.writeFileSync(path.join(outDir, 'check-block.txt'), checkOut, 'utf8');
+  fs.writeFileSync(joinRepositoryPath(outDir, 'check-block.txt'), checkOut, 'utf8');
 
   const coverageLine = (checkOut.match(/coverage .*/) || [''])[0].trim();
   console.log(`  ${checkCode === 0 ? '✓' : '✗'} ${coverageLine}`);
@@ -471,13 +473,13 @@ async function runBlock(blockId, ctx) {
 
 async function main() {
   const credentials = resolveCredentials();
-  const planRaw = fs.readFileSync(path.resolve(ROOT, args.plan), 'utf8');
+  const planRaw = fs.readFileSync(resolveRepositoryPath(ROOT, args.plan), 'utf8');
   const plan = JSON.parse(planRaw);
-  const design = JSON.parse(fs.readFileSync(path.resolve(ROOT, args.design), 'utf8'));
-  const catalog = fs.readFileSync(path.resolve(ROOT, args.catalog), 'utf8');
-  const sourceSections = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs', 'source-sections.json'), 'utf8'));
+  const design = JSON.parse(fs.readFileSync(resolveRepositoryPath(ROOT, args.design), 'utf8'));
+  const catalog = fs.readFileSync(resolveRepositoryPath(ROOT, args.catalog), 'utf8');
+  const sourceSections = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'docs', 'source-sections.json'), 'utf8'));
 
-  const promptRaw = fs.readFileSync(path.resolve(ROOT, args.prompt), 'utf8');
+  const promptRaw = fs.readFileSync(resolveRepositoryPath(ROOT, args.prompt), 'utf8');
   const systemStart = promptRaw.indexOf('## SYSTEM');
   const template = (systemStart >= 0 ? promptRaw.slice(systemStart + '## SYSTEM'.length) : promptRaw).trim();
 
@@ -509,8 +511,8 @@ async function main() {
 
   console.log('=== Stage 2 runner ===');
   console.log(`model      ${credentials.model}`);
-  console.log(`plan       ${path.relative(ROOT, path.resolve(ROOT, args.plan))}（sha ${ctx.planSha}）`);
-  console.log(`prompt     ${path.relative(ROOT, path.resolve(ROOT, args.prompt))}（sha ${ctx.promptSha256 || sha(template)}）`);
+  console.log(`plan       ${path.relative(ROOT, resolveRepositoryPath(ROOT, args.plan))}（sha ${ctx.planSha}）`);
+  console.log(`prompt     ${path.relative(ROOT, resolveRepositoryPath(ROOT, args.prompt))}（sha ${ctx.promptSha256 || sha(template)}）`);
   console.log(`blocks     ${blockIds.join(', ')}`);
   if (args.select) {
     console.log('选择依据   每类 shape 中"unit 数 × core 数 × kind 丰富度 × 章节跨度"得分最高者');
@@ -529,7 +531,7 @@ async function main() {
     else console.log(`  ${r.blockId.padEnd(6)} ${r.shape.padEnd(22)} ${r.checkCode === 0 ? 'PASS' : 'FAIL'}  ${r.coverage}`);
   });
   fs.writeFileSync(
-    path.join(ROOT, args.outDir, 'pilot-summary.json'),
+    joinRepositoryPath(resolveRepositoryPath(ROOT, args.outDir), 'pilot-summary.json'),
     `${JSON.stringify(
       {
         model: credentials.model,
@@ -551,7 +553,7 @@ async function main() {
     )}\n`,
     'utf8'
   );
-  console.log(`\n产物目录：${path.relative(ROOT, path.join(ROOT, args.outDir))}/<block-id>/`);
+  console.log(`\n产物目录：${path.relative(ROOT, resolveRepositoryPath(ROOT, args.outDir))}/<block-id>/`);
 }
 
 main().catch((error) => {

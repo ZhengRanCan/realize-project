@@ -1,5 +1,7 @@
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative,legacyReviewPath}=require('../../scripts/helpers/repository-layout');
+
 /**
  * 主进程：本地文件访问 + 结构化分析结果加载。
  *
@@ -25,28 +27,29 @@ const { evaluateGate, buildHumanReviewSkeleton } = semantics;
 const {createReadingSessionController,inspectReadingSession,sourceReadingSession,sourceIntegrity}=require('./reading-session');
 const bundleSessions=createReadingSessionController();
 
-const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const PROJECT_ROOT = resolveRepositoryPath(__dirname, '..', '..');
 const SELF_TEST = process.argv.includes('--selftest');
 /** `--verify-preview <file>`：加载生成的 preview HTML 并断言 DOM（实验性验证，不改 UI）。 */
 const VERIFY_PREVIEW = (() => {
   const i = process.argv.indexOf('--verify-preview');
-  return i >= 0 && process.argv[i + 1] ? path.resolve(process.argv[i + 1]) : null;
+  return i >= 0 && process.argv[i + 1] ? resolveRepositoryPath(process.argv[i + 1]) : null;
 })();
 if (SELF_TEST || VERIFY_PREVIEW) {
   // 无人值守运行不需要 GPU；关掉可避免退出时的 command_buffer 相关 stderr 噪音。
   app.disableHardwareAcceleration();
 }
-const SCHEMA_PATH = path.join(PROJECT_ROOT, 'schema', 'design-review.schema.json');
-const DEFAULT_FIXTURE = path.join(PROJECT_ROOT, 'fixtures', 'context-consumption.json');
-const DEFAULT_DOCUMENT = path.join(PROJECT_ROOT, '测试文档', '18-context-consumption-semantic-model.md');
-const DEFAULT_HUMAN_REVIEW = path.join(PROJECT_ROOT, 'human-review.json');
-const SOURCE_SECTIONS = path.join(PROJECT_ROOT, 'docs', 'source-sections.json');
+const SCHEMA_PATH = joinRepositoryPath(PROJECT_ROOT, 'schema', 'design-review.schema.json');
+const DEFAULT_FIXTURE = joinRepositoryPath(PROJECT_ROOT, 'fixtures', 'context-consumption.json');
+const DEFAULT_DOCUMENT = joinRepositoryPath(PROJECT_ROOT, '测试文档', '18-context-consumption-semantic-model.md');
+const DEFAULT_HUMAN_REVIEW = legacyReviewPath(PROJECT_ROOT);
+const SOURCE_SECTIONS = joinRepositoryPath(PROJECT_ROOT, 'docs', 'source-sections.json');
 
 const saveHumanReview=require('./human-review-store').createHumanReviewWriter({write:writeJsonAtomic,projectRoot:PROJECT_ROOT});
 let sessionEpoch=0;
 function beginSessionLoad(){bundleSessions.invalidate();return ++sessionEpoch;}
 const staleLoad=()=>({ok:false,stage:'stale',errors:['加载请求已过期'],warnings:[]});
 async function prepareBundle(file,epoch=beginSessionLoad()){
+ file=resolveRepositoryPath(file);
  if(epoch!==sessionEpoch)return staleLoad();
  const result=await bundleSessions.prepare(file);return epoch===sessionEpoch?result:staleLoad();
 }
@@ -92,7 +95,7 @@ async function validateModel(model) {
  * 加载一个 design-review.json（fixture 或 AI 输出），并把它与 human-review.json 合并成 UI 需要的载荷。
  */
 async function loadDesignReview(modelPath, humanReviewPath, epoch=beginSessionLoad()) {
-  const resolvedModel = path.resolve(modelPath);
+  const resolvedModel = resolveRepositoryPath(modelPath);
   const model = await readJson(resolvedModel);
 
   const check = await validateModel(model);
@@ -106,7 +109,7 @@ async function loadDesignReview(modelPath, humanReviewPath, epoch=beginSessionLo
     };
   }
 
-  const resolvedHuman = path.resolve(humanReviewPath || DEFAULT_HUMAN_REVIEW);
+  const resolvedHuman = resolveRepositoryPath(humanReviewPath || DEFAULT_HUMAN_REVIEW);
   let humanReview = null;
   let humanReviewExists = false;
   try {
@@ -162,13 +165,13 @@ function createWindow() {
     backgroundColor: '#12161c',
     title: 'Design Review',
     webPreferences: {
-      preload: VERIFY_PREVIEW ? undefined : path.join(__dirname, 'preload.js'),
+      preload: VERIFY_PREVIEW ? undefined : joinRepositoryPath(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
     },
   });
-  mainWindow.loadFile(VERIFY_PREVIEW || path.join(__dirname, '..', 'renderer', 'index.html'));
+  mainWindow.loadFile(VERIFY_PREVIEW || joinRepositoryPath(__dirname, '..', 'renderer', 'index.html'));
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -183,14 +186,14 @@ function createWindow() {
  * 同目录的 check-map.txt 若存在，一并带上供 Review View 使用。
  */
 async function loadFrameworkMap(mapPath, epoch=beginSessionLoad()) {
-  const p = path.resolve(mapPath);
+  const p = resolveRepositoryPath(mapPath);
   const map = JSON.parse(await fs.readFile(p, 'utf8'));
-  const siblingCheck = path.join(path.dirname(p), 'check-map.txt');
+  const siblingCheck = joinRepositoryPath(path.dirname(p), 'check-map.txt');
   let checkMapText = null;
   try { checkMapText = await fs.readFile(siblingCheck, 'utf8'); } catch { checkMapText = null; }
   // view model 的实现在 scripts/ 下（已被 test-l0-view-model.js 覆盖 34 断言）
-  const { buildL0ViewModel } = require(path.join(PROJECT_ROOT, 'scripts', 'l0-view-model.js'));
-  const schema = JSON.parse(await fs.readFile(path.join(PROJECT_ROOT, 'schema', 'framework-map.schema.json'), 'utf8'));
+  const { buildL0ViewModel } = require(joinRepositoryPath(PROJECT_ROOT, 'scripts', 'l0-view-model.js'));
+  const schema = JSON.parse(await fs.readFile(joinRepositoryPath(PROJECT_ROOT, 'schema', 'framework-map.schema.json'), 'utf8'));
   const viewModel = buildL0ViewModel(map, {
     checkMapText,
     knownRoles: schema.$defs.element.properties.role['x-known-roles'],
@@ -273,7 +276,7 @@ function registerIpc() {
   ipcMain.handle('document:openMarkdown', async () => {
     const result = await dialog.showOpenDialog(mainWindow, {
       title: '选择 Markdown 设计文档',
-      defaultPath: path.join(PROJECT_ROOT, '测试文档'),
+      defaultPath: repositoryPath('samples'),
       filters: [{ name: 'Markdown', extensions: ['md', 'markdown'] }],
       properties: ['openFile'],
     });
@@ -306,8 +309,8 @@ function registerIpc() {
       return { ok: false, errors: ['缺少 content'] };
     }
     const target = payload.path
-      ? path.resolve(payload.path)
-      : path.join(PROJECT_ROOT, 'design-review.json');
+      ? resolveRepositoryPath(payload.path)
+      : joinRepositoryPath(PROJECT_ROOT, 'design-review.json');
     let parsed;
     try {
       parsed = JSON.parse(payload.content);
@@ -345,7 +348,7 @@ function registerIpc() {
 
   /**
    * 原文回查：Overview 里的 Source 标签点开时，右侧面板显示对应章节。
-   * 数据来自 docs/source-sections.json（由 scripts/extract-source-sections.js 从 Markdown 切分）。
+   * 数据来自 samples/context-consumption/source-sections.json（由 scripts/extract-source-sections.js 从 Markdown 切分）。
    */
   ipcMain.handle('source:load', async () => {
     try {
@@ -433,6 +436,29 @@ async function runSelfTest() {
     if (domCheck.sections) ok('页面五个核心区域容器存在');
     else fail('页面缺少核心区域容器');
 
+    const startLayout=await win.webContents.executeJavaScript(`(()=>({
+      closed:!document.getElementById('legacy-entry').open,
+      primary:document.getElementById('btn-open-bundle').getClientRects().length>0,
+      legacyHidden:!document.getElementById('btn-load-fixture').checkVisibility(),
+      disabled:document.querySelectorAll('#screen-start button:disabled').length
+    }))()`);
+    if(startLayout.closed&&startLayout.primary&&startLayout.legacyHidden&&startLayout.disabled===0)ok('F22 首屏资料包突出；旧入口默认折叠，无未启用占位');
+    else fail('F22 首屏分组异常: '+JSON.stringify(startLayout));
+    await fs.mkdir(repositoryPath('workspace/previews'),{recursive:true});
+    await fs.writeFile(repositoryPath('workspace/previews/start-screen.png'),(await win.webContents.capturePage()).toPNG());
+    win.focus();win.webContents.focus();
+    await win.webContents.executeJavaScript("document.querySelector('#legacy-entry summary').focus()");
+    win.webContents.sendInputEvent({type:'keyDown',keyCode:'Return'});win.webContents.sendInputEvent({type:'char',keyCode:'\r'});win.webContents.sendInputEvent({type:'keyUp',keyCode:'Return'});
+    await new Promise(r=>setTimeout(r,80));
+    if(await win.webContents.executeJavaScript("document.getElementById('legacy-entry').open&&document.getElementById('btn-load-fixture').getClientRects().length>0"))ok('F22 键盘可展开开发与旧版入口');
+    else fail('F22 details 键盘展开失败');
+    const oldEntry=await win.webContents.executeJavaScript(`new Promise((resolve,reject)=>{
+      const timeout=setTimeout(()=>{observer.disconnect();reject(new Error('fixture click timeout'));},2000);
+      const observer=new MutationObserver(()=>{if(document.getElementById('screen-start').classList.contains('hidden')){clearTimeout(timeout);observer.disconnect();resolve(window.__state.model?.design.id);}});
+      observer.observe(document.getElementById('screen-start'),{attributes:true});document.getElementById('btn-load-fixture').click();
+    })`);
+    if(oldEntry===load.model.design.id)ok('F22 折叠内 fixture 实际点击可加载');else fail('F22 旧入口加载异常');
+
     const uiResult = await win.webContents.executeJavaScript(
       `(async () => {
          const loaded = await window.designReview.loadFixture();
@@ -477,17 +503,17 @@ async function runSelfTest() {
      * fixture 选 E：12 elements / 8 edges / attachments / state / constraint / 无 element Topic —— 够覆盖又不重。
      */
     try {
-      const l0Fixture = path.join(PROJECT_ROOT, 'experiments', 'semantic-grounding', 'fixture-e', 'run-08', 'framework-map.json');
+      const l0Fixture = joinRepositoryPath(PROJECT_ROOT, 'experiments', 'semantic-grounding', 'fixture-e', 'run-08', 'framework-map.json');
       const l0Loaded = await loadFrameworkMap(l0Fixture); // main 侧加载函数（IPC handler 用的同一个）
       if (!l0Loaded.ok || !l0Loaded.viewModel) {
         fail(`L0 加载失败: ${(l0Loaded.errors || []).join('; ')}`);
       } else {
-        const s1Fixture = path.join(PROJECT_ROOT, 'experiments', 'semantic-grounding', 'fixture-d', 'run-04', 'framework-map.json');
+        const s1Fixture = joinRepositoryPath(PROJECT_ROOT, 'experiments', 'semantic-grounding', 'fixture-d', 'run-04', 'framework-map.json');
         const s1Map = JSON.parse(await fs.readFile(s1Fixture, 'utf8'));
         const s1KnownEmptyMap = JSON.parse(JSON.stringify(s1Map));
         s1KnownEmptyMap.topics[0].blockIds = [];
-        const s1TempDir = await fs.mkdtemp(path.join(app.getPath('temp'), 'design-review-s1-'));
-        const s1KnownEmptyPath = path.join(s1TempDir, 'known-empty.framework-map.json');
+        const s1TempDir = await fs.mkdtemp(joinRepositoryPath(app.getPath('temp'), 'design-review-s1-'));
+        const s1KnownEmptyPath = joinRepositoryPath(s1TempDir, 'known-empty.framework-map.json');
         await fs.writeFile(s1KnownEmptyPath, JSON.stringify(s1KnownEmptyMap), 'utf8');
         const f = l0Loaded.viewModel.facts;
         const seam = await win.webContents.executeJavaScript(`(async () => {
@@ -1085,7 +1111,7 @@ async function runSelfTest() {
              openQuestions: { 'Q-001': { status: 'pending', comment: '' } },
              gaps: { 'GAP-001': { status: 'confirmed', comment: '' } },
            },
-           ${JSON.stringify(path.join(PROJECT_ROOT, '.selftest-human-review.json'))}
+           ${JSON.stringify(joinRepositoryPath(PROJECT_ROOT, '.selftest-human-review.json'))}
          );
          return { ok: result.ok, version: result.humanReview && result.humanReview.reviewVersion,
                   gateBlockers: result.gate ? result.gate.blockers.length : null,
@@ -1097,7 +1123,7 @@ async function runSelfTest() {
     } else {
       fail(`humanReview:save 失败: ${JSON.stringify(liveSave)}`);
     }
-    const savedRaw = JSON.parse(await fs.readFile(path.join(PROJECT_ROOT, '.selftest-human-review.json'), 'utf8'));
+    const savedRaw = JSON.parse(await fs.readFile(joinRepositoryPath(PROJECT_ROOT, '.selftest-human-review.json'), 'utf8'));
     if (Object.keys(savedRaw.decisions).length === load.model.decisions.length) {
       ok(`human-review.json 覆盖全部 ${load.model.decisions.length} 条 Decision（未做部分覆盖式丢失）`);
     } else {
@@ -1108,10 +1134,10 @@ async function runSelfTest() {
     } else {
       fail('人工状态未正确持久化');
     }
-    await fs.rm(path.join(PROJECT_ROOT, '.selftest-human-review.json'), { force: true });
+    await fs.rm(joinRepositoryPath(PROJECT_ROOT, '.selftest-human-review.json'), { force: true });
 
     // 不经 UI 保存 human-review.json：自检只写到临时文件，避免覆盖人工结果。
-    const sandbox = path.join(PROJECT_ROOT, '.selftest-human-review-2.json');
+    const sandbox = joinRepositoryPath(PROJECT_ROOT, '.selftest-human-review-2.json');
     const reviewPayload = JSON.parse(JSON.stringify(load.humanReview));
     reviewPayload.decisions[load.model.decisions[0].id] = {
       status: 'needs-evidence',
@@ -1139,13 +1165,42 @@ async function runSelfTest() {
       fail('design-review.json 被人工状态污染');
     }
     const defaultHumanExists = await fs
-      .access(DEFAULT_HUMAN_REVIEW)
+      .access(repositoryPath('human-review.json'))
       .then(() => true)
       .catch(() => false);
     if (!defaultHumanExists) ok('未在项目根目录偷偷生成 human-review.json（仍只由人工点击保存时创建）');
     else report.push('! 项目根目录已存在 human-review.json（人工审核产物，属正常情况）');
 
 
+    // F22: read the real existing package at its relocated canonical path, without saving.
+    const movedManifest=repositoryPath('workspace/analyses/context-consumption/stage2-gold/reading-bundle.json');
+    if(await fs.access(movedManifest).then(()=>true,()=>false)) {
+    const movedRead=await win.webContents.executeJavaScript(`(async()=>{
+      window.__state.dirty=false;
+      const result=await window.__loadBundle(${JSON.stringify(movedManifest)});
+      if(!result.ok)throw new Error('moved bundle load failed');
+      if(window.__state.view!=='l0')throw new Error('moved bundle default Map');
+      const blocks=window.__state.l2ViewModel.sections.flatMap(s=>s.blocks);
+      const suitable=id=>blocks.find(b=>b.id===id&&b.covers.length&&b.reviewObjectLinks.values.length);
+      const topic=Object.values(window.__state.l1Topics).find(t=>t.blockEntries?.some(b=>suitable(b.id)));
+      if(!topic)throw new Error('moved bundle Topic');
+      document.querySelector('.topic-entry[data-topic-focus="'+topic.topic.id+'"]').click();
+      const id=topic.blockEntries.find(b=>suitable(b.id)).id;
+      document.querySelector('[data-l1-block="'+id+'"]').click();
+      const inspect=document.querySelector('[data-inspect-block="'+id+'"]');inspect.click();
+      await new Promise(r=>setTimeout(r,100));
+      const sourceButton=document.querySelector('[data-source-unit-id] button');if(!sourceButton)throw new Error('moved SU entry');sourceButton.click();
+      await new Promise(r=>setTimeout(r,100));
+      if(document.querySelector('#l3-source-coordinate').dataset.coordinateState!=='known')throw new Error('moved source coordinate');
+      const review=document.querySelector('#source-body details[data-review-object-id]');
+      if(!review)throw new Error('moved review path');review.open=true;
+      if(!review.querySelector('.l3-evidence')&&!review.textContent.includes('没有 Evidence'))throw new Error('moved Evidence');
+      window.__closeInspection();
+      return {human:window.__state.humanReviewPath,dirty:window.__state.dirty};
+    })()`);
+    if(movedRead.human===repositoryPath('workspace/analyses/context-consumption/stage2-gold/human-review.json')&&!movedRead.dirty)ok('F22 搬迁既有包 Map→Topic→Block→原文/Evidence；人工审核路径留在包内，无自动保存');
+    else fail('F22 搬迁包审核路径异常');
+    }
     ok(await require('../../scripts/test-reading-bundle-electron').runBundleIntegration(win));
 
     emit();
@@ -1200,7 +1255,7 @@ async function runVerifyPreview(filePath) {
         if(s.l0ViewModel){const t=Object.values(s.l1Topics).find(t=>t.blockEntries?.length);document.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"]').click();document.querySelector('[data-l1-block]').click();}
         const id=s.l2ViewModel.sections[0].blocks[0].id;
         await window.__openInspection(id);
-        document.querySelector('[data-source-unit-id] button').click();await new Promise(r=>setTimeout(r,50));
+        const sourceButton=document.querySelector('[data-source-unit-id] button');if(!sourceButton)throw new Error('moved SU entry');sourceButton.click();await new Promise(r=>setTimeout(r,50));
         const panel=document.getElementById('l3-source-coordinate');if(panel.dataset.coordinateState!=='known')throw new Error('Preview section');
         if(document.getElementById('source-body').dataset.claimVerification!=='absent')throw new Error('Preview verification');
         if(!document.getElementById('btn-save').disabled)throw new Error('Preview saving');

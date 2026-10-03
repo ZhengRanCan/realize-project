@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * check-plan 的自动测试。
  *
@@ -15,12 +17,12 @@ const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
-const ROOT = path.resolve(__dirname, '..');
-const GOLD = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
-const CHECK = path.join(ROOT, 'scripts', 'check-plan.js');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const GOLD = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
+const CHECK = joinRepositoryPath(ROOT, 'scripts', 'check-plan.js');
 
 const goldRaw = fs.readFileSync(GOLD, 'utf8');
-const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-plan-test-'));
+const tmpDir = fs.mkdtempSync(joinRepositoryPath(os.tmpdir(), 'check-plan-test-'));
 
 let passed = 0;
 const failures = [];
@@ -32,7 +34,7 @@ function safeFileName(name) {
 
 /** 跑 check-plan，返回 { code, stdout }。 */
 function runCheck(planObject, name) {
-  const file = path.join(tmpDir, `${safeFileName(name)}.json`);
+  const file = joinRepositoryPath(tmpDir, `${safeFileName(name)}.json`);
   fs.writeFileSync(file, `${JSON.stringify(planObject, null, 2)}\n`, 'utf8');
   try {
     const stdout = execFileSync(process.execPath, [CHECK, file], { encoding: 'utf8' });

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 10 · 两阶段产物安全 + 中间态保留验证（**离线，零模型调用**）
  *
@@ -21,11 +23,11 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawnSync } = require('node:child_process');
 
-const ROOT = path.resolve(__dirname, '..');
-const RUNNER = path.join(ROOT, 'scripts', 'run-semantic-grounding.js');
-const SANDBOX = path.join(ROOT, 'tmp', 'f10-selftest');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const RUNNER = joinRepositoryPath(ROOT, 'scripts', 'run-semantic-grounding.js');
+const SANDBOX = joinRepositoryPath(ROOT, 'workspace/tmp/tests', 'f10-selftest');
 const FIXTURE = 'e';
-const DOC = '测试文档/fixture-e-f13-f16-runbook.md';
+const DOC = 'samples/operational-runbook/source.md';
 
 const sha = (f) => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
 const exists = (f) => fs.existsSync(f);
@@ -89,7 +91,7 @@ const block = (map, sel) => `<<<FRAMEWORK_MAP>>>\n${JSON.stringify(map)}\n<<<MAP
 const wrap = (c) => JSON.stringify({ choices: [{ message: { content: c }, finish_reason: 'stop' }], usage: { prompt_tokens: 1, completion_tokens: 1 } });
 
 const files = {};
-const w = (name, content) => { const p = path.join(SANDBOX, name); fs.writeFileSync(p, content, 'utf8'); files[name] = path.relative(ROOT, p).replace(/\\/g, '/'); return files[name]; };
+const w = (name, content) => { const p = joinRepositoryPath(SANDBOX, name); fs.writeFileSync(p, content, 'utf8'); files[name] = path.relative(ROOT, p).replace(/\\/g, '/'); return files[name]; };
 
 w('inv-ok.json', wrap(JSON.stringify(invBase())));
 w('inv-malformed.json', wrap(JSON.stringify({ inventoryVersion: 1, document: { title: 'x', sourcePath: DOC } }))); // 缺 items
@@ -111,9 +113,9 @@ function run(args) {
     { cwd: ROOT, stdio: 'ignore' });
   return r.status;
 }
-const runDir = (n) => path.join(SANDBOX, `fixture-${FIXTURE}`, `run-${String(n).padStart(2, '0')}`);
-const metaOf = (n) => JSON.parse(fs.readFileSync(path.join(runDir(n), 'run-meta.json'), 'utf8'));
-const A = (n, f) => path.join(runDir(n), f);
+const runDir = (n) => joinRepositoryPath(SANDBOX, `fixture-${FIXTURE}`, `run-${String(n).padStart(2, '0')}`);
+const metaOf = (n) => JSON.parse(fs.readFileSync(joinRepositoryPath(runDir(n), 'run-meta.json'), 'utf8'));
+const A = (n, f) => joinRepositoryPath(runDir(n), f);
 
 console.log('===== F10 · 两阶段产物安全 + 中间态保留验证（离线，零模型调用）=====');
 console.log(`沙箱: ${path.relative(ROOT, SANDBOX).replace(/\\/g, '/')}`);
@@ -250,7 +252,7 @@ check('被拒绝的 run 没有产生 .tmp.json', () => fs.readdirSync(runDir(1))
 
 /* --- 15. 编号单调、目录独立 ----------------------------------------- */
 check('run 目录为 run-01 … run-13（各阶段独立，无复用）', () => {
-  const dirs = fs.readdirSync(path.join(SANDBOX, `fixture-${FIXTURE}`)).sort();
+  const dirs = fs.readdirSync(joinRepositoryPath(SANDBOX, `fixture-${FIXTURE}`)).sort();
   const want = Array.from({ length: 13 }, (_, i) => `run-${String(i + 1).padStart(2, '0')}`).join(',');
   return dirs.join(',') === want || dirs.join(',');
 });

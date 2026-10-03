@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * experiments/ 索引生成器（experiments/index.json）
  *
@@ -22,9 +24,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const EXPERIMENTS = path.join(ROOT, 'experiments');
-const INDEX = path.join(EXPERIMENTS, 'index.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const EXPERIMENTS = joinRepositoryPath(ROOT, 'experiments');
+const INDEX = joinRepositoryPath(EXPERIMENTS, 'index.json');
 
 /** 区域 → 归属 feature。'baseline' 表示 F 系列之前、没有对应 feature 的历史实验。 */
 const AREA_FEATURE = {
@@ -37,7 +39,7 @@ const AREA_FEATURE = {
 };
 
 const AREA_NOTE = {
-  'framework-map-generation': 'scripts/generate-framework-map.js 的逐 run 产物（prompt ai/framework-map-generation.prompt.md）',
+  'framework-map-generation': 'scripts/generate-framework-map.js 的逐 run 产物（prompt prompts/framework-map-generation.prompt.md）',
   'semantic-grounding': 'scripts/run-semantic-grounding.js 的两阶段 run（Stage A inventory → Stage B map）',
   'stage2': 'Stage 2 pilot：6 个 block 的试点产物与首次失败尝试，F01 问题清单的来源',
   'stage2-full': 'Stage 2 全量 run：21 个 block + 修复前快照，F01 的修复对象',
@@ -68,16 +70,16 @@ const SKIP_FILES = new Set(['README.md', 'index.json']);
 const readJson = (file) => {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
 };
-const listFiles = (dir) => fs.readdirSync(dir).filter((name) => fs.statSync(path.join(dir, name)).isFile()).sort();
+const listFiles = (dir) => fs.readdirSync(dir).filter((name) => fs.statSync(joinRepositoryPath(dir, name)).isFile()).sort();
 const dirs = (dir) => fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
 const rel = (p) => path.relative(ROOT, p).replace(/\\/g, '/');
 const normalizeFeature = (value) => (typeof value === 'string' ? (value.match(/^F\d+/)?.[0] ?? value) : null);
 
 function unitFor(dir, area) {
   const files = listFiles(dir);
-  const meta = files.includes('run-meta.json') ? readJson(path.join(dir, 'run-meta.json')) : null;
-  const request = files.includes('request.json') ? readJson(path.join(dir, 'request.json')) : null;
-  const manifest = files.includes('manifest.json') ? readJson(path.join(dir, 'manifest.json')) : null;
+  const meta = files.includes('run-meta.json') ? readJson(joinRepositoryPath(dir, 'run-meta.json')) : null;
+  const request = files.includes('request.json') ? readJson(joinRepositoryPath(dir, 'request.json')) : null;
+  const manifest = files.includes('manifest.json') ? readJson(joinRepositoryPath(dir, 'manifest.json')) : null;
 
   const unit = {
     path: rel(dir),
@@ -113,7 +115,7 @@ function collectUnits(dir, area, out, isRoot = false) {
     out.push(unitFor(dir, area));
     return;
   }
-  for (const sub of dirs(dir)) collectUnits(path.join(dir, sub), area, out);
+  for (const sub of dirs(dir)) collectUnits(joinRepositoryPath(dir, sub), area, out);
 }
 
 function collect() {
@@ -121,7 +123,7 @@ function collect() {
   const areas = {};
 
   for (const area of dirs(EXPERIMENTS)) {
-    const base = path.join(EXPERIMENTS, area);
+    const base = joinRepositoryPath(EXPERIMENTS, area);
     const areaUnits = [];
     collectUnits(base, area, areaUnits, true);
     areaUnits.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));

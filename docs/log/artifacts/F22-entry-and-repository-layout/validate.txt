@@ -1,0 +1,11 @@
+
+> design-review-mvp@0.1.0 validate
+> node scripts/validate-fixture.js
+
+
+=== samples\context-consumption\design-review.json ===
+✓ Schema 校验通过
+✓ 一致性检查通过
+  统计: decisions=12 (pending=12) gaps=6 openQuestions=10 (blocking=6) facts=6 models=0
+
+结果：PASSED

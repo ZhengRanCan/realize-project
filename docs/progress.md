@@ -3,9 +3,9 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: **F22 Entry and Repository Layout**（按用户指定优先整理；当前为书面设计阶段）。
-- Next queued feature: **F19 Reading Navigation and Resolver**；F22 完成后再回到该路线，本轮未启动。
-- Latest completed feature: `F18` L3 Inspector（2026-10-03）；显式资料包、Plan + Generated 与真实 L3 路径已通过集成检查和独立审查。
+- Active feature: none；F22 已完成。
+- Next queued feature: **F19 Reading Navigation and Resolver**；本轮未启动。
+- Latest completed feature: `F22` Entry and Repository Layout（2026-10-03）；首页、目录迁移、真实路径与独立审查通过。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
   （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
@@ -35,7 +35,7 @@
 | F19 | Reading Navigation and Resolver | `blocked` | F18 前置已就绪；完整 canonical resolver 与跨层导航尚未实施 |
 | F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
-| F22 | Entry and Repository Layout | `active` | 用户已批准分类方向；书面设计待审阅，首页和目录尚未整理 |
+| F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -258,3 +258,11 @@ Source-verified Evidence
 - 提示词核查：五份模板被现行生成脚本引用；一份未接入的 Phase 2 协议草稿归历史设计记录。
 - 登记检查：check:docs 123 files / 0 broken；verify:harness 21 features / 0 errors。未改产品代码或移动目录，不代表实施完成。
 - F18 保持 passing；F19–F21 本轮未启动。F22 完成后回到原定 Reading 导航路线。
+
+## 2026-10-03 — F22 Complete
+
+- 用户要求完成 F22，Native 实施与独立复查通过。首页资料包为主入口，旧功能默认折叠；docs / samples / prompts / artifacts/experiments / workspace 职责与文档更新。
+- 10,695 项迁移清单中 10,570 项不可变材料完整，333 个受保护跟踪文件哈希一致；66 个实验单元、17 个产物及归属保留。本地私有材料继续忽略 Git。
+- 完整回归、真实 Electron 新首屏与搬迁既有包路径、portable Preview、命令/文档/索引/harness 门禁通过；原有 Overview warnings 保留。
+- 独立审查发现的默认/显式 CLI 路径、原子 journal、旧根审核兼容均修正，无剩余 P1/P2。用户路径是自动化实测，不声称手工验收。
+- 证据：[F22 Verification Summary](log/artifacts/F22-entry-and-repository-layout/verification-summary.md)。F19–F21 未启动。

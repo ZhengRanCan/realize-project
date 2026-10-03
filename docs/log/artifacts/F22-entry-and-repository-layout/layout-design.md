@@ -2,7 +2,7 @@
 
 ## Status and Intent
 
-Date: 2026-10-03. Direction: approved by user. Written design: awaiting review.
+Date: 2026-10-03. Direction and written design: authorized for implementation by the user's “完成F22” instruction.
 
 用户反馈 Electron 首屏混杂多个版本入口，仓库目录按历史 feature 零散形成。
 已批准方向：正常首页突出资料包；旧入口放默认折叠区域；目录按用途分区，测试材料按文章归拢。
@@ -127,5 +127,5 @@ feature、设计、计划与完成证据集中在现有 F22 合同和 artifact �
 - [x] 原始字节、Plan fingerprint、历史引用和本地审核的兼容方案明确。
 - [x] 本地文件保留、目标碰撞、Git 忽略与运行时边界有约束。
 - [x] 未包含 F19/F20/F21 实现或模型调用；验收区分登记和产品完成。
-- [ ] 用户审阅书面设计。
-- [ ] 形成并审阅书面实施计划，选择执行方式。
+- [x] 用户在书面设计呈现后要求“完成F22”，授权实施。
+- [x] 实施计划形成并由代理自检；按用户完成指令沿用此前 Native，无新增审批停顿。

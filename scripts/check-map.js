@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
 /**
  * framework-map 校验器（Feature 06 / Phase 3）
  *
@@ -16,8 +17,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = path.resolve(__dirname, '..');
-const SCHEMA = path.join(ROOT, 'schema', 'framework-map.schema.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const SCHEMA = joinRepositoryPath(ROOT, 'schema', 'framework-map.schema.json');
 
 // ── 词表从 schema 读（单一真相） ─────────────────────────────
 const schema = JSON.parse(fs.readFileSync(SCHEMA, 'utf8'));
@@ -46,7 +47,7 @@ const GAP_DENSITY_MIN_RATIO = 0.5;
  * sectionLevel = 最浅的、且至少有 2 个标题的那一层（跳过孤零零的文档大标题）。
  */
 function readDocHeadings(sourcePath) {
-  return require('../app/shared/source-coordinates').parseDocHeadings(fs.readFileSync(path.resolve(ROOT, sourcePath), 'utf8'));
+  return require('../app/shared/source-coordinates').parseDocHeadings(fs.readFileSync(resolveRepositoryPath(ROOT, sourcePath), 'utf8'));
 }
 
 /** 兼容旧调用方直接传入 `{top, sub}`（测试用）。 */
@@ -379,8 +380,8 @@ function main() {
     process.exit(2);
   }
   const planPath = arg('--plan');
-  const map = JSON.parse(fs.readFileSync(path.resolve(ROOT, mapPath), 'utf8'));
-  const plan = planPath ? JSON.parse(fs.readFileSync(path.resolve(ROOT, planPath), 'utf8')) : undefined;
+  const map = JSON.parse(fs.readFileSync(resolveRepositoryPath(ROOT, mapPath), 'utf8'));
+  const plan = planPath ? JSON.parse(fs.readFileSync(resolveRepositoryPath(ROOT, planPath), 'utf8')) : undefined;
   const r = checkMap(map, { plan, planPath });
   console.log(renderReport(mapPath, map, r));
   process.exit(r.hard.length === 0 ? 0 : 1);

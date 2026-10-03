@@ -1,0 +1,44 @@
+$ npm.cmd run check:docs
+
+> design-review-mvp@0.1.0 check:docs
+> node scripts/check-doc-links.js
+
+Doc links: 130 markdown files checked, 0 broken.
+Exit: 0
+
+$ npm.cmd run check:experiments
+
+> design-review-mvp@0.1.0 check:experiments
+> node scripts/index-experiments.js --check
+
+experiments index: 66 units + 17 artifacts, up to date.
+Exit: 0
+
+$ npm.cmd run verify:harness
+
+> design-review-mvp@0.1.0 verify:harness
+> node scripts/harness-gate.mjs
+
+Harness gate: 21 features, 0 errors.
+Exit: 0
+
+$ npm.cmd run verify-preview
+
+> design-review-mvp@0.1.0 verify-preview
+> node scripts/build-preview.js --out workspace/previews/overview.html && electron . --verify-preview workspace/previews/overview.html
+
+Preview: E:\project\self\realize-project\workspace\previews\overview.html (21 blocks)
+
+
+===== VERIFY PREVIEW =====
+! 渲染器控制台错误 1 条：
+    %cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy
+✓ bundle inspection: 默认视图 / SU section / Known Absent / 只读审核通过
+===== END =====
+VERIFY PREVIEW PASSED
+Exit: 0
+
+$ node scripts/migrate-repository-layout.js --verify
+Migration integrity: 10570 entries passed; 333 protected tracked files; local content remains private.
+Exit: 0

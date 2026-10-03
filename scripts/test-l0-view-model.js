@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 08 · View Model 回归（Phase 1 验收 + Phase 5 的 A–E regression 骨架）
  *
@@ -19,8 +21,8 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { buildL0ViewModel } = require('./l0-view-model.js');
 
-const ROOT = path.resolve(__dirname, '..');
-const SCHEMA = JSON.parse(fs.readFileSync(path.join(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const SCHEMA = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
 const KNOWN_ROLES = SCHEMA.$defs.element.properties.role['x-known-roles'];
 
 const results = [];
@@ -36,12 +38,12 @@ function check(name, fn) {
 /* ---------- 收集仓库里所有 framework-map ---------- */
 function collectMaps() {
   const out = [];
-  for (const base of ['experiments', 'docs']) {
-    const abs = path.join(ROOT, base);
+  for (const base of ['artifacts/experiments', 'samples', 'docs']) {
+    const abs = joinRepositoryPath(ROOT, base);
     if (!fs.existsSync(abs)) continue;
     const walk = (d) => {
       for (const name of fs.readdirSync(d)) {
-        const p = path.join(d, name);
+        const p = joinRepositoryPath(d, name);
         if (fs.statSync(p).isDirectory()) { walk(p); continue; }
         if (!name.endsWith('.json')) continue;
         if (!/\.map\.json$|framework-map\.json$/.test(name)) continue;
@@ -62,15 +64,15 @@ console.log(`===== F08 · View Model 回归（${maps.length} 份 framework-map�
 /* ---------- 逐份断言 ---------- */
 const matrix = [];
 for (const rel of maps) {
-  const raw = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const raw = fs.readFileSync(joinRepositoryPath(ROOT, rel), 'utf8');
   const before = crypto.createHash('sha256').update(raw).digest('hex');
   const map = JSON.parse(raw);
-  const checkPath = path.join(ROOT, path.dirname(rel), 'check-map.txt');
+  const checkPath = joinRepositoryPath(ROOT, path.dirname(rel), 'check-map.txt');
   const vm = buildL0ViewModel(map, {
     checkMapText: fs.existsSync(checkPath) ? fs.readFileSync(checkPath, 'utf8') : null,
     knownRoles: KNOWN_ROLES,
   });
-  const after = crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, rel), 'utf8')).digest('hex');
+  const after = crypto.createHash('sha256').update(fs.readFileSync(joinRepositoryPath(ROOT, rel), 'utf8')).digest('hex');
 
   const tag = rel.length > 58 ? '…' + rel.slice(-57) : rel;
   const problems = [];
@@ -146,7 +148,7 @@ check('relationGap 不被转成 edge', () => {
   const withGap = matrix.filter((m) => m.gap > 0);
   if (!withGap.length) return '没有带 relationGap 的样本';
   for (const m of withGap) {
-    const input = JSON.parse(fs.readFileSync(path.join(ROOT, m.rel), 'utf8'));
+    const input = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, m.rel), 'utf8'));
     if (m.ed !== (input.edges || []).length) return `${m.rel}: edge 数被 relationGap 影响`;
   }
   return true;

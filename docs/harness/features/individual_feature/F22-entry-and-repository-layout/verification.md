@@ -18,10 +18,10 @@
 
 ## User Paths
 
-- [ ] 新启动首屏：资料包入口立即可见；旧入口默认不可见，键盘可展开开发入口并加载 fixture / Review / Map。
-- [ ] 从 workspace 下的既有包打开 Map，进入 Topic/Block，再分别查原文与审阅材料；关闭回原位置。
-- [ ] 搬迁带人工审核的本地包后，只在原包的人工文件中保存；未保存状态、失败和取消仍按 F18 隔离。
-- [ ] 搬迁后的只读 Preview 默认显示框架图，原文与 Evidence 分开，保存禁用。
+- [x] 新启动首屏：资料包入口立即可见；旧入口默认不可见，键盘可展开开发入口并加载 fixture / Review / Map。
+- [x] 从 workspace 下的既有包打开 Map，进入 Topic/Block，再分别查原文与审阅材料；关闭回原位置。
+- [x] 搬迁带人工审核的本地包后，只在原包的人工文件中保存；未保存状态、失败和取消仍按 F18 隔离。
+- [x] 搬迁后的只读 Preview 默认显示框架图，原文与 Evidence 分开，保存禁用。
 
 可用真实 Electron 集成证据覆盖上述路径；若采用人工操作，记录日期与结果，不把自动化操作称为用户手工验收。
 
@@ -31,3 +31,5 @@
 - 实现后将命令、完整性记录与真实路径证据放在本 feature artifact 目录。
 - 实现代码需独立审查，发现的问题修复并复查后才能完成。
 - knownUnverified 与 humanReviewRequired 清空且验收项全部完成后，才可标 passing。
+
+执行结果与命令输出已归入 F22 verification-summary；真实 Electron 自动化覆盖用户路径，迁移完整性与独立 Native 复查通过。

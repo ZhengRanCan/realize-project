@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 确定性组装器：把 Gold overview-plan 与 Stage 2 生成的 block.content 组装成完整 overview.generated.json。
  *
@@ -15,7 +17,7 @@
  *
  * 用法：
  *   node scripts/assemble-overview.js \
- *     --plan fixtures/context-consumption.overview-plan.json \
+ *     --plan samples/context-consumption/overview-plan.json \
  *     --blocks experiments/stage2-full/blocks \
  *     --out experiments/stage2-full/overview.generated.json
  */
@@ -24,13 +26,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 
 const DEFAULTS = {
-  plan: path.join('fixtures', 'context-consumption.overview-plan.json'),
-  design: path.join('fixtures', 'context-consumption.json'),
-  blocks: path.join('experiments', 'stage2-full', 'blocks'),
-  out: path.join('experiments', 'stage2-full', 'overview.generated.json'),
+  plan: joinRepositoryPath('fixtures', 'context-consumption.overview-plan.json'),
+  design: joinRepositoryPath('fixtures', 'context-consumption.json'),
+  blocks: joinRepositoryPath('experiments', 'stage2-full', 'blocks'),
+  out: joinRepositoryPath('experiments', 'stage2-full', 'overview.generated.json'),
   model: null,
 };
 
@@ -58,10 +60,10 @@ const args = parseArgs(process.argv.slice(2));
  * ------------------------------------------------------------------ */
 
 async function main() {
-  const planPath = path.resolve(ROOT, args.plan);
-  const blocksDir = path.resolve(ROOT, args.blocks);
-  const outPath = path.resolve(ROOT, args.out);
-  const designPath = path.resolve(ROOT, args.design);
+  const planPath = resolveRepositoryPath(ROOT, args.plan);
+  const blocksDir = resolveRepositoryPath(ROOT, args.blocks);
+  const outPath = resolveRepositoryPath(ROOT, args.out);
+  const designPath = resolveRepositoryPath(ROOT, args.design);
 
   const planRaw = fs.readFileSync(planPath, 'utf8');
   const plan = JSON.parse(planRaw);
@@ -77,10 +79,10 @@ async function main() {
   const metadata = { model: null, promptSha256: null, requestFiles: [] };
 
   plan.blocks.forEach((planBlock) => {
-    const blockDir = path.join(blocksDir, planBlock.id);
-    const generatedFile = path.join(blockDir, 'block.generated.json');
-    const requestFile = path.join(blockDir, 'request.json');
-    const checkFile = path.join(blockDir, 'check-block.txt');
+    const blockDir = joinRepositoryPath(blocksDir, planBlock.id);
+    const generatedFile = joinRepositoryPath(blockDir, 'block.generated.json');
+    const requestFile = joinRepositoryPath(blockDir, 'request.json');
+    const checkFile = joinRepositoryPath(blockDir, 'check-block.txt');
 
     if (!fs.existsSync(generatedFile)) {
       missing.push(planBlock.id);

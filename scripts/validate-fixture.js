@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 校验 design-review.json：
  *   1) JSON 可解析
@@ -8,7 +10,7 @@
  *   3) 文件内部自洽（id 唯一、引用存在、summary 计数一致）
  *
  * 用法：node scripts/validate-fixture.js [path ...]
- * 默认校验 fixtures/context-consumption.json
+ * 默认校验 samples/context-consumption/design-review.json
  */
 
 const path = require('node:path');
@@ -17,17 +19,17 @@ const fs = require('node:fs');
 const { validate } = require('../app/shared/schema-validator');
 const { semanticCheck } = require('../app/shared/review-model');
 
-const ROOT = path.resolve(__dirname, '..');
-const schema = JSON.parse(fs.readFileSync(path.join(ROOT, 'schema', 'design-review.schema.json'), 'utf8'));
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const schema = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'schema', 'design-review.schema.json'), 'utf8'));
 
 const targets = process.argv.slice(2).length > 0
   ? process.argv.slice(2)
-  : [path.join(ROOT, 'fixtures', 'context-consumption.json')];
+  : [joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.json')];
 
 let failed = false;
 
 for (const target of targets) {
-  const absolute = path.resolve(target);
+  const absolute = resolveRepositoryPath(target);
   console.log(`\n=== ${path.relative(ROOT, absolute)} ===`);
 
   let model;

@@ -10,7 +10,7 @@
     "reports": "baseline"
   },
   "areaNote": {
-    "framework-map-generation": "scripts/generate-framework-map.js 的逐 run 产物（prompt ai/framework-map-generation.prompt.md）",
+    "framework-map-generation": "scripts/generate-framework-map.js 的逐 run 产物（prompt prompts/framework-map-generation.prompt.md）",
     "semantic-grounding": "scripts/run-semantic-grounding.js 的两阶段 run（Stage A inventory → Stage B map）",
     "stage2": "Stage 2 pilot：6 个 block 的试点产物与首次失败尝试，F01 问题清单的来源",
     "stage2-full": "Stage 2 全量 run：21 个 block + 修复前快照，F01 的修复对象",
@@ -65,24 +65,24 @@
   "areas": {
     "framework-map-generation": {
       "feature": "F07",
-      "note": "scripts/generate-framework-map.js 的逐 run 产物（prompt ai/framework-map-generation.prompt.md）",
+      "note": "scripts/generate-framework-map.js 的逐 run 产物（prompt prompts/framework-map-generation.prompt.md）",
       "units": [
-        "experiments/framework-map-generation/fixture-a/run-02",
-        "experiments/framework-map-generation/fixture-a/run-03",
-        "experiments/framework-map-generation/fixture-a/run-04",
-        "experiments/framework-map-generation/fixture-a/run-05",
-        "experiments/framework-map-generation/fixture-b/run-01",
-        "experiments/framework-map-generation/fixture-b/run-02",
-        "experiments/framework-map-generation/fixture-b/run-03",
-        "experiments/framework-map-generation/fixture-c/run-01",
-        "experiments/framework-map-generation/fixture-c/run-02",
-        "experiments/framework-map-generation/fixture-c/run-03",
-        "experiments/framework-map-generation/fixture-d/run-01",
-        "experiments/framework-map-generation/fixture-d/run-02",
-        "experiments/framework-map-generation/fixture-d/run-03",
-        "experiments/framework-map-generation/fixture-e/run-01",
-        "experiments/framework-map-generation/fixture-e/run-02",
-        "experiments/framework-map-generation/fixture-e/run-03"
+        "artifacts/experiments/framework-map-generation/fixture-a/run-02",
+        "artifacts/experiments/framework-map-generation/fixture-a/run-03",
+        "artifacts/experiments/framework-map-generation/fixture-a/run-04",
+        "artifacts/experiments/framework-map-generation/fixture-a/run-05",
+        "artifacts/experiments/framework-map-generation/fixture-b/run-01",
+        "artifacts/experiments/framework-map-generation/fixture-b/run-02",
+        "artifacts/experiments/framework-map-generation/fixture-b/run-03",
+        "artifacts/experiments/framework-map-generation/fixture-c/run-01",
+        "artifacts/experiments/framework-map-generation/fixture-c/run-02",
+        "artifacts/experiments/framework-map-generation/fixture-c/run-03",
+        "artifacts/experiments/framework-map-generation/fixture-d/run-01",
+        "artifacts/experiments/framework-map-generation/fixture-d/run-02",
+        "artifacts/experiments/framework-map-generation/fixture-d/run-03",
+        "artifacts/experiments/framework-map-generation/fixture-e/run-01",
+        "artifacts/experiments/framework-map-generation/fixture-e/run-02",
+        "artifacts/experiments/framework-map-generation/fixture-e/run-03"
       ],
       "artifactFiles": []
     },
@@ -143,21 +143,21 @@
       "feature": "F10",
       "note": "scripts/run-semantic-grounding.js 的两阶段 run（Stage A inventory → Stage B map）",
       "units": [
-        "experiments/semantic-grounding/fixture-d/run-01",
-        "experiments/semantic-grounding/fixture-d/run-02",
-        "experiments/semantic-grounding/fixture-d/run-03",
-        "experiments/semantic-grounding/fixture-d/run-04",
-        "experiments/semantic-grounding/fixture-e/run-01",
-        "experiments/semantic-grounding/fixture-e/run-02",
-        "experiments/semantic-grounding/fixture-e/run-03",
-        "experiments/semantic-grounding/fixture-e/run-04",
-        "experiments/semantic-grounding/fixture-e/run-05",
-        "experiments/semantic-grounding/fixture-e/run-06",
-        "experiments/semantic-grounding/fixture-e/run-07",
-        "experiments/semantic-grounding/fixture-e/run-08",
-        "experiments/semantic-grounding/fixture-e/run-09",
-        "experiments/semantic-grounding/fixture-e/run-10",
-        "experiments/semantic-grounding/fixture-e/run-11"
+        "artifacts/experiments/semantic-grounding/fixture-d/run-01",
+        "artifacts/experiments/semantic-grounding/fixture-d/run-02",
+        "artifacts/experiments/semantic-grounding/fixture-d/run-03",
+        "artifacts/experiments/semantic-grounding/fixture-d/run-04",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-01",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-02",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-03",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-04",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-05",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-06",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-07",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-08",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-09",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-10",
+        "artifacts/experiments/semantic-grounding/fixture-e/run-11"
       ],
       "artifactFiles": []
     },
@@ -165,18 +165,18 @@
       "feature": "F01",
       "note": "Stage 2 pilot：6 个 block 的试点产物与首次失败尝试，F01 问题清单的来源",
       "units": [
-        "experiments/stage2/O-03",
-        "experiments/stage2/O-04",
-        "experiments/stage2/O-07",
-        "experiments/stage2/O-08",
-        "experiments/stage2/O-10",
-        "experiments/stage2/O-10b",
-        "experiments/stage2/O-11b",
-        "experiments/stage2/O-12",
-        "experiments/stage2/_first-attempt-failures/O-03-provenance",
-        "experiments/stage2/_first-attempt-failures/O-04",
-        "experiments/stage2/_first-attempt-failures/O-04-structural",
-        "experiments/stage2/_first-attempt-failures/O-07"
+        "artifacts/experiments/stage2/O-03",
+        "artifacts/experiments/stage2/O-04",
+        "artifacts/experiments/stage2/O-07",
+        "artifacts/experiments/stage2/O-08",
+        "artifacts/experiments/stage2/O-10",
+        "artifacts/experiments/stage2/O-10b",
+        "artifacts/experiments/stage2/O-11b",
+        "artifacts/experiments/stage2/O-12",
+        "artifacts/experiments/stage2/_first-attempt-failures/O-03-provenance",
+        "artifacts/experiments/stage2/_first-attempt-failures/O-04",
+        "artifacts/experiments/stage2/_first-attempt-failures/O-04-structural",
+        "artifacts/experiments/stage2/_first-attempt-failures/O-07"
       ],
       "artifactFiles": [
         {
@@ -188,29 +188,29 @@
       "feature": "F01",
       "note": "Stage 2 全量 run：21 个 block + 修复前快照，F01 的修复对象",
       "units": [
-        "experiments/stage2-full/_before-fix/O-05",
-        "experiments/stage2-full/_before-fix/O-08",
-        "experiments/stage2-full/blocks/O-01",
-        "experiments/stage2-full/blocks/O-02",
-        "experiments/stage2-full/blocks/O-03",
-        "experiments/stage2-full/blocks/O-04",
-        "experiments/stage2-full/blocks/O-04b",
-        "experiments/stage2-full/blocks/O-04c",
-        "experiments/stage2-full/blocks/O-05",
-        "experiments/stage2-full/blocks/O-06",
-        "experiments/stage2-full/blocks/O-07",
-        "experiments/stage2-full/blocks/O-08",
-        "experiments/stage2-full/blocks/O-09",
-        "experiments/stage2-full/blocks/O-10",
-        "experiments/stage2-full/blocks/O-10b",
-        "experiments/stage2-full/blocks/O-10c",
-        "experiments/stage2-full/blocks/O-11",
-        "experiments/stage2-full/blocks/O-11b",
-        "experiments/stage2-full/blocks/O-12",
-        "experiments/stage2-full/blocks/O-13",
-        "experiments/stage2-full/blocks/O-14",
-        "experiments/stage2-full/blocks/O-15",
-        "experiments/stage2-full/blocks/O-16"
+        "artifacts/experiments/stage2-full/_before-fix/O-05",
+        "artifacts/experiments/stage2-full/_before-fix/O-08",
+        "artifacts/experiments/stage2-full/blocks/O-01",
+        "artifacts/experiments/stage2-full/blocks/O-02",
+        "artifacts/experiments/stage2-full/blocks/O-03",
+        "artifacts/experiments/stage2-full/blocks/O-04",
+        "artifacts/experiments/stage2-full/blocks/O-04b",
+        "artifacts/experiments/stage2-full/blocks/O-04c",
+        "artifacts/experiments/stage2-full/blocks/O-05",
+        "artifacts/experiments/stage2-full/blocks/O-06",
+        "artifacts/experiments/stage2-full/blocks/O-07",
+        "artifacts/experiments/stage2-full/blocks/O-08",
+        "artifacts/experiments/stage2-full/blocks/O-09",
+        "artifacts/experiments/stage2-full/blocks/O-10",
+        "artifacts/experiments/stage2-full/blocks/O-10b",
+        "artifacts/experiments/stage2-full/blocks/O-10c",
+        "artifacts/experiments/stage2-full/blocks/O-11",
+        "artifacts/experiments/stage2-full/blocks/O-11b",
+        "artifacts/experiments/stage2-full/blocks/O-12",
+        "artifacts/experiments/stage2-full/blocks/O-13",
+        "artifacts/experiments/stage2-full/blocks/O-14",
+        "artifacts/experiments/stage2-full/blocks/O-15",
+        "artifacts/experiments/stage2-full/blocks/O-16"
       ],
       "artifactFiles": [
         {
@@ -235,7 +235,7 @@
   "artifactFileCount": 17,
   "units": [
     {
-      "path": "experiments/framework-map-generation/fixture-a/run-02",
+      "path": "artifacts/experiments/framework-map-generation/fixture-a/run-02",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -252,7 +252,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-a/run-03",
+      "path": "artifacts/experiments/framework-map-generation/fixture-a/run-03",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -269,7 +269,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-a/run-04",
+      "path": "artifacts/experiments/framework-map-generation/fixture-a/run-04",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -286,7 +286,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-a/run-05",
+      "path": "artifacts/experiments/framework-map-generation/fixture-a/run-05",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -303,7 +303,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-b/run-01",
+      "path": "artifacts/experiments/framework-map-generation/fixture-b/run-01",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -320,7 +320,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-b/run-02",
+      "path": "artifacts/experiments/framework-map-generation/fixture-b/run-02",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -337,7 +337,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-b/run-03",
+      "path": "artifacts/experiments/framework-map-generation/fixture-b/run-03",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -354,7 +354,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-c/run-01",
+      "path": "artifacts/experiments/framework-map-generation/fixture-c/run-01",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -371,7 +371,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-c/run-02",
+      "path": "artifacts/experiments/framework-map-generation/fixture-c/run-02",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -388,7 +388,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-c/run-03",
+      "path": "artifacts/experiments/framework-map-generation/fixture-c/run-03",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -405,7 +405,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-d/run-01",
+      "path": "artifacts/experiments/framework-map-generation/fixture-d/run-01",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -422,7 +422,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-d/run-02",
+      "path": "artifacts/experiments/framework-map-generation/fixture-d/run-02",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -439,7 +439,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-d/run-03",
+      "path": "artifacts/experiments/framework-map-generation/fixture-d/run-03",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -456,7 +456,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-e/run-01",
+      "path": "artifacts/experiments/framework-map-generation/fixture-e/run-01",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -473,7 +473,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-e/run-02",
+      "path": "artifacts/experiments/framework-map-generation/fixture-e/run-02",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -490,7 +490,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/framework-map-generation/fixture-e/run-03",
+      "path": "artifacts/experiments/framework-map-generation/fixture-e/run-03",
       "area": "framework-map-generation",
       "feature": "F07",
       "files": 5,
@@ -507,7 +507,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-d/run-01",
+      "path": "artifacts/experiments/semantic-grounding/fixture-d/run-01",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 9,
@@ -530,7 +530,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-d/run-02",
+      "path": "artifacts/experiments/semantic-grounding/fixture-d/run-02",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 4,
@@ -548,7 +548,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-d/run-03",
+      "path": "artifacts/experiments/semantic-grounding/fixture-d/run-03",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 4,
@@ -566,7 +566,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-d/run-04",
+      "path": "artifacts/experiments/semantic-grounding/fixture-d/run-04",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 9,
@@ -589,7 +589,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-01",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-01",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 3,
@@ -606,7 +606,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-02",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-02",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 4,
@@ -620,7 +620,7 @@
       "provenance": "stage-trace"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-03",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-03",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 3,
@@ -637,7 +637,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-04",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-04",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 6,
@@ -656,7 +656,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-05",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-05",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 6,
@@ -677,7 +677,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-06",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-06",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 6,
@@ -698,7 +698,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-07",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-07",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 3,
@@ -715,7 +715,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-08",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-08",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 6,
@@ -736,7 +736,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-09",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-09",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 4,
@@ -754,7 +754,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-10",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-10",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 6,
@@ -775,7 +775,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/semantic-grounding/fixture-e/run-11",
+      "path": "artifacts/experiments/semantic-grounding/fixture-e/run-11",
       "area": "semantic-grounding",
       "feature": "F10",
       "files": 6,
@@ -796,7 +796,7 @@
       "model": "deepseek-flash"
     },
     {
-      "path": "experiments/stage2/O-03",
+      "path": "artifacts/experiments/stage2/O-03",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -810,7 +810,7 @@
       "shape": "diff"
     },
     {
-      "path": "experiments/stage2/O-04",
+      "path": "artifacts/experiments/stage2/O-04",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -824,7 +824,7 @@
       "shape": "current-target-flow"
     },
     {
-      "path": "experiments/stage2/O-07",
+      "path": "artifacts/experiments/stage2/O-07",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -838,7 +838,7 @@
       "shape": "capability-matrix"
     },
     {
-      "path": "experiments/stage2/O-08",
+      "path": "artifacts/experiments/stage2/O-08",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -852,7 +852,7 @@
       "shape": "two-column-comparison"
     },
     {
-      "path": "experiments/stage2/O-10",
+      "path": "artifacts/experiments/stage2/O-10",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -866,7 +866,7 @@
       "shape": "ladder"
     },
     {
-      "path": "experiments/stage2/O-10b",
+      "path": "artifacts/experiments/stage2/O-10b",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -880,7 +880,7 @@
       "shape": "checklist"
     },
     {
-      "path": "experiments/stage2/O-11b",
+      "path": "artifacts/experiments/stage2/O-11b",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -894,7 +894,7 @@
       "shape": "combo"
     },
     {
-      "path": "experiments/stage2/O-12",
+      "path": "artifacts/experiments/stage2/O-12",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -908,7 +908,7 @@
       "shape": "walkthrough"
     },
     {
-      "path": "experiments/stage2/_first-attempt-failures/O-03-provenance",
+      "path": "artifacts/experiments/stage2/_first-attempt-failures/O-03-provenance",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -922,7 +922,7 @@
       "shape": "diff"
     },
     {
-      "path": "experiments/stage2/_first-attempt-failures/O-04",
+      "path": "artifacts/experiments/stage2/_first-attempt-failures/O-04",
       "area": "stage2",
       "feature": "F01",
       "files": 2,
@@ -933,7 +933,7 @@
       "shape": "current-target-flow"
     },
     {
-      "path": "experiments/stage2/_first-attempt-failures/O-04-structural",
+      "path": "artifacts/experiments/stage2/_first-attempt-failures/O-04-structural",
       "area": "stage2",
       "feature": "F01",
       "files": 4,
@@ -947,7 +947,7 @@
       "shape": "current-target-flow"
     },
     {
-      "path": "experiments/stage2/_first-attempt-failures/O-07",
+      "path": "artifacts/experiments/stage2/_first-attempt-failures/O-07",
       "area": "stage2",
       "feature": "F01",
       "files": 2,
@@ -958,7 +958,7 @@
       "shape": "capability-matrix"
     },
     {
-      "path": "experiments/stage2-full/_before-fix/O-05",
+      "path": "artifacts/experiments/stage2-full/_before-fix/O-05",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -972,7 +972,7 @@
       "shape": "flow"
     },
     {
-      "path": "experiments/stage2-full/_before-fix/O-08",
+      "path": "artifacts/experiments/stage2-full/_before-fix/O-08",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -986,7 +986,7 @@
       "shape": "two-column-comparison"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-01",
+      "path": "artifacts/experiments/stage2-full/blocks/O-01",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1000,7 +1000,7 @@
       "shape": "prose"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-02",
+      "path": "artifacts/experiments/stage2-full/blocks/O-02",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1014,7 +1014,7 @@
       "shape": "ladder"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-03",
+      "path": "artifacts/experiments/stage2-full/blocks/O-03",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1028,7 +1028,7 @@
       "shape": "diff"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-04",
+      "path": "artifacts/experiments/stage2-full/blocks/O-04",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1042,7 +1042,7 @@
       "shape": "current-target-flow"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-04b",
+      "path": "artifacts/experiments/stage2-full/blocks/O-04b",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1056,7 +1056,7 @@
       "shape": "checklist"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-04c",
+      "path": "artifacts/experiments/stage2-full/blocks/O-04c",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1070,7 +1070,7 @@
       "shape": "matrix"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-05",
+      "path": "artifacts/experiments/stage2-full/blocks/O-05",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1084,7 +1084,7 @@
       "shape": "flow"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-06",
+      "path": "artifacts/experiments/stage2-full/blocks/O-06",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1098,7 +1098,7 @@
       "shape": "capability-matrix"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-07",
+      "path": "artifacts/experiments/stage2-full/blocks/O-07",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1112,7 +1112,7 @@
       "shape": "capability-matrix"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-08",
+      "path": "artifacts/experiments/stage2-full/blocks/O-08",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1126,7 +1126,7 @@
       "shape": "two-column-comparison"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-09",
+      "path": "artifacts/experiments/stage2-full/blocks/O-09",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1140,7 +1140,7 @@
       "shape": "ladder"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-10",
+      "path": "artifacts/experiments/stage2-full/blocks/O-10",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1154,7 +1154,7 @@
       "shape": "ladder"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-10b",
+      "path": "artifacts/experiments/stage2-full/blocks/O-10b",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1168,7 +1168,7 @@
       "shape": "checklist"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-10c",
+      "path": "artifacts/experiments/stage2-full/blocks/O-10c",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1182,7 +1182,7 @@
       "shape": "checklist"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-11",
+      "path": "artifacts/experiments/stage2-full/blocks/O-11",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1196,7 +1196,7 @@
       "shape": "two-column-comparison"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-11b",
+      "path": "artifacts/experiments/stage2-full/blocks/O-11b",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1210,7 +1210,7 @@
       "shape": "combo"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-12",
+      "path": "artifacts/experiments/stage2-full/blocks/O-12",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1224,7 +1224,7 @@
       "shape": "walkthrough"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-13",
+      "path": "artifacts/experiments/stage2-full/blocks/O-13",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1238,7 +1238,7 @@
       "shape": "combo"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-14",
+      "path": "artifacts/experiments/stage2-full/blocks/O-14",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1252,7 +1252,7 @@
       "shape": "checklist"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-15",
+      "path": "artifacts/experiments/stage2-full/blocks/O-15",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,
@@ -1266,7 +1266,7 @@
       "shape": "checklist"
     },
     {
-      "path": "experiments/stage2-full/blocks/O-16",
+      "path": "artifacts/experiments/stage2-full/blocks/O-16",
       "area": "stage2-full",
       "feature": "F01",
       "files": 4,

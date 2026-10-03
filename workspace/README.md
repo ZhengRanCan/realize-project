@@ -1,10 +1,14 @@
-# Reading Bundles
+# Local Workspace
+
+这里存放本机资料，除本说明外不提交 Git。`analyses/` 按文章与分析批次存放资料包；`tmp/` 保留临时材料，测试新输出写到 `tmp/tests/`；`previews/` 放新预览；`references/` 保留外部参考；`legacy-review/` 存旧单文件入口的新人工审核；已有根目录 human-review.json 继续原位使用。迁移不会清空这些数据。
+
+## Reading Bundles
 
 一篇文章的一次分析放在一个目录里。应用点「打开分析资料包」，选择其中的 `reading-bundle.json`；
 有框架图时先进入框架图，再查看主题、解释区块和出处。
 
 ```text
-bundles/<document>/<analysis>/
+workspace/analyses/<document>/<analysis>/
 ├── reading-bundle.json       统一入口：文件位置、哈希和明确配对
 ├── source.md                 本次分析使用的原文副本
 ├── source-sections.json      原文的章节坐标
@@ -17,7 +21,7 @@ bundles/<document>/<analysis>/
 ```
 
 这整个目录可以一起移动。运行时只跟随清单中的相对路径，不根据名字猜配套文件。
-多个分析目录分别保存人工审核，避免互相覆盖。`bundles/` 下的分析资料不提交 Git。
+多个分析目录分别保存人工审核，避免互相覆盖。`workspace/analyses/` 下的分析资料不提交 Git。
 
 ## Example
 
@@ -25,7 +29,7 @@ bundles/<document>/<analysis>/
 
 ```bash
 npm run bundle:example
-node scripts/build-preview.js --bundle bundles/context-consumption/stage2-gold/reading-bundle.json --out bundles/context-consumption/stage2-gold/reading-preview.html
+node scripts/build-preview.js --bundle workspace/analyses/context-consumption/stage2-gold/reading-bundle.json --out workspace/analyses/context-consumption/stage2-gold/reading-preview.html
 npm start
 ```
 

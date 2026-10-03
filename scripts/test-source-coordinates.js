@@ -1,4 +1,6 @@
 'use strict';
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -11,16 +13,16 @@ assert.equal(resolveSourceCoordinate(registry,{namespace:'heading',key:'4.1'}).s
 assert.equal(resolveSourceCoordinate(registry,{namespace:'heading',key:'Goal'}).state,'unknown');
 assert.equal(resolveSourceCoordinate(registry,{namespace:'plan-section',key:'§1'}).state,'unknown');
 assert.equal(parseDocHeadings('no headings').sectionLevel,null);
-const original = JSON.parse(fs.readFileSync(path.join(__dirname,'../docs/source-sections.json')));
-const raw = fs.readFileSync(path.join(__dirname,'..',original.document.path),'utf8');
+const original = JSON.parse(fs.readFileSync(joinRepositoryPath(__dirname,'../samples/context-consumption/source-sections.json')));
+const raw = fs.readFileSync(joinRepositoryPath(__dirname,'..',original.document.path),'utf8');
 assert.deepEqual(buildSourceRegistry(raw,{sourcePath:original.document.path}).sections,original.sections);
 for (const file of ['check-plan','check-overview']) {
-  const out=execFileSync(process.execPath,['-e',`require('./scripts/${file}'); console.log('imported')`],{cwd:path.join(__dirname,'..'),encoding:'utf8'});
+  const out=execFileSync(process.execPath,['-e',`require('./scripts/${file}'); console.log('imported')`],{cwd:joinRepositoryPath(__dirname,'..'),encoding:'utf8'});
   assert.equal(out.trim(),'imported');
 }
 const {checkPlan} = require('./check-plan');
-const plan=JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/context-consumption.overview-plan.json')));
-const design=JSON.parse(fs.readFileSync(path.join(__dirname,'../fixtures/context-consumption.json')));
+const plan=JSON.parse(fs.readFileSync(joinRepositoryPath(__dirname,'../samples/context-consumption/overview-plan.json')));
+const design=JSON.parse(fs.readFileSync(joinRepositoryPath(__dirname,'../samples/context-consumption/design-review.json')));
 assert.equal(checkPlan(plan,{design,sourceSections:original,sourceText:raw}).structuralErrors.length,0);
 const bad=structuredClone(plan);bad.blocks[0].covers.push('SU-missing');
 assert.ok(checkPlan(bad,{design,sourceSections:original,sourceText:raw}).structuralErrors.length>0);

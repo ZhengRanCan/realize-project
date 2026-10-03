@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 为收缩版 MVP 的「方案总览」补上视觉层数据（overview）。
  *
@@ -19,8 +21,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const FIXTURE = path.join(ROOT, 'fixtures', 'context-consumption.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const FIXTURE = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.json');
 
 /* ------------------------------------------------------------------ *
  * 甲 · 这是什么

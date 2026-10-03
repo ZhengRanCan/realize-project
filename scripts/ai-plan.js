@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 最小 AI test runner —— 只跑 Stage 1（Semantic Coverage Planning）。
  *
@@ -8,7 +10,7 @@
  * 一次调用 = 一次生成 + 一次 check-plan，然后落盘全部原始产物供人工比对。
  *
  * 用法：
- *   npm run ai:plan -- --doc 测试文档/18-context-consumption-semantic-model.md
+ *   npm run ai:plan -- --doc samples/context-consumption/source.md
  *   npm run ai:plan -- --run 1 --model gpt-5.6-sol
  *
  * 凭据解析顺序（绝不写入仓库、绝不打印完整 key）：
@@ -28,15 +30,15 @@ const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 
 const DEFAULTS = {
-  doc: path.join('测试文档', '18-context-consumption-semantic-model.md'),
-  design: path.join('fixtures', 'context-consumption.json'),
-  prompt: path.join('ai', 'stage1-plan.prompt.md'),
-  schema: path.join('schema', 'overview-plan.schema.json'),
-  catalog: path.join('docs', 'specs', 'shape-catalog.md'),
-  sections: path.join('docs', 'source-sections.json'),
+  doc: joinRepositoryPath('测试文档', '18-context-consumption-semantic-model.md'),
+  design: joinRepositoryPath('fixtures', 'context-consumption.json'),
+  prompt: joinRepositoryPath('ai', 'stage1-plan.prompt.md'),
+  schema: joinRepositoryPath('schema', 'overview-plan.schema.json'),
+  catalog: joinRepositoryPath('docs', 'specs', 'shape-catalog.md'),
+  sections: joinRepositoryPath('docs', 'source-sections.json'),
   outDir: 'tmp',
   model: 'gpt-5.6-sol',
   maxTokens: 32000,
@@ -66,10 +68,10 @@ function parseArgs(argv) {
 }
 
 const args = parseArgs(process.argv.slice(2));
-const docPath = path.resolve(ROOT, args.doc);
-const designPath = path.resolve(ROOT, args.design);
-const promptPath = path.resolve(ROOT, args.prompt);
-const outDir = path.resolve(ROOT, args.outDir);
+const docPath = resolveRepositoryPath(ROOT, args.doc);
+const designPath = resolveRepositoryPath(ROOT, args.design);
+const promptPath = resolveRepositoryPath(ROOT, args.prompt);
+const outDir = resolveRepositoryPath(ROOT, args.outDir);
 const runLabel = args.run ? `run-${args.run}` : `run-${Date.now()}`;
 
 /* ------------------------------------------------------------------ *
@@ -77,7 +79,7 @@ const runLabel = args.run ? `run-${args.run}` : `run-${Date.now()}`;
  * ------------------------------------------------------------------ */
 
 function readSettings() {
-  const file = path.join(os.homedir(), '.dsh', 'settings.yaml');
+  const file = joinRepositoryPath(os.homedir(), '.dsh', 'settings.yaml');
   if (!fs.existsSync(file)) return {};
   const text = fs.readFileSync(file, 'utf8');
   const url = text.match(/apiUrl:\s*(\S+)/);
@@ -112,9 +114,9 @@ function loadPromptTemplate() {
 }
 
 function buildUserMessage(template) {
-  const docSections = JSON.parse(fs.readFileSync(path.resolve(ROOT, args.sections), 'utf8'));
-  const schema = fs.readFileSync(path.resolve(ROOT, args.schema), 'utf8');
-  const catalog = fs.readFileSync(path.resolve(ROOT, args.catalog), 'utf8');
+  const docSections = JSON.parse(fs.readFileSync(resolveRepositoryPath(ROOT, args.sections), 'utf8'));
+  const schema = fs.readFileSync(resolveRepositoryPath(ROOT, args.schema), 'utf8');
+  const catalog = fs.readFileSync(resolveRepositoryPath(ROOT, args.catalog), 'utf8');
   const design = JSON.parse(fs.readFileSync(designPath, 'utf8'));
 
   const sectionsText = docSections.sections
@@ -303,7 +305,7 @@ async function main() {
     result = await callModel(credentials, template, userMessage);
   } catch (error) {
     fs.writeFileSync(
-      path.join(outDir, `context-consumption.${runLabel}.request.json`),
+      joinRepositoryPath(outDir, `context-consumption.${runLabel}.request.json`),
       `${JSON.stringify({ ...requestRecord, error: error.message }, null, 2)}\n`,
       'utf8'
     );
@@ -319,7 +321,7 @@ async function main() {
   }
 
   // 落盘原始输出
-  const rawFile = path.join(outDir, `context-consumption.${runLabel}.raw.md`);
+  const rawFile = joinRepositoryPath(outDir, `context-consumption.${runLabel}.raw.md`);
   fs.writeFileSync(rawFile, result.content, 'utf8');
 
   let plan;
@@ -327,7 +329,7 @@ async function main() {
     plan = extractJson(result.content);
   } catch (error) {
     fs.writeFileSync(
-      path.join(outDir, `context-consumption.${runLabel}.request.json`),
+      joinRepositoryPath(outDir, `context-consumption.${runLabel}.request.json`),
       `${JSON.stringify({ ...requestRecord, usage: result.usage, latencyMs: result.latencyMs, parseError: error.message }, null, 2)}\n`,
       'utf8'
     );
@@ -336,10 +338,10 @@ async function main() {
     process.exit(1);
   }
 
-  const planFile = path.join(outDir, `context-consumption.${runLabel}.overview-plan.json`);
+  const planFile = joinRepositoryPath(outDir, `context-consumption.${runLabel}.overview-plan.json`);
   fs.writeFileSync(planFile, `${JSON.stringify(plan, null, 2)}\n`, 'utf8');
   fs.writeFileSync(
-    path.join(outDir, `context-consumption.${runLabel}.request.json`),
+    joinRepositoryPath(outDir, `context-consumption.${runLabel}.request.json`),
     `${JSON.stringify(
       {
         ...requestRecord,
@@ -364,7 +366,7 @@ async function main() {
   let checkOutput = '';
   let checkCode = 0;
   try {
-    checkOutput = execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'check-plan.js'), planFile], {
+    checkOutput = execFileSync(process.execPath, [joinRepositoryPath(ROOT, 'scripts', 'check-plan.js'), planFile], {
       encoding: 'utf8',
     });
   } catch (error) {
@@ -372,7 +374,7 @@ async function main() {
     checkCode = error.status === undefined ? 1 : error.status;
   }
   process.stdout.write(checkOutput);
-  fs.writeFileSync(path.join(outDir, `context-consumption.${runLabel}.check-plan.txt`), checkOutput, 'utf8');
+  fs.writeFileSync(joinRepositoryPath(outDir, `context-consumption.${runLabel}.check-plan.txt`), checkOutput, 'utf8');
 
   console.log(`\n本 run 结果：${checkCode === 0 ? '通过（见上方 warning）' : 'FAIL'}`);
   console.log('说明：本 runner 不做自动重试。失败信息请人工观察后决定如何调整 prompt。');

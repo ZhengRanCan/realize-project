@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 10 · 两阶段生成运行器
  *
@@ -52,23 +54,23 @@ const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 
 const FIXTURES = {
-  a: { doc: '测试文档/18-context-consumption-semantic-model.md', label: 'A · Concept / Architecture heavy' },
-  b: { doc: '测试文档/fixture-b-canonical-hash-digest-and-integrity-specification.md', label: 'B · Data / transformation heavy' },
-  c: { doc: '测试文档/fixture-c-candidate-inbox-driven-profile-pipeline.md', label: 'C · Process heavy' },
-  d: { doc: '测试文档/fixture-d-goal-plan-task-state-model.md', label: 'D · ER-heavy / multi-entity network' },
-  e: { doc: '测试文档/fixture-e-f13-f16-runbook.md', label: 'E · Operational Runbook' },
+  a: { doc: 'samples/context-consumption/source.md', label: 'A · Concept / Architecture heavy' },
+  b: { doc: 'samples/canonical-hash-integrity/source.md', label: 'B · Data / transformation heavy' },
+  c: { doc: 'samples/candidate-inbox-profile/source.md', label: 'C · Process heavy' },
+  d: { doc: 'samples/goal-plan-task-state/source.md', label: 'D · ER-heavy / multi-entity network' },
+  e: { doc: 'samples/operational-runbook/source.md', label: 'E · Operational Runbook' },
 };
 
 const DEFAULTS = {
-  out: path.join('experiments', 'semantic-grounding'),
-  promptA: path.join('ai', 'semantic-inventory.prompt.md'),
-  promptB: path.join('ai', 'framework-map-synthesis.prompt.md'),
-  schemaA: path.join('schema', 'semantic-inventory.schema.json'),
-  schemaB: path.join('schema', 'framework-map.schema.json'),
-  selectionSchema: path.join('schema', 'map-selection.schema.json'),
+  out: joinRepositoryPath('experiments', 'semantic-grounding'),
+  promptA: joinRepositoryPath('ai', 'semantic-inventory.prompt.md'),
+  promptB: joinRepositoryPath('ai', 'framework-map-synthesis.prompt.md'),
+  schemaA: joinRepositoryPath('schema', 'semantic-inventory.schema.json'),
+  schemaB: joinRepositoryPath('schema', 'framework-map.schema.json'),
+  selectionSchema: joinRepositoryPath('schema', 'map-selection.schema.json'),
   model: 'deepseek-flash',
   // Stage A 的输出预算：**不能压**。
   // 实测（e/run-03）：16384 预算下 finish_reason=length，16386/16384 顶格，
@@ -128,15 +130,15 @@ if (!['a', 'b', 'both'].includes(stage)) usage(`--stage 必须是 a / b / both�
 if (stage === 'b' && !args.inventory) usage('--stage b 必须同时给 --inventory <已冻结的 inventory 路径>');
 
 const fixture = FIXTURES[fixtureId];
-const docPath = path.resolve(ROOT, fixture.doc);
+const docPath = resolveRepositoryPath(ROOT, fixture.doc);
 if (!fs.existsSync(docPath)) usage(`fixture 文档不存在：${fixture.doc}`);
 
-const outBase = path.resolve(ROOT, String(args.out));
-const promptAPath = path.resolve(ROOT, String(args.promptA));
-const promptBPath = path.resolve(ROOT, String(args.promptB));
-const schemaAPath = path.resolve(ROOT, String(args.schemaA));
-const schemaBPath = path.resolve(ROOT, String(args.schemaB));
-const selectionSchemaPath = path.resolve(ROOT, String(args.selectionSchema));
+const outBase = resolveRepositoryPath(ROOT, String(args.out));
+const promptAPath = resolveRepositoryPath(ROOT, String(args.promptA));
+const promptBPath = resolveRepositoryPath(ROOT, String(args.promptB));
+const schemaAPath = resolveRepositoryPath(ROOT, String(args.schemaA));
+const schemaBPath = resolveRepositoryPath(ROOT, String(args.schemaB));
+const selectionSchemaPath = resolveRepositoryPath(ROOT, String(args.selectionSchema));
 
 const sha256 = (t) => crypto.createHash('sha256').update(t).digest('hex');
 const rel = (p) => path.relative(ROOT, p).replace(/\\/g, '/');
@@ -152,7 +154,7 @@ const isStubStage = (s) => !!(args[`stub${s.toUpperCase()}Content`] || args[`stu
  * ------------------------------------------------------------------ */
 
 function readSettings() {
-  const file = path.join(os.homedir(), '.dsh', 'settings.yaml');
+  const file = joinRepositoryPath(os.homedir(), '.dsh', 'settings.yaml');
   if (!fs.existsSync(file)) return {};
   const text = fs.readFileSync(file, 'utf8');
   const url = text.match(/apiUrl:\s*(\S+)/);
@@ -218,9 +220,9 @@ function headingInfo() {
  * ------------------------------------------------------------------ */
 
 function allocateRunDir() {
-  const base = path.join(outBase, `fixture-${fixtureId}`);
+  const base = joinRepositoryPath(outBase, `fixture-${fixtureId}`);
   if (args.run) {
-    const dir = path.join(base, `run-${String(args.run).padStart(2, '0')}`);
+    const dir = joinRepositoryPath(base, `run-${String(args.run).padStart(2, '0')}`);
     if (fs.existsSync(dir)) {
       console.error(`✗ 拒绝覆盖：${rel(dir)} 已存在。每次 run 必须独立 —— 换编号，或先人工确认后再删除。`);
       process.exit(EXIT.REFUSE_OVERWRITE);
@@ -234,14 +236,14 @@ function allocateRunDir() {
       if (m) max = Math.max(max, Number(m[1]));
     }
   }
-  return path.join(base, `run-${String(max + 1).padStart(2, '0')}`);
+  return joinRepositoryPath(base, `run-${String(max + 1).padStart(2, '0')}`);
 }
 
 /** temp 写入 → read-back 解析 → 原子 rename。任何一步失败都不产生最终文件。 */
 function writeJsonAtomically(dir, fileName, obj, protocol) {
-  const finalPath = path.join(dir, fileName);
+  const finalPath = joinRepositoryPath(dir, fileName);
   if (fs.existsSync(finalPath)) throw new Error(`拒绝覆盖已存在的 ${fileName}`);
-  const tmpPath = path.join(dir, fileName.replace(/\.json$/, '.tmp.json'));
+  const tmpPath = joinRepositoryPath(dir, fileName.replace(/\.json$/, '.tmp.json'));
   writeText(tmpPath, `${JSON.stringify(obj, null, 2)}\n`);
   protocol.tempWrite = true;
   const readBack = JSON.parse(fs.readFileSync(tmpPath, 'utf8'));
@@ -460,7 +462,7 @@ function stubCall(stageKey) {
   const S = stageKey.toUpperCase();
   if (args[`stub${S}TransportError`]) return { error: new Error(`模拟传输层失败：${args[`stub${S}TransportError`]}`) };
   if (args[`stub${S}Http`]) return { error: new Error(`HTTP ${Number(args[`stub${S}Http`])}：模拟网关错误（stub）`) };
-  const file = path.resolve(ROOT, String(args[`stub${S}Content`] || ''));
+  const file = resolveRepositoryPath(ROOT, String(args[`stub${S}Content`] || ''));
   if (!fs.existsSync(file)) usage(`--stub-${stageKey}-content 文件不存在：${args[`stub${S}Content`]}`);
   const text = fs.readFileSync(file, 'utf8');
   let content = text;
@@ -478,14 +480,14 @@ function stubCall(stageKey) {
 
 function finish(runDir, meta, code) {
   meta.finishedAt = nowIso();
-  writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
+  writeText(joinRepositoryPath(runDir, 'run-meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
   process.exit(code);
 }
 
 /** 增量写 run-meta：**每个阶段结束就落一次盘**。
  *  这样即使进程被 kill（或长 run 中途被打断），已完成阶段的证据也不会失去记录。 */
 function saveMeta(runDir, meta) {
-  writeText(path.join(runDir, 'run-meta.json'), `${JSON.stringify({ ...meta, savedAt: nowIso() }, null, 2)}\n`);
+  writeText(joinRepositoryPath(runDir, 'run-meta.json'), `${JSON.stringify({ ...meta, savedAt: nowIso() }, null, 2)}\n`);
 }
 
 async function main() {
@@ -552,8 +554,8 @@ async function main() {
         frameworkMap: artifactRef(schemaBPath),
         mapSelection: artifactRef(selectionSchemaPath),
       },
-      contract: artifactRef(path.join(ROOT, 'docs', 'specs', 'framework-map-contract.md')),
-      validator: artifactRef(path.join(ROOT, 'scripts', 'check-map.js')),
+      contract: artifactRef(joinRepositoryPath(ROOT, 'docs', 'specs', 'framework-map-contract.md')),
+      validator: artifactRef(joinRepositoryPath(ROOT, 'scripts', 'check-map.js')),
     },
     startedAt: nowIso(),
     finishedAt: null,
@@ -598,7 +600,7 @@ async function main() {
       promptPath: rel(promptAPath), promptSha256: promptA.sha256,
       userMessageSha256: sha256(userMessage), userMessageChars: userMessage.length, startedAt: nowIso(),
     };
-    writeText(path.join(runDir, 'request-stage-a.json'), `${JSON.stringify(recA, null, 2)}\n`);
+    writeText(joinRepositoryPath(runDir, 'request-stage-a.json'), `${JSON.stringify(recA, null, 2)}\n`);
 
     console.log('\nStage A（semantic inventory）…');
     let resA;
@@ -616,7 +618,7 @@ async function main() {
     meta.stages.a.finishReason = resA.finishReason ?? null;
     meta.stages.a.usage = resA.usage || null;
 
-    writeText(path.join(runDir, 'raw-inventory-response.txt'), resA.content ?? '');
+    writeText(joinRepositoryPath(runDir, 'raw-inventory-response.txt'), resA.content ?? '');
     meta.stages.a.protocol.rawResponseSaved = true;
 
     let inv;
@@ -637,7 +639,7 @@ async function main() {
     }
     inventory = inv;
     inventoryRelPath = `${rel(runDir)}/semantic-inventory.json`;
-    inventorySha = sha256(fs.readFileSync(path.join(runDir, 'semantic-inventory.json'), 'utf8'));
+    inventorySha = sha256(fs.readFileSync(joinRepositoryPath(runDir, 'semantic-inventory.json'), 'utf8'));
     meta.artifactSha256['semantic-inventory.json'] = inventorySha;
 
     const shape = checkInventoryShape(inv, headings.keys);
@@ -669,7 +671,7 @@ async function main() {
     if (stage === 'a') { meta.status = 'stage-a-only'; console.log('\n--stage a：到此为止（inv 已冻结）'); finish(runDir, meta, EXIT.CLEAN); }
   } else {
     /* ---------------- --stage b：复用已冻结的 inventory ---------------- */
-    const invPath = path.resolve(ROOT, String(args.inventory));
+    const invPath = resolveRepositoryPath(ROOT, String(args.inventory));
     if (!fs.existsSync(invPath)) usage(`--inventory 不存在：${args.inventory}`);
     inventory = JSON.parse(fs.readFileSync(invPath, 'utf8'));
     inventoryRelPath = rel(invPath);
@@ -703,7 +705,7 @@ async function main() {
     userMessageSha256: sha256(userMessageB), userMessageChars: userMessageB.length,
     inventoryPath: inventoryRelPath, inventorySha256: inventorySha, startedAt: nowIso(),
   };
-  writeText(path.join(runDir, 'request-stage-b.json'), `${JSON.stringify(recB, null, 2)}\n`);
+  writeText(joinRepositoryPath(runDir, 'request-stage-b.json'), `${JSON.stringify(recB, null, 2)}\n`);
 
   console.log('\nStage B（framework map synthesis）…');
   let resB;
@@ -722,7 +724,7 @@ async function main() {
   meta.stages.b.finishReason = resB.finishReason ?? null;
   meta.stages.b.usage = resB.usage || null;
 
-  writeText(path.join(runDir, 'raw-synthesis-response.txt'), resB.content ?? '');
+  writeText(joinRepositoryPath(runDir, 'raw-synthesis-response.txt'), resB.content ?? '');
   meta.stages.b.protocol.rawResponseSaved = true;
 
   let blocks;
@@ -743,11 +745,11 @@ async function main() {
     meta.status = 'stage-b-write-failed'; meta.error = error.message;
     finish(runDir, meta, EXIT.FAILED);
   }
-  meta.artifactSha256['framework-map.json'] = sha256(fs.readFileSync(path.join(runDir, 'framework-map.json'), 'utf8'));
-  meta.artifactSha256['map-selection.json'] = sha256(fs.readFileSync(path.join(runDir, 'map-selection.json'), 'utf8'));
+  meta.artifactSha256['framework-map.json'] = sha256(fs.readFileSync(joinRepositoryPath(runDir, 'framework-map.json'), 'utf8'));
+  meta.artifactSha256['map-selection.json'] = sha256(fs.readFileSync(joinRepositoryPath(runDir, 'map-selection.json'), 'utf8'));
 
   const v = runValidator(blocks.map, `${rel(runDir)}/framework-map.json`);
-  writeText(path.join(runDir, 'check-map.txt'), v.out);
+  writeText(joinRepositoryPath(runDir, 'check-map.txt'), v.out);
   meta.stages.b.protocol.checkMapExecuted = true;
   meta.validator = { exitCode: v.exitCode, ...v.summary };
 

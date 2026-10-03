@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 无 GUI 的端到端模拟：验证 “fixture → human-review.json → Implementation Gate” 闭环。
  *
@@ -20,13 +22,13 @@ const { semanticCheck } = require('../app/shared/review-model');
 const semantics = require('../app/shared/semantics');
 const { evaluateGate, buildHumanReviewSkeleton } = semantics;
 
-const ROOT = path.resolve(__dirname, '..');
-const FIXTURE = path.join(ROOT, 'fixtures', 'context-consumption.json');
-const SCHEMA = path.join(ROOT, 'schema', 'design-review.schema.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const FIXTURE = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.json');
+const SCHEMA = joinRepositoryPath(ROOT, 'schema', 'design-review.schema.json');
 
 function outPathFromArgs() {
   const index = process.argv.indexOf('--out');
-  if (index !== -1 && process.argv[index + 1]) return path.resolve(process.argv[index + 1]);
+  if (index !== -1 && process.argv[index + 1]) return resolveRepositoryPath(process.argv[index + 1]);
   return null;
 }
 

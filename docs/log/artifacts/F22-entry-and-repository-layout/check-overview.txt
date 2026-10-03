@@ -1,0 +1,21 @@
+
+> design-review-mvp@0.1.0 check-overview
+> node scripts/check-overview.js
+
+=== check-overview ===
+overview  artifacts\experiments\stage2-full\overview.generated.json
+plan      samples\context-consumption\overview-plan.json（gold）
+complete  true｜失败 block：无
+
+--- 统计（事实，不是评分）---
+Blocks          21 / 21
+Core coverage   75 / 75
+Supporting      12 / 12
+Total           87 / 87
+Provenance      151 / 151
+Shapes          prose×1, ladder×3, diff×1, current-target-flow×1, checklist×5, matrix×1, flow×2, capability-matrix×2, two-column-comparison×2, combo×2, walkthrough×1
+Stages          what(6块/45元素) how(4块/31元素) prove(7块/39元素) boundary(4块/38元素)
+Warnings        重复×17, 密度×1
+Failures        无
+
+结果：PASS WITH WARNINGS —— Overview 完整实现了 Plan，但见上方 warning。

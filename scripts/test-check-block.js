@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * check-block 的自动测试。
  *
@@ -15,8 +17,8 @@ const path = require('node:path');
 
 const { checkBlock } = require('./check-block.js');
 
-const ROOT = path.resolve(__dirname, '..');
-const SOURCE_SECTIONS = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs', 'source-sections.json'), 'utf8'));
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const SOURCE_SECTIONS = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'docs', 'source-sections.json'), 'utf8'));
 const sourceText = SOURCE_SECTIONS.sections.map((s) => s.text).join('\n');
 const allowedPhrases = new Set(
   ['只能算', '充分条件', '一定正确', '课程一定有效', '学生一定学会', '已实现', '已经实现', '已验证'].filter((p) =>
@@ -30,7 +32,7 @@ const allowedPhrases = new Set(
 
 const PLAN = {
   planVersion: 1,
-  designRef: { id: 'TEST', path: 'fixtures/context-consumption.json' },
+  designRef: { id: 'TEST', path: 'samples/context-consumption/design-review.json' },
   shapeVocabularyVersion: 'shape-catalog-v1',
   sourceUnits: [
     { id: 'SU-001', section: '§1', kind: 'definition', statement: 'Definition A', importance: 'core' },

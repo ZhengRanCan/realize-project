@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * compare-plan —— 实验性对比工具：把模型生成的 overview-plan 与 Gold Fixture 对照。
  *
@@ -19,9 +21,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const GOLD = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
-const SHAPE_CATALOG = path.join(ROOT, 'docs', 'specs', 'shape-catalog.md');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const GOLD = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
+const SHAPE_CATALOG = joinRepositoryPath(ROOT, 'docs', 'specs', 'shape-catalog.md');
 
 /* ================================================================== *
  * 阈值集中配置
@@ -172,7 +174,7 @@ function matchUnits(goldUnits, candidateUnits) {
 function runCheckPlan(planFile) {
   const { execFileSync } = require('node:child_process');
   try {
-    const stdout = execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'check-plan.js'), planFile], {
+    const stdout = execFileSync(process.execPath, [joinRepositoryPath(ROOT, 'scripts', 'check-plan.js'), planFile], {
       encoding: 'utf8',
     });
     return { code: 0, output: stdout, errors: [] };
@@ -235,9 +237,9 @@ function main() {
   const runsIndex = args.indexOf('--runs');
   const onlyRuns = runsIndex >= 0 ? String(args[runsIndex + 1] || '').split(',').map((s) => s.trim()) : null;
   const outIndex = args.indexOf('--out');
-  const outFile = outIndex >= 0 ? path.resolve(ROOT, args[outIndex + 1]) : null;
+  const outFile = outIndex >= 0 ? resolveRepositoryPath(ROOT, args[outIndex + 1]) : null;
 
-  const tmpDir = path.join(ROOT, 'tmp');
+  const tmpDir = joinRepositoryPath(ROOT, 'tmp');
   const files = fs
     .readdirSync(tmpDir)
     .filter((f) => f.includes(pattern) && f.endsWith('.overview-plan.json'))
@@ -256,7 +258,7 @@ function main() {
   const gold = JSON.parse(fs.readFileSync(GOLD, 'utf8'));
   const catalog = catalogShapes();
   const runs = files.map((file) => {
-    const planPath = path.join(tmpDir, file);
+    const planPath = joinRepositoryPath(tmpDir, file);
     const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
     const check = runCheckPlan(planPath);
     const match = matchUnits(gold.sourceUnits, plan.sourceUnits);

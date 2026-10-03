@@ -1,18 +1,15 @@
 # Experiments
 
-实验产物目录。**每次运行一个独立目录，失败痕迹必须原样保留。** 这里放的是原始证据，
-不是产品运行时读取的数据；产品只读 `fixtures/**` 与装配后的 `experiments/stage2-full/overview.generated.json`。
+实验产物目录，每次运行一个独立目录，失败痕迹原样保留。F22 将原 experiments 整体移到这里；请求、生成结果与报告正文不改写，66 个实验单元与 17 个产物的归属不变。产品通过显式资料包读取选择后的副本，Gold 在 samples。
 
-产物目录**原地保留在旧路径**（见 `docs/decisions.md` 2026-09-27 条），因此其中的
-`run-meta.json` / `request.json` 里记录的是规范化前的路径（例如 `docs/framework-map-contract.md`，
-现为 `docs/specs/framework-map-contract.md`）。映射表见 `docs/README.md` 的 Path mapping。
+历史 run-meta / request 仍记录当时路径，当前位置由 `scripts/helpers/repository-layout.json` 明确映射。索引只重建路径元数据。新临时预览写到 workspace/previews，不覆盖历史快照。
 
 ## 归属映射
 
 **机器可读的逐 run 归属表是 `index.json`**（由 `scripts/index-experiments.js` 生成）：
 
 ```bash
-npm run index:experiments     # 重新生成 experiments/index.json
+npm run index:experiments     # 重新生成 artifacts/experiments/index.json
 npm run check:experiments     # 校验索引与现状是否一致（漂移则退出 1）
 ```
 

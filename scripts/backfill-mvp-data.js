@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * 一次性数据回填脚本（保留备查）：
  * 为收缩版 MVP 补上 design.summary、models[].role、decisions[].rationaleSummary、
@@ -13,8 +15,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
-const FIXTURE = path.join(ROOT, 'fixtures', 'context-consumption.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const FIXTURE = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.json');
 
 const RATIONALE_SUMMARY = {
   'DEC-001':

@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 08 · L0 View Model Adapter（Phase 1）
  *
@@ -24,7 +26,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = resolveRepositoryPath(__dirname, '..');
 
 /* ------------------------------------------------------------------ *
  * 审阅信息：解析 check-map.txt（**只读文本，不重跑校验**）
@@ -180,15 +182,15 @@ function main() {
   const arg = (n) => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : null; };
   const mapPath = arg('--map');
   if (!mapPath) { console.error('用法: node scripts/l0-view-model.js --map <framework-map.json> [--check <check-map.txt>] [--out <file>]'); process.exit(2); }
-  const map = JSON.parse(fs.readFileSync(path.resolve(ROOT, mapPath), 'utf8'));
+  const map = JSON.parse(fs.readFileSync(resolveRepositoryPath(ROOT, mapPath), 'utf8'));
   const checkPath = arg('--check');
-  const knownRoles = JSON.parse(fs.readFileSync(path.join(ROOT, 'schema/framework-map.schema.json'), 'utf8')).$defs.element.properties.role['x-known-roles'];
+  const knownRoles = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'schema/framework-map.schema.json'), 'utf8')).$defs.element.properties.role['x-known-roles'];
   const vm = buildL0ViewModel(map, {
-    checkMapText: checkPath ? fs.readFileSync(path.resolve(ROOT, checkPath), 'utf8') : null,
+    checkMapText: checkPath ? fs.readFileSync(resolveRepositoryPath(ROOT, checkPath), 'utf8') : null,
     knownRoles,
   });
   const out = arg('--out');
-  if (out) { fs.writeFileSync(path.resolve(ROOT, out), `${JSON.stringify(vm, null, 2)}\n`, 'utf8'); console.log(`wrote ${out}`); }
+  if (out) { fs.writeFileSync(resolveRepositoryPath(ROOT, out), `${JSON.stringify(vm, null, 2)}\n`, 'utf8'); console.log(`wrote ${out}`); }
   else console.log(JSON.stringify(vm.facts, null, 2));
 }
 

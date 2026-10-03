@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Stage 2 的块级验收器：`npm run check-block`
  *
@@ -15,7 +17,7 @@
  *
  * 用法：
  *   node scripts/check-block.js <block.json> --plan <plan.json>
- *   node scripts/check-block.js experiments/stage2/O-04/block.generated.json --plan fixtures/context-consumption.overview-plan.json
+ *   node scripts/check-block.js experiments/stage2/O-04/block.generated.json --plan samples/context-consumption/overview-plan.json
  *
  * 也可作为模块使用：const { checkBlock } = require('./check-block.js')
  */
@@ -25,10 +27,10 @@ const path = require('node:path');
 
 const { validate } = require('../app/shared/schema-validator');
 
-const ROOT = path.resolve(__dirname, '..');
-const DEFAULT_PLAN = path.join(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
-const STAGE2_SCHEMA = path.join(ROOT, 'schema', 'stage2-block.schema.json');
-const SOURCE_SECTIONS = path.join(ROOT, 'docs', 'source-sections.json');
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const DEFAULT_PLAN = joinRepositoryPath(ROOT, 'fixtures', 'context-consumption.overview-plan.json');
+const STAGE2_SCHEMA = joinRepositoryPath(ROOT, 'schema', 'stage2-block.schema.json');
+const SOURCE_SECTIONS = joinRepositoryPath(ROOT, 'docs', 'source-sections.json');
 
 /* ================================================================== *
  * 阈值集中配置
@@ -582,10 +584,10 @@ function parseArgs(argv) {
   const args = { plan: DEFAULT_PLAN, block: null };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === '--plan') {
-      args.plan = path.resolve(ROOT, argv[i + 1]);
+      args.plan = resolveRepositoryPath(ROOT, argv[i + 1]);
       i += 1;
     } else if (!argv[i].startsWith('--')) {
-      args.block = path.resolve(argv[i]);
+      args.block = resolveRepositoryPath(argv[i]);
     }
   }
   return args;

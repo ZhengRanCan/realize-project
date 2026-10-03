@@ -1,0 +1,13 @@
+
+> design-review-mvp@0.1.0 audit
+> node scripts/audit-overview.js
+
+=== Overview 覆盖审计 ===
+区块 21 个 | 承载形式：prose×1, ladder×3, diff×1, flow×3, checklist×7, matrix×3, combo×2, steps×1
+默认展开 10 / 折叠 11
+
+✓ 段落结构正确：what → how → prove → boundary
+✓ 原文 15 节全部被至少一个区块引用
+✓ 全部 12 条 Decision 都能被区块关联
+
+结果：PASSED

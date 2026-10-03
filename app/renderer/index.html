@@ -13,52 +13,36 @@
   <section id="screen-start" class="screen">
     <div class="start-card">
       <h1>Design Review</h1>
-      <p class="muted">
-        把长设计文档转换成有限、明确、可验证、可批准的 Review Objects。
-        当前阶段只读取结构化分析结果，不调用 AI。
-      </p>
-
+      <p class="muted">打开一份分析资料包，先看框架图，再查看解释和出处。</p>
       <div class="start-block">
-        <div class="start-label">Markdown 设计文档（本轮测试样本）</div>
-        <div class="start-row">
-          <button id="btn-pick-markdown" class="btn">选择 Markdown 文件</button>
-          <button id="btn-use-default-markdown" class="btn ghost">使用测试样本</button>
-        </div>
-        <div id="md-info" class="file-hint">尚未选择 Markdown。</div>
-      </div>
-
-      <div class="start-block">
-        <div class="start-label">Source 目录（Phase 3，本轮不启用）</div>
-        <button class="btn" disabled>选择源码目录</button>
-      </div>
-
-      <div class="start-block">
-        <div class="start-label">结构化分析结果</div>
         <button id="btn-open-bundle" class="btn primary">打开分析资料包</button>
-        <p class="file-hint">选择 reading-bundle.json，一并加载框架图、解释和原文。</p>
-        <div class="start-row">
-          <button id="btn-load-fixture" class="btn primary">打开 fixture（context-consumption.json）</button>
-          <button id="btn-open-json" class="btn ghost">打开其他 design-review.json</button>
-        </div>
-        <div id="fixture-info" class="file-hint"></div>
+        <p class="file-hint">选择资料夹中的 reading-bundle.json，一并加载相关材料。</p>
       </div>
-
-      <div class="start-block">
-        <div class="start-label">L0 Framework Map（Feature 08 · deterministic renderer，不调用模型）</div>
-        <div class="start-row">
-          <button id="btn-open-l0" class="btn">打开 framework-map.json</button>
-        </div>
-        <div id="l0-info" class="file-hint">尚未加载 L0 图。</div>
-      </div>
-
       <div id="start-error" class="error-box hidden"></div>
-
-      <details class="start-details">
-        <summary>AI 分析（Phase 2）尚未接入</summary>
-        <p class="muted">
-          先把 Review UI 验证完，再决定是否值得让 AI 生成 <code>design-review.json</code>。
-          本版本只加载已经存在的结构模型，并把它与人工审批状态分离保存。
-        </p>
+      <details id="legacy-entry" class="start-details">
+        <summary>开发与旧版入口</summary>
+        <p class="muted">用于测试样本和单独文件的兼容检查。</p>
+        <div class="start-block">
+          <div class="start-label">测试原文</div>
+          <div class="start-row">
+            <button id="btn-pick-markdown" class="btn ghost">选择 Markdown 文件</button>
+            <button id="btn-use-default-markdown" class="btn ghost">使用测试样本</button>
+          </div>
+          <div id="md-info" class="file-hint">尚未选择 Markdown。</div>
+        </div>
+        <div class="start-block">
+          <div class="start-label">单独审阅文件</div>
+          <div class="start-row">
+            <button id="btn-load-fixture" class="btn ghost">打开标准测试样本</button>
+            <button id="btn-open-json" class="btn ghost">打开 design-review.json</button>
+          </div>
+          <div id="fixture-info" class="file-hint"></div>
+        </div>
+        <div class="start-block">
+          <div class="start-label">单独框架图</div>
+          <button id="btn-open-l0" class="btn ghost">打开 framework-map.json</button>
+          <div id="l0-info" class="file-hint">尚未加载框架图。</div>
+        </div>
       </details>
     </div>
   </section>

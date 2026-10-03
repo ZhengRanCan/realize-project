@@ -39,3 +39,7 @@ Thumbs.db
 
 /bundles/*
 !/bundles/README.md
+
+# F22 本地资料与参考材料；只跟踪使用说明
+/workspace/*
+!/workspace/README.md

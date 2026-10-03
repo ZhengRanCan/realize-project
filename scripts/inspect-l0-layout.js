@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+const {joinRepositoryPath,resolveRepositoryPath,repositoryPath,repositoryRelative}=require('./helpers/repository-layout');
+
 /**
  * Feature 08 · Phase 4.1 · 用文字看布局（不开 GUI 就能核对"第一眼看到什么"）
  *
@@ -19,8 +21,8 @@ const path = require('node:path');
 const { buildL0ViewModel } = require('./l0-view-model.js');
 const { computeL0Layout } = require('../app/renderer/l0-layout.js');
 
-const ROOT = path.resolve(__dirname, '..');
-const SCHEMA = JSON.parse(fs.readFileSync(path.join(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
+const ROOT = resolveRepositoryPath(__dirname, '..');
+const SCHEMA = JSON.parse(fs.readFileSync(joinRepositoryPath(ROOT, 'schema/framework-map.schema.json'), 'utf8'));
 const roles = SCHEMA.$defs.element.properties.role['x-known-roles'];
 
 const DEFAULT = [
@@ -30,8 +32,8 @@ const DEFAULT = [
 
 const targets = process.argv.slice(2).length ? process.argv.slice(2) : DEFAULT;
 for (const rel of targets) {
-  const abs = path.isAbsolute(rel) ? rel : path.join(ROOT, rel);
-  const checkPath = path.join(path.dirname(abs), 'check-map.txt');
+  const abs = path.isAbsolute(rel) ? rel : joinRepositoryPath(ROOT, rel);
+  const checkPath = joinRepositoryPath(path.dirname(abs), 'check-map.txt');
   const vm = buildL0ViewModel(JSON.parse(fs.readFileSync(abs, 'utf8')), {
     checkMapText: fs.existsSync(checkPath) ? fs.readFileSync(checkPath, 'utf8') : null,
     knownRoles: roles,
