@@ -114,7 +114,7 @@
   {
     "id": "F18",
     "title": "L3 Inspector (traceability without verification)",
-    "status": "active",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F18-l3-inspector",
     "version": "v0.1"
   },

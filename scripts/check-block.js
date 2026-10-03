@@ -274,6 +274,18 @@ function loadJson(file) {
  * @param {object} [options] { allowedPhrases?: Set, sourceText?: string }
  * @returns {{verdict:'PASS'|'PASS WITH WARNINGS'|'FAIL', errors:string[], warnings:string[], coverage:object, elements:Array}}
  */
+function cardinalityErrors(schema,value,definitions,where='$') {
+  if(schema.$ref) return cardinalityErrors(definitions[schema.$ref.split('/').pop()],value,definitions,where);
+  const errors=[];
+  if(Array.isArray(value)) {
+    if(schema.minItems!==undefined && value.length<schema.minItems) errors.push(`${where}: 数组长度必须 >= ${schema.minItems}`);
+    if(schema.maxItems!==undefined && value.length>schema.maxItems) errors.push(`${where}: 数组长度必须 <= ${schema.maxItems}`);
+    if(schema.items) value.forEach((item,index)=>errors.push(...cardinalityErrors(schema.items,item,definitions,`${where}[${index}]`)));
+  }else if(value && typeof value==='object') {
+    for(const [key,child]of Object.entries(schema.properties||{})) if(key in value) errors.push(...cardinalityErrors(child,value[key],definitions,`${where}.${key}`));
+  }
+  return errors;
+}
 function checkBlock(block, plan, options = {}) {
   const errors = [];
   const warnings = [];
@@ -313,6 +325,7 @@ function checkBlock(block, plan, options = {}) {
   if (branch) {
     const selected=validate({...branch,definitions:schema.definitions}, {shape:block.shape,content:block.content});
     selected.errors.forEach(e=>structureFail('[schema] '+e));
+    cardinalityErrors(branch,{shape:block.shape,content:block.content},schema.definitions).forEach(e=>structureFail('[schema] '+e));
   }
   if(!schemaResult.valid || (branch && validate({...branch,definitions:schema.definitions}, {shape:block.shape,content:block.content}).valid===false)) {
     if(block.content?.type && SHAPE_TO_CONTENT_TYPE[block.shape]!==block.content.type) structureFail('[shape] shape 与 content.type 不一致');

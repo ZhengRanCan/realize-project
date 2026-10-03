@@ -3,7 +3,7 @@
 ## Status and Authority
 
 - Date: 2026-10-03.
-- Status: Approved；用户于 2026-10-03 认可当前设计。实施计划待审阅，产品代码尚未修改。
+- Status: Approved；用户于 2026-10-03 认可设计和实施计划，选择 Native 顺序实施与末尾独立审查。实现结果见 verification-summary。
 - Owner: F18；包含使 F18 能运行的 F16 输入补齐，不扩展到 F19 / F20。
 - 本文件是实施设计稿，不是第二份 Reading 规范。认知规则仍以
   [Reading Cognitive Contract](../../../specs/reading-view-cognitive-contract.md) 与
@@ -216,4 +216,4 @@ F19 继续等待 F18；F20 / F21 保留各自范围。本轮不把既有 F16 证
 - [x] 规范、设计、执行记录各有唯一归属；不额外铺开文档体系。
 - [x] 真实操作和跨包负向路径列入验收，不仅测试 helper。
 - [x] 用户完成本文件审阅（2026-10-03：“看着暂时没有问题。”）。
-- [ ] 审阅[实施计划](drafts/implementation-plan.md)并选择执行方式；随后进入开发。
+- [x] 审阅[实施计划](drafts/implementation-plan.md)并选择 Native（2026-10-03）；实施与独立审查已完成。

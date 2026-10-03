@@ -10,7 +10,7 @@
 
 **Spec:** [Approved design](../runtime-bundle-design.md)，2026-10-03 用户认可其当前版本。
 
-**Status:** Approved；用户于 2026-10-03 选择当前会话按项目现有流程顺序实施，末尾独立审查。
+**Status:** Completed；用户于 2026-10-03 批准 Native；六项任务完成，独立复查通过。
 
 ## Global Constraints
 
@@ -69,8 +69,8 @@ Modify `scripts/{check-map,check-plan,check-block,check-overview,extract-source-
 **Consumes:** 现有 parser、Schema、validator 的规则与 CLI 输出；已批准设计。
 **Produces:** 上述 source/validator API；F18 扩展 scope 与明确验收命令。所有后续文件提前登记在合同。
 
-- [ ] **Step 1: 更新 F18 合同及 runtime-input incident。** 将 F18 置为唯一 active；登记全计划 scope、两条核查路径与对应测试命令。将新清单规范登记为单一 authority；主契约只预留实际证据更新位置。
-- [ ] **Step 2: 写 source 与可复用 validator 的失败测试。** 用原生 assert 注册下列独立用例：
+- [x] **Step 1: 更新 F18 合同及 runtime-input incident。** 将 F18 置为唯一 active；登记全计划 scope、两条核查路径与对应测试命令。将新清单规范登记为单一 authority；主契约只预留实际证据更新位置。
+- [x] **Step 2: 写 source 与可复用 validator 的失败测试。** 用原生 assert 注册下列独立用例：
   - `fence-headings-ignored`：三个/四个反引号与波浪围栏里的 # 不进入 heading tree。
   - `heading-range-and-alias`：无编号 Goal / 4.1 标题与旧 §N alias 的坐标空间分开；不搜索 statement 造 exactLine。
   - `ambiguous-heading-not-first-match`：相同 heading key 报告不可唯一解析，不能选第一条。
@@ -83,12 +83,12 @@ Modify `scripts/{check-map,check-plan,check-block,check-overview,extract-source-
   assert.equal(registry.headings.length, 1);
   assert.equal(resolveSourceCoordinate(registry, {namespace: 'heading', key: 'Goal'}).state, 'known');
   ```
-- [ ] **Step 3: 执行新增测试，确认因上述 API 尚不存在而失败。** Run `node scripts/test-source-coordinates.js`。
-- [ ] **Step 4: 实现 source API 并把 check-map / legacy extract-source-sections 接到同一语法感知 parser。** 默认旧 source 输出须逐字段保持等价；新的 registry 才带 headings/hash/version。
-- [ ] **Step 5: 抽取 validator 的显式 context 入口。** 保留旧命令默认路径和报告文本；check-plan 增加 `--design` / `--source-sections` / `--source`，check-overview 增加后二者。不得用 verdict 文本解析分类结构错误。
+- [x] **Step 3: 执行新增测试，确认因上述 API 尚不存在而失败。** Run `node scripts/test-source-coordinates.js`。
+- [x] **Step 4: 实现 source API 并把 check-map / legacy extract-source-sections 接到同一语法感知 parser。** 默认旧 source 输出须逐字段保持等价；新的 registry 才带 headings/hash/version。
+- [x] **Step 5: 抽取 validator 的显式 context 入口。** 保留旧命令默认路径和报告文本；check-plan 增加 `--design` / `--source-sections` / `--source`，check-overview 增加后二者。不得用 verdict 文本解析分类结构错误。
   两个 CLI 共用 normalizeGeneratedBlock；对现有 Schema 中 validator 尚不支持的 oneOf 分支，显式校验当前 content.type 对应结构并添加拒绝坏内容的用例，不声称未执行的 Schema 分支已通过，不开展通用 Schema 引擎重写。
-- [ ] **Step 6: 执行 source、plan/block/map 既有测试。** Run `node scripts/test-source-coordinates.js`、`npm run test:plan`、`npm run test:block`、`npm run test:map`；全部通过且旧 gold verdict 不变。
-- [ ] **Step 7: 提交本任务文件。** Message `refactor: share explicit Reading validation contexts`。
+- [x] **Step 6: 执行 source、plan/block/map 既有测试。** Run `node scripts/test-source-coordinates.js`、`npm run test:plan`、`npm run test:block`、`npm run test:map`；全部通过且旧 gold verdict 不变。
+- [x] **Step 7: 提交本任务文件。** Message `refactor: share explicit Reading validation contexts`。
 
 ## Task 2: Portable Bundle Export and Read
 
@@ -98,7 +98,7 @@ Modify `scripts/assemble-overview.js`、`package.json`、`.gitignore`、bundle c
 **Consumes:** Task 1 source/validator API；现有 Schema validator 与 review-model semanticCheck。
 **Produces:** 离线完整 bundle；readReadingBundle / validateBundleData API。
 
-- [ ] **Step 1: 写 bundle 正常和负向测试。** 用 makeBundleFixture 的临时副本分别证明：
+- [x] **Step 1: 写 bundle 正常和负向测试。** 用 makeBundleFixture 的临时副本分别证明：
   - 打开一份清单，读齐 21 Plan Block / 87 SU；复制到含中文与空格的新目录后仍加载。
   - Map document.id 与 Review design.id 不同但各自匹配 bindings 时通过；仅相同标题不建立关联。
   - 必填文件缺失、JSON 坏、未知版本、坏 SHA、Plan fingerprint 错、重复/悬空 ID 失败。
@@ -116,16 +116,16 @@ Modify `scripts/assemble-overview.js`、`package.json`、`.gitignore`、bundle c
   bad.manifest.bundleVersion = 99;
   assert.ok(validateBundleData(bad).errors.length > 0);
   ```
-- [ ] **Step 2: Run `node scripts/test-reading-bundle.js` 确认尚缺实现而失败。**
-- [ ] **Step 3: 实现清单和纯 validation。** Schema 使用现有 validator 确实支持的 keyword；版本1固定字段为 analysisId/bindings/files。
+- [x] **Step 2: Run `node scripts/test-reading-bundle.js` 确认尚缺实现而失败。**
+- [x] **Step 3: 实现清单和纯 validation。** Schema 使用现有 validator 确实支持的 keyword；版本1固定字段为 analysisId/bindings/files。
   每个不可变 file 条目为 `{path,sha256}`；required source/designReview/plan/sourceSections，optional generated/frameworkMap。
   清单必须含 bundleVersion:1；定位以 realpath 后的分析目录为根；不读取内部 producer path。compare namespace-local binding 和生成 Plan hash，不能把 Map ID 与 Review ID 合并。
-- [ ] **Step 4: 实现 readReadingBundle 与 exporter。** 原始 Plan/Generated/Review/Map 字节原样复制；从实际 source snapshot 派生 registry；在同父临时目录校验与 read-back 后 rename 到未存在的 out。
+- [x] **Step 4: 实现 readReadingBundle 与 exporter。** 原始 Plan/Generated/Review/Map 字节原样复制；从实际 source snapshot 派生 registry；在同父临时目录校验与 read-back 后 rename 到未存在的 out。
   清理临时目录前检查绝对路径在本任务 staging parent 内；不清理旧 out，不导出 API credentials 或 human-review。
-- [ ] **Step 5: 给 assembler 增加显式 bundle 选项。** `--bundle-out <dir> --source <md> --map <json> --analysis-id <id>` 复用 exporter；design/plan/generated 使用已有装配参数和 out。
+- [x] **Step 5: 给 assembler 增加显式 bundle 选项。** `--bundle-out <dir> --source <md> --map <json> --analysis-id <id>` 复用 exporter；design/plan/generated 使用已有装配参数和 out。
   不提供 bundle-out 时保持旧行为。独立 CLI 使用 `npm run export:bundle -- --source ... --design ... --plan ... --generated ... --map ... --out ... --analysis-id ...`。
-- [ ] **Step 6: Run bundle suite 与 `npm run check-overview`。** 前者通过；后者仍保留旧管线判据。新增套件接入 test:all，新增 `/bundles/` ignore。
-- [ ] **Step 7: 提交本任务文件。** Message `feat: export and validate portable Reading bundles`。
+- [x] **Step 6: Run bundle suite 与 `npm run check-overview`。** 前者通过；后者仍保留旧管线判据。新增套件接入 test:all，新增 `/bundles/` ignore。
+- [x] **Step 7: 提交本任务文件。** Message `feat: export and validate portable Reading bundles`。
 
 ## Task 3: Plan-based L2 and L3 Projection
 
@@ -135,7 +135,7 @@ Create `scripts/test-reading-bundle-projection.js`；更新 package.json 套件�
 **Consumes:** Task 2 validated bundle；Task 1 normalization / collectElements / source coordinate APIs。
 **Produces:** projectReadingBundle、扩展 projectTopic、projectL3 API；三种投影均不做文件 I/O。
 
-- [ ] **Step 1: 写真实 gold 与最小 counterexample 的 projection 失败测试。**
+- [x] **Step 1: 写真实 gold 与最小 counterexample 的 projection 失败测试。**
   - `plan-subject-survives-missing`：Generated 删除 O-01 后仍有 `O-01`，state=missing，coverage=unavailable；完全没提供 generated 则 unknown。
   - `stage-partial-order`：打乱 Plan 与 Generated 数组，仍 what/how/prove/boundary；同 stage 排列只作 layout，不渲染 Next/1/2 阅读承诺。
   - `plan-authority-not-generated`：title/stage/shape/covers 等来自 Plan，禁止让 Generated 的同名字段覆盖。
@@ -153,14 +153,14 @@ Create `scripts/test-reading-bundle-projection.js`；更新 package.json 套件�
   assert.deepEqual(projectL3({blockId: 'O-01'}, input).claimVerification,
     {space: 'CapabilityAvailability', state: 'absent'});
   ```
-- [ ] **Step 2: Run `node scripts/test-reading-bundle-projection.js`，确认缺少新 API 而失败。**
-- [ ] **Step 3: 实现 L2 与 L1 扩展。** 新 L2 返回 renderer-compatible sections；明确 generatedExpression 标签 unknown/missing/present。
+- [x] **Step 2: Run `node scripts/test-reading-bundle-projection.js`，确认缺少新 API 而失败。**
+- [x] **Step 3: 实现 L2 与 L1 扩展。** 新 L2 返回 renderer-compatible sections；明确 generatedExpression 标签 unknown/missing/present。
   realizedCoverage 是 unavailable/not-applicable/available 独立 tagged capability，集合由既有 collectElements 规则计算；不落盘比例。
   sources 源于 Plan；Known links 含 relation=related-to；旧 projectL2Overview 与二参数 projectTopic 保持测试兼容。
-- [ ] **Step 4: 实现 L3 projection。** 解析 sourceUnits 与各 review bucket；缺少 carrier 不补 null，required evidence 缺席交由结构校验拒绝。
+- [x] **Step 4: 实现 L3 projection。** 解析 sourceUnits 与各 review bucket；缺少 carrier 不补 null，required evidence 缺席交由结构校验拒绝。
   未分类字段保持 ProvenanceAssurance=indeterminate；可用 section 仅含范围坐标。收集 fragments 使用共享 walker，不建另一套 coverage 规则。
-- [ ] **Step 5: Run 新 suite 与 F13/F14/F15/F16/F17/F18 suites。** 执行 `test-reading-projection`、`test-reading-adversarial`、`test-reading-integration`、`test-reading-runtime`、`test-l1-topic-projection`、`test-l3-inspector-projection` 各 Node 脚本；全部通过。
-- [ ] **Step 6: 提交本任务文件。** Message `feat: project Plan-based Reading and L3 inspection`。
+- [x] **Step 5: Run 新 suite 与 F13/F14/F15/F16/F17/F18 suites。** 执行 `test-reading-projection`、`test-reading-adversarial`、`test-reading-integration`、`test-reading-runtime`、`test-l1-topic-projection`、`test-l3-inspector-projection` 各 Node 脚本；全部通过。
+- [x] **Step 6: 提交本任务文件。** Message `feat: project Plan-based Reading and L3 inspection`。
 
 ## Task 4: Transactional Session and Map-first Entry
 
@@ -171,7 +171,7 @@ Create `app/main/reading-session.js`、`scripts/test-reading-session.js`；modif
 **Produces:** `bundle:open` / `bundle:loadPath` 准备 IPC、`bundle:commit` / `bundle:discard` IPC；preload `bundle.open()` / `bundle.loadPath(path)` / `bundle.commit({requestToken})` / `bundle.discard({requestToken})`。
 准备结果含 requestToken 和候选 loadResult；只有 commit 成功才应用新 loadResult，含 sessionToken、bundleInfo、L0/L1/L2 projection 和当前包 humanReviewPath。
 
-- [ ] **Step 1: 写 session 测试。** prepareReadingSession / controller.prepare 只准备；controller.commit(requestToken) 才更新 state。
+- [x] **Step 1: 写 session 测试。** prepareReadingSession / controller.prepare 只准备；controller.commit(requestToken) 才更新 state。
   包 A/B 的 SU 标签相同但 source text 和 review 状态不同，切换后只见 B；加载失败或取消保留 A 及 dirty 审核；A 慢 B 快时过期 requestToken 不提交。
   human-review 读取仅限当前包路径；存在 designId 与当前 Review 不一致则拒绝；不写任何人工文件。
   最小断言（bundleA / bundleB 为临时目录中两份不同来源的合法包）：
@@ -186,15 +186,15 @@ Create `app/main/reading-session.js`、`scripts/test-reading-session.js`；modif
   assert.equal(controller.current().sessionToken, tokenA);
   assert.equal(controller.commit(b.requestToken).ok, false);
   ```
-- [ ] **Step 2: Run `node scripts/test-reading-session.js`，确认缺少 session API 而失败。**
-- [ ] **Step 3: 实现 preparation / commit 与 IPC。** 使用递增 requestToken，bundle sessionToken 唯一；load失败不调用commit。
+- [x] **Step 2: Run `node scripts/test-reading-session.js`，确认缺少 session API 而失败。**
+- [x] **Step 3: 实现 preparation / commit 与 IPC。** 使用递增 requestToken，bundle sessionToken 唯一；load失败不调用commit。
   renderer 先完成 dirty 审核的取舍，再请求 commit；放弃切换则 discard。新请求使旧 prepare/commit 无效，主进程与 renderer 不得在用户放弃切换后分属不同的包。
   读取当前包 human-review 后复用 skeleton 合并。正常保存复用既有人工点击路径，默认目标为当前包 human-review.json；旧 legacy 路径仍按原规则。
-- [ ] **Step 4: 接入首屏“打开分析资料包”和 applyLoadResult。** 成功包有 Map 时 state.view=l0；无 Map 显式说明缺失并提供用户可选的独立 Block 视图。
+- [x] **Step 4: 接入首屏“打开分析资料包”和 applyLoadResult。** 成功包有 Map 时 state.view=l0；无 Map 显式说明缺失并提供用户可选的独立 Block 视图。
   重置旧 source cache、Map、Topic、L3 和 selection；取消/失败不清空。成功切换且已有 dirty 审核时先让用户选择保留当前阅读或放弃未保存改动，不能自动保存。
-- [ ] **Step 5: 接入 L1 明确的 Block 入口。** 边界展示不依赖 blockIds；Unknown 和 empty 提示不同；known blockEntries 点击到已有 #block-id 并记录局部 origin。保留文档身份，不增加 Topic canonical resolver。
-- [ ] **Step 6: Run session suite 与 Electron selftest。** 新 selftest 通过真实 bundle.loadPath；证明默认框架图、主题边界、明确 Block 入口、坏包保留当前 state，以及没有自动生成 human-review。
-- [ ] **Step 7: 提交本任务文件。** Message `feat: open Reading bundles as isolated Map-first sessions`。
+- [x] **Step 5: 接入 L1 明确的 Block 入口。** 边界展示不依赖 blockIds；Unknown 和 empty 提示不同；known blockEntries 点击到已有 #block-id 并记录局部 origin。保留文档身份，不增加 Topic canonical resolver。
+- [x] **Step 6: Run session suite 与 Electron selftest。** 新 selftest 通过真实 bundle.loadPath；证明默认框架图、主题边界、明确 Block 入口、坏包保留当前 state，以及没有自动生成 human-review。
+- [x] **Step 7: 提交本任务文件。** Message `feat: open Reading bundles as isolated Map-first sessions`。
 
 ## Task 5: Source and L3 Inspection Interaction
 
@@ -205,7 +205,7 @@ Tests: main.js Electron selftest 中的真实下钻断言；`scripts/test-l3-ins
 **Produces:** preload `bundle.inspect({sessionToken,blockId,fragmentPath?})` 返回 `{ok,sessionToken,viewModel?,errors?}`；`bundle.source({sessionToken,namespace,key})` 返回 `{ok,sessionToken,coordinate,integrity}`。
 对应 IPC 为 bundle:inspect / bundle:source；coordinate 遵守 Task 1 known/unknown/unavailable 输出，integrity 为 consistent/drifted/unavailable。可从 Block 或本次渲染 fragment 打开的 inspection 面板；按当前包 namespace 解析的 Source。
 
-- [ ] **Step 1: 在 Electron selftest 增加当前失败的路径测试。** 打开包→Map→Topic→Block→查出处→SU→section；另展开 review object Evidence；片段只保持父 O-xx。
+- [x] **Step 1: 在 Electron selftest 增加当前失败的路径测试。** 打开包→Map→Topic→Block→查出处→SU→section；另展开 review object Evidence；片段只保持父 O-xx。
   关闭后 scrollTop、blockExpanded、origin view/topicId 恢复；包切换后旧 inspection 回复被忽略。keyboard Enter/Space 与 Close/Back 均覆盖。
   IPC 输出在真实 preload 调用中断言（token 为成功提交后的 sessionToken；原文逐字匹配 fixture 的 section，不搜 statement）：
   ```js
@@ -216,16 +216,16 @@ Tests: main.js Electron selftest 中的真实下钻断言；`scripts/test-l3-ins
   assert.deepEqual(reply.viewModel.claimVerification, {space: 'CapabilityAvailability', state: 'absent'});
   ```
   preload 在现有 designReview 对象下增加 bundle 分组；该断言不能代替本步骤的 DOM 点击、键盘和返回操作。
-- [ ] **Step 2: Run `npm run selftest`，确认新 UI / IPC 断言失败。**
-- [ ] **Step 3: 实现 inspect / source IPC。** 拒绝与当前 state 不匹配的 sessionToken，拒绝未知 block/fragmentPath；source/registry 指纹或 range/text 漂移时返回坐标 unavailable 与明确 integrity 提示，保留 parent subject。
+- [x] **Step 2: Run `npm run selftest`，确认新 UI / IPC 断言失败。**
+- [x] **Step 3: 实现 inspect / source IPC。** 拒绝与当前 state 不匹配的 sessionToken，拒绝未知 block/fragmentPath；source/registry 指纹或 range/text 漂移时返回坐标 unavailable 与明确 integrity 提示，保留 parent subject。
   legacy source:load 维持旧入口；bundle Source 走当前 session，不读取全仓库固定 registry。读取与检查放在 main，UI 不决定解析关系。
-- [ ] **Step 4: 实现纯 DOM L3 面板与入口。** 分开呈现 traceability / reviewContext / generationContext，Evidence 只在父对象内展开。
+- [x] **Step 4: 实现纯 DOM L3 面板与入口。** 分开呈现 traceability / reviewContext / generationContext，Evidence 只在父对象内展开。
   fragmentEntries 的 path 作为临时数据属性连接已渲染片段与 inspect 请求；不产生 #fragment 路由或保存字段。
   使用 textContent/已有 escaping 展示内容，不把原文或 review 字符串注入 innerHTML。
-- [ ] **Step 5: 实现 origin 恢复与状态 disclosure。** 保存本次 view/topic/block/scroll/expanded，关闭恢复该快照；不调用 canonical resolver。
+- [x] **Step 5: 实现 origin 恢复与状态 disclosure。** 保存本次 view/topic/block/scroll/expanded，关闭恢复该快照；不调用 canonical resolver。
   原文来源只说明 section range；生成 warning 与 Evidence 级别分开显示；Unknown/Missing/empty/indeterminate/absent 有不同结构状态。
-- [ ] **Step 6: Run `npm run selftest` 与 L3 suite。** 完整路径通过；approved、generation PASS/FAIL 或 Evidence type 没有产生 claim-level verified 字段或汇总 badge。
-- [ ] **Step 7: 提交本任务文件。** Message `feat: inspect Block and fragment provenance with source context`。
+- [x] **Step 6: Run `npm run selftest` 与 L3 suite。** 完整路径通过；approved、generation PASS/FAIL 或 Evidence type 没有产生 claim-level verified 字段或汇总 badge。
+- [x] **Step 7: 提交本任务文件。** Message `feat: inspect Block and fragment provenance with source context`。
 
 ## Task 6: Shared Preview, Documentation and Acceptance
 
@@ -235,22 +235,22 @@ Create `scripts/test-reading-bundle-preview.js`。必要时调整 `.gitignore` �
 **Consumes:** 前五项的已验证 bundle、projection、renderer 和 IPC response shapes。
 **Produces:** 共用的 Preview 注入、用户示例包、集中入口说明、独立审查与范围真实的 F18 完成证据。
 
-- [ ] **Step 1: 写 Preview 的失败测试。** `build-preview --bundle <manifest> --out <html>` 注入同一 load result；默认 Map，inspect/Source 在宿主 shim 内消费同份 snapshot，保存审核不可用。
+- [x] **Step 1: 写 Preview 的失败测试。** `build-preview --bundle <manifest> --out <html>` 注入同一 load result；默认 Map，inspect/Source 在宿主 shim 内消费同份 snapshot，保存审核不可用。
   legacy --overview 仍可生成，并通过 projectReadingBundle 或明确的 legacy adapter 交给同一 renderer；脚本目录相对链接在移动输出位置后正确。
   在既有 Electron --verify-preview 路径添加结构断言：新包首屏 view=l0，DOM 点查出处后 inspector 的 blockId=O-01；Source 与包内快照逐字一致，claimVerification.state=absent；移动输出 HTML 后重复相同操作。预览行为需在真实页面执行，不能仅搜索生成 HTML 的字符串。
-- [ ] **Step 2: Run `node scripts/test-reading-bundle-preview.js`，确认新 bundle 参数未实现而失败。**
-- [ ] **Step 3: 实现 Preview 宿主适配。** 嵌入已验证数据与 L3 projection 的同一实现结果，复用 l3-inspector.js；不复制 relation/source/verification 逻辑。
+- [x] **Step 2: Run `node scripts/test-reading-bundle-preview.js`，确认新 bundle 参数未实现而失败。**
+- [x] **Step 3: 实现 Preview 宿主适配。** 嵌入已验证数据与 L3 projection 的同一实现结果，复用 l3-inspector.js；不复制 relation/source/verification 逻辑。
   若引用内容无 Known namespace，则展示不可解析状态，不能因预览环境没有文件系统就兜底成成功。
-- [ ] **Step 4: 导出实际示例并整理文档。** 从现有 gold + stage2-full + Fixture A Map 明确导出 bundles/context-consumption/<analysis-id>/，原始资料不变。
+- [x] **Step 4: 导出实际示例并整理文档。** 从现有 gold + stage2-full + Fixture A Map 明确导出 bundles/context-consumption/<analysis-id>/，原始资料不变。
   bundles/README 只说明目录与打开方式；字段规则只在 bundle contract；ARCHITECTURE/初始化/根 README 路由到唯一正文。
   当前 Source registry 路径区分 legacy 固定路径与包内实例；历史 Path mapping 和实验记录保留。
-- [ ] **Step 5: 跑约定回归。** 新六类 suites 全部加入 test:all；执行 `npm run test:all`、`npm run selftest`、`npm run check-overview`、`npm run check:docs`、`npm run check:experiments`、`npm run verify:harness`、相关 node --check。
+- [x] **Step 5: 跑约定回归。** 新六类 suites 全部加入 test:all；执行 `npm run test:all`、`npm run selftest`、`npm run check-overview`、`npm run check:docs`、`npm run check:experiments`、`npm run verify:harness`、相关 node --check。
   收集输出在 F18 artifacts；不用实验 AI 命令，不把 metadata 全绿当作产品路径证明。
-- [ ] **Step 6: 独立审查并修复有证据的发现。** native 执行时用一个独立 reviewer 检查整轮 diff、namespace/降级/跨包路径、导出不覆盖与证据完整性；审查结果记录 subagent-review.md。
+- [x] **Step 6: 独立审查并修复有证据的发现。** native 执行时用一个独立 reviewer 检查整轮 diff、namespace/降级/跨包路径、导出不覆盖与证据完整性；审查结果记录 subagent-review.md。
   reviewer 使用可用的受信默认代理，不把私有项目发送给外部 DeepSeek；审查失败要报告并处理，不能伪造记录。
-- [ ] **Step 7: 完成验收记录与状态。** 只有新路径、必要人工或真实集成证据、独立审查和 harness 门禁均满足才同步 F18 passing。
+- [x] **Step 7: 完成验收记录与状态。** 只有新路径、必要人工或真实集成证据、独立审查和 harness 门禁均满足才同步 F18 passing。
   F19 的前置完成不等于 F19 已实现；F15/F20/F21 状态不提前改为 passing。更新 §6 对应 cell，注明实际保护边界。
-- [ ] **Step 8: 提交本任务文件。** Message `test: verify Reading bundle inspection and document its layout`。
+- [x] **Step 8: 提交本任务文件。** Message `test: verify Reading bundle inspection and document its layout`。
 
 ## Self-review
 
@@ -258,7 +258,7 @@ Create `scripts/test-reading-bundle-preview.js`。必要时调整 `.gitignore` �
 - [x] 新文件与职责、调用方参数、结果字段、测试命令和成功条件已明确。
 - [x] 旧 CLI / projector / 独立 L0 与人工保存路径有回归保护；不把当前历史证据改写成新验收。
 - [x] 五条 Review Focus 已落到各自任务测试；不复用未知或不同命名空间的引用。
-- [x] 计划没有实现完整函数体或另外增加一个文档体系；本目录 drafts 表示尚未审阅的计划。
+- [x] 计划没有实现完整函数体或另外增加一个文档体系；本目录保留原计划路径，当前版本已获批准并完成。
 - [x] 用户完成计划审阅并选择 Native，按本项目现有 harness 顺序实施（2026-10-03）。
 
 ## Execution Handoff
@@ -268,3 +268,10 @@ Create `scripts/test-reading-bundle-preview.js`。必要时调整 `.gitignore` �
 本机已搜索 skill 目录、plugin cache 和常见共享 skill 目录，尚未发现 header 指定的两个 superpowers 执行技能。
 如果采用 Native，可由用户明确选择“按本项目现有 harness 在当前会话直接实现”作为替代执行方式；
 否则需要先补齐所选执行技能。不会静默声称已使用不存在的技能。
+
+## Execution Record
+
+- Tasks 1–3 分别提交为 96fe527 / 4af0ac8 / c04a876；Task 4/5 共享接口紧密耦合，一并提交为 9599bf3。
+- Task 6 包含便携 Preview、文档、最终验证，以及独立审查后修正。新增保存 writer 专门绑定原 session。
+- Stage2 展示 variant 和矩阵列写法对齐既有词汇表/renderer；补充严格分支 cardinality，不改历史原始产物。
+- 原生独立代理只读复查；未向外部 DeepSeek 传送项目源码。结果与回归见 verification-summary / subagent-review。

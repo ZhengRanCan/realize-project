@@ -11,16 +11,21 @@ Task 2–6 的具体输入和命令见 `docs/log/artifacts/F18-l3-inspector/draf
 
 | Layer | Command | Required | Evidence |
 | --- | --- | --- | --- |
-| L1 static | `node --check app/renderer/app.js app/renderer/l0-map.js app/main/main.js` | yes | command output |
+| L1 static | 对本轮每个 JS 文件分别执行 `node --check` | yes | artifact logs/static.txt |
 | L2 feature | L3 降级与两条路径的**结构级**断言（禁止 `Verified` 的出现必须断在结构上，不是字符串） | yes | 结构断言全绿 |
+| L2 regression | `npm run test:all` | yes | 既有套件、新 bundle / session / projection / Preview 全绿 |
 | L3 system | `npm run selftest` | yes — `completionGate.l3 = required` | Electron 内从 Block 往下核查的集成断言 |
+| Compatibility | `npm run check-overview` | yes | 原始 Generated verdict 与 warning 保留 |
+| Documentation | `npm run check:docs` / `npm run check:experiments` | yes | 文档与历史实验索引一致 |
 | Harness | `npm run verify:harness` | yes before `passing` | command output |
 
-## Manual paths
+## User Paths
 
-- [ ] 从一个 Block 走到 `SU → §N → 原文 section`，确认只到 section range。
-- [ ] 从同一个 Block 走到 `review object → evidence`，确认两条路径没有被连成一条。
-- [ ] 确认界面**没有任何** claim-level 的 Verified / Unverified 结论。
+以下由真实 Electron preload / IPC / renderer 集成操作完成，未记为用户手工验收。
+
+- [x] 从一个 Block 走到 `SU → §N → 原文 section`，确认只到 section range。
+- [x] 从同一个 Block 走到 `review object → evidence`，确认两条路径没有被连成一条。
+- [x] 确认 claim carrier 结构为 absent，界面不创建 claim-level 结论。
 
 ## Passing evidence
 

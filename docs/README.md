@@ -25,9 +25,11 @@ docs/
 | `docs/notes/**` | 背景材料、讨论稿、改进建议 | 任何被代码或校验器依赖的规则 |
 | `docs/log/artifacts/Fxx-*/` | 该 feature 的验收证据、历史任务书与结果 | 下一个 feature 的上下文 |
 | `experiments/**` | 原始 run 产物与实验报告（逐 run → feature 的归属表见 `experiments/index.json`） | 产品运行时会读取的数据 |
+| `bundles/<document>/<analysis>/` | 原文、坐标、Review、Plan 与可选 Generated/Map 的运行时副本；用户保存的审核 | 原始实验记录、规范与开发日志 |
 
-`docs/source-sections.json` 是唯一的例外：它由 `npm run source` 生成，但 `app/main/main.js` 与多个
-`scripts/check-*.js` 直接按这个路径读取，因此**保留在 `docs/` 根目录**，不迁进 `docs/specs/`。
+`docs/source-sections.json` 保留旧 fixture / CLI 的固定入口；资料包模式使用本分析目录的坐标副本。
+新资料包的目录说明见 [Reading Bundles](../bundles/README.md)，输入协议见
+[Reading Bundle Contract](specs/reading-bundle-contract.md)。历史实验不搬迁，exporter 复制明确选择的输入。
 
 ## Path mapping
 

@@ -1,0 +1,80 @@
+
+> design-review-mvp@0.1.0 selftest
+> electron . --selftest
+
+
+
+===== SELFTEST =====
+✓ fixture 加载: decisions=12 gaps=6 openQuestions=10
+✓ L2 projection 已由主进程生成（21 个 block）
+✓ reviewLevel 分布: root=4 supporting=7 derived=1
+✓ Question 类别: blocking=6（architecture/implementation）, 非阻塞=4（deferred/research）
+✓ 初始 Gate=BLOCKED (18 项，其中 blocking question 6 项)
+✓ Gate 的 blocking question 数与类别判定一致
+✓ preload API 已在渲染进程暴露
+✓ Mermaid 已随包加载（离线可用）
+✓ 页面五个核心区域容器存在
+✓ 渲染进程可通过 IPC 加载 fixture
+✓ fixture 已进入 Review UI（导航项已渲染）
+✓ 一级导航有三个页面：方案总览 / 决策清单 待决定 12/12 / L0 框架图 未加载
+✓ 没有统计卡片 / Dashboard 卡片 / 阻塞面板
+✓ L0 集成：真实 preload → IPC → main → view model 链路保留 S1 的 Unknown 与 Known(0) shape
+✓ L0 集成：preload API → IPC → main.loadFrameworkMap 链路可用（走真实入口 loadL0(path)）
+✓ L1 集成：真实 Topic 点击进入边界视图（T-01，relations=3，block=unknown）并可返回 L0
+✓ L0 集成：加载后真的切屏了（首屏隐藏 → Review 屏显示，view=l0）
+✓ L0 集成：view model 被 app.js 接收并 mount（标题「F13–F16 售后链路运行验证 & 部署手册」+ Topic Navigation）
+✓ L0 集成：两个视图各自覆盖全部 element（Reading 12 / Review 12 / 共 12 · topics 9 · focus panels 12）
+✓ L0 集成：Reading 把关系画成了线（8 条线 + 8 个类型标签 == edge 数）
+✓ L0 集成：Reading 不显示机器 ID（0 个 .eid）· Topic 默认折叠（0 个展开）
+✓ L0 集成：Reading 的关系词已产品化（产出/产出/使用；原词共 8 份保留在 data-edge-type）· 顶部说明默认折叠
+✓ L0 集成：Reading 下钻面板用中文术语（关联关系/来自/指向/约束/出处），英文与机器 ID 只在 Review
+✓ L0 集成：默认 Reading View，且 Review 整块在 Reading 下被隐藏（数据仍在 DOM）
+✓ L0 集成：点 Reading 节点 → 只高光相关项（命中 13 处 · 含 2 条线），其余不压暗（dim=0）
+✓ L0 集成：点约束 → 角标自身有高光 + 2 个宿主一起点亮（不压暗任何东西）
+✓ L0 集成：从下钻面板点 provenance「§2.2」→ 走到已有 openSource() 并打开 Source 面板
+✓ L0 集成：L0 可独立打开 —— 无 design-review.json 时切向总览/决策被挡住（不进入空视图）
+✓ 方案总览按四段推进：甲 · 这是什么 → 乙 · 它怎么跑 → 丙 · 怎么算发生了 → 丁 · 边界与反模式
+✓ O-01 ~ O-14 全部有承载位置（21 个区块：O-01, O-02, O-03, O-04, O-04b, O-04c, O-05, O-06, O-07, O-08, O-09, O-16, O-10, O-10b, O-10c, O-11, O-11b, O-13, O-12, O-14, O-15）
+✓ 区块默认折叠生效（展开 10 / 折叠 11）
+✓ 左侧常驻目录：4 段 / 21 个区块条目
+✓ 滚动位置对应"我在读哪一段"的目录高亮
+✓ 每个区块都有 Source 回原文入口（45 个标签）
+✓ 区块底部列出可跳转的 Review Object（32 个）
+✓ 八种承载形式全部用上：prose, ladder, diff, flow, checklist, matrix, combo, steps
+✓ 默认展开的区块已实际渲染：prose, flow, ladder, matrix, checklist（折叠的 3 种展开后才渲染）
+✓ 流程图与对照表已渲染（lane 4 个 / matrix 2 张）
+✓ 总览有明确的结束标记
+✓ 总览首屏没有直接铺 blocking 项目列表
+✓ Gate badge = 未满足前置条件 · 18
+✓ 区块折叠会真正收起内容并可在原处展开（O-02）
+✓ 点 Source: §0 → 右侧显示原文段落（953 字），页面不跳走
+✓ 原文面板可切换到全部 16 个章节
+✓ 打开原文面板时视觉总览仍在原位（不是跳转）
+✓ 原文面板可关闭，回到纯视觉阅读
+✓ 背景为白色 (body rgb(255,255,255), main rgb(255,255,255))
+✓ 正文文字为深色 (亮度 21/255)
+✓ 决策清单在一个页面里展示全部 12 条决策
+✓ 按 reviewLevel 分组且每条只出现一次（核心判断（高优先级） 4 / 支撑性判断 7 / 推导性判断 1）
+✓ 侧栏计数为「待决定 12/12」
+✓ Decision 默认只展示 3 个字段：问题 / AI 建议 / 为什么这样建议
+✓ 默认展示三个审核动作：同意 / 不同意 / 以后再说
+✓ 三个动作映射到 approved / rejected / needs-revision（不新增状态）
+✓ Alternatives / Rationale / Consequences / Current-Target / Evidence 默认全部折叠（0 个 disclosure 渲染）
+✓ "查看详情"展开 7 个附属区块：Alternatives / Full Rationale / Consequences / Current / Target / Evidence / Open Questions / Dependencies / Related
+✓ Decision 的 Evidence 全标为 document-claim（1 条），无 source-verified
+✓ Current / Target 作为附属信息渲染（1 个 Gap，每个含"现在/目标"两栏）
+! 首条决策没有 dependsOn，Dependencies 区块为空（数据本身如此）
+✓ Overview 没有把 Open Questions 单独放大
+✓ 全部 10 个 Open Question 都挂在某条 Decision 的详情里
+✓ 点击"不同意"后状态变为 已否决，并出现备注输入框
+✓ 决策清单进度随表态更新（待决定 11 / 12只看待决定，首条状态 已否决）
+✓ humanReview:save 写入成功（reviewVersion=2, 剩余阻塞=17）
+✓ human-review.json 覆盖全部 12 条 Decision（未做部分覆盖式丢失）
+✓ 多条 Decision / Gap 的审核状态都被正确持久化
+✓ human-review.json 与 design-review.json 分离读写正常
+✓ needs-evidence 会让 Gate 继续 BLOCKED
+✓ design-review.json 未被人工审核状态污染（仍全部 pending）
+✓ 未在项目根目录偷偷生成 human-review.json（仍只由人工点击保存时创建）
+✓ 真实资料包 → Map → Topic → Block → SU/section 与独立 Evidence；fragment/返回/跨文档/取消/旧加载与 Source 回复/独立 Map 隔离/漂移/无自动保存均通过
+===== END =====
+SELFTEST PASSED

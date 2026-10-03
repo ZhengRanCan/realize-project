@@ -1,0 +1,5 @@
+
+> design-review-mvp@0.1.0 verify:harness
+> node scripts/harness-gate.mjs
+
+Harness gate: 20 features, 0 errors.

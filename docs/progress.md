@@ -3,10 +3,9 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: **F18 L3 Inspector**.
-- Next queued feature: **F18 L3 Inspector**，先补齐资料包输入协议与 F16 的 Plan + Generated 关联。
-  用户已认可设计与实施计划，选择当前会话按现有 harness 顺序实现，末尾独立审查。
-- Latest completed feature: `F17` L1 Topic Runtime（分支完成记录：2026-10-01）。
+- Active feature: **None**.
+- Next queued feature: **F19 Reading Navigation and Resolver**；本轮未启动。
+- Latest completed feature: `F18` L3 Inspector（2026-10-03）；显式资料包、Plan + Generated 与真实 L3 路径已通过集成检查和独立审查。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
   （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
@@ -30,10 +29,10 @@
 | F13 | Minimal Semantic Projection Boundary (B1) | `passing` | 纯边界与八项结构断言已通过 |
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `blocked` | Explore/Back 产品入口尚不存在；其余已执行边界见 F15 evidence |
-| F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 既有 Overview projection 经真实 IPC 接入；Plan + Generated runtime 缺口在 F18 前置补齐中处理 |
+| F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 既有 Overview projection；Plan + Generated runtime 补齐的独立证据在 F18 |
 | F17 | L1 Topic Runtime | `passing` | Topic boundary projection、真实入口和 Back 自检通过 |
-| F18 | L3 Inspector | `active` | 实施资料包输入、Map-first 入口与两条 L3 核查路径 |
-| F19 | Reading Navigation and Resolver | `blocked` | 等待 F18 真实 inspection 路径完成 |
+| F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
+| F19 | Reading Navigation and Resolver | `blocked` | F18 前置已就绪；完整 canonical resolver 与跨层导航尚未实施 |
 | F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
 
@@ -46,9 +45,8 @@ Phase C  Cross-Projection Nav       Reading / Explore 共享 identity？ F19 →
 Phase D  Product Maturity           是否好用、快、清晰、可维护？  F21
 ```
 
-**当前在 Phase B 的 F18 前置补齐。** F16 / F17 的既有路径已接入；
-完整 Plan + Generated 输入与 L3 inspection 仍待产品化：
-`app/main/main.js` 今天并不消费 `overview.generated.json`。
+**Phase B 的 F18 路径已接入。** 资料包明确消费 Plan + Generated，首屏为框架图；
+L3 保持两条独立核查路径，缺失与漂移明确降级。完整 Back / Resolve 与 Explore 仍属后续范围。
 
 ### Reading v1 的完成判据（不是 B2 全绿）
 
@@ -232,12 +230,20 @@ Source-verified Evidence
 - 当前分支：`codex/f11-f21-conformance`，拉取时 HEAD 为 `baa459c`。
 - 用户已选定：只打开一份清单，配套资料在同一个分析目录；开发过程中显式选定输入，随后整理目录说明。
 - 设计：[Reading Bundle and L3 Runtime Design](log/artifacts/F18-l3-inspector/runtime-bundle-design.md)。
-  用户于 2026-10-03 认可当前设计；[实施计划](log/artifacts/F18-l3-inspector/drafts/implementation-plan.md) 已形成，待审阅和选择执行方式。尚未实现清单加载、目录导出或 L3 UI。
-- F18 范围需要补充：manifest Schema、离线 exporter、preload、包目录 Source binding、共享验证与 projection、
-  静态 Preview、suite 接入，以及 architecture / design / 初始化 / 目录规范。审阅后在 F18 合同中登记允许文件。
+  用户于 2026-10-03 认可设计与[实施计划](log/artifacts/F18-l3-inspector/drafts/implementation-plan.md)，选择 Native；实施结果见后续记录。
+- F18 合同已登记 manifest Schema、离线 exporter、preload、包目录 Source binding、共享验证与 projection、
+  静态 Preview、suite 接入，以及 architecture / design / 初始化 / 目录规范。
 - 改动原因：现有 runtime 只将 model.overview 投影到 L2；Plan.covers / sourceUnits 未加载，
   L3 helper 与 L2 输入不匹配，Source 使用固定 registry。完整输入协议属于 F18 必需前置。
 - 验证基线：`npm run test:all`、`npm run selftest`、`npm run verify:harness` 全部 exit 0；
   F16 / F17 / F18 单独脚本分别报告 8 / 9 / 4 assertions。
   这些结果只证明既有路径和 helper，不能验收尚不存在的 bundle → L3 产品路径。
 - 历史 fixture、实验 run 与失败记录保留原位置；新产品资料通过独立离线导出集中放置，采用目录内相对路径。
+
+## 2026-10-03 — F18 Implementation Complete
+
+- 用户批准设计、计划与 Native 执行；资料包在 `bundles/<document>/<analysis>/` 汇集相关输入和用户审核。
+- 共享 source parser、显式 validator 上下文、严格 bundle binding、Plan LEFT JOIN Generated、两条 L3 核查与同一 Preview renderer 已接入。
+- 真实 Electron 路径、跨文档/旧请求/保存隔离与便携 Preview 通过；独立复查的问题修正后无剩余 P1/P2。
+- 完整命令与证据见 [F18 Verification Summary](log/artifacts/F18-l3-inspector/verification-summary.md)。
+- F19 前置已就绪，但 canonical resolver / Explore 尚未实施；不把本轮局部返回视为完整跨投影导航。

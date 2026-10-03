@@ -36,6 +36,7 @@ function createReadingSessionController({prepare=prepareReadingSession}={}) {
   },
   commit(token){if(!pending || pending.token!==token || token!==request) return {ok:false,reason:'stale',errors:['资料包请求已过期']};current=pending.session;pending=null;return {ok:true,loadResult:current.loadResult};},
   discard(token){if(pending?.token===token) pending=null;},
+  invalidate(){request++;pending=null;},
   current(){return current;},
   reset(){request++;pending=null;current=null;},
  };

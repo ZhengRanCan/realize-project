@@ -471,27 +471,26 @@ Priority = High | Medium | Low
 | S3 Absent ≠ Unknown | — | — | ✅ partial（F13 claim verification 只能为 capability `absent`） | Partial | Medium |
 | S4 Known Absent ≠ Unverified | — | — | ✅ partial（F14 对抗测试保持 Indeterminate，不升级为 Unsupported） | Partial | Medium |
 | S7 状态须有可区分编码 | — | — | — | None | Medium |
-| S8 / S9 派生与漂移 | — | — | — | None | Medium |
+| S8 / S9 派生与漂移 | — | ✅ partial（资料包文件哈希、registry 重建和 Generated 的 Plan fingerprint；运行时 source 漂移降级） | ✅ partial（搬迁、错误配对与漂移；coverage 只作本次派生） | Partial | Medium |
 | N1 / N2 / N3 | — | — | — | None | Medium |
 | N4 / N5 | — | — | — | None | Medium |
 | N6 坐标重叠 ⇏ 语义关系 | — | — | ✅ partial（F14 exact-containment 对抗测试） | Partial | Medium |
 | N7 source-verified ⇏ verified | — | — | ✅ partial（F14 evidence-level 对抗测试） | Partial | Medium |
 | N8 approved/reviewed/PASS ⇏ verified | — | — | ✅ partial（F14 独立状态汇总对抗测试） | Partial | Medium |
-| N9 / N10 / N11 / N12 | — | — | — | None | Medium |
+| N9 / N10 / N11 / N12 | — | — | ✅ partial（L3 fragment 保留父 Block identity；SU 只到 section range；Evidence 无独立 landing；真实 IPC / renderer 回归） | Partial | Medium |
 
 > 说明：`Protection coverage = None` **不自动**等于 `Priority = High`。
 > High 的判据额外要求"存在主动误实现的诱因"。High 的数量**没有架构意义**，
 > 不应人为固定；新发现一条现行的 silent violation 就应照实新增一条 High。
 > B1 / B2 落成后只更新对应 cell 与 Protection coverage，Priority 随判据重算，**不做整行搬迁**。
 
-### 6.1 当前基线（如实记录，不提前记功）
+### 6.1 Current Enforcement Boundaries
 
-- 现有 validator（`check-plan` / `check-block` / `check-overview` / `check-map`）
-  **全部在 artifact 侧**；没有任何 validator 校验投影输出。
-- projection 侧唯一的测试是 `scripts/test-l0-view-model.js`，它测的是
-  **不丢 / 不裁 / 不改 / 不造 / 不崩**，**不是**针对非法语义升级的负向测试。
-- 因此：**投影侧针对非法语义升级的机器保障为零**；S1 / S3 / S4 / N6 / N7 / N8 六条完全未保障，
-  其中 S1 已存在一处正在运行的违反。
+- validator 校验源制品和明确输入上下文；投影输出由结构断言与真实 renderer 集成检查保护。
+- L0 / L1、Plan + Generated 的 L2 与从 Block/fragment 发起的 L3 已有产品入口。
+  投影与对抗测试覆盖 identity、authority、能力缺失及禁止跨链语义升级；范围以表中 partial cell 为限。
+- 资料包会检查配对与原文坐标一致性；这不提供历史版本追踪，也不构成 provenance assurance 或 claim verification。
+- canonical resolver、Explore 与 durable fragment identity 仍不在当前边界。各次实现的过程和命令结果仅记录在 feature artifacts。
 
 ---
 
@@ -508,7 +507,7 @@ Priority = High | Medium | Low
 | Fragment 的 durable identity / 深链 / 评论锚点 | Deferred（不得制造 synthetic ID） |
 | `source-verified` 整合 | Deferred（当前 36/36 evidence 均为 `document-claim`） |
 | 交互可用性（zoom / pan / 自定义节点 / 评论） | Deferred |
-| L2/L3 的产品级投影实现 | Deferred（见 §6.1 基线） |
+| L2/L3 的产品级投影实现 | Present（资料包 Plan + Generated、Block/fragment inspection）；完整 canonical navigation 仍 Deferred |
 | 文档去重（PRODUCT_SPEC / DESIGN / F03 brief 的旧表述） | Deferred（由 §1.2 scoped precedence 覆盖，属文档维护任务） |
 
 **明确不做**：不为满足 UI 需要而在投影期补造 identity、关系、证据或 verification；

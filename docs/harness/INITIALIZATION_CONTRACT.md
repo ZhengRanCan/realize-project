@@ -6,11 +6,14 @@
 git clone https://github.com/ZhengRanCan/realize-project.git
 cd realize-project
 npm install     # 首次需联网下载 Electron（约 100 MB 以上）；可用 npmmirror 镜像
-npm start       # 启动应用；首屏点「打开 fixture」进入方案总览
+npm start       # 启动应用；首屏点「打开分析资料包」选择 reading-bundle.json
 ```
 
 环境要求：Node.js 18 LTS 或更高、桌面操作系统（Windows / macOS / Linux）、无需数据库或账号。
 应用本身**完全离线**运行；只有显式调用 `npm run ai:*` / `npm run f10:run` 才会访问外部模型。
+
+首次可用 `npm run bundle:example` 导出本地样例，再选择其清单；命令和目录约定见
+[Reading Bundles](../../bundles/README.md)。已存在的分析目录拒绝覆盖。旧「打开 fixture」入口仍可用于回归。
 
 ## Standard verification
 
@@ -20,10 +23,10 @@ npm start       # 启动应用；首屏点「打开 fixture」进入方案总览
 | L1 static | `npm run audit` | 覆盖审计：原文每节被引用、每条 Decision 能关联 |
 | L1 static | `npm run check:docs` | 文档引用检查：markdown 里指向仓库内文件的路径是否真实存在 |
 | L1 static | `npm run check:experiments` | `experiments/index.json`（逐 run 归属表）与实验产物是否一致 |
-| L2 feature | `npm run test:all` | 全部离线单元测试与索引校验：`test:plan`、`test:block`、`test:map`、`test:ai-map`、`test:grounding`、`test:l0`、`check:docs`、`check:experiments` |
+| L2 feature | `npm run test:all` | 既有 validator / L0、Reading projection、source / bundle / session、保存隔离、便携 Preview 与索引校验；Preview 测试会启动 Electron |
 | L3 system | `npm run check-overview` | 装配后的 overview 是否合格（覆盖率 / provenance / 段落结构） |
 | L3 system | `npm run verify-preview` | 在真实 renderer 里渲染静态 Preview 并断言 |
-| L3 system | `npm run selftest` | Electron 渲染进程内跑通导入 → 两页渲染 → 审批 → 保存 → Gate，然后退出 |
+| L3 system | `npm run selftest` | 真实 preload / IPC / renderer 的资料包 → Map → Topic → Block → 两条 L3 路径，以及旧入口、审核保存、异步隔离、键盘返回 |
 | Harness | `npm run verify:harness` | feature 合同、状态机与证据元数据 |
 
 每个 feature 可以在 `verification.md` 里收窄这些命令，但不能在没有其合同标为必需的层的情况下声明 `passing`。

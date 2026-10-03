@@ -222,6 +222,7 @@ function contentFlow(content) {
       laneEl.appendChild(nodeEl);
       if (item.edge) {
         const edge = el('div', `fedge edge-${item.edge.kind || 'plain'}`);
+        edge.dataset.nodeIndex=index;
         edge.appendChild(el('span', 'fedge-line'));
         if (item.edge.note) edge.appendChild(el('span', 'fedge-note', item.edge.note));
         laneEl.appendChild(edge);
@@ -530,9 +531,9 @@ function viewOverview() {
 
 async function ensureSourceLoaded() {
   if (state.source.loaded) return state.source;
-  const token=state.sessionToken;
+  const token=state.sessionToken,loadRequest=bundleLoadRequest;
   const result = await api.loadSource();
-  if(token!==state.sessionToken) return state.source;
+  if(token!==state.sessionToken || loadRequest!==bundleLoadRequest) return state.source;
   if (!result || !result.ok) {
     state.source.error = result && result.errors ? result.errors.join('; ') : '读取失败';
     return state.source;
@@ -548,18 +549,21 @@ async function ensureSourceLoaded() {
 }
 
 async function openSource(label,{namespace='plan-section',key=label}={}) {
+  const request=++state.inspectionRequest;
   if(state.sessionToken) {
     const token=state.sessionToken,result=await api.bundle.source({sessionToken:token,namespace,key});
-    if(token!==state.sessionToken) return;
+    if(token!==state.sessionToken || request!==state.inspectionRequest) return;
     closeInspection(false);const body=clear($('#source-body'));clear($('#source-head')).textContent=label;
     $('#source-panel').classList.remove('hidden');$('#screen-review').classList.add('with-source');
     showCoordinate(body,result.coordinate||{state:'unavailable',reason:(result.errors||[]).join('; ')});return;
   }
   await ensureSourceLoaded();
+  if(request!==state.inspectionRequest) return;
   renderSourcePanel(label);
 }
 
 function closeSource() {
+  state.inspectionRequest++;
   $('#source-panel').classList.add('hidden');
   $('#screen-review').classList.remove('with-source');
 }
@@ -571,6 +575,7 @@ function renderSourcePanel(label) {
   $('#screen-review').classList.add('with-source');
 
   const source = state.source;
+  if (source.error) clear($('#source-head')).textContent=label;
   if (source.error) {
     body.appendChild(el('div', 'error-box', source.error));
     return;
@@ -1003,10 +1008,11 @@ function renderGateBadge() {
 }
 
 function render() {
+  if(state.inspectionOrigin) closeInspection(false);
   if (!state.model && state.view !== 'l0' && state.view !== 'l1') return;
   const summary = state.model ? currentSummary() : null;
 
-  $('#design-title').textContent = (state.view === 'l0')
+  $('#design-title').textContent = (state.view === 'l0' || state.view === 'l1')
     ? ((state.l0ViewModel && state.l0ViewModel.document.title) || 'L0 Framework Map')
     : state.model.design.title;
   $('#design-id').textContent = state.model ? state.model.design.id : 'L0';
@@ -1084,13 +1090,19 @@ function viewL1() {
  * 测试要覆盖这条缝，就只能调这个函数本身。
  */
 async function loadL0(mapPath) {
+  const request=++bundleLoadRequest;
+  if(state.dirty && !window.confirm('放弃未保存审核并打开独立框架图？')) return {ok:false,canceled:true};
   const api = window.designReview;
   const res = mapPath ? await api.l0.loadPath(mapPath) : await api.l0.openJson();
+  if(request!==bundleLoadRequest) return {ok:false,stale:true};
   if (!res || !res.ok) {
     if (res && res.canceled) return null;
     window.alert(`加载 framework-map 失败：${(res && res.errors && res.errors[0]) || '未知错误'}`);
     return null;
   }
+  state.sessionToken=null;state.bundleInfo=null;state.model=null;state.humanReview=null;state.l2ViewModel=null;
+  state.inspectionOrigin=null;state.inspectionRequest++;state.dirty=false;
+  state.source={loaded:false,document:null,sections:[],labels:[],error:null};
   state.l0ViewModel = res.viewModel;
   state.l1Topics = res.l1Topics;
   state.l0Path = res.mapPath;
@@ -1140,6 +1152,7 @@ function applyLoadResult(result) {
     return { applied: false, reason: `validation-failed:${result.stage}` };
   }
   clearError();
+  bundleLoadRequest++;
   state.inspectionRequest++;state.inspectionOrigin=null;
   state.sessionToken=result.sessionToken||null;state.bundleInfo=result.bundleInfo||null;
   state.source={loaded:false,document:null,sections:[],labels:[],error:null};
@@ -1190,7 +1203,9 @@ window.__state = state;
 function bindStartScreen() {
   if($('#btn-open-bundle')) $('#btn-open-bundle').addEventListener('click',()=>loadBundle());
   $('#btn-load-fixture').addEventListener('click', async () => {
+    const request=++bundleLoadRequest;
     const result = await api.loadFixture();
+    if(request!==bundleLoadRequest)return;
     if (applyLoadResult(result).applied && !state.markdown) {
       const md = await api.readDefaultMarkdown();
       if (md && md.ok) {
@@ -1201,8 +1216,9 @@ function bindStartScreen() {
   });
 
   $('#btn-open-json').addEventListener('click', async () => {
+    const request=++bundleLoadRequest;
     const result = await api.openDesignJson();
-    applyLoadResult(result);
+    if(request===bundleLoadRequest)applyLoadResult(result);
   });
 
   // Feature 08 · 打开 framework-map.json（L0 视图；不调用模型）
@@ -1272,11 +1288,15 @@ function bindReviewScreen() {
   $('#source-close').addEventListener('click',()=>state.inspectionOrigin?closeInspection():closeSource());
 
   $('#btn-save').addEventListener('click', async () => {
-    const result = await api.saveHumanReview(state.humanReview,undefined,state.sessionToken);
+    const token=state.sessionToken,model=state.model;
+    const reviewSnapshot=JSON.stringify(state.humanReview);
+    const result = await api.saveHumanReview(state.humanReview,undefined,token);
+    if(token!==state.sessionToken || model!==state.model) return;
     if (!result.ok) {
       toast(`保存失败：${(result.errors || []).join('; ')}`, true);
       return;
     }
+    if(JSON.stringify(state.humanReview)!==reviewSnapshot){toast('已保存提交的内容，期间的新修改仍未保存。');return;}
     state.humanReview = result.humanReview;
     state.humanReviewPath = result.path;
     state.dirty = false;
@@ -1292,8 +1312,9 @@ function bindReviewScreen() {
   $('#btn-reload').addEventListener('click', async () => {
     if (state.dirty && !window.confirm('有未保存的人工审核修改，重新加载会丢弃它们。继续？')) return;
     if(state.bundleInfo) {await loadBundle(state.bundleInfo.manifestPath);return;}
+    const request=++bundleLoadRequest;
     const result = await api.loadDesignPath(state.modelPath);
-    applyLoadResult(result);
+    if(request===bundleLoadRequest)applyLoadResult(result);
   });
 
   $('#btn-back').addEventListener('click', () => {
@@ -1303,6 +1324,7 @@ function bindReviewScreen() {
   });
 
   document.addEventListener('keydown', (event) => {
+    if(event.key==='Escape' && state.inspectionOrigin){event.preventDefault();closeInspection();return;}
     if ($('#screen-review').classList.contains('hidden')) return;
     const tag = (event.target && event.target.tagName) || '';
     if (tag === 'TEXTAREA' || tag === 'INPUT') return;
@@ -1378,9 +1400,11 @@ async function openInspection(blockId,fragmentPath) {
  if(token!==state.sessionToken || request!==state.inspectionRequest)return result;
  if(!result.ok){toast((result.errors||[]).join('; '));return result;}
  state.inspectionOrigin=origin;$('#source-panel').classList.remove('hidden');$('#screen-review').classList.add('with-source');clear($('#source-head')).textContent='查出处';
+ let coordinateRequest=0;
  window.DesignReviewL3.mountL3Inspector($('#source-body'),result.viewModel,{onClose:()=>closeInspection(),onFragment:()=>openInspection(blockId),onSource:async unit=>{
+  const coordinateToken=++coordinateRequest;
   const source=await api.bundle.source({sessionToken:token,namespace:'plan-section',key:unit.section});
-  if(token!==state.sessionToken || request!==state.inspectionRequest)return;
+  if(token!==state.sessionToken || request!==state.inspectionRequest || coordinateToken!==coordinateRequest)return;
   showCoordinate($('#l3-source-coordinate'),source.coordinate||{state:'unavailable',reason:(source.errors||[]).join('; ')});
  }});return result;
 }
@@ -1392,7 +1416,7 @@ function bindFragmentInspection(host,block) {
  const target=path=>{
   let m;
   if((m=path.match(/^parts\[(\d+)\]$/)))return host.querySelectorAll('.c-prose > p')[+m[1]];
-  if((m=path.match(/^lanes\[(\d+)\](?:\.nodes\[(\d+)\]\.(node|edge))?$/))){const lane=host.querySelectorAll('.lane')[+m[1]];if(!lane)return null;return m[2]===undefined?lane.querySelector('.lane-label'):lane.querySelectorAll(m[3]==='node'?'.fnode':'.fedge')[+m[2]];}
+  if((m=path.match(/^lanes\[(\d+)\](?:\.nodes\[(\d+)\]\.(node|edge))?$/))){const lane=host.querySelectorAll('.lane')[+m[1]];if(!lane)return null;return m[2]===undefined?lane.querySelector('.lane-label'):m[3]==='node'?lane.querySelectorAll('.fnode')[+m[2]]:lane.querySelector('.fedge[data-node-index="'+m[2]+'"]');}
   if((m=path.match(/^rows\[(\d+)\]\[(\d+)\]$/)))return host.querySelectorAll('tbody tr')[+m[1]]?.children[+m[2]];
   if((m=path.match(/^columns\[(\d+)\]$/)))return host.querySelectorAll('th')[+m[1]];
   if((m=path.match(/^tiers\[(\d+)\]$/)))return host.querySelectorAll('.rung')[+m[1]];

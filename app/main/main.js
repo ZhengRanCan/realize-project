@@ -42,6 +42,14 @@ const DEFAULT_DOCUMENT = path.join(PROJECT_ROOT, '测试文档', '18-context-con
 const DEFAULT_HUMAN_REVIEW = path.join(PROJECT_ROOT, 'human-review.json');
 const SOURCE_SECTIONS = path.join(PROJECT_ROOT, 'docs', 'source-sections.json');
 
+const saveHumanReview=require('./human-review-store').createHumanReviewWriter({write:writeJsonAtomic,projectRoot:PROJECT_ROOT});
+let sessionEpoch=0;
+function beginSessionLoad(){bundleSessions.invalidate();return ++sessionEpoch;}
+const staleLoad=()=>({ok:false,stage:'stale',errors:['加载请求已过期'],warnings:[]});
+async function prepareBundle(file,epoch=beginSessionLoad()){
+ if(epoch!==sessionEpoch)return staleLoad();
+ const result=await bundleSessions.prepare(file);return epoch===sessionEpoch?result:staleLoad();
+}
 let mainWindow = null;
 /** 最近一次成功加载的模型与来源，供保存 human-review.json 时使用。 */
 let state = { modelPath: null, model: null, humanReviewPath: DEFAULT_HUMAN_REVIEW, humanReview: null };
@@ -61,7 +69,7 @@ async function loadSchema() {
 
 /** 原子写入 JSON：先写临时文件再 rename，避免写坏 human-review.json。 */
 async function writeJsonAtomic(targetPath, value) {
-  const temp = `${targetPath}.tmp-${process.pid}`;
+  const temp = `${targetPath}.tmp-${process.pid}-${require('node:crypto').randomUUID()}`;
   await fs.writeFile(temp, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
   await fs.rename(temp, targetPath);
 }
@@ -83,7 +91,7 @@ async function validateModel(model) {
 /**
  * 加载一个 design-review.json（fixture 或 AI 输出），并把它与 human-review.json 合并成 UI 需要的载荷。
  */
-async function loadDesignReview(modelPath, humanReviewPath) {
+async function loadDesignReview(modelPath, humanReviewPath, epoch=beginSessionLoad()) {
   const resolvedModel = path.resolve(modelPath);
   const model = await readJson(resolvedModel);
 
@@ -120,6 +128,7 @@ async function loadDesignReview(modelPath, humanReviewPath) {
   // review/Gate semantics only and is never interpreted by the renderer.
   const l2ViewModel = projectL2Overview(model.overview);
 
+  if(epoch!==sessionEpoch)return staleLoad();
   bundleSessions.reset();
   state = {
     modelPath: resolvedModel,
@@ -153,13 +162,13 @@ function createWindow() {
     backgroundColor: '#12161c',
     title: 'Design Review',
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: VERIFY_PREVIEW ? undefined : path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
     },
   });
-  mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
+  mainWindow.loadFile(VERIFY_PREVIEW || path.join(__dirname, '..', 'renderer', 'index.html'));
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -173,7 +182,7 @@ function createWindow() {
  * Feature 08 · 读取一份 framework-map.json → view model（**只读，不修改 map**）。
  * 同目录的 check-map.txt 若存在，一并带上供 Review View 使用。
  */
-async function loadFrameworkMap(mapPath) {
+async function loadFrameworkMap(mapPath, epoch=beginSessionLoad()) {
   const p = path.resolve(mapPath);
   const map = JSON.parse(await fs.readFile(p, 'utf8'));
   const siblingCheck = path.join(path.dirname(p), 'check-map.txt');
@@ -187,14 +196,17 @@ async function loadFrameworkMap(mapPath) {
     knownRoles: schema.$defs.element.properties.role['x-known-roles'],
   });
   const l1Topics = Object.fromEntries(map.topics.map((topic) => [topic.id, projectTopic(map, topic.id)]));
+  if(epoch!==sessionEpoch)return staleLoad();
+  bundleSessions.reset();state={model:null,modelPath:null,humanReview:null,humanReviewPath:DEFAULT_HUMAN_REVIEW,standaloneMap:true};
   return { ok: true, mapPath: p, checkMapPath: checkMapText ? siblingCheck : null, viewModel, l1Topics };
 }
 
 function registerIpc() {
-  ipcMain.handle('bundle:loadPath',(_event,payload)=>bundleSessions.prepare(payload.path));
+  ipcMain.handle('bundle:loadPath',(_event,payload)=>prepareBundle(payload.path));
   ipcMain.handle('bundle:open',async()=>{
+    const epoch=beginSessionLoad();
     const result=await dialog.showOpenDialog(mainWindow,{title:'选择分析资料包 reading-bundle.json',filters:[{name:'Reading Bundle',extensions:['json']}],properties:['openFile']});
-    return result.canceled?{ok:false,canceled:true}:bundleSessions.prepare(result.filePaths[0]);
+    return result.canceled?{ok:false,canceled:true}:prepareBundle(result.filePaths[0],epoch);
   });
   ipcMain.handle('bundle:commit',(_event,payload)=>{const result=bundleSessions.commit(payload.requestToken);if(result.ok) state=bundleSessions.current();return result;});
   ipcMain.handle('bundle:discard',(_event,payload)=>{bundleSessions.discard(payload.requestToken);return {ok:true};});
@@ -213,6 +225,7 @@ function registerIpc() {
   // 只读 framework-map.json + 同目录的 check-map.txt（若存在），在主进程算好 view model 再交给 renderer
   //（renderer 不接触 node fs）。**不修改 map**：buildL0ViewModel 自带"输入被改动就抛错"的自检。
   ipcMain.handle('l0:openJson', async () => {
+    const epoch=beginSessionLoad();
     const result = await dialog.showOpenDialog(mainWindow, {
       title: '选择 framework-map.json',
       defaultPath: PROJECT_ROOT,
@@ -220,7 +233,7 @@ function registerIpc() {
       properties: ['openFile'],
     });
     if (result.canceled || result.filePaths.length === 0) return { ok: false, canceled: true };
-    return loadFrameworkMap(result.filePaths[0]);
+    return loadFrameworkMap(result.filePaths[0],epoch);
   });
 
   ipcMain.handle('l0:loadPath', async (_event, payload) => {
@@ -235,6 +248,7 @@ function registerIpc() {
   });
 
   ipcMain.handle('design:openJson', async () => {
+    const epoch=beginSessionLoad();
     const result = await dialog.showOpenDialog(mainWindow, {
       title: '选择 design-review.json',
       defaultPath: PROJECT_ROOT,
@@ -242,7 +256,7 @@ function registerIpc() {
       properties: ['openFile'],
     });
     if (result.canceled || result.filePaths.length === 0) return { ok: false, canceled: true };
-    return loadDesignReview(result.filePaths[0], state.bundle ? DEFAULT_HUMAN_REVIEW : state.humanReviewPath);
+    return loadDesignReview(result.filePaths[0], state.bundle ? DEFAULT_HUMAN_REVIEW : state.humanReviewPath,epoch);
   });
 
   ipcMain.handle('design:loadPath', async (_event, payload) => {
@@ -316,57 +330,7 @@ function registerIpc() {
    * - 重写时保留 AI 侧不可见但人工有意义的字段（例如人工备注之外的自定义键）；
    * - 绝不写入 design-review.json。
    */
-  ipcMain.handle('humanReview:save', async (_event, payload) => {
-    if (!payload || typeof payload !== 'object' || typeof payload.humanReview !== 'object') {
-      return { ok: false, errors: ['缺少 humanReview 载荷'] };
-    }
-    const target = payload.path ? path.resolve(payload.path) : state.humanReviewPath;
-    if (!target) return { ok: false, errors: ['未确定 human-review.json 目标路径'] };
-
-    if(state.bundle) {
-      if(payload.sessionToken!==state.sessionToken || target!==state.humanReviewPath) return {ok:false,errors:['审核保存 session / 目标不匹配']};
-      try {if((await fs.lstat(target)).isSymbolicLink()) return {ok:false,errors:['审核文件不可为链接']};}catch(e){if(e.code!=='ENOENT') throw e;}
-    }
-    const existing = state.humanReview || {};
-    const buckets = ['decisions', 'openQuestions', 'gaps'];
-    const mergeBucket = (incoming, previous) => {
-      const merged = {};
-      const keys = new Set([...Object.keys(previous || {}), ...Object.keys(incoming || {})]);
-      keys.forEach((key) => {
-        const prev = (previous && previous[key]) || {};
-        const next = (incoming && incoming[key]) || {};
-        merged[key] = {
-          ...prev,
-          ...next,
-          status: next.status || prev.status || 'pending',
-          comment: next.comment !== undefined ? next.comment : prev.comment || '',
-        };
-      });
-      return merged;
-    };
-
-    const review = {
-      ...existing,
-      reviewVersion: (existing.reviewVersion || 0) + 1,
-      designId: state.model ? state.model.design.id : existing.designId,
-      designReviewPath: state.modelPath ? path.relative(PROJECT_ROOT, state.modelPath) : existing.designReviewPath,
-      updatedAt: new Date().toISOString(),
-    };
-    buckets.forEach((bucket) => {
-      review[bucket] = mergeBucket(payload.humanReview[bucket], existing[bucket]);
-    });
-
-    try {
-      await writeJsonAtomic(target, review);
-    } catch (error) {
-      return { ok: false, errors: [error.message] };
-    }
-    state.humanReview = review;
-    state.humanReviewPath = target;
-    const gate = state.model ? evaluateGate(state.model, review) : { ready: false, blockers: [] };
-    const summary = state.model ? semantics.reviewSummary(state.model, review) : null;
-    return { ok: true, path: target, humanReview: review, gate, summary };
-  });
+  ipcMain.handle('humanReview:save', (_event,payload)=>saveHumanReview(state,payload));
 
   ipcMain.handle('humanReview:reveal', async () => {
     if (!state.humanReviewPath) return { ok: false };
@@ -385,9 +349,11 @@ function registerIpc() {
    */
   ipcMain.handle('source:load', async () => {
     try {
-      if(state.bundle) {
-        if(await sourceIntegrity(state)!=='consistent') return {ok:false,errors:['当前资料包原文坐标不可用，请重新导出']};
-        return {ok:true,sessionToken:state.sessionToken,document:state.bundle.sourceSections.document,sections:state.bundle.sourceSections.sections};
+      const sourceSession=state;
+      if(sourceSession.standaloneMap)return {ok:false,errors:['独立框架图未配对原文；请打开分析资料包查看来源。']};
+      if(sourceSession.bundle) {
+        if(await sourceIntegrity(sourceSession)!=='consistent') return {ok:false,errors:['当前资料包原文坐标不可用，请重新导出']};
+        return {ok:true,sessionToken:sourceSession.sessionToken,document:sourceSession.bundle.sourceSections.document,sections:sourceSession.bundle.sourceSections.sections};
       }
       const payload = await readJson(SOURCE_SECTIONS);
       return { ok: true, document: payload.document, sections: payload.sections };
@@ -637,9 +603,7 @@ async function runSelfTest() {
           document.getElementById('l1-back')?.click();
           out.l1Back = state.view === 'l0' && !!document.querySelector('.l0-root');
           // ⑥ 复原，保证后续断言仍在 overview 视图
-          state.view = 'overview';
-          state.l0ViewModel = null;
-          render();
+          applyLoadResult(await api.loadFixture());
           // buildToc() 重建了 .toc-item，会把 .active 丢掉；而 setActiveBlock 在
           // state.activeBlockId 未变时会提前 return → 高亮不会自己回来。
           // 这里用产品自己的函数（清 id 再设）把"我在读哪一段"恢复成原状。
@@ -1228,6 +1192,24 @@ async function runVerifyPreview(filePath) {
       consoleErrors.slice(0, 8).forEach((e) => report.push(`    ${e.slice(0, 160)}`));
     }
 
+    const bundlePreview=await win.webContents.executeJavaScript('Boolean(window.__PREVIEW__?.inspections)');
+    if(bundlePreview) {
+      const result=await win.webContents.executeJavaScript(`(async()=>{
+        const s=window.__state;
+        if(s.view!==(s.l0ViewModel?'l0':'overview'))throw new Error('Preview default view');
+        if(s.l0ViewModel){const t=Object.values(s.l1Topics).find(t=>t.blockEntries?.length);document.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"]').click();document.querySelector('[data-l1-block]').click();}
+        const id=s.l2ViewModel.sections[0].blocks[0].id;
+        await window.__openInspection(id);
+        document.querySelector('[data-source-unit-id] button').click();await new Promise(r=>setTimeout(r,50));
+        const panel=document.getElementById('l3-source-coordinate');if(panel.dataset.coordinateState!=='known')throw new Error('Preview section');
+        if(document.getElementById('source-body').dataset.claimVerification!=='absent')throw new Error('Preview verification');
+        if(!document.getElementById('btn-save').disabled)throw new Error('Preview saving');
+        return {blocks:s.l2ViewModel.sections.flatMap(s=>s.blocks).length,text:panel.textContent.length};
+      })()`);
+      if(result.blocks!==21 || result.text<80)throw new Error('Preview content');
+      ok('bundle inspection: 默认视图 / SU section / Known Absent / 只读审核通过');
+      emit();process.stdout.write('VERIFY PREVIEW PASSED\n');app.exit(0);return;
+    }
     const dom = await win.webContents.executeJavaScript(
       `(() => ({
          title: document.getElementById('design-title')?.textContent || null,

@@ -155,7 +155,7 @@ const allowedPhrases=new Set(FORBIDDEN_PHRASES.filter(p=>sourceText.includes(p))
   blocks.forEach((b) => {
     const pb = planById.get(b.id);
     if (!pb) return;
-    const FIXED = ['id', 'title', 'stage', 'defaultExpanded'];
+    const FIXED = ['id', 'title', 'stage', 'shape', 'sourceRefs', 'defaultExpanded'];
     FIXED.forEach((f) => {
       if (JSON.stringify(b[f]) !== JSON.stringify(pb[f])) {
         structureFail(`[固定字段] ${b.id}.${f} 被修改：generated=${JSON.stringify(b[f])}，plan=${JSON.stringify(pb[f])}`);
@@ -182,6 +182,8 @@ const allowedPhrases=new Set(FORBIDDEN_PHRASES.filter(p=>sourceText.includes(p))
       hardFail(`[块级] ${b.id} 的 check-block = FAIL：${result.errors[0].slice(0, 110)}`);
     }
   });
+
+  if(structuralErrors.length) return {errors,warnings,structuralErrors,missingBlockIds:missing,blockResults:Object.fromEntries(blockResults),stats:{verdict:'FAIL'}};
 
   /* ---------------- 7/8/9. 全文语义覆盖与 sourceUnit 归属 ---------------- */
 
@@ -369,7 +371,7 @@ function main() {
 const args=parseArgs(process.argv.slice(2));
 const overview=JSON.parse(fs.readFileSync(args.overview,'utf8')),plan=JSON.parse(fs.readFileSync(args.plan,'utf8')),source=JSON.parse(fs.readFileSync(args.sourceSections||SOURCE_SECTIONS,'utf8'));
 const result=checkOverview(overview,plan,{sourceSections:source,sourceText:args.source?fs.readFileSync(args.source,'utf8'):undefined});
-const {errors,warnings}=result;const {verdict,failedBlocks,coreCovered,coreUnits,supportingCovered,supportingUnits,allUnits,shapeCounts,stageStats,warningCategories,semanticWithProv,semanticElements}=result.stats;
+const {errors,warnings}=result;if(!result.stats.stageStats){console.log('HARD ERRORS');errors.forEach(e=>console.log('  ✗ '+e));return 1;}const {verdict,failedBlocks,coreCovered,coreUnits,supportingCovered,supportingUnits,allUnits,shapeCounts,stageStats,warningCategories,semanticWithProv,semanticElements}=result.stats;
 const blocks=overview.blocks||[],planBlocks=plan.blocks;
   console.log('=== check-overview ===');
   console.log(`overview  ${path.relative(ROOT, args.overview)}`);

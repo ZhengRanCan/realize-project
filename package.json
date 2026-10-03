@@ -33,7 +33,7 @@
     "l0:layout": "node scripts/inspect-l0-layout.js",
     "test:l0": "node scripts/test-l0-view-model.js && node scripts/test-l0-layout.js && node scripts/test-l0-preview.js",
     "test:docs": "node scripts/check-doc-links.js",
-    "test:all": "node scripts/test-check-plan.js && node scripts/test-check-block.js && node scripts/test-check-map.js && node scripts/test-generate-framework-map.js && node scripts/test-semantic-grounding.js && node scripts/test-l0-view-model.js && node scripts/test-l0-layout.js && node scripts/test-l0-preview.js && node scripts/check-doc-links.js && node scripts/index-experiments.js --check && node scripts/test-source-coordinates.js && node scripts/test-reading-bundle.js && node scripts/test-reading-bundle-projection.js && node scripts/test-reading-session.js",
+    "test:all": "node scripts/test-check-plan.js && node scripts/test-check-block.js && node scripts/test-check-map.js && node scripts/test-generate-framework-map.js && node scripts/test-semantic-grounding.js && node scripts/test-l0-view-model.js && node scripts/test-l0-layout.js && node scripts/test-l0-preview.js && node scripts/check-doc-links.js && node scripts/index-experiments.js --check && node scripts/test-source-coordinates.js && node scripts/test-reading-bundle.js && node scripts/test-reading-bundle-projection.js && node scripts/test-reading-session.js && node scripts/test-reading-projection.js && node scripts/test-reading-adversarial.js && node scripts/test-reading-integration.js && node scripts/test-reading-runtime.js && node scripts/test-l1-topic-projection.js && node scripts/test-l3-inspector-projection.js && node scripts/test-human-review-session.js && node scripts/test-reading-bundle-preview.js",
     "assemble": "node scripts/assemble-overview.js",
     "check-overview": "node scripts/check-overview.js",
     "check-map": "node scripts/check-map.js",
@@ -41,7 +41,8 @@
     "report:full": "node scripts/full-run-report.js",
     "verify-preview": "electron . --verify-preview experiments/stage2-full/overview-preview.html",
     "manifest:full": "node scripts/write-full-manifest.js",
-    "export:bundle": "node scripts/export-reading-bundle.js"
+    "export:bundle": "node scripts/export-reading-bundle.js",
+    "bundle:example": "node scripts/export-reading-bundle.js --source \"测试文档/18-context-consumption-semantic-model.md\" --design fixtures/context-consumption.json --plan fixtures/context-consumption.overview-plan.json --generated experiments/stage2-full/overview.generated.json --map docs/log/artifacts/F04-l0-framework-map/drafts/context-consumption.map.json --out bundles/context-consumption/stage2-gold --analysis-id stage2-gold"
   },
   "devDependencies": {
     "electron": "^31.7.7"

@@ -58,7 +58,7 @@ function projectReadingBundle(input) {
     const realized=new Set(fragmentEntries.filter(f=>!f.presentation).flatMap(f=>f.sourceUnitIds));
     const report=input.reports?.generated?.blockResults[p.id];
     const missing=p.covers.filter(id=>!realized.has(id));
-    const integrity=raw?{space:'GenerationIntegrity',state:'present',verdict:report?(report.errors.length?'FAIL':report.warnings.length?'PASS_WITH_WARNINGS':'PASS'):(raw.generation?.verdict||'UNKNOWN'),errors:report?.errors||[],warnings:report?.warnings||[]}:{space:'GenerationIntegrity',state:'unavailable'};
+    const integrity=raw?{space:'GenerationIntegrity',state:'present',verdict:raw.generation?.verdict==='FAIL'?'FAIL':report?(report.errors.length?'FAIL':report.warnings.length?'PASS_WITH_WARNINGS':'PASS'):(raw.generation?.verdict||'UNKNOWN'),errors:report?.errors||[],warnings:report?.warnings||[]}:{space:'GenerationIntegrity',state:'unavailable'};
     return Object.freeze({id:p.id,title:p.title,stage:p.stage,shape:p.shape,covers:[...p.covers],role:'primary',defaultExpanded:p.defaultExpanded,content,
       sourceRefs:[...new Set(p.sourceRefs.map(r=>r.section))],reviewObjectLinks:{space:'KnowledgeState',state:p.reviewObjects.length?'known':'empty',relation:'related-to',values:[...p.reviewObjects]},
       generatedExpression:generated(expression===undefined?'unknown':raw?'present':'missing'),generationIntegrity:integrity,
