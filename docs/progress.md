@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: **None**.
-- Next queued feature: **F19 Reading Navigation and Resolver**；本轮未启动。
+- Active feature: **F22 Entry and Repository Layout**（按用户指定优先整理；当前为书面设计阶段）。
+- Next queued feature: **F19 Reading Navigation and Resolver**；F22 完成后再回到该路线，本轮未启动。
 - Latest completed feature: `F18` L3 Inspector（2026-10-03）；显式资料包、Plan + Generated 与真实 L3 路径已通过集成检查和独立审查。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
@@ -35,6 +35,7 @@
 | F19 | Reading Navigation and Resolver | `blocked` | F18 前置已就绪；完整 canonical resolver 与跨层导航尚未实施 |
 | F20 | Explore v1 | `not_started` | 契约待补（F11–F19 完成后细化） |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `not_started` | 契约待补（F16–F20 完成后细化） |
+| F22 | Entry and Repository Layout | `active` | 用户已批准分类方向；书面设计待审阅，首页和目录尚未整理 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -247,3 +248,13 @@ Source-verified Evidence
 - 真实 Electron 路径、跨文档/旧请求/保存隔离与便携 Preview 通过；独立复查的问题修正后无剩余 P1/P2。
 - 完整命令与证据见 [F18 Verification Summary](log/artifacts/F18-l3-inspector/verification-summary.md)。
 - F19 前置已就绪，但 canonical resolver / Explore 尚未实施；不把本轮局部返回视为完整跨投影导航。
+
+## 2026-10-03 — F22 Registration and Layout Design
+
+- 用户批准首页旧入口折叠与用途分区的方向，要求独立新建 feature；登记 F22 为当前唯一 active，处于规划阶段。
+- 合同：[F22 Entry and Repository Layout](harness/features/individual_feature/F22-entry-and-repository-layout/feature.md)。
+- 书面设计：[Layout Design](log/artifacts/F22-entry-and-repository-layout/layout-design.md)，待用户审阅后细化实施计划。
+- 目标分区为 docs / samples / prompts / artifacts/experiments / workspace；样本按文章归拢，本地资料保留并忽略 Git。
+- 提示词核查：五份模板被现行生成脚本引用；一份未接入的 Phase 2 协议草稿归历史设计记录。
+- 登记检查：check:docs 123 files / 0 broken；verify:harness 21 features / 0 errors。未改产品代码或移动目录，不代表实施完成。
+- F18 保持 passing；F19–F21 本轮未启动。F22 完成后回到原定 Reading 导航路线。

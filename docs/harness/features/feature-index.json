@@ -138,5 +138,12 @@
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F21-product-maturity",
     "version": "v0.1"
+  },
+  {
+    "id": "F22",
+    "title": "Entry and Repository Layout",
+    "status": "active",
+    "feature_folder": "docs/harness/features/individual_feature/F22-entry-and-repository-layout",
+    "version": "v0.1"
   }
 ]
