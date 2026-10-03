@@ -57,7 +57,7 @@ const args = parseArgs(process.argv.slice(2));
  * 组装
  * ------------------------------------------------------------------ */
 
-function main() {
+async function main() {
   const planPath = path.resolve(ROOT, args.plan);
   const blocksDir = path.resolve(ROOT, args.blocks);
   const outPath = path.resolve(ROOT, args.out);
@@ -187,7 +187,11 @@ function main() {
   const stageCounts = stages.map((s) => `${s.id}=${s.blockIds.length}`).join(' ');
   console.log(`stages    ${stageCounts}`);
 
-  process.exit(0);
+  if(args['bundle-out']) {
+    const result=await require('./export-reading-bundle').exportReadingBundle({source:args.source,design:designPath,plan:planPath,generated:outPath,map:args.map,out:args['bundle-out'],analysisId:args['analysis-id']});
+    console.log('bundle    '+result.manifestPath);
+  }
+  return 0;
 }
 
-main();
+if(require.main===module) main().catch(error=>{console.error(error.message);process.exitCode=1;});
