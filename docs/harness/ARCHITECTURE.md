@@ -96,3 +96,7 @@ support。原始 `model` 仍只供 Gate 和人工审核语义使用。
 ## Explore runtime boundary
 
 F20纯projection消费已验证L0 VM的身份、edges、membership与attachment。renderer只交付Focus graph和已声明外键，不补关系；F19同一地址/栈/resolver承担跨投影导航。annotation与relationGap不作为邻接。
+
+## F23 L1 delivery — 待审阅设计
+
+F23 计划由现有 projectTopic 补齐原始显示信息副本，独立 L1 renderer 负责纯布局、DOM 和回调；内部坐标复用 L0Layout，外部端点布局不改关系分类。Electron/Preview 共用模块，现有 Reading controller 继续拥有导航和现场恢复，扩展 L1 选择及图滚动的捕获。无新 schema、文件 I/O、私有导航栈或模型调用；详细接口和验收见[展示设计](../log/artifacts/F23-l1-topic-boundary-view/view-design.md)。产品实现尚未开始。

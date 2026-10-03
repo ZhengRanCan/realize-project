@@ -58,3 +58,7 @@ Reading各层可显式选择Map Element/Topic探索关系，图只展示已声�
 ## F21 maturity interaction
 
 工具行提供显式Explore入口与live阅读位置；顶部导航继续复用原页面。Map节点完整accessible name与选中状态，键盘披露不依赖hover。Escape只处理当前顶层，编辑/选择/IME/修饰键受保护。640×720窄窗口允许图独立滚动，Source可关闭恢复；不隐藏语义。relates-to在所有读法都无方向。焦点可见并随Back恢复，性能预算与证据在F21合同。
+
+## F23 L1 boundary view — 待审阅设计
+
+F23 的[展示设计](../log/artifacts/F23-l1-topic-boundary-view/view-design.md)采用主题内部图与明确标注的外部端点，同一画布保留全部已有内部/crossing 关系；解释区块入口放在图下方。无可绘制关系才显示 boundary summary。节点/关系用原生键盘披露，窄窗口图独立滚动，返回恢复选择、展开、焦点与图滚动。设计尚未确认，现有产品仍是文字列表；该段不是已实现能力。

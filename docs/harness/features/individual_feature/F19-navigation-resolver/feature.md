@@ -1,9 +1,9 @@
 ---
 id: F19
 title: Reading Navigation and Resolver
-version: v0.1
+version: v0.2
 status: passing
-dependsOn: ["F16","F17","F18"]
+dependsOn: ["F16","F18"]
 scope: {"code":["app/shared/reading-navigation.js","app/renderer/reading-navigation.js","app/renderer/app.js","app/renderer/l0-map.js","app/renderer/l0-map.css","app/renderer/index.html","app/renderer/styles.css","app/main/main.js","scripts/build-preview.js","package.json"],"tests":["scripts/test-reading-navigation.js","scripts/test-reading-navigation-electron.js","scripts/test-reading-bundle-electron.js","scripts/test-l0-preview.js","scripts/test-reading-bundle-preview.js","scripts/helpers/reading-bundle-fixture.js"],"docs":["docs/harness/ARCHITECTURE.md","docs/harness/DESIGN.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F19-navigation-resolver/**","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F19-navigation-resolver/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"2026-10-03","commands":[{"command":"npm run test:all","result":"passed"},{"command":"npm run selftest","result":"passed"},{"command":"npm run verify-preview","result":"passed"}],"manualSmoke":"User delegated completion; real Electron automated input/IPC paths passed, not claimed as human manual acceptance."}
 completionGate: {"version":"v0.1","l3":"required","userPath":["真实 Electron：Map → Topic occurrence → Block → fragment inspection → 逐层 Back，恢复展开、滚动、选中与焦点","共享定位入口打开 Element / Block 唯一 canonical landing，再 Back 回原 occurrence；Known(0) Block 仍可打开","搬迁 Preview 复用同一导航模块；不将测试入口描述成实际 Explore 页面"],"integrationEvidence":["2026-10-03 real Electron and relocated portable Preview navigation passed","Native independent review: 4 P2 fixed, no remaining P1/P2"],"knownUnverified":[],"humanReviewRequired":[]}
@@ -22,7 +22,8 @@ F19 验收 Reading 内导航和共享定位动作；真实 Explore 页面及跨�
 
 ## Process preconditions
 
-- F16 / F17 / F18 已 passing，登记为强制前置。
+- F16/F18 是强制前置；F17 已验证的 Topic 投影与进入/返回路径作为技术基线。
+- 2026-10-03 F17 因视觉缺口重开：其未完成的边界图不构成 F19 导航正确性的前置，因此从 dependsOn 中移除 F17 并在正文保留实际基线。代码及原导航证据不变，F23/F24 新展示仍须重新验证共享导航，不能复用旧结果声称新页通过。
 - 依据 Reading 主契约 §3.3、Decision B / E、I4 / I5 / N10，以及各层下钻与返回纪律。
 - F20 不反向作为 F19 的完成前置。
 

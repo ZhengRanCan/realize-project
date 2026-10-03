@@ -3,10 +3,10 @@
 ## Status
 
 - Date: 2026-10-03.
-- Active feature: 无；F11–F21 与 F22 均 passing。
-- Next queued feature: 无；开发分支交付，等待用户体验后决定合并。
+- Active feature: F23 L1 Topic Boundary View，展示设计待用户审阅；F17 保持 blocked，F24 为 not_started。
+- Next queued feature: F23 完成后继续 F24；当前已开始 F23 设计，未改产品代码。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
-- Git strategy: 用户确认 F22 完成；本轮提交并推送到 `codex/f11-f21-conformance`，F11–F21 全部完成并通过验收后再合并 main。
+- Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；登记与展示设计作为本地文档检查点提交，未推送；不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
   （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
@@ -30,13 +30,15 @@
 | F13 | Minimal Semantic Projection Boundary (B1) | `passing` | 纯边界与八项结构断言已通过 |
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `passing` | F19–F21后补真实模块/DOM、Back与Known(0)落点证据，独立审查通过 |
-| F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 既有 Overview projection；Plan + Generated runtime 补齐的独立证据在 F18 |
-| F17 | L1 Topic Runtime | `passing` | Topic boundary projection、真实入口和 Back 自检通过 |
+| F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 仅数据投影接入完成；独立单 Block 展示由 F24 补齐 |
+| F17 | L1 Topic Runtime | `blocked` | 投影/入口已通过；有关系时仍为文字列表，待 F23 补齐图并实际验收 |
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
 | F19 | Reading Navigation and Resolver | `passing` | 统一导航/定位、真实逐层返回、便携Preview与独立审查通过；Explore组合路径由F20验证 |
 | F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
+| F23 | L1 Topic Boundary View | `active` | 展示设计已写，待审阅后细化计划；图实现与实际界面验收待做 |
+| F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -50,6 +52,13 @@ Phase D  Product Maturity           是否好用、快、清晰、可维护？  
 **Phase B 的 F18 路径已接入。** 资料包明确消费 Plan + Generated，首屏为框架图；
 L3 保持两条独立核查路径，缺失与漂移明确降级。F19/F20 已补齐共享 Back / Resolve 与 Explore；F21 的键盘、窄窗口和性能验收通过。
 
+### 当前返工（2026-10-03）
+
+- F23 → F24：L1 有关系时展示局部与边界图；L2 主路径只展示当前 Block，按已有受控表达呈现。
+- 两项均需真实 Electron/Preview、键盘/窄窗口、Back/Resolve/L3/Explore 回归及用户查看实际界面的结果；不修改原文或重新调用模型。
+- F17 复核关闭由 F23 的实际验收触发；F16 保留数据接入结论。F19 仅将 F17 已验证投影/入口记为技术基线，视觉返工不作为导航依赖，gate 本身不改。
+- 反馈：[L1/L2 展示缺口](harness/incidents/2026-10-03-l1-l2-reading-gap.md)。新任务登记通过文档校验不代表实现完成。
+
 ### Reading v1 的完成判据（不是 B2 全绿）
 
 ```text
@@ -60,7 +69,7 @@ Renderer 不重新推断 semantic relation
 高风险 invariants 有机器保护
 ```
 
-到这里，Reading View Cognitive Contract v1 才算**从文档变成产品**。
+以上是完成条件，不是当前完成结论。**用户试用确认 L1/L2 展示仍有缺口，整体分层阅读体验尚未完成验收。** F23/F24 分别补齐边界图和独立解释页，自动化通过不能代替实际可理解性判断。
 
 ## 下一阶段路线（2026-09-29 登记）
 
@@ -100,10 +109,10 @@ F15  集成不变量                 renderer 纪律 / Decision B 导航 / Decis
 
 ```text
 $ npm run verify:harness
-Harness gate: 20 features, 0 errors.        # 2026-09-29，加入 F11–F21 之后
+Harness gate: 23 features, 0 errors.        # 2026-10-03，登记 F23/F24、重开 F17
 
 $ npm run check:docs
-Doc links: 107 markdown files checked, 0 broken.
+Doc links: 145 markdown files checked, 0 broken.
 
 $ npm run check:experiments
 experiments index: 66 units + 17 artifacts, up to date.
@@ -303,3 +312,10 @@ Source-verified Evidence
 - fixtureD无Plan不补造O-01；Known(0)Block落点由F19有效bundle验证。独立审查的身份集合漏检P2已修正，最终无P1/P2。
 - F11–F21/F22全部passing；历史F04–F08/F10的人工Track A/模型质量记录仍独立。未运行任何模型/API或提交用户资料包/审核，成功txt不留存。
 - 完整test:all、selftest、portablePreview、input gates、harness/docs/experiments通过；check-overview既有warnings保留。继续用户指定开发分支，不在本轮直接合并main。
+
+## 2026-10-03 — F23 Design Started
+
+- 用户要求开始 F23，已核对现有投影、renderer、导航现场和 Preview 接入点。强制前置 F16/F18/F19 均 passing，F23 为当前唯一 active。
+- [展示设计](log/artifacts/F23-l1-topic-boundary-view/view-design.md)：内部成员图与外部端点在同一画布，区块入口在下方；公开样本 T-02 验内部连接，T-03 验 crossing，不补造演示关系。
+- projection 计划只补原始显示字段；L1 模块复用 L0 纯布局和既有导航，返回现场需要增加 L1 选择与独立图滚动。产品代码未修改。
+- 按 brainstorming 的书面设计审阅步骤等待用户反馈，再细化实施计划；沿用此前 Native 执行选择。BMad runtime 缺失，本轮未安装或替代其工作流。

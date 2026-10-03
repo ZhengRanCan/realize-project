@@ -11,8 +11,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":[],"integrationEvid
 
 # F16 L2 Block Runtime (first product adoption)
 
-> **契约待补**：本 feature 的详细契约在 **F11–F15 完成后**再补全。此处只固定
-> 职责边界、与其它 feature 的分界、以及不可让步的约束。
+> **完成范围说明（2026-10-03）**：passing 仅证明 L2 的语义投影接入与迁移行为一致；当前仍在整篇 Overview 内定位区块，不证明独立 Block 阅读页或主观可理解性已验收。独立展示由 F24 补齐。
 
 ## Goal
 

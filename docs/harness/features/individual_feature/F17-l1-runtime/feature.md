@@ -1,17 +1,17 @@
 ---
 id: F17
 title: L1 Topic Runtime
-version: v0.1
-status: passing
+version: v0.2
+status: blocked
 dependsOn: []
 scope: {"code":["app/shared/l1-topic-projection.js","app/renderer/l0-map.js","app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-l1-topic-projection.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F17-l1-runtime/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"node scripts/test-l1-topic-projection.js","result":"passed","output":"9 assertions passed"},{"command":"npm run selftest","result":"passed","output":"Topic to L1 to Back passed"}],"manualSmoke":"Electron selftest passed."}
-completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中进入一个 Topic：确认看到的是它的语义边界（成员 / 内部关系 / 穿越边界的关系），而不是 Topic 内部被裁出来的 L0 子图"],"integrationEvidence":[],"knownUnverified":[],"humanReviewRequired":[]}
+completionGate: {"version":"v0.2","l3":"required","userPath":["有可绘制关系时查看 L1 主题局部/边界图；无关系时查看合法 summary","Topic → L1 → 返回恢复现场，已有投影语义不改变"],"integrationEvidence":["2026-10-01 projection 与 Topic/Back 已通过；这些是技术基线，不证明视觉体验完成"],"knownUnverified":["有关系时仍只渲染文字列表，未落实局部地图；待 F23 补齐并复核"],"humanReviewRequired":["F23 实际图完成后由用户确认局部结构与外部连接可理解"]}
 ---
 
 # F17 L1 Topic Runtime
 
-> **契约待补**：详细契约在 **F11–F16 完成后**再补全。此处只固定职责边界与不可让步的约束。
+> **2026-10-03 重新打开**：投影、边界分类和导航证据保留；有关系时的边界图未实现，原 passing 结论撤回。F23 补齐展示并完成实际用户验收后，按本合同复核关闭。
 
 ## Goal
 
@@ -49,7 +49,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
 ### Out of scope
 
 - 不做 L3 / Explore；不做 L2 的进一步扩张。
-- 不重设计 UI（视觉形态属 F21）。
+- 本 feature 保留投影和语义范围；视觉补齐由 F23 实施，F21 的键盘/性能证据不能替代该项。
 - 不因为 `blockIds` 缺失就发明 Topic 的内部结构。
 
 ## Acceptance Criteria
@@ -62,10 +62,12 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["在 Electron 中�
       Unknown 与 Known(0) 的用户结果都是"没有 Block 入口"，但**不得合并成同一句话**。
 - [x] 为空的 boundary relation class 保持空语义，但**不要求为它绘制空画布**（knowledge state ≠ visual footprint）。
 - [x] **内部关系为空时不得伪造**（实测 D 的 21 个 Topic 里 16 个 internal = 0）。
-- [x] 退化规则成立：无任何可绘制 relation 时，L1 退化为 Topic boundary summary ——
+- [ ] 有可绘制关系时默认显示主题局部/边界图，关系文字仅作辅助披露；实际界面由 F23 验证。
+- [ ] 退化规则成立：无任何可绘制 relation 时，L1 退化为 Topic boundary summary ——
       改变 representation，**不改变 L1 identity**，也不表示数据缺失。
 - [x] §6 矩阵对应 cell 更新。
-- [x] 独立审查记录已写入 artifact 目录。
+- [x] 原数据/入口实现的独立审查记录已写入 artifact 目录。
+- [ ] 用户检查补齐后的实际界面，并明确确认局部结构与边界可理解；不能以自动化替代。
 
 ## Risks and compatibility
 
