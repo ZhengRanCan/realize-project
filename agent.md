@@ -11,6 +11,45 @@
 
 ---
 
+## 文件归类与存放
+
+项目说明、测试材料、模型任务模板、实验结果和本地资料按用途分开。找文件或新增材料时，先看这张表；具体说明由各目录 README 维护。
+
+| 位置 | 放什么 | 入口说明 |
+| --- | --- | --- |
+| `docs/` | 项目文档：当前规范、开发合同、进度、决策、讨论稿和 feature 验收记录 | `docs/README.md` |
+| `samples/<document>/` | 测试材料：一篇文章的原文与配套 Gold、Plan、Map、章节坐标、审核样例 | `samples/README.md` |
+| `prompts/` | 生成脚本交给模型的任务说明模板，规定如何分析、输出什么结构 | `prompts/README.md`（列出五份模板及消费脚本） |
+| `artifacts/experiments/` | 原始实验记录：每次 run 的请求、生成结果、失败痕迹与实验报告 | `artifacts/experiments/README.md`、`artifacts/experiments/index.json` |
+| `workspace/` | 本机资料：分析资料包、人工审核、临时输出、预览、外部参考与归档；除 README 外不提交 Git | `workspace/README.md` |
+
+`docs/` 内也按职责分放：harness 管产品与开发流程，specs 管当前判断规则，notes 放讨论与历史草稿，prototypes 放探索原型，log/artifacts 放 feature 的验收与历史证据。**feature 验收记录在 docs，原始实验 run 在 artifacts/experiments**；两者通过引用关联。
+
+`workspace/` 的位置约定：
+
+| 位置 | 用途 |
+| --- | --- |
+| `workspace/analyses/<document>/<analysis>/` | 一篇文章的一次分析；清单、原文、坐标、Review、Plan、可选 Generated/Map 与本次人工审核放在同一目录 |
+| `workspace/tmp/<task>/` | 当前任务的临时文件；新的自动化测试输出写入 `workspace/tmp/tests/`，任务结束后清理 |
+| `workspace/archive/` | 仍需留存的旧生成结果、一次性脚本、草稿和补丁，按任务或用途分组 |
+| `workspace/previews/` | 新生成的预览页面与截图 |
+| `workspace/references/` | 外部参考资料与本地参考仓库 |
+| `workspace/legacy-review/` | 旧单文件入口的新人工审核；已有根目录 human-review.json 继续原位读写 |
+
+存放与维护规则：
+
+- **同一篇文章的配套材料放一起**：标准测试输入放 samples 的文章目录，实际分析放 workspace 的文章/分析目录；只有确实存在的配套数据才放入，不补造缺失的 Review/Plan。
+- 自动化测试代码放 `scripts/test-*.js`；samples 放测试输入。人工审核样例与用户真实审核分开，真实结果只由显式保存写入当前分析目录或旧入口审核位置。
+- prompts 是生成任务模板；模型输出放实验 run 或显式导出的分析资料包。Electron 打开已有包时不执行 prompt；未接入的旧协议草稿在 `docs/notes/legacy/`。
+- 每次新实验使用独立 run 目录；feature 的结论和验收记录引用相应 run。历史请求、失败记录、原文、Gold、Plan 和 Generated 不因目录整理而改写。
+- 新命令与当前文档使用整理后的路径。旧路径兼容的唯一机器映射是 `scripts/helpers/repository-layout.json`，由同目录的 resolver 使用；历史文档路径对照见 `docs/README.md`。资料包内部仍按清单校验，不走仓库旧路径映射，不按文件名猜配套关系。
+- **任务结束时清理临时文件**：agent 校验日志、测试缓存、提交说明与可重建输出不用长期保留，更不能散放在 workspace 根目录。成功检查默认直接看终端输出，正式验收记录只登记命令、结果与关键证据。
+- 排查失败时可暂存日志于当前任务的 tmp 子目录，问题解决后删除；不为每次成功检查新增永久 txt。测试复用固定缓存目录，完成后清理。
+- 旧生成结果、仍有价值的一次性脚本、草稿与补丁归档到 workspace/archive；稳定且可复用的工具经过整理和验证后再进入 scripts。分析资料包、用户人工审核、原文、Gold、正式实验和本地配置不作为测试缓存处理。
+- 清理只针对当前任务已确认的临时范围，不扫删整个 workspace、archive 或外部参考资料。文件移动核对内容，目标冲突时停止；删除受工具限制时如实报告，不能把“移到待删目录”称为已删除。
+
+---
+
 ## 文档路由
 
 先按"要做什么"查表，**只读被指向的那一份**；不要一次性把全部文档读完。
@@ -34,7 +73,10 @@
 | 判断某个主题该由哪份文档负责（authority 归属 / 冲突时谁优先） | 各 spec 开头的 **Authority / Scope** 段；Reading 与其它文档的优先级见 `docs/specs/reading-view-cognitive-contract.md` §1.2 的 scoped precedence |
 | 查某个 feature 的需求、结论与验收证据 | `docs/log/artifacts/Fxx-*/`（先看 `brief.md`、`verification-summary.md`） |
 | 查原始实验 run（什么参数下生成了什么、失败留下了什么） | `artifacts/experiments/README.md` + `artifacts/experiments/index.json`（逐 run → feature 的归属表） |
-| 找回规范化之前的旧路径 | `docs/README.md` 的 Path mapping |
+| 找测试文章、Gold、Map 或章节坐标 | `samples/README.md` → 对应文章目录 |
+| 查 prompt 的用途、对应生成脚本或修改模型任务模板 | `prompts/README.md` → 对应模板；阶段职责见 `docs/harness/ARCHITECTURE.md` |
+| 找本地分析资料包、审核、临时输出、预览或参考资料 | `workspace/README.md` |
+| 找回规范化之前的旧路径 | `docs/README.md` 的 Path mapping；仓库兼容映射在 `scripts/helpers/repository-layout.json` |
 | 记录真实缺陷或用户返工反馈 | `docs/harness/incidents/`；可复用经验进 `docs/harness/lessons.jsonl` |
 | 看形状探索原型、背景材料、改进建议 | `docs/prototypes/`、`docs/notes/` |
 | 理解某个 feature 的当前状态语义（`active` / `blocked` / `passing`） | `docs/harness/features/README.md` |
@@ -95,6 +137,10 @@
   主进程与渲染进程共用，不要在别处复制。
 - 会调用外部模型的命令只有 `npm run ai:*` 与 `npm run f10:run`；它们不参与标准验证，凭据不得入库。
 - 项目当前最重要的判断标准已移到 `docs/harness/PRODUCT_SPEC.md`，改动前先对照它。
+
+## Git 分支约定
+
+用户指定 F11–F21 及配套 F22 工作继续在 `codex/f11-f21-conformance` 上提交和推送。等 F11–F21 全部完成并通过验收后，再将该分支合并到 main；此前不提前合并主分支。
 
 ## 常用命令
 

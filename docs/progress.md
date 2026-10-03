@@ -6,6 +6,7 @@
 - Active feature: none；F22 已完成。
 - Next queued feature: **F19 Reading Navigation and Resolver**；本轮未启动。
 - Latest completed feature: `F22` Entry and Repository Layout（2026-10-03）；首页、目录迁移、真实路径与独立审查通过。
+- Git strategy: 用户确认 F22 完成；本轮提交并推送到 `codex/f11-f21-conformance`，F11–F21 全部完成并通过验收后再合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
   （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
