@@ -9,6 +9,14 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('designReview', {
+  bundle: {
+    open: () => ipcRenderer.invoke('bundle:open'),
+    loadPath: path => ipcRenderer.invoke('bundle:loadPath', {path}),
+    commit: payload => ipcRenderer.invoke('bundle:commit', payload),
+    discard: payload => ipcRenderer.invoke('bundle:discard', payload),
+    inspect: payload => ipcRenderer.invoke('bundle:inspect', payload),
+    source: payload => ipcRenderer.invoke('bundle:source', payload),
+  },
   paths: () => ipcRenderer.invoke('app:paths'),
 
   loadFixture: () => ipcRenderer.invoke('design:loadFixture'),
@@ -20,8 +28,8 @@ contextBridge.exposeInMainWorld('designReview', {
   openMarkdown: () => ipcRenderer.invoke('document:openMarkdown'),
   readDefaultMarkdown: () => ipcRenderer.invoke('document:readDefault'),
 
-  saveHumanReview: (humanReview, targetPath) =>
-    ipcRenderer.invoke('humanReview:save', { humanReview, path: targetPath }),
+  saveHumanReview: (humanReview, targetPath, sessionToken) =>
+    ipcRenderer.invoke('humanReview:save', { humanReview, path: targetPath, sessionToken }),
   revealHumanReview: () => ipcRenderer.invoke('humanReview:reveal'),
 
   evaluateGate: () => ipcRenderer.invoke('gate:evaluate'),

@@ -164,6 +164,10 @@ code { font-family: "Cascadia Mono", Consolas, monospace; background: var(--bg-3
 .sidebar-foot { margin-top: auto; padding: 10px 12px 4px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
 
 .main { flex: 1; overflow: auto; padding: 22px 26px 60px; min-width: 0; background: var(--bg); }
+.fragment-inspect { margin-left: 8px; font-size: 11px; border: 1px solid #ccd5df; border-radius: 4px; color: #43566b; background: transparent; cursor: pointer; }
+.fragment-inspect:focus-visible { outline: 2px solid #3b76bd; }
+#source-body section, #source-body details { margin-bottom: 16px; }
+.l3-evidence pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
 
 h2.section-title { margin: 0 0 4px; font-size: 18px; }
 .section-sub { color: var(--fg-dim); font-size: 13px; margin-bottom: 18px; }

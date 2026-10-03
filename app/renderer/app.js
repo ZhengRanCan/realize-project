@@ -50,6 +50,10 @@ const KEY_TO_ACTION = { a: 'approved', r: 'rejected', l: 'needs-revision' };
 const RELATION_LABELS = { upstream: '它依赖', downstream: '依赖它', sibling: '同一 root 下的并列判断' };
 
 const state = {
+  sessionToken: null,
+  bundleInfo: null,
+  inspectionOrigin: null,
+  inspectionRequest: 0,
   model: null,
   humanReview: null,
   modelPath: null,
@@ -394,6 +398,7 @@ function renderBlock(block) {
   head.appendChild(el('span', 'block-title', block.title));
   head.appendChild(el('span', 'spacer'));
   head.appendChild(renderSourceTags(block, openSource));
+  if(state.sessionToken) {const inspect=el('button','btn tiny','查出处');inspect.dataset.inspectBlock=block.id;inspect.addEventListener('click',()=>openInspection(block.id));head.appendChild(inspect);}
 
   if (block.role === 'ambient') {
     head.appendChild(el('span', 'block-flag', '常驻'));
@@ -409,11 +414,12 @@ function renderBlock(block) {
 
   const body = el('div', 'block-body');
   if (expanded) {
-    const renderer = CONTENT_RENDERERS[block.content.type];
+    const renderer = block.content && CONTENT_RENDERERS[block.content.type];
     if (renderer) {
-      body.appendChild(renderer(block.content));
+      const expression=renderer(block.content);body.appendChild(expression);
+      if(state.sessionToken) bindFragmentInspection(expression,block);
     } else {
-      body.appendChild(el('div', 'muted small', `未知承载形式：${block.content.type}`));
+      body.appendChild(el('div', 'muted small', `${block.generatedExpression?.state==='missing'?'这个区块缺少生成表达。':block.generatedExpression?.state==='unknown'?'尚未提供生成资料；仍可查看规划出处。':'未知承载形式。'}`));
     }
     if (block.reviewObjectLinks.state === 'known') {
       const foot = el('div', 'block-foot');
@@ -524,7 +530,9 @@ function viewOverview() {
 
 async function ensureSourceLoaded() {
   if (state.source.loaded) return state.source;
+  const token=state.sessionToken;
   const result = await api.loadSource();
+  if(token!==state.sessionToken) return state.source;
   if (!result || !result.ok) {
     state.source.error = result && result.errors ? result.errors.join('; ') : '读取失败';
     return state.source;
@@ -539,7 +547,14 @@ async function ensureSourceLoaded() {
   return state.source;
 }
 
-async function openSource(label) {
+async function openSource(label,{namespace='plan-section',key=label}={}) {
+  if(state.sessionToken) {
+    const token=state.sessionToken,result=await api.bundle.source({sessionToken:token,namespace,key});
+    if(token!==state.sessionToken) return;
+    closeInspection(false);const body=clear($('#source-body'));clear($('#source-head')).textContent=label;
+    $('#source-panel').classList.remove('hidden');$('#screen-review').classList.add('with-source');
+    showCoordinate(body,result.coordinate||{state:'unavailable',reason:(result.errors||[]).join('; ')});return;
+  }
   await ensureSourceLoaded();
   renderSourcePanel(label);
 }
@@ -1034,7 +1049,7 @@ function viewL0() {
   window.L0Map.mount(host, state.l0ViewModel, {
     view: state.l0View || 'reading',
     // provenance → 打开右侧 Source 面板的对应章节（复用现有原文回查能力）
-    onSourceRef: (ref) => { openSource(ref); },
+    onSourceRef: (ref) => { state.sessionToken ? openSource(ref,{namespace:'heading',key:ref.replace(/^§/,'')}) : openSource(ref); },
     onTopic: (id) => { state.l1Topic = state.l1Topics[id]; state.view = 'l1'; render(); },
   });
   // Reading / Review 切换后保持视图状态（不重新计算任何数据）
@@ -1048,11 +1063,15 @@ function viewL0() {
 }
 
 function viewL1() {
-  const topic = state.l1Topic;
-  if (!topic) { $('#main').innerHTML = '<div class="l0-empty">未选择 Topic。</div>'; return; }
-  const relationRows = topic.relations.map((r) => `<li data-l1-role="${r.role}">${r.from} —${r.type}→ ${r.to} (${r.role})</li>`).join('') || '<li>无可绘制关系；这是 Topic boundary summary。</li>';
-  $('#main').innerHTML = `<section class="block" data-l1-topic="${topic.topic.id}"><button class="btn" id="l1-back">返回 L0</button><h2>${topic.topic.title}</h2><p>${topic.topic.proposition}</p><h3>成员</h3><ul>${topic.inside.map((e) => `<li>${e.label}</li>`).join('') || '<li>无成员</li>'}</ul><h3>边界关系</h3><ul>${relationRows}</ul><p data-block-organization="${topic.blockOrganization.state}">Block Organization: ${topic.blockOrganization.state}</p></section>`;
-  $('#l1-back').addEventListener('click', () => { state.view = 'l0'; render(); });
+ const topic=state.l1Topic,host=clear($('#main'));if(!topic){host.textContent='未选择 Topic。';return;}
+ const wrap=el('section','block');wrap.dataset.l1Topic=topic.topic.id;
+ const back=el('button','btn','返回框架图');back.id='l1-back';back.addEventListener('click',()=>{state.view='l0';render();});wrap.append(back,el('h2','',topic.topic.title),el('p','',topic.topic.proposition));
+ wrap.append(el('h3','','成员'));for(const member of topic.inside)wrap.append(el('p','',member.label));
+ wrap.append(el('h3','','边界关系'));if(!topic.relations.length)wrap.append(el('p','','无可绘制关系；这是 Topic boundary summary。'));
+ for(const relation of topic.relations){const row=el('p','',relation.from+' —'+relation.type+'→ '+relation.to+' ('+relation.role+')');row.dataset.l1Role=relation.role;wrap.append(row);}
+ const organization=el('p','',topic.blockOrganization.state==='unknown'?'尚未声明区块关联。':topic.blockOrganization.state==='empty'?'已明确没有关联区块。':'相关解释区块');organization.dataset.blockOrganization=topic.blockOrganization.state;wrap.append(organization);
+ for(const entry of topic.blockEntries||[]) {const button=el('button','btn',entry.id+' · '+entry.title);button.dataset.l1Block=entry.id;button.addEventListener('click',()=>{state.view='overview';state.blockExpanded[entry.id]=true;render();document.getElementById('block-'+entry.id)?.scrollIntoView({block:'start'});});wrap.append(button);}
+ host.append(wrap);
 }
 
 /**
@@ -1121,6 +1140,10 @@ function applyLoadResult(result) {
     return { applied: false, reason: `validation-failed:${result.stage}` };
   }
   clearError();
+  state.inspectionRequest++;state.inspectionOrigin=null;
+  state.sessionToken=result.sessionToken||null;state.bundleInfo=result.bundleInfo||null;
+  state.source={loaded:false,document:null,sections:[],labels:[],error:null};
+  state.l0ViewModel=result.l0ViewModel||null;state.l1Topics=result.l1Topics||null;state.l1Topic=null;
   state.model = result.model;
   state.l2ViewModel = result.l2ViewModel;
   state.humanReview = result.humanReview;
@@ -1131,7 +1154,7 @@ function applyLoadResult(result) {
   state.onlyPending = false;
   state.focusedDecisionId = null;
   state.activeBlockId = null;
-  state.view = 'overview';
+  state.view = result.bundleInfo && result.l0ViewModel ? 'l0' : 'overview';
   state.dirty = false;
   state.scrollSpyReady = false;
   setSaveState(result.humanReviewExists ? '已加载 human-review.json' : '尚未保存（human-review.json 不存在）');
@@ -1165,6 +1188,7 @@ window.__applyLoadResult = applyLoadResult;
 window.__state = state;
 
 function bindStartScreen() {
+  if($('#btn-open-bundle')) $('#btn-open-bundle').addEventListener('click',()=>loadBundle());
   $('#btn-load-fixture').addEventListener('click', async () => {
     const result = await api.loadFixture();
     if (applyLoadResult(result).applied && !state.markdown) {
@@ -1245,10 +1269,10 @@ function bindReviewScreen() {
     }
   });
 
-  $('#source-close').addEventListener('click', closeSource);
+  $('#source-close').addEventListener('click',()=>state.inspectionOrigin?closeInspection():closeSource());
 
   $('#btn-save').addEventListener('click', async () => {
-    const result = await api.saveHumanReview(state.humanReview);
+    const result = await api.saveHumanReview(state.humanReview,undefined,state.sessionToken);
     if (!result.ok) {
       toast(`保存失败：${(result.errors || []).join('; ')}`, true);
       return;
@@ -1267,6 +1291,7 @@ function bindReviewScreen() {
 
   $('#btn-reload').addEventListener('click', async () => {
     if (state.dirty && !window.confirm('有未保存的人工审核修改，重新加载会丢弃它们。继续？')) return;
+    if(state.bundleInfo) {await loadBundle(state.bundleInfo.manifestPath);return;}
     const result = await api.loadDesignPath(state.modelPath);
     applyLoadResult(result);
   });
@@ -1330,3 +1355,53 @@ async function main() {
 }
 
 main();
+
+let bundleLoadRequest=0;
+async function loadBundle(manifestPath) {
+ const request=++bundleLoadRequest;const prepared=manifestPath?await api.bundle.loadPath(manifestPath):await api.bundle.open();
+ if(request!==bundleLoadRequest){if(prepared.requestToken)await api.bundle.discard({requestToken:prepared.requestToken});return {ok:false,stale:true};}
+ if(!prepared.ok){if(!prepared.canceled){showError(prepared.errors,prepared.stage);toast((prepared.errors||[]).join('; '));}return prepared;}
+ if(state.dirty && !window.confirm('有未保存的审核修改。放弃这些修改并切换资料包？')) {await api.bundle.discard({requestToken:prepared.requestToken});return {ok:false,canceled:true};}
+ const committed=await api.bundle.commit({requestToken:prepared.requestToken});
+ if(!committed.ok){toast((committed.errors||[]).join('; '));return committed;}
+ applyLoadResult(committed.loadResult);if(!committed.loadResult.l0ViewModel)toast('未提供框架图，当前展示独立区块解释。');return committed.loadResult;
+}
+function showCoordinate(host,coordinate) {
+ host.replaceChildren();host.dataset.coordinateState=coordinate.state;
+ if(coordinate.state!=='known'){host.appendChild(el('p','',coordinate.reason||'当前来源无法定位。'));return;}
+ host.append(el('p','source-meta',coordinate.title+' · 原文 L'+coordinate.range.startLine+'-'+coordinate.range.endLine),el('pre','source-text',coordinate.text));
+}
+async function openInspection(blockId,fragmentPath) {
+ const token=state.sessionToken,request=++state.inspectionRequest;
+ const origin=state.inspectionOrigin||{view:state.view,topic:state.l1Topic,blockExpanded:{...state.blockExpanded},scroll:$('#main').scrollTop,windowScroll:window.scrollY};
+ const result=await api.bundle.inspect({sessionToken:token,blockId,...(fragmentPath!==undefined?{fragmentPath}:{})});
+ if(token!==state.sessionToken || request!==state.inspectionRequest)return result;
+ if(!result.ok){toast((result.errors||[]).join('; '));return result;}
+ state.inspectionOrigin=origin;$('#source-panel').classList.remove('hidden');$('#screen-review').classList.add('with-source');clear($('#source-head')).textContent='查出处';
+ window.DesignReviewL3.mountL3Inspector($('#source-body'),result.viewModel,{onClose:()=>closeInspection(),onFragment:()=>openInspection(blockId),onSource:async unit=>{
+  const source=await api.bundle.source({sessionToken:token,namespace:'plan-section',key:unit.section});
+  if(token!==state.sessionToken || request!==state.inspectionRequest)return;
+  showCoordinate($('#l3-source-coordinate'),source.coordinate||{state:'unavailable',reason:(source.errors||[]).join('; ')});
+ }});return result;
+}
+function closeInspection(restore=true) {
+ const origin=state.inspectionOrigin;state.inspectionRequest++;state.inspectionOrigin=null;closeSource();
+ if(origin && restore){state.view=origin.view;state.l1Topic=origin.topic;state.blockExpanded=origin.blockExpanded;render();$('#main').scrollTop=origin.scroll;window.scrollTo(0,origin.windowScroll);}
+}
+function bindFragmentInspection(host,block) {
+ const target=path=>{
+  let m;
+  if((m=path.match(/^parts\[(\d+)\]$/)))return host.querySelectorAll('.c-prose > p')[+m[1]];
+  if((m=path.match(/^lanes\[(\d+)\](?:\.nodes\[(\d+)\]\.(node|edge))?$/))){const lane=host.querySelectorAll('.lane')[+m[1]];if(!lane)return null;return m[2]===undefined?lane.querySelector('.lane-label'):lane.querySelectorAll(m[3]==='node'?'.fnode':'.fedge')[+m[2]];}
+  if((m=path.match(/^rows\[(\d+)\]\[(\d+)\]$/)))return host.querySelectorAll('tbody tr')[+m[1]]?.children[+m[2]];
+  if((m=path.match(/^columns\[(\d+)\]$/)))return host.querySelectorAll('th')[+m[1]];
+  if((m=path.match(/^tiers\[(\d+)\]$/)))return host.querySelectorAll('.rung')[+m[1]];
+  if((m=path.match(/^steps\[(\d+)\]$/)))return host.querySelectorAll('.step')[+m[1]];
+  if(path==='verdict')return host.querySelector('.verdict');
+  if((m=path.match(/^pairs\[(\d+)\]$/)))return host.querySelectorAll('.combo-row')[+m[1]];
+  if((m=path.match(/^panels\[(\d+)\](?:\.items\[(\d+)\])?$/))){const panel=host.querySelectorAll('.cl-panel')[+m[1]];return m[2]===undefined?panel?.querySelector('.cl-title'):panel?.querySelectorAll('li')[+m[2]];}
+  if((m=path.match(/^sides\[(\d+)\](?:\.lines\[(\d+)\])?$/))){const side=host.querySelectorAll('.diff-col')[+m[1]];return m[2]===undefined?side?.querySelector('.diff-head'):side?.querySelectorAll('.diff-line')[+m[2]];}
+ };
+ for(const fragment of block.fragmentEntries||[]){if(!fragment.sourceUnitIds.length)continue;const element=target(fragment.path);if(!element)continue;const button=el('button','fragment-inspect','出处');button.dataset.fragmentPath=fragment.path;button.setAttribute('aria-label','查看'+fragment.kind+'出处');button.addEventListener('click',event=>{event.stopPropagation();openInspection(block.id,fragment.path);});element.append(button);}
+}
+window.__loadBundle=loadBundle;window.__openInspection=openInspection;window.__closeInspection=closeInspection;

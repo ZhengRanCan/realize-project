@@ -22,6 +22,9 @@ const { projectL2Overview } = require('../shared/reading-projection');
 const { projectTopic } = require('../shared/l1-topic-projection');
 const { evaluateGate, buildHumanReviewSkeleton } = semantics;
 
+const {createReadingSessionController,inspectReadingSession,sourceReadingSession,sourceIntegrity}=require('./reading-session');
+const bundleSessions=createReadingSessionController();
+
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
 const SELF_TEST = process.argv.includes('--selftest');
 /** `--verify-preview <file>`：加载生成的 preview HTML 并断言 DOM（实验性验证，不改 UI）。 */
@@ -117,6 +120,7 @@ async function loadDesignReview(modelPath, humanReviewPath) {
   // review/Gate semantics only and is never interpreted by the renderer.
   const l2ViewModel = projectL2Overview(model.overview);
 
+  bundleSessions.reset();
   state = {
     modelPath: resolvedModel,
     model,
@@ -186,14 +190,24 @@ async function loadFrameworkMap(mapPath) {
   return { ok: true, mapPath: p, checkMapPath: checkMapText ? siblingCheck : null, viewModel, l1Topics };
 }
 
-function registerIpc() {  ipcMain.handle('app:paths', () => ({
+function registerIpc() {
+  ipcMain.handle('bundle:loadPath',(_event,payload)=>bundleSessions.prepare(payload.path));
+  ipcMain.handle('bundle:open',async()=>{
+    const result=await dialog.showOpenDialog(mainWindow,{title:'选择分析资料包 reading-bundle.json',filters:[{name:'Reading Bundle',extensions:['json']}],properties:['openFile']});
+    return result.canceled?{ok:false,canceled:true}:bundleSessions.prepare(result.filePaths[0]);
+  });
+  ipcMain.handle('bundle:commit',(_event,payload)=>{const result=bundleSessions.commit(payload.requestToken);if(result.ok) state=bundleSessions.current();return result;});
+  ipcMain.handle('bundle:discard',(_event,payload)=>{bundleSessions.discard(payload.requestToken);return {ok:true};});
+  ipcMain.handle('bundle:inspect',(_event,payload)=>inspectReadingSession(bundleSessions.current(),payload));
+  ipcMain.handle('bundle:source',(_event,payload)=>sourceReadingSession(bundleSessions.current(),payload));
+  ipcMain.handle('app:paths', () => ({
     projectRoot: PROJECT_ROOT,
     defaultFixture: DEFAULT_FIXTURE,
     defaultDocument: DEFAULT_DOCUMENT,
     defaultHumanReview: DEFAULT_HUMAN_REVIEW,
   }));
 
-  ipcMain.handle('design:loadFixture', () => loadDesignReview(DEFAULT_FIXTURE, state.humanReviewPath));
+  ipcMain.handle('design:loadFixture', () => loadDesignReview(DEFAULT_FIXTURE, state.bundle ? DEFAULT_HUMAN_REVIEW : state.humanReviewPath));
 
   // ── Feature 08 · L0 Framework Map（deterministic UI，不调用模型）────────────
   // 只读 framework-map.json + 同目录的 check-map.txt（若存在），在主进程算好 view model 再交给 renderer
@@ -228,7 +242,7 @@ function registerIpc() {  ipcMain.handle('app:paths', () => ({
       properties: ['openFile'],
     });
     if (result.canceled || result.filePaths.length === 0) return { ok: false, canceled: true };
-    return loadDesignReview(result.filePaths[0], state.humanReviewPath);
+    return loadDesignReview(result.filePaths[0], state.bundle ? DEFAULT_HUMAN_REVIEW : state.humanReviewPath);
   });
 
   ipcMain.handle('design:loadPath', async (_event, payload) => {
@@ -236,7 +250,7 @@ function registerIpc() {  ipcMain.handle('app:paths', () => ({
       return { ok: false, stage: 'input', errors: ['未提供路径'] };
     }
     try {
-      return await loadDesignReview(payload.path, state.humanReviewPath);
+      return await loadDesignReview(payload.path, state.bundle ? DEFAULT_HUMAN_REVIEW : state.humanReviewPath);
     } catch (error) {
       return { ok: false, stage: 'read', errors: [error.message] };
     }
@@ -309,6 +323,10 @@ function registerIpc() {  ipcMain.handle('app:paths', () => ({
     const target = payload.path ? path.resolve(payload.path) : state.humanReviewPath;
     if (!target) return { ok: false, errors: ['未确定 human-review.json 目标路径'] };
 
+    if(state.bundle) {
+      if(payload.sessionToken!==state.sessionToken || target!==state.humanReviewPath) return {ok:false,errors:['审核保存 session / 目标不匹配']};
+      try {if((await fs.lstat(target)).isSymbolicLink()) return {ok:false,errors:['审核文件不可为链接']};}catch(e){if(e.code!=='ENOENT') throw e;}
+    }
     const existing = state.humanReview || {};
     const buckets = ['decisions', 'openQuestions', 'gaps'];
     const mergeBucket = (incoming, previous) => {
@@ -367,6 +385,10 @@ function registerIpc() {  ipcMain.handle('app:paths', () => ({
    */
   ipcMain.handle('source:load', async () => {
     try {
+      if(state.bundle) {
+        if(await sourceIntegrity(state)!=='consistent') return {ok:false,errors:['当前资料包原文坐标不可用，请重新导出']};
+        return {ok:true,sessionToken:state.sessionToken,document:state.bundle.sourceSections.document,sections:state.bundle.sourceSections.sections};
+      }
       const payload = await readJson(SOURCE_SECTIONS);
       return { ok: true, document: payload.document, sections: payload.sections };
     } catch (error) {
@@ -1159,6 +1181,8 @@ async function runSelfTest() {
     if (!defaultHumanExists) ok('未在项目根目录偷偷生成 human-review.json（仍只由人工点击保存时创建）');
     else report.push('! 项目根目录已存在 human-review.json（人工审核产物，属正常情况）');
 
+
+    ok(await require('../../scripts/test-reading-bundle-electron').runBundleIntegration(win));
 
     emit();
     const failedCount = report.filter((line) => line.startsWith('✗')).length;
