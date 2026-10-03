@@ -1,6 +1,15 @@
 'use strict';
 
 const directional = new Set(['consumes', 'produces', 'depends-on', 'contains', 'validates', 'controls', 'constrains', 'transforms-to']);
+// The display projection owns its copies, including optional nested metadata.
+function copyFrozen(value) {
+  if (Array.isArray(value)) return Object.freeze(value.map(copyFrozen));
+  if (value && typeof value === 'object') return Object.freeze(Object.fromEntries(Object.entries(value).map(([key, item]) => [key, copyFrozen(item)])));
+  return value;
+}
+function pick(value, keys) {
+  return Object.fromEntries(keys.filter(key => Object.prototype.hasOwnProperty.call(value, key)).map(key => [key, value[key]]));
+}
 function projectTopic(map, topicId, {plan}={}) {
   const topic = map.topics.find((item) => item.id === topicId);
   if (!topic) throw new Error(`unknown topic ${topicId}`);
@@ -19,11 +28,22 @@ function projectTopic(map, topicId, {plan}={}) {
   const blockOrganization = Object.prototype.hasOwnProperty.call(topic, 'blockIds')
     ? { state: topic.blockIds.length ? 'known' : 'empty', ids: [...topic.blockIds] }
     : { state: 'unknown' };
-  const result={ kind: 'L1TopicViewModel', topic: Object.freeze({ id: topic.id, title: topic.title, proposition: topic.proposition }), inside: Object.freeze(inside.map((e) => Object.freeze({ id: e.id, label: e.label }))), relations: Object.freeze(relations.map(({ edge, role }) => Object.freeze({ id: edge.id, from: edge.from, to: edge.to, type: edge.type, role }))), relationClasses: Object.freeze(Object.fromEntries(Object.entries(relationClasses).map(([key, ids]) => [key, Object.freeze(ids)]))), blockOrganization: Object.freeze(blockOrganization), representation: relations.length ? 'boundary-map' : 'boundary-summary' };
+  const outsideIds = new Set(relations.filter(r => r.role !== 'internal').flatMap(({edge}) => [edge.from, edge.to]).filter(id => !ids.has(id)));
+  const elementFields = ['id', 'label', 'type', 'sectionRefs', 'sourceUnitIds'];
+  const result = {
+    kind: 'L1TopicViewModel',
+    document: pick(map.document || {}, ['id', 'title', 'sourcePath', 'role']),
+    topic: pick(topic, ['id', 'title', 'proposition', 'sectionRefs']),
+    inside: inside.map(e => pick(e, elementFields)),
+    outside: map.elements.filter(e => outsideIds.has(e.id)).map(e => pick(e, elementFields)),
+    relations: relations.map(({edge, role}) => ({...pick(edge, ['id', 'from', 'to', 'type', 'label', 'qualifiers', 'note']), role})),
+    relationClasses, blockOrganization,
+    representation: relations.length ? 'boundary-map' : 'boundary-summary',
+  };
   if(plan && blockOrganization.state==='known') {
     const order=['what','how','prove','boundary'];
     result.blockEntries=blockOrganization.ids.map(id=>{const b=plan.blocks.find(x=>x.id===id);if(!b) throw new Error(`dangling topic block ${id}`);return {id:b.id,title:b.title,stage:b.stage};}).sort((a,b)=>order.indexOf(a.stage)-order.indexOf(b.stage));
   }
-  return Object.freeze(result);
+  return copyFrozen(result);
 }
 module.exports = { projectTopic };
