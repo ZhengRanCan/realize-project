@@ -101,9 +101,9 @@ F20纯projection消费已验证L0 VM的身份、edges、membership与attachment�
 
 F23 首轮由现有 projectTopic 补齐原始显示信息副本，独立 L1 renderer 负责纯布局、DOM 和回调；内部坐标复用 L0Layout，外部端点布局不改关系分类。Electron/Preview 共用模块，现有 Reading controller 继续拥有导航和现场恢复，扩展 L1 选择及图滚动的捕获。首轮无新 schema、文件 I/O、私有导航栈或模型调用；详细接口和验收见[展示设计](../log/artifacts/F23-l1-topic-boundary-view/view-design.md)。已接入产品与便携 Preview；2026-10-04 实际可理解性验收未通过，v0.2 解释修正待做。共享 reading-projection 传递当前包的 sourceSections/sourceIntegrity，L1 复用 coordinate resolver 投影入口可用性；不传原文内容，原文读取仍经既有 session API 和实时完整性保护。
 
-## F25 shared explanation — 设计确认，尚未实施
+## F25 shared explanation — 已接入 L0
 
-[设计](../log/artifacts/F25-l0-document-orientation/view-design.md)已确认 Map 可选 readingGuide 及一份 shared 解释/绑定规则，L0 与后续 F23 共用。载体绑定原文和 Map 结构指纹，不串接 Map/Plan SU。[实施计划](../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)待审阅；规范、schema、loader 和 projection 在实施前同步，不将未实现接口称为已生效架构。
+[设计](../log/artifacts/F25-l0-document-orientation/view-design.md)已确认 Map 可选 readingGuide 及一份 shared 解释/绑定规则，L0 与后续 F23 共用。载体绑定原文和 Map 结构指纹，不串接 Map/Plan SU。[实施计划](../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)已确认，规范、schema、loader 和 L0 projection 已同步实现；F23 的后续消费仍待实现。
 
 ## F25 implementation boundary
 

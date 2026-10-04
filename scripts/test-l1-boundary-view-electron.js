@@ -12,7 +12,7 @@ async function key(win,keyCode){const code=keyCode==='Enter'?'Return':keyCode===
  win.webContents.sendInputEvent({type:'keyUp',keyCode:code});await settle(win);
 }
 async function check(win,code,label){const result=await exec(win,code);if(result!==true)throw new Error('F23 '+label+' '+JSON.stringify(await exec(win,"({view:window.__state.view,active:document.activeElement.outerHTML.slice(0,260),source:document.getElementById('source-body').dataset.coordinateState,sourceText:document.getElementById('source-body').textContent.slice(0,200)})")));}
-async function topic(win,id){await exec(win,`document.querySelector('.topic-entry[data-topic-focus="${id}"] summary').click()`);await settle(win);}
+async function topic(win,id){await exec(win,`document.querySelector('.topic-entry[data-topic-focus="${id}"] [data-enter-topic]').click()`);await settle(win);}
 async function verifyGraph(win){
  const result=await exec(win,`(()=>{
   const vm=window.__state.l1Topic,root=document.querySelector('[data-l1-topic]'),nodes=[...root.querySelectorAll('[data-l1-node]')],paths=[...root.querySelectorAll('path[data-l1-relation]')],labels=[...root.querySelectorAll('[data-l1-relation-button]')];
@@ -36,6 +36,7 @@ async function verifyGraph(win){
  return result;
 }
 async function exerciseBoundaryView(win){
+ win.focus();win.webContents.focus();
  await topic(win,'T-02');await verifyGraph(win);
  await check(win,"!document.querySelector('.l1-outside-zone')&&document.querySelectorAll('[data-l1-block]').length===3",'internal-only, real Block entries');
  const before=await exec(win,'window.__readingNavigation.size');

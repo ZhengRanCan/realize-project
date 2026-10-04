@@ -45,7 +45,7 @@ function buildOne({ map, check, out, view = 'reading', note = '' }) {
     checkMapText: fs.existsSync(checkAbs) ? fs.readFileSync(checkAbs, 'utf8') : null,
     knownRoles: KNOWN_ROLES,
   });
-  const body = renderL0MapHTML(vm, { view });
+  const body = renderL0MapHTML(vm, { view, topicNavigation:false });
   const outAbs = resolveRepositoryPath(ROOT, out);
   // 用相对路径引 CSS，保证 file:// 直接打开可用（F07 的教训）
   const rel = (path.relative(path.dirname(outAbs), ROOT) || '.').replace(/\\/g, '/');

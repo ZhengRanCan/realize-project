@@ -35,3 +35,5 @@ for(const name of ['context-consumption','operational-runbook']){
  const before=JSON.stringify(enhanced);buildL0ViewModel(enhanced,{guideContext});assert.equal(JSON.stringify(enhanced),before);
 }
 console.log('L0 orientation: two public documents, complete original identities, source grounding, standalone/legacy and purity passed');
+
+{const {renderL0MapHTML}=require('../app/renderer/l0-map');const {buildL0ViewModel}=require('./l0-view-model');const map=require('../samples/operational-runbook/framework-map.reading.json');assert.match(renderL0MapHTML(buildL0ViewModel(map),{topicNavigation:false}),/data-enter-topic="T-01" disabled/);}

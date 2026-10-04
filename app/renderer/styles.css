@@ -37,6 +37,7 @@
 * { box-sizing: border-box; }
 
 html, body {
+  overflow: hidden;
   margin: 0;
   height: 100%;
   background: var(--bg);
@@ -52,7 +53,7 @@ code { font-family: "Cascadia Mono", Consolas, monospace; background: var(--bg-3
 
 /* ---------- Start screen ---------- */
 
-.screen { height: 100%; }
+.screen { height: 100%; position:fixed; inset:0; }
 #screen-start { display: flex; align-items: center; justify-content: center; padding: 32px; overflow: auto; }
 .start-card {
   width: min(760px, 100%);

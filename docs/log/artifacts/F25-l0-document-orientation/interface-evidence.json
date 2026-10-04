@@ -1,0 +1,33 @@
+{
+  "feature": "F25",
+  "screenshots": [
+    {
+      "file": "context-orientation.png",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "context-meaning.png",
+      "width": 1280,
+      "height": 900
+    },
+    {
+      "file": "context-narrow.png",
+      "width": 640,
+      "height": 720
+    },
+    {
+      "file": "runbook-narrow.png",
+      "width": 640,
+      "height": 720
+    },
+    {
+      "file": "runbook-orientation.png",
+      "width": 1280,
+      "height": 900
+    }
+  ],
+  "mapSha256": "9f66b3125b2c8dfb44b1c6637644a9a71c96ee0ec7c515239730463ea99e9da7",
+  "runbookMapSha256": "7b1b1ecbb74cc189090d725852c4232fa7edd23d9c381fd1c72385817edf7aa4",
+  "result": "F25 actual orientation, node/edge meaning, heading source, native keys and Topic Back passed"
+}

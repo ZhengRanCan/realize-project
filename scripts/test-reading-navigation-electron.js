@@ -9,7 +9,7 @@ async function exerciseNavigation(win){
   check(t,'Topic entry');const main=document.getElementById('main');
   const graphNode=main.querySelector('.l0-node');graphNode?.click();const selection=L0Map.getSelection(main);check(selection?.kind==='element','fresh Map selection');
   const fold=main.querySelector('.l0-howto');fold.open=true;
-  const trigger=main.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"] summary');trigger.focus();main.scrollTop=80;
+  const trigger=main.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"] [data-enter-topic]');trigger.focus();main.scrollTop=80;
   const mapScroll=main.scrollTop;trigger.click();check(s.view==='l1','enter L1');
   const blockButton=main.querySelector('[data-l1-block]'),id=blockButton.dataset.l1Block;blockButton.focus();blockButton.click();check(s.readingTopicId===t.topic.id&&s.view==='overview','occurrence Block');
   const inspection=main.querySelector('[data-inspect-block="'+id+'"]');inspection.focus();const blockScroll=main.scrollTop;
@@ -19,13 +19,13 @@ async function exerciseNavigation(win){
   await n.resolve({kind:'element',id:s.l0ViewModel.elements[0].id});const anchor=document.getElementById('element-'+s.l0ViewModel.elements[0].id);
   check(anchor.checkVisibility()&&document.activeElement===anchor,'canonical Element visible focus');
   check(document.querySelectorAll('[id="'+anchor.id+'"]').length===1,'unique Element anchor');
-  const tab=main.querySelector('[data-l0-view="reading"]');tab.focus();main.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"] summary').click();document.getElementById('l1-back').click();
+  const tab=main.querySelector('[data-l0-view="reading"]');tab.focus();main.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"] [data-enter-topic]').click();document.getElementById('l1-back').click();
   check(document.getElementById(anchor.id).checkVisibility()&&document.activeElement.dataset.l0View==='reading','canonical subject preserved after moving focus');
   document.getElementById('reading-back').click();check(s.readingTopicId===t.topic.id&&s.readingBlockId===id,'Resolve Back original occurrence');check(n.snapshot().resolverCalls===calls+1,'Back no resolver');
   for(const kind of ['topic','source-unit','review','evidence','fragment']){const before=n.size,view=s.view;check(!n.resolve({kind,id:'SU-001'}).ok,'unsupported '+kind);check(n.size===before&&s.view===view,'unsupported unchanged');}
   document.getElementById('reading-back').click();check(s.view==='l1'&&s.l1Topic.topic.id===t.topic.id,'L2 Back Topic');check(document.activeElement.dataset.l1Block===id,'Topic focus');
   document.getElementById('l1-back').click();check(s.view==='l0','L1 Back Map');await wait();
-  check(main.scrollTop===mapScroll,'Map scroll');check(document.activeElement.classList.contains('topic-head'),'Map focus');check(main.querySelector('.l0-howto').open,'Map disclosure');check(JSON.stringify(L0Map.getSelection(main))===JSON.stringify(selection),'Map selection');
+  check(main.scrollTop===mapScroll,'Map scroll');check(document.activeElement.hasAttribute('data-enter-topic'),'Map focus');check(main.querySelector('.l0-howto').open,'Map disclosure');check(JSON.stringify(L0Map.getSelection(main))===JSON.stringify(selection),'Map selection');
   check(n.size===0,'empty stack');check(!n.back().ok&&s.view==='l0','empty no home');
   const attachment=s.l0ViewModel.attachments[0]?.elementId;if(attachment){await n.resolve({kind:'element',id:attachment});check(document.getElementById('element-'+attachment).checkVisibility(),'attachment canonical');n.back();}
   await n.resolve({kind:'block',id});check(s.view==='overview'&&s.readingTopicId===null,'canonical Block no inferred Topic');

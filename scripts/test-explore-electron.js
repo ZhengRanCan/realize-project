@@ -11,7 +11,7 @@ async function exerciseExplore(win){return win.webContents.executeJavaScript(`(a
  enter(element.ref);check(main.querySelector('[data-explore-focus]').dataset.exploreFocus==='element:'+element.ref.id,'Element Focus');
  const neighbor=main.querySelector('[data-explore-id]:not([disabled])');check(neighbor,'typed neighbor');neighbor.click();
  document.getElementById('explore-back-reading').click();check(s.view==='l0'&&n.size===0,'L0 Back Reading');check(JSON.stringify(L0Map.getSelection(main))===JSON.stringify(selection),'L0 selection');check(n.snapshot().resolverCalls===initialCalls,'Back Reading no resolver');
- main.querySelector('.topic-entry[data-topic-focus="'+topic.topic.id+'"] summary').click();
+ main.querySelector('.topic-entry[data-topic-focus="'+topic.topic.id+'"] [data-enter-topic]').click();
  enter({kind:'topic',id:topic.topic.id});check(document.getElementById('explore-open-reading').disabled,'Topic no canonical landing');
  check(main.querySelector('[data-explore-organization]').dataset.exploreOrganization===topic.blockOrganization.state,'Topic organization preserved');
  enter(element.ref);document.getElementById('explore-open-reading').click();

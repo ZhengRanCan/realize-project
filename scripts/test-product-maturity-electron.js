@@ -11,13 +11,14 @@ async function key(win,keyCode,modifiers=[]){const code=keyCode==='Enter'?'Retur
 async function focus(win,selector){await exec(win,`document.querySelector(${JSON.stringify(selector)}).focus()`);}
 async function check(win,code,label){const result=await exec(win,code);if(result!==true)throw new Error('F21 '+label+' '+JSON.stringify(await exec(win,"({width:innerWidth,height:innerHeight,active:document.activeElement.outerHTML.slice(0,300),view:window.__state.view,overflow:document.documentElement.scrollWidth})")));}
 async function exerciseMaturity(win){
+ win.focus();win.webContents.focus();
  await focus(win,'.l0-node');await key(win,'Enter');
  await check(win,"document.activeElement.classList.contains('l0-node')&&document.activeElement.getAttribute('aria-pressed')==='true'&&getComputedStyle(document.activeElement).outlineStyle!=='none'",'native Enter, selection and visible focus');
  await key(win,'Space');await check(win,"L0Map.getSelection(document.getElementById('main')).kind==='element'",'native Space');
  await focus(win,'#btn-explore');await key(win,'Tab');
  await check(win,"document.activeElement.id!=='btn-explore'&&document.activeElement!==document.body",'native Tab advances');
  const topic=await exec(win,"Object.values(window.__state.l1Topics).find(t=>t.blockEntries?.length).topic.id");
- await focus(win,'.topic-entry[data-topic-focus="'+topic+'"] summary');await key(win,'Enter');
+ await focus(win,'.topic-entry[data-topic-focus="'+topic+'"] [data-enter-topic]');await key(win,'Enter');
  await check(win,"window.__state.view==='l1'",'keyboard Topic');
  await focus(win,'[data-l1-block]');await key(win,'Space');
  const id=await exec(win,'window.__state.readingBlockId');
@@ -29,7 +30,7 @@ async function exerciseMaturity(win){
  await check(win,"window.__state.view==='explore'",'keyboard Explore');
  await key(win,'Escape');await check(win,"window.__state.view==='overview'&&document.activeElement.id==='btn-explore'",'Escape Explore restores Reading');
  await key(win,'Escape');await check(win,"window.__state.view==='l1'",'Escape Block');
- await key(win,'Escape');await check(win,"window.__state.view==='l0'&&document.activeElement.classList.contains('topic-head')",'Escape Topic');
+ await key(win,'Escape');await check(win,"window.__state.view==='l0'&&document.activeElement.hasAttribute('data-enter-topic')",'Escape Topic');
  await check(win,"document.getElementById('reading-location').getAttribute('aria-live')==='polite'&&document.getElementById('save-state').getAttribute('aria-live')==='polite'",'live location/save state');
  // Native SELECT Escape and injected composing/editable events must leave route and review unchanged.
  await focus(win,'#explore-entity');await key(win,'G');await key(win,'Escape');
@@ -46,7 +47,7 @@ async function runMaturityIntegration(win){
   await exec(win,`window.__state.dirty=false;window.__loadBundle(${JSON.stringify(fixture.manifestPath)})`);
   metrics.rows.push(measurePure('Gold pure',fixture.models.frameworkMap));
   const report=await exerciseMaturity(win);
-  const screenshot=async name=>{await exec(win,'new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');await pause();const capture=await win.webContents.capturePage(),actual=capture.getSize(),viewport=await exec(win,'({width:innerWidth,height:innerHeight})');assert.deepEqual(actual,viewport,'screenshot actual viewport');if(record)await fs.writeFile(path.join(out,name),capture.toPNG());};
+  const screenshot=async name=>{await exec(win,'new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');await pause();const capture=await win.webContents.capturePage(),actual=capture.getSize(),viewport=await exec(win,'({width:innerWidth,height:innerHeight})');assert.deepEqual(actual,viewport,'screenshot actual viewport '+JSON.stringify({actual,viewport}));if(record)await fs.writeFile(path.join(out,name),capture.toPNG());};
   await screenshot('reading-map.png');
   const element=await exec(win,"window.__state.exploreProjection.catalog.find(e=>e.available&&e.ref.kind==='element').ref");
   await exec(win,`window.__openExplore(${JSON.stringify(element)})`);await screenshot('explore.png');await exec(win,'window.__readingNavigation.back(true)');
@@ -63,7 +64,7 @@ async function runMaturityIntegration(win){
   }
   assert.ok(Math.max(...timings)<=2000);metrics.rows.push({name:'Gold navigation',rounds:15,maxNavigationMs:+Math.max(...timings).toFixed(2),mapDOM:baseline});
   // A single Topic keyboard activation after remounts must add exactly one frame, not duplicate callbacks.
-  await focus(win,'.topic-entry summary');await key(win,'Enter');await check(win,"window.__readingNavigation.size===1",'no accumulated Topic handlers');await key(win,'Escape');
+  await focus(win,'.topic-entry [data-enter-topic]');await key(win,'Enter');await check(win,"window.__readingNavigation.size===1",'no accumulated Topic handlers');await key(win,'Escape');
   win.setContentSize(640,720);await pause();await check(win,'innerWidth===640&&innerHeight===720','actual narrow viewport');
   await check(win,"document.documentElement.scrollWidth<=window.innerWidth&&document.getElementById('btn-explore').getBoundingClientRect().right<=window.innerWidth",'narrow Map no page overflow');
   await exec(win,"window.__readingNavigation.resolve({kind:'block',id:window.__state.l2ViewModel.sections[0].blocks[0].id})");
@@ -75,7 +76,8 @@ async function runMaturityIntegration(win){
   await exec(win,'window.__readingNavigation.back()');
   await exec(win,`window.__openExplore(${JSON.stringify(element)})`);await check(win,"document.documentElement.scrollWidth<=innerWidth&&document.getElementById('explore-back-reading').getBoundingClientRect().right<=innerWidth",'narrow Explore');await key(win,'Escape');
   // Legacy provenance Source uses the same close affordance and returns focus too.
-  await focus(win,'[data-source-ref]');await key(win,'Enter');
+  await exec(win,"document.querySelector('.l0-node').click();document.querySelector('#l0-focus-slot .guide-raw').open=true");
+  await focus(win,'#l0-focus-slot [data-source-ref]');await key(win,'Enter');
   await check(win,"!document.getElementById('source-panel').classList.contains('hidden')&&document.activeElement.id==='source-close'",'source keyboard open');await key(win,'Escape');
   await check(win,"document.getElementById('source-panel').classList.contains('hidden')&&document.activeElement.hasAttribute('data-source-ref')",'source keyboard close restores');
   // Actual public stress file goes through the main-process map validation boundary.

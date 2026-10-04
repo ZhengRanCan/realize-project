@@ -29,7 +29,8 @@ const bundleSessions=createReadingSessionController();
 
 const PROJECT_ROOT = resolveRepositoryPath(__dirname, '..', '..');
 const BOUNDARY_TEST = process.argv.includes('--selftest-l1-boundary');
-const SELF_TEST = process.argv.includes('--selftest') || BOUNDARY_TEST;
+const ORIENTATION_TEST = process.argv.includes('--selftest-l0-orientation');
+const SELF_TEST = process.argv.includes('--selftest') || BOUNDARY_TEST || ORIENTATION_TEST;
 /** `--verify-preview <file>`：加载生成的 preview HTML 并断言 DOM（实验性验证，不改 UI）。 */
 const VERIFY_PREVIEW = (() => {
   const i = process.argv.indexOf('--verify-preview');
@@ -38,6 +39,8 @@ const VERIFY_PREVIEW = (() => {
 if (SELF_TEST || VERIFY_PREVIEW) {
   // 无人值守运行不需要 GPU；关掉可避免退出时的 command_buffer 相关 stderr 噪音。
   app.disableHardwareAcceleration();
+  // Screenshot assertions use CSS pixels; isolate unattended checks from monitor DPI.
+  app.commandLine.appendSwitch('force-device-scale-factor','1');
 }
 const SCHEMA_PATH = joinRepositoryPath(PROJECT_ROOT, 'schema', 'design-review.schema.json');
 const DEFAULT_FIXTURE = joinRepositoryPath(PROJECT_ROOT, 'fixtures', 'context-consumption.json');
@@ -165,7 +168,9 @@ function createWindow() {
     minHeight: 720,
     backgroundColor: '#12161c',
     title: 'Design Review',
+    maximizable: !(SELF_TEST || VERIFY_PREVIEW),
     webPreferences: {
+      backgroundThrottling: !(SELF_TEST || VERIFY_PREVIEW),
       preload: VERIFY_PREVIEW ? undefined : joinRepositoryPath(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
@@ -427,6 +432,10 @@ async function runSelfTest() {
       win.webContents.once('did-finish-load', resolve);
     });
 
+    if (ORIENTATION_TEST) {
+      ok(await require('../../scripts/test-l0-orientation-electron').runOrientationIntegration(win));
+      emit();app.exit(0);return;
+    }
     if (BOUNDARY_TEST) {
       ok(await require('../../scripts/test-l1-boundary-view-electron').runBoundaryIntegration(win));
       emit();app.exit(0);return;
@@ -628,7 +637,7 @@ async function runSelfTest() {
           })();
           // F17：从真实 L0 Topic 入口进入 L1，不能把 Topic 当作 L0 子图裁剪。
           const topicEntry = document.querySelector('.topic-entry');
-          topicEntry?.querySelector('summary')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          topicEntry?.querySelector('[data-enter-topic]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
           out.l1 = {
             view: state.view,
             topic: document.querySelector('[data-l1-topic]')?.getAttribute('data-l1-topic'),
@@ -1194,7 +1203,7 @@ async function runSelfTest() {
       const suitable=id=>blocks.find(b=>b.id===id&&b.covers.length&&b.reviewObjectLinks.values.length);
       const topic=Object.values(window.__state.l1Topics).find(t=>t.blockEntries?.some(b=>suitable(b.id)));
       if(!topic)throw new Error('moved bundle Topic');
-      document.querySelector('.topic-entry[data-topic-focus="'+topic.topic.id+'"]').click();
+      document.querySelector('[data-enter-topic="'+topic.topic.id+'"]').click();
       const id=topic.blockEntries.find(b=>suitable(b.id)).id;
       document.querySelector('[data-l1-block="'+id+'"]').click();
       const inspect=document.querySelector('[data-inspect-block="'+id+'"]');inspect.click();
@@ -1217,6 +1226,7 @@ async function runSelfTest() {
     ok(await require('../../scripts/test-product-maturity-electron').runMaturityIntegration(win));
     ok(await require('../../scripts/test-reading-integration-electron').runIntegrationInvariants(win));
     ok(await require('../../scripts/test-l1-boundary-view-electron').runBoundaryIntegration(win));
+    ok(await require('../../scripts/test-l0-orientation-electron').runOrientationIntegration(win));
 
     emit();
     const failedCount = report.filter((line) => line.startsWith('✗')).length;
@@ -1264,16 +1274,21 @@ async function runVerifyPreview(filePath) {
 
     const bundlePreview=await win.webContents.executeJavaScript('Boolean(window.__PREVIEW__?.inspections)');
     if(bundlePreview) {
+      const previewWrites=[],originalWrite=fs.writeFile;
+      fs.writeFile=async(...args)=>{previewWrites.push(String(args[0]));return originalWrite(...args);};
+      try {
       const result=await win.webContents.executeJavaScript(`(async()=>{
         const s=window.__state;
         if(s.view!==(s.l0ViewModel?'l0':'overview'))throw new Error('Preview default view');
-        if(s.l0ViewModel){const t=Object.values(s.l1Topics).find(t=>t.blockEntries?.length);document.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"]').click();document.querySelector('[data-l1-block]').click();}
+        if(s.l0ViewModel){const t=Object.values(s.l1Topics).find(t=>t.blockEntries?.length);document.querySelector('[data-enter-topic="'+t.topic.id+'"]').click();document.querySelector('[data-l1-block]').click();}
         const id=s.l2ViewModel.sections[0].blocks[0].id;
         await window.__openInspection(id);
         const sourceButton=document.querySelector('[data-source-unit-id] button');if(!sourceButton)throw new Error('moved SU entry');sourceButton.click();await new Promise(r=>setTimeout(r,50));
         const panel=document.getElementById('l3-source-coordinate');if(panel.dataset.coordinateState!=='known')throw new Error('Preview section');
         if(document.getElementById('source-body').dataset.claimVerification!=='absent')throw new Error('Preview verification');
         if(!document.getElementById('btn-save').disabled)throw new Error('Preview saving');
+        document.getElementById('btn-save').click();
+        if((await window.designReview.saveHumanReview({})).ok!==false)throw new Error('Preview save API must reject');
         return {blocks:s.l2ViewModel.sections.flatMap(s=>s.blocks).length,text:panel.textContent.length};
       })()`);
       if(result.blocks!==21 || result.text<80)throw new Error('Preview content');
@@ -1289,11 +1304,19 @@ async function runVerifyPreview(filePath) {
         ok(await require('../../scripts/test-reading-integration-electron').exerciseIntegration(win));
         await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
         ok(await require('../../scripts/test-l1-boundary-view-electron').exerciseBoundaryView(win));
+        if(await win.webContents.executeJavaScript("window.__state.l0ViewModel.readingGuide?.state==='present'")){
+          await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
+          ok(await require('../../scripts/test-l0-orientation-electron').exerciseOrientation(win));
+        }
       } else {
         const nav=await win.webContents.executeJavaScript("(()=>{window.__closeInspection();const n=window.__readingNavigation;const origin=n.snapshot().current;const calls=n.snapshot().resolverCalls;n.resolve({kind:'block',id:'O-01'});n.back();return n.snapshot().resolverCalls===calls+1&&JSON.stringify(origin.address)===JSON.stringify(n.snapshot().current.address);})()");
         if(!nav)throw new Error('Preview Back/Resolve');ok('Preview no-map canonical Block and Back isolation');
       }
+      fs.writeFile=originalWrite;
+      if(previewWrites.length)throw new Error('Preview attempted application writes: '+previewWrites.join(', '));
+      ok('Preview application write interception: zero writes; disabled save and rejected save API');
       emit();process.stdout.write('VERIFY PREVIEW PASSED\n');app.exit(0);return;
+      } finally { fs.writeFile=originalWrite; }
     }
     const dom = await win.webContents.executeJavaScript(
       `(() => ({

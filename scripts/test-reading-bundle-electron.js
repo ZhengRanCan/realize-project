@@ -23,7 +23,7 @@ async function runBundleIntegration(win) {
    const check=(condition,message)=>{if(!condition)throw new Error(message);};
    check(window.__state.view==='l0','default Map');
    const topic=Object.values(window.__state.l1Topics).find(t=>t.blockEntries?.length);check(topic,'known Topic');
-   document.querySelector('.topic-entry[data-topic-focus="'+topic.topic.id+'"]').click();check(window.__state.view==='l1','Topic click');
+   document.querySelector('[data-enter-topic="'+topic.topic.id+'"]').click();check(window.__state.view==='l1','Topic click');
    const button=document.querySelector('[data-l1-block]');button.click();check(window.__state.view==='overview','Block click');
    const id=button.dataset.l1Block;
    const before=document.getElementById('main').scrollTop;
@@ -118,7 +118,7 @@ async function runBundleIntegration(win) {
   const previousToken=await execute('window.__state.sessionToken');
   await execute(`loadL0(${JSON.stringify(a.inputs.map)})`);
   assert.equal(await execute('window.__state.sessionToken===null&&window.__state.model===null&&window.__state.l2ViewModel===null&&window.__state.bundleInfo===null'),true);
-  assert.equal(await execute("document.querySelector('.topic-entry').click();window.__state.view==='l1'&&Boolean(document.querySelector('[data-l1-topic]'))"),true);
+  assert.equal(await execute("document.querySelector('[data-enter-topic]').click();window.__state.view==='l1'&&Boolean(document.querySelector('[data-l1-topic]'))"),true);
   assert.equal((await execute(`window.designReview.bundle.inspect({sessionToken:${JSON.stringify(previousToken)},blockId:'O-01'})`)).ok,false);
   assert.equal((await execute('window.designReview.loadSource()')).ok,false);
   await execute("openSource('§0')");

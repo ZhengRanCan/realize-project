@@ -209,7 +209,7 @@ function renderReading(vm, layout) {
     </div>
     ${noEdge ? '<p class="l0-no-edge">这份 map 没有任何 <code>edge</code> —— <b>没有主轴就不发明主轴</b>，所以这里不画任何线。</p>' : ''}
     <div class="l0-legend">${renderLegend(vm)}</div>
-    ${vm.edges.length?`<details class="guide-edge-list"><summary>查看连接的含义 · ${vm.edges.length} 条</summary><ul>${vm.edges.map(edge=>`<li><button data-focus-edge="1" data-edge-index="${edge.edgeIndex}" data-edge-id="${esc(edge.id||'')}" data-from="${esc(edge.from)}" data-to="${esc(edge.to)}">${esc(edge.fromLabel)} ${edge.type==='relates-to'?'—': '→'} ${esc(edge.toLabel)}<span>${esc(edge.explanation?.summary||edge.label||relZh(edge.type))}</span></button></li>`).join('')}</ul></details>`:''}
+    ${vm.edges.length?`<details class="guide-edge-list"><summary>查看连接的含义 · ${vm.edges.length} 条</summary><ul>${vm.edges.map(edge=>`<li><button data-focus-edge="1" data-edge-index="${edge.edgeIndex}" data-edge-id="${esc(edge.id||`${edge.from}->${edge.to}`)}" data-from="${esc(edge.from)}" data-to="${esc(edge.to)}">${esc(edge.fromLabel)} ${edge.type==='relates-to'?'—': '→'} ${esc(edge.toLabel)}<span>${esc(edge.explanation?.summary||edge.label||relZh(edge.type))}</span></button></li>`).join('')}</ul></details>`:''}
     <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>`;
 }
@@ -274,7 +274,7 @@ function renderEdgeRow(ed, vm) {
     return el ? `<span class="prov-group"><span class="eid">${esc(id)}</span> ${refChips([...el.provenance.sectionRefs, ...el.provenance.sourceUnitIds])}</span>` : '';
   }).join('');
   return `
-<li class="edge-row ${ed.selfLoop ? 'is-selfloop' : ''}" id="edge-row-${ed.edgeIndex}" data-edge-id="${esc(ed.id || '')}" data-edge-index="${ed.edgeIndex}" data-from="${esc(ed.from)}" data-to="${esc(ed.to)}" data-focus-edge="1">
+<li class="edge-row ${ed.selfLoop ? 'is-selfloop' : ''}" id="edge-row-${ed.edgeIndex}" data-edge-id="${esc(ed.id || `${ed.from}->${ed.to}`)}" data-edge-index="${ed.edgeIndex}" data-from="${esc(ed.from)}" data-to="${esc(ed.to)}" data-focus-edge="1">
   <span class="edge-line">
     <span class="node">${esc(ed.fromLabel)}</span>
     <span class="rel">—${esc(ed.type)}${ed.type==='relates-to'?'—':'→'}</span>
@@ -286,7 +286,9 @@ function renderEdgeRow(ed, vm) {
     ${qualifierLine(ed.qualifiers)}
     ${ed.label ? `<span class="elabel">${esc(ed.label)}</span>` : '<span class="muted">（无 label）</span>'}
   </span>
+  <button class="edge-explain" data-focus-edge="1" data-edge-index="${ed.edgeIndex}" data-edge-id="${esc(ed.id || `${ed.from}->${ed.to}`)}" data-from="${esc(ed.from)}" data-to="${esc(ed.to)}">查看含义与依据<span class="sr-only">：${esc(ed.fromLabel)} ${esc(ed.type)} ${esc(ed.toLabel)}</span></button>
   <div class="edge-extra">
+    ${renderExplanation(ed.explanation)}
     ${qualifierText(ed.qualifiers) ? `<div class="edge-qual"><b>qualifiers</b> ${esc(qualifierText(ed.qualifiers))}</div>` : '<div class="edge-qual muted">（无 qualifiers）</div>'}
     <div class="edge-prov"><b>provenance</b> ${prov || '<span class="muted">（端点无出处）</span>'}</div>
   </div>
@@ -394,7 +396,7 @@ function renderReviewBoard(vm, layout) {
 /* ------------------------------------------------------------------ *
  * Topic Navigation（Phase 4.1：默认只显示轻量入口，details 按需展开）
  * ------------------------------------------------------------------ */
-function renderTopicEntry(t) {
+function renderTopicEntry(t, opts = {}) {
   const blockIdsState = Object.prototype.hasOwnProperty.call(t, 'blockIds')
     ? (t.blockIds.length ? 'known' : 'empty')
     : 'unknown';
@@ -417,7 +419,7 @@ function renderTopicEntry(t) {
     </div>
   </details>
   <p class="topic-question">${esc(t.explanation?.summary||t.proposition)}</p>
-  <button class="topic-enter" data-enter-topic="${esc(t.id)}">进入主题<span class="sr-only">：${esc(t.title)}</span></button>
+  <button class="topic-enter" data-enter-topic="${esc(t.id)}"${opts.topicNavigation===false?' disabled title="独立 L0 预览没有 L1 页面；请在 Electron 中打开这份 Map"':''}>进入主题<span class="sr-only">：${esc(t.title)}</span></button>
 </li>`;
 }
 
@@ -463,7 +465,8 @@ function renderL0MapHTML(vm, opts = {}) {
       <h2>Topic Navigation（完整入口索引 · ${f.topicCount}）</h2>
       <p class="note">这里与左边的图不是一一对应的：图中是<b>有关系的核心机制</b>，这里是<b>完整入口</b>。
         没有 L0 element 的 Topic 也照样能进入。先看每个主题回答的问题，再进入主题；展开可查看命题与出处。</p>
-      <ul class="topic-list">${vm.topics.map(renderTopicEntry).join('')}</ul>
+      ${opts.topicNavigation===false?'<p class="note">独立 L0 预览仅展示框架与解释；在 Electron 中打开这份 Map 可进入主题。</p>':''}
+      <ul class="topic-list">${vm.topics.map(t=>renderTopicEntry(t,opts)).join('')}</ul>
       <div class="doc-entries">
         <h3>文档级入口</h3>
         ${vm.document.entries.map((d) => `<div class="doc-entry"><span class="k">${esc(d.key)}</span><div>${esc(d.text)}</div><div class="v">${refChips(d.sectionRefs.concat(d.sourceUnitIds))}</div></div>`).join('') || '<div class="muted">（无）</div>'}
@@ -589,7 +592,7 @@ function bindInteractions(root, opts = {}) {
     // 原生 <details> 的展开/收起不能被 preventDefault 吃掉
     const inSummary = !!ev.target.closest('summary');
     const edgeEl = ev.target.closest('[data-focus-edge]');
-    if (edgeEl) { ev.preventDefault(); focusEdge(edgeEl); return; }
+    if (edgeEl) { if(inSummary)return; ev.preventDefault(); focusEdge(edgeEl); return; }
     const topicRow = ev.target.closest('[data-topic-focus]');
     if (topicRow && !inSummary && !ev.target.closest('[data-focus-target],button')) {
       if (!inSummary) ev.preventDefault();

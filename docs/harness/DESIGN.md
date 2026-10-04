@@ -63,10 +63,12 @@ Reading各层可显式选择Map Element/Topic探索关系，图只展示已声�
 
 F23 的[展示设计](../log/artifacts/F23-l1-topic-boundary-view/view-design.md)采用主题内部图与明确标注的外部端点，同一画布保留全部已有内部/crossing 关系；解释区块入口放在图下方。无可绘制关系才显示 boundary summary。节点/关系用原生键盘披露，窄窗口图独立滚动，返回恢复选择、展开、焦点与图滚动。内部线和跨边界线已接入，路径避开卡片并保留箭头入射方向；无向关系不加箭头。出处只在当前资料包坐标唯一可解析且完整性一致时启用，否则披露原因。用户批准首轮设计及实施计划；2026-10-04 实际试用指出解释不足，F23 v0.2 保持 blocked，需补主题解释和无边摘要。
 
-## F25 L0 orientation — 设计确认，计划待审阅
+## F25 L0 orientation — 已实施，等待阅读验收
 
-[书面设计](../log/artifacts/F25-l0-document-orientation/view-design.md)已获用户确认：图前整篇定位、节点短解释、选择后的对象/关系含义和 Topic 关注问题；解释随 Map 加载。[实施计划](../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)待审阅，现有规范继续适用；实施前更新正式接口与交互约定，再修改产品。不会用固定四阶段组织 L0 全文。
+[书面设计](../log/artifacts/F25-l0-document-orientation/view-design.md)已获用户确认：图前整篇定位、节点短解释、选择后的对象/关系含义和 Topic 关注问题；解释随 Map 加载。[实施计划](../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)已确认并实施；现有规范继续适用。L0 按既有框架及解释定位，不用固定四阶段铺全文。
 
 ## F25 L0 interaction
 
 用户已批准设计和计划。图前直接显示有依据的整篇问题/说明，保留 scope、非目标和已有 thesis；节点有短解释，完整含义在选择详情中披露。具体边解释按原始 occurrence 选择，原始身份和无向/自环语义保留。Topic 默认显示关注问题或原 proposition，原生展开与明确“进入主题”按钮分开。解释先于折叠原始关系表；每条来源独立说明可用性，快照可定位不标命题已验证。640×720 依次排列并保留图独立滚动，原生键盘/共享 Back/Source 会话保护继续适用。
+
+桌面和资料包 Preview 的 screen 固定于视口，主内容与图各自滚动；窄窗口 grid 使用 minmax(0,1fr)，避免主体横向溢出与外层页偏移。独立 L0 HTML 未承载 L1 runtime，显式禁用进入按钮并提示 Electron；完整资料包 Preview 保留主题导航。
