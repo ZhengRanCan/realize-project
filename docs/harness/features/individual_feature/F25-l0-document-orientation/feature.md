@@ -4,9 +4,9 @@ title: L0 Document Orientation and Explanation
 version: v0.1
 status: active
 dependsOn: ["F18","F19","F21"]
-scope: {"code":["scripts/l0-view-model.js","app/renderer/l0-map.js","app/renderer/l0-layout.js","app/renderer/app.js","app/renderer/styles.css","app/renderer/index.html","app/main/main.js","app/main/reading-bundle.js","app/main/reading-session.js","app/shared/reading-projection.js","app/shared/reading-explanation.*","app/shared/reading-bundle-validation.js","scripts/build-preview.js","scripts/export-reading-bundle.js","scripts/check-map.js","schema/framework-map.schema.json","schema/reading-bundle.schema.json","package.json"],"tests":["scripts/test-l0-view-model.js","scripts/test-l0-layout.js","scripts/test-l0-preview.js","scripts/test-check-map.js","scripts/test-reading-bundle.js","scripts/test-reading-session.js","scripts/test-reading-bundle-projection.js","scripts/test-reading-bundle-preview.js","scripts/test-reading-navigation-electron.js","scripts/test-explore-electron.js","scripts/test-product-maturity-electron.js","scripts/test-l0-orientation*.js","scripts/test-reading-explanation*.js"],"docs":["docs/harness/PRODUCT_SPEC.md","docs/harness/ARCHITECTURE.md","docs/harness/DESIGN.md","docs/specs/framework-map-contract.md","docs/specs/reading-view-cognitive-contract.md","docs/specs/reading-view-layer-contracts.md","docs/specs/reading-bundle-contract.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F25-l0-document-orientation/**","docs/log/artifacts/F25-l0-document-orientation/**","docs/harness/features/individual_feature/F23-l1-topic-boundary-view/**","docs/progress.md","docs/harness/incidents/2026-10-04-reading-comprehension-feedback.md"]}
+scope: {"code":["scripts/l0-view-model.js","app/renderer/l0-map.js","app/renderer/l0-layout.js","app/renderer/app.js","app/renderer/styles.css","app/renderer/index.html","app/main/main.js","app/main/reading-bundle.js","app/main/reading-session.js","app/shared/reading-projection.js","app/shared/reading-explanation.*","app/shared/reading-bundle-validation.js","scripts/build-preview.js","scripts/export-reading-bundle.js","scripts/check-map.js","schema/framework-map.schema.json","schema/reading-bundle.schema.json","package.json","app/renderer/l0-map.css","scripts/build-l0-preview.js","samples/context-consumption/*.reading.json","samples/operational-runbook/*.reading.json"],"tests":["scripts/test-l0-view-model.js","scripts/test-l0-layout.js","scripts/test-l0-preview.js","scripts/test-check-map.js","scripts/test-reading-bundle.js","scripts/test-reading-session.js","scripts/test-reading-bundle-projection.js","scripts/test-reading-bundle-preview.js","scripts/test-reading-navigation-electron.js","scripts/test-explore-electron.js","scripts/test-product-maturity-electron.js","scripts/test-l0-orientation*.js","scripts/test-reading-explanation*.js","scripts/test-reading-bundle-electron.js","scripts/test-l1-boundary-view-electron.js"],"docs":["docs/harness/PRODUCT_SPEC.md","docs/harness/ARCHITECTURE.md","docs/harness/DESIGN.md","docs/specs/framework-map-contract.md","docs/specs/reading-view-cognitive-contract.md","docs/specs/reading-view-layer-contracts.md","docs/specs/reading-bundle-contract.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F25-l0-document-orientation/**","docs/log/artifacts/F25-l0-document-orientation/**","docs/harness/features/individual_feature/F23-l1-topic-boundary-view/**","docs/progress.md","docs/harness/incidents/2026-10-04-reading-comprehension-feedback.md","samples/README.md","docs/harness/incidents/*-f25-*.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 → L0 理解文章核心问题、关键对象和整体结构","选择节点/关系 → 阅读具体含义和依据 → 选择能解决当前疑问的 Topic","独立 Map / 旧包 / 缺解释输入 → 明确能力缺失且保留结构与导航","L0 → L1 → Back 恢复选择/滚动/焦点；真实窄窗口和只读 Preview"],"integrationEvidence":[],"knownUnverified":["候选书面设计待用户审阅，实施计划尚未形成","共享解释协议尚未获确认或实施；节点/关系导读与真实用户理解待验证"],"humanReviewRequired":["用户在不打开原文的情况下，能说明文章讨论的问题、主要对象及其连接含义，并知道下一步选择哪个 Topic"]}
+completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 → L0 理解文章核心问题、关键对象和整体结构","选择节点/关系 → 阅读具体含义和依据 → 选择能解决当前疑问的 Topic","独立 Map / 旧包 / 缺解释输入 → 明确能力缺失且保留结构与导航","L0 → L1 → Back 恢复选择/滚动/焦点；真实窄窗口和只读 Preview"],"integrationEvidence":[],"knownUnverified":["书面设计已获用户确认，实施计划待审阅","共享解释协议与 L0 导读尚未实施；真实界面、独立审查和用户理解待验证"],"humanReviewRequired":["用户在不打开原文的情况下，能说明文章讨论的问题、主要对象及其连接含义，并知道下一步选择哪个 Topic"]}
 ---
 
 # F25 L0 Document Orientation and Explanation
@@ -17,11 +17,11 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 �
 
 ## Process preconditions
 
-- 用户于 2026-10-04 明确授权新建 L0 feature，并更新原 L1 feature；随后要求完成 L0 feature。当前唯一 active，处于设计审阅阶段，尚未开始产品实现。
-- [候选书面设计](../../../../log/artifacts/F25-l0-document-orientation/view-design.md)已具体描述导读、节点/关系解释、Topic 引导和可选 Map readingGuide；待用户审阅后形成实施计划。候选协议不替代当前规范，未声称已获设计或实施计划批准。
+- 用户于 2026-10-04 明确授权新建 L0 feature，并更新原 L1 feature；随后要求完成 L0 feature。当前唯一 active，书面设计已确认，处于实施计划审阅阶段，尚未开始产品实现。
+- [书面设计](../../../../log/artifacts/F25-l0-document-orientation/view-design.md)已获用户于 2026-10-04 确认（“可以，按你说的推荐那种来”），采用 Map 可选 readingGuide。[实施计划](../../../../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)已写并自查，待用户审阅；沿用 Native。规范接口在实施前同步，尚未修改产品。
 - 用户验收反馈见 [记录](../../../incidents/2026-10-04-reading-comprehension-feedback.md)。已有 L0/F23 图形、导航和数据测试属于技术基线，不证明本 feature 的阅读效果。
 - F18 输入/原文绑定、F19 导航、F21 键盘/窄窗口作为强制基线；不依赖 blocked 的 F08/F17/F23，避免通过新 feature 形成关闭循环或冒称旧视觉验收通过。
-- 实施前明确并确认展示设计、解释资料载体/来源/绑定、兼容策略和实施计划。当前文件登记需求，不是已经批准的界面布局或新数据协议。
+- 实施前明确并确认展示设计、解释资料载体/来源/绑定、兼容策略和实施计划。书面设计已经确认，实施计划尚未确认；不能将设计批准视为实现或阅读验收通过。
 
 ## Scope
 
@@ -68,4 +68,4 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 �
 
 - [登记与验证记录](../../../../log/artifacts/F25-l0-document-orientation/verification-summary.md)。
 - 设计、计划和解释依据按本 feature artifact 保存；代码实现后须有独立审查和实际用户验收。
-- 当前 active（设计审阅阶段）；合同、候选设计和文档门禁不构成产品实现或阅读效果通过。成功校验不保留永久 txt 日志。
+- 当前 active（实施计划审阅阶段）；已确认设计、计划和文档门禁不构成产品实现或阅读效果通过。成功校验不保留永久 txt 日志。

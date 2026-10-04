@@ -22,6 +22,7 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["资料包 → L0 
 - 强制前置是已验证的数据接入、资料包/溯源和共享导航（F16/F18/F19）；沿用 F17 已有投影，不重新推断关系。
 - 已核对 Reading 主契约、Layer Contracts §2 与 harness DESIGN；[展示设计](../../../../log/artifacts/F23-l1-topic-boundary-view/view-design.md)已获用户确认（2026-10-03，“可以，做吧”）；[实施计划](../../../../log/artifacts/F23-l1-topic-boundary-view/drafts/implementation-plan.md)已获用户批准（“看着没问题，实施咯”），沿用 Native；首轮技术实施与独立复查已完成；2026-10-04 用户验收指出解释不足，需重新设计。
 - 反馈与原 feature 完成范围修正在 [incident](../../../incidents/2026-10-03-l1-l2-reading-gap.md)。
+- F25 的[解释资料设计](../../../../log/artifacts/F25-l0-document-orientation/view-design.md)已于 2026-10-04 获确认，采用 Map 可选 readingGuide。共享绑定/出处规则由 F25 实施，F23 后续消费其 GuideVM，不复制指纹或猜 Map/Plan SU 对应；当前新协议尚未实施，F23 v0.2 的局部解释设计与验收仍待完成。
 
 ## Scope
 

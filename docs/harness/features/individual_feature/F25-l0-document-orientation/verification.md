@@ -2,7 +2,7 @@
 
 ## Required commands
 
-当前 active，处于候选设计审阅阶段：执行 check:docs、verify:harness 和 git diff --check。下列功能检查用于设计及计划确认后的实施阶段；新测试文件是允许的目标，不声称已创建或执行。
+当前 active，书面设计已确认，处于实施计划审阅阶段：执行 check:docs、verify:harness 和 git diff --check。下列功能检查用于计划确认后的实施阶段；新测试文件是允许的目标，不声称已创建或执行。
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |

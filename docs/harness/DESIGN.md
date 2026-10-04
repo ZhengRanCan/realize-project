@@ -63,6 +63,6 @@ Reading各层可显式选择Map Element/Topic探索关系，图只展示已声�
 
 F23 的[展示设计](../log/artifacts/F23-l1-topic-boundary-view/view-design.md)采用主题内部图与明确标注的外部端点，同一画布保留全部已有内部/crossing 关系；解释区块入口放在图下方。无可绘制关系才显示 boundary summary。节点/关系用原生键盘披露，窄窗口图独立滚动，返回恢复选择、展开、焦点与图滚动。内部线和跨边界线已接入，路径避开卡片并保留箭头入射方向；无向关系不加箭头。出处只在当前资料包坐标唯一可解析且完整性一致时启用，否则披露原因。用户批准首轮设计及实施计划；2026-10-04 实际试用指出解释不足，F23 v0.2 保持 blocked，需补主题解释和无边摘要。
 
-## F25 L0 orientation — 候选设计待审阅
+## F25 L0 orientation — 设计确认，计划待审阅
 
-[候选书面设计](../log/artifacts/F25-l0-document-orientation/view-design.md)提出图前整篇定位、节点短解释、选择后的对象/关系含义和 Topic 关注问题；解释随 Map 加载。当前尚未确认新展示/数据协议，现有规范继续适用；书面设计与实施计划确认后再更新正式接口并修改产品。不会用固定四阶段组织 L0 全文。
+[书面设计](../log/artifacts/F25-l0-document-orientation/view-design.md)已获用户确认：图前整篇定位、节点短解释、选择后的对象/关系含义和 Topic 关注问题；解释随 Map 加载。[实施计划](../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)待审阅，现有规范继续适用；实施前更新正式接口与交互约定，再修改产品。不会用固定四阶段组织 L0 全文。

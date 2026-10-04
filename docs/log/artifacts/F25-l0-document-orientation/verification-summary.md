@@ -1,6 +1,6 @@
 # F25 Registration and Design Verification
 
-Date: 2026-10-04. Current status: active（候选设计审阅阶段）。
+Date: 2026-10-04. Current status: active（设计已确认，实施计划审阅阶段）。
 
 用户授权新建 L0 feature 并更新 L1 合同。已登记 F25 与验收标准，未改产品、schema、validator、样本、用户审核或解释输入协议；没有声称未来功能测试已通过。
 
@@ -25,3 +25,15 @@ Date: 2026-10-04. Current status: active（候选设计审阅阶段）。
 - `git diff --check`：通过。
 
 初次文档检查发现尚未创建的模块被写成现存文件路径；已改为明确的拟新增模块说明，复跑通过。未创建占位代码，也未调整文档检查器来放宽规则。以上只证明候选设计和任务状态的文档一致性。
+
+## Plan stage
+
+用户确认推荐方案（“可以，按你说的推荐那种来”），[书面设计](view-design.md)记录批准。[实施计划](drafts/implementation-plan.md)已写并自查，沿用 Native；共用协议、输入及投影、展示、实际交付和验收分为五项任务，各自有测试周期。
+
+已扩充合同中的样式、独立 L0 预览、两份派生 Map、Topic 入口受影响测试和样本说明范围。F23 仅记录共享接口交接，产品/规范/schema/validator/旧样本未改；计划待审阅，未来功能检查与实际用户理解尚未完成。
+
+- `npm.cmd run check:docs`：153 Markdown files / 0 broken（drafts 按现有规则不计入当前引用检查）。
+- `npm.cmd run verify:harness`：24 features / 0 errors，F25 唯一 active。
+- `git diff --check`：通过。
+
+计划已逐段对照设计自查：接口/状态名一致，五项 Review Focus 有对应任务测试，全部实施 checkbox 未勾选。初次引用检查将 scope 中尚未创建的两份输入当成现存文件；已按既有合同惯例将其登记为 reading.json 文件模式，计划仍固定两个确切文件名。没有创建占位产品文件或放宽检查器。

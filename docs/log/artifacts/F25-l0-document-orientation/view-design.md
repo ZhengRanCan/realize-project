@@ -1,8 +1,8 @@
 # F25 L0 导读与解释设计
 
-Date: 2026-10-04. Status: **候选书面设计，待用户审阅；未授权产品实现**。
+Date: 2026-10-04. Status: **书面设计已确认；实施计划待审阅，尚未开始产品实现**。
 
-本设计响应[实际阅读反馈](../../../harness/incidents/2026-10-04-reading-comprehension-feedback.md)，范围以 [F25 合同](../../../harness/features/individual_feature/F25-l0-document-orientation/feature.md)为准。这里描述拟议变更，不改写当前规范；书面设计确认后再形成实施计划。
+本设计响应[实际阅读反馈](../../../harness/incidents/2026-10-04-reading-comprehension-feedback.md)，范围以 [F25 合同](../../../harness/features/individual_feature/F25-l0-document-orientation/feature.md)为准。用户于 2026-10-04 确认“可以，按你说的推荐那种来”，采用 Map 可选 readingGuide。[实施计划](drafts/implementation-plan.md)已写，待审阅后实施；本设计不直接替代当前规范，正式接口须在改代码前同步。
 
 ## 1. 要解决的问题
 
@@ -20,7 +20,7 @@ Date: 2026-10-04. Status: **候选书面设计，待用户审阅；未授权产�
 | 独立 explanation.json，通过清单选入 | 可以完全保持 Map 文件不变；解释可单独修订 | 多一种文件和配对协议；独立 Map 入口还需要显式选择解释文件，用户管理负担增加 |
 | 只调整现有名称、关系 label/note 和 Topic proposition 的展示 | 数据协议改动少 | 示例没有节点定义；现有 Map SU 与 Plan SU 未建立身份对应，不能从 Plan 猜解释，无法完整解决问题 |
 
-采用推荐方案的候选设计如下。原始样本和 Gold 不改；新建 `framework-map.reading.json` 保存包含解释的派生样本。实际资料包仍通过清单明确选择 Map，目录中同时存在多个 Map 也不自动选“增强版”。
+采用用户确认的推荐方案如下。原始样本和 Gold 不改；新建 `framework-map.reading.json` 保存包含解释的派生样本。实际资料包仍通过清单明确选择 Map，目录中同时存在多个 Map 也不自动选“增强版”。
 
 ## 3. 用户打开后会看到什么
 
@@ -110,9 +110,9 @@ L0 的语义输入仍只有 Map；原文/registry 只用于核对与定位 guide
 
 ## 7. 实施边界与后续交接
 
-设计确认后，先在 framework-map / Reading layer / bundle 规范与 harness ARCHITECTURE、DESIGN 中登记接口和 UI 变化，再修改 schema 与产品代码。当前候选不作为新的 authority。
+实施计划确认后，先在 framework-map / Reading layer / bundle 规范与 harness ARCHITECTURE、DESIGN 中登记接口和 UI 变化，再修改 schema 与产品代码。本设计不作为新的 authority。
 
-实施计划需要将 `app/renderer/l0-map.css`、`samples/README.md` 和两份新增 `samples/*/framework-map.reading.json` 加入 F25 文件范围；如需额外文件，应先更新合同。当前尚未创建这些样本或修改 schema。
+实施计划涉及的 `app/renderer/l0-map.css`、`samples/README.md`、独立 L0 预览构建器和新增派生 Map 已加入 F25 文件范围；如需额外文件，应先更新合同。当前尚未创建这些样本或修改 schema。
 
 F25 拥有共用解释协议；F23 复用已验证解释和来源状态，继续设计主题局部含义、对照和边界摘要。F25 的完成不关闭 F23/F17，也不改变旧 F04–F08 的实际验收状态。
 
@@ -120,4 +120,4 @@ F25 拥有共用解释协议；F23 复用已验证解释和来源状态，继续
 
 需要确认的产品方案是：**图前有整篇导读，节点有短解释，点击节点/关系能读到具体含义，Topic 默认说明能回答的问题，再显式进入主题；解释随 Map 一并加载。**
 
-该方案经用户确认后进入书面实施计划审阅，沿用此前 Native 执行方式；当前未开始产品实现，F25 不构成完成。
+方案已确认，现进入书面实施计划审阅，沿用此前 Native 执行方式；当前未开始产品实现，F25 不构成完成。

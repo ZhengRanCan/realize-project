@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-04.
-- Active feature: F25 L0 Document Orientation and Explanation（active，候选书面设计待审阅）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
-- Next queued feature: F25 设计确认后形成实施计划并实施；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
+- Active feature: F25 L0 Document Orientation and Explanation（active，书面设计已确认、实施计划待审阅）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
+- Next queued feature: F25 实施计划确认后实施；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -39,7 +39,7 @@
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 | F23 | L1 Topic Boundary View v0.2 | `blocked` | 技术基线保留；补节点/关系解释与无边摘要，实际验收未通过 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
-| F25 | L0 Document Orientation and Explanation | `active` | 候选书面设计已写，待审阅；产品、解释协议及新样本尚未实施 |
+| F25 | L0 Document Orientation and Explanation | `active` | 已确认 Map 内嵌解释方案；实施计划待审阅，产品尚未实施 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -361,3 +361,11 @@ Source-verified Evidence
 - 共享接口拟由 F25 拥有，显式绑定文档、Map 结构和原文版本，不从 Plan SU 猜定义；F23 后续复用。本轮仅写候选，不修改当前规范、schema、产品或旧样本。实施前须更新所需文件范围及规范并完成书面设计/计划审阅。
 - 已确认 schema 原本支持根字段 thesis；context-consumption 示例缺席不能推断 schema 缺少该能力。原文中的两条链、非等价与非因果边界必须保留。
 - 技术验证和用户读懂分开验收；F25 的 passing 不自动关闭 F23/F17 或历史 L0 feature。检查记录见 [F25 verification](log/artifacts/F25-l0-document-orientation/verification-summary.md)。
+
+## 2026-10-04 — F25 Design Approved / Plan Written
+
+- 用户确认推荐方案（“可以，按你说的推荐那种来”）：Map 可选 readingGuide 随图一并加载，显式绑定文档、图版本和原文快照。
+- [实施计划](log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)已写并自查：共用协议与校验、两类有依据的输入及投影、L0 展示/进入动作、真实 Electron/便携 Preview 回归、独立审查与用户理解验收。
+- 已将独立 L0 预览、样式、两份新增派生 Map 和受进入动作影响的旧测试加入 scope；旧原文/Map/Gold/Plan 和历史实验不修改。
+- 共用解释模块由 F25 拥有，F23 后续复用；本轮不实现 L1 新解释，也不提前将 F23/F17 标通过。来源失效逐项披露，关系按原始 edge occurrence 配对，不用端点字符串合并平行边。
+- 沿用 Native 和本项目 Harness + 独立 reviewer；本机 executing-plans 子技能缺失，不冒称调用。计划待用户审阅；尚未修改规范正文、产品、schema、validator 或创建新样本。
