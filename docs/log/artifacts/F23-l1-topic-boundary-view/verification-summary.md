@@ -1,6 +1,6 @@
 # F23 Implementation Verification
 
-Date: 2026-10-03. Status: blocked only on actual user interface acceptance. Implementation and independent code review complete; F17 remains blocked on the same user acceptance. F24 has not started.
+Technical verification date: 2026-10-03. Current acceptance (2026-10-04): not passed; user reports insufficient L0 orientation and L1 explanation. First implementation and independent code review remain valid technical evidence; F23/F17 stay blocked for design revision. F24 has not started.
 
 The user approved the [design](view-design.md) with “可以，做吧” and the [Native implementation plan](drafts/implementation-plan.md) with “看着没问题，实施咯”. These approve implementation, not the resulting interface.
 
@@ -45,7 +45,7 @@ One full selftest run alongside another Electron Preview process failed the visi
 
 [Independent review](subagent-review.md): three P2 repaired and rechecked; no remaining P1/P2. [Incident](../../../harness/incidents/2026-10-03-f23-boundary-review.md) records the defects before repairs.
 
-## User acceptance still required
+## User acceptance pending at technical delivery — 2026-10-03
 
 A local read-only preview is generated at `workspace/previews/f23-reading-preview.html`, based on the existing Gold analysis bundle. Open it and click “生成链路与消费点” (T-02) for internal structure, then “消费的证据与判定” (T-03) for external connections. For Electron run `npm.cmd start` and open `workspace/analyses/context-consumption/stage2-gold/reading-bundle.json`. These local artifacts are ignored by Git.
 
@@ -56,3 +56,15 @@ The user must inspect the actual interface and confirm the internal and external
 - `eafcdc3`: original display metadata projection and regression.
 - `81e8395`: pure boundary renderer and layout/HTML regression.
 - Integration, review repairs and technical delivery are committed together after final documentation gates; actual user acceptance will be a separate record.
+
+## Actual user acceptance — 2026-10-04
+
+User inspected the actual interface and did not accept comprehension: L0 objects are abstract, relationship disclosure mostly repeats links, Topic choice lacks document-wide orientation, and L1 does not sufficiently explain its members. The pictured further-reading list is an L1 entry to L2, not L2 content. User asked to revisit L2 later.
+
+[Feedback/diagnosis](../../../harness/incidents/2026-10-04-reading-comprehension-feedback.md) records the evidence. Status remains blocked due to an identified product gap, not because the user has yet to look. Technical tests above are retained; no new product change or actual comprehension pass is claimed.
+
+## Contract revision v0.2 — 2026-10-04
+
+用户明确要求新建 L0 feature 并更新 L1。F25 已登记为 not_started，负责整篇导读与共享解释资料设计；F23 更新为 v0.2，保留 blocked，增加对象含义/职责、关系语境、无边 summary 定义/差异/边界、L1 本层基本理解和显式解释依据的验收要求。历史技术基线不重写成新功能通过；未修改产品代码。F24 后置，F23 未通过项继续归本 feature 负责。
+
+2026-10-04 v0.2 登记检查：check:docs 152 Markdown / 0 broken；verify:harness 24 features / 0 errors；git diff --check 通过。只验证本轮合同与状态，不代表新增解释功能通过。

@@ -151,13 +151,20 @@
     "title": "L1 Topic Boundary View",
     "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F23-l1-topic-boundary-view",
-    "version": "v0.1"
+    "version": "v0.2"
   },
   {
     "id": "F24",
     "title": "L2 Independent Block Reading View",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F24-l2-block-reading-view",
+    "version": "v0.1"
+  },
+  {
+    "id": "F25",
+    "title": "L0 Document Orientation and Explanation",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F25-l0-document-orientation",
     "version": "v0.1"
   }
 ]

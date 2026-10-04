@@ -2,9 +2,9 @@
 
 ## Status
 
-- Date: 2026-10-03.
-- Active feature: none；F23 技术实现、完整回归与独立审查完成，blocked 等待用户查看实际图；F17 保持同一验收阻塞，F24 为 not_started。
-- Next queued feature: 用户确认 F23 实际界面后关闭 F23/F17，再继续 F24。
+- Date: 2026-10-04.
+- Active feature: none；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
+- Next queued feature: F25 L0 Document Orientation and Explanation（not_started），先做整篇导读与解释资料设计；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -31,14 +31,15 @@
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `passing` | F19–F21后补真实模块/DOM、Back与Known(0)落点证据，独立审查通过 |
 | F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 仅数据投影接入完成；独立单 Block 展示由 F24 补齐 |
-| F17 | L1 Topic Runtime | `blocked` | 投影/入口已通过；F23 已补齐图及自动化回归；待实际用户验收 |
+| F17 | L1 Topic Runtime | `blocked` | 投影/入口已通过；F23 已补齐图及技术回归；用户验收指出解释不足，待修订 |
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
 | F19 | Reading Navigation and Resolver | `passing` | 统一导航/定位、真实逐层返回、便携Preview与独立审查通过；Explore组合路径由F20验证 |
 | F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
-| F23 | L1 Topic Boundary View | `blocked` | 图、出处能力、真实回归与独立审查完成；只待用户实际图理解性验收 |
+| F23 | L1 Topic Boundary View v0.2 | `blocked` | 技术基线保留；补节点/关系解释与无边摘要，实际验收未通过 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
+| F25 | L0 Document Orientation and Explanation | `not_started` | 用户授权登记；整篇定位、概念/关系含义和 Topic 导读，设计与实施待做 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -54,8 +55,8 @@ L3 保持两条独立核查路径，缺失与漂移明确降级。F19/F20 已补
 
 ### 当前返工（2026-10-03）
 
-- F23 → F24：L1 有关系时展示局部与边界图；L2 主路径只展示当前 Block，按已有受控表达呈现。
-- 两项均需真实 Electron/Preview、键盘/窄窗口、Back/Resolve/L3/Explore 回归及用户查看实际界面的结果；不修改原文或重新调用模型。
+- F25 → F23 v0.2 → F24：先补 L0 整篇导读与对象/关系解释；L1 继续修主题含义和无关系摘要；L2 独立 Block 视图后置。
+- 三项分别验收，均需真实 Electron/Preview、键盘/窄窗口、既有导航回归和用户实际阅读判断；登记轮不修改原文或运行模型。
 - F17 复核关闭由 F23 的实际验收触发；F16 保留数据接入结论。F19 仅将 F17 已验证投影/入口记为技术基线，视觉返工不作为导航依赖，gate 本身不改。
 - 反馈：[L1/L2 展示缺口](harness/incidents/2026-10-03-l1-l2-reading-gap.md)。新任务登记通过文档校验不代表实现完成。
 
@@ -338,3 +339,17 @@ Source-verified Evidence
 - 完整 test:all、单独 full selftest、输入 gates、静态检查通过；新路径覆盖公共 5 Map/31 Topic/66 关系、1–6 条 parallel/self/inbound/outbound/symmetric、640×720、合法 summary、Unknown/Known(0)/无 Plan 与 Source 缺失/重复/漂移。最终 docs/harness 同步检查通过。
 - 独立审查的三项 P2（卡片穿越/目标箭头方向、虚假 Source 能力、标签处线路折返）均修复；复查无剩余 P1/P2。证据：[F23 verification](log/artifacts/F23-l1-topic-boundary-view/verification-summary.md)。
 - 用户尚未查看实际实现并确认可理解性；F23/F17 保持 blocked，F24 未启动。只读预览 workspace/previews/f23-reading-preview.html 供试用，正式数据与审核不改；临时测试输出已按任务清理，无新增永久 txt 日志。继续开发分支，不合并 main。
+
+## 2026-10-04 — Actual Reading Acceptance Not Passed
+
+- 用户实际试用后指出 L0 抽象、关联列表对理解帮助有限、Topic 缺少整篇定位，L1 信息量少且缺少概念解释。F23/F17 保持 blocked；不能将此前技术全绿视为可理解性通过。
+- [反馈与诊断](harness/incidents/2026-10-04-reading-comprehension-feedback.md)：当前 Map 缺少节点解释、边缺少自然语言语境；无边 T-01 的合法摘要仅列名称，也需要解释三个层级的含义与差异。
+- 图片是 L1 的 L2 入口与成员详情，尚非 L2 解释正文；按用户要求 L2 后置。本次未修改产品、样本或输入协议，先明确 L0/L1 解释设计与数据依据。
+
+## 2026-10-04 — F25 Registration / F23 v0.2
+
+- 用户批准“L0 新建，L1 修原 feature”并要求完成合同登记：[F25](harness/features/individual_feature/F25-l0-document-orientation/feature.md) 新建为 not_started；[F23](harness/features/individual_feature/F23-l1-topic-boundary-view/feature.md) 升至 v0.2，保持 blocked。
+- F25 负责整篇导读、节点/关系含义、Topic 选择引导和共享解释资料的设计；F23 负责 L1 主题解释、对象职责、关系语境、无关系摘要的定义/对照/边界。本层基本理解不能全部推给 L2。
+- 共享资料要显式来源/身份绑定；不按 Map/Plan SU 编号、标题或文件名自动配对。具体载体/兼容策略在设计阶段确认，本轮不改规范正文、产品、schema、validator 或样本。
+- 推进顺序：F25 设计与实施 → F23 修订与复验 → F24。F25 不强制依赖 blocked F23，F23 不提前依赖未定协议，避免关闭循环；每次只激活一项。
+- 登记结果见 [F25 verification](log/artifacts/F25-l0-document-orientation/verification-summary.md)。此前 v0.1 技术全绿只作基线，新解释功能与用户可理解性仍未通过。
