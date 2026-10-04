@@ -89,3 +89,10 @@ F23 完成后按 F17 重新打开的验收项复核并记录关闭依据，不�
 - 推进建议：先设计 F25 的导读/解释资料，再修订本 feature 的展示设计，按确认后的计划实施；F24 后置。不得同时激活两项，也不把尚未确定的共享协议当作已存在依赖。
 - F25 不依赖 blocked F23；F23 的 harness 强制前置暂保持 F16/F18/F19。若确定共享制品是必需输入，实施前再同步精确范围和必要依赖，不制造关闭循环。
 - v0.1 设计/实施计划与审批仅是历史技术基线；本次合同更新不等于 v0.2 展示设计已确认。现有代码、原文、Gold 和历史实验不在本登记轮修改。
+
+
+## Shared explanation handoff — 2026-10-04
+
+F25 已实现 app/shared/reading-explanation.js，GuideVM 含 orientation/elements/edges/topics 与逐来源状态；元素/主题按原身份、边按原 edges occurrence，heading 空间不推断 Map/Plan SU 对应。L0 会话已明确传原文 hash/registry/integrity；F23 v0.2 后续复用其规则，不能另写一份解析或直接展示 guide 原数据为已核实解释。缺项/declared/located 区别和 Snapshot 保护必须保持。
+
+L0 Topic 的展开不进入 L1，明确 data-enter-topic 才进入。原 F23 实际关系/键盘/Source/Back 检查在新入口下通过，但 v0.2 的节点/关系解释及概念主题摘要仍待设计与实施，blocked 未关闭。F25 pending 人工理解不作强制 passing 依赖；必要输入接口已经存在，F23 实施前再确认精确消费范围。

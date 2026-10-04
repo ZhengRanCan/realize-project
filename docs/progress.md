@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-04.
-- Active feature: F25 L0 Document Orientation and Explanation（active，设计和计划已确认，Native 实施中）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
-- Next queued feature: F25 正在实施；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
+- Active feature: 无；F25 L0 Document Orientation and Explanation（blocked，实现与技术检查完成，等用户实际阅读验收）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
+- Next queued feature: F25 等实际阅读验收；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -39,7 +39,7 @@
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 | F23 | L1 Topic Boundary View v0.2 | `blocked` | 技术基线保留；补节点/关系解释与无边摘要，实际验收未通过 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
-| F25 | L0 Document Orientation and Explanation | `active` | 设计/计划已确认；共享校验、导读及真实路径实施中 |
+| F25 | L0 Document Orientation and Explanation | `blocked` | 实现/技术回归/独立审查完成；等待实际阅读理解验收 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -375,3 +375,14 @@ Source-verified Evidence
 - 用户批准实施计划（“可以，做吧”），按 Native 实施；解释资料、绑定、纯投影和 L0 renderer 共用一套规则。
 - 先同步规范：Map 可选 readingGuide，显式文档/核心 Map 指纹/原文字节 hash；heading 摘录只能证明可定位，不能证明解释语义正确。来源逐项披露，旧输入有效。
 - 共享接口、独立 Map/资料包加载、Topic 独立进入及关系 occurrence 会影响既有集成测试；按计划覆盖完整身份、三态、Source/session、Back 和只读 Preview。F23 的局部解释后续实施。
+
+
+### F25 技术交付（2026-10-04）
+
+- 导读、节点短解释、节点/关系/约束的完整含义与独立出处、Topic 问题与明确进入已实现。Map readingGuide 显式绑定，部分来源/坏绑定/漂移/旧会话不冒称核实；F23 后续共用同一模块。
+- 两类源文解释已核对，受保护原文/旧 Map/Gold/Plan 字节不变。新增派生 Map；未运行模型生成或保存用户审核。
+- test:all、selftest、L0 orientation、L1 boundary、搬迁只读 Preview 和独立审查通过；未关闭 F23/F17，不合并 main。
+- 本机增强包：workspace/analyses/context-consumption/f25-reading/reading-bundle.json；完整预览：workspace/previews/f25-reading-preview.html；runbook 独立 L0：workspace/previews/l0/f25-runbook.html。详细证据见 [F25 verification](log/artifacts/F25-l0-document-orientation/verification-summary.md)。
+- F25 blocked 只待实际阅读理解：用户能说明文章问题、对象/关系及下一步主题选择理由。代码正确不能代替该项；目前没有 passing 结论。
+
+F25 收口的清理限制：旧 L0 预览测试的8个缓存文件删除被工具策略拒绝，仍在 workspace/tmp/tests/l0-preview-check；专项 UUID 目录已清理，未新增永久校验 txt。

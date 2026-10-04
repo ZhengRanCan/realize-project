@@ -136,26 +136,30 @@
 - package 新命令 `test:l0-orientation` 运行两份纯测试后运行 `electron . --selftest-l0-orientation`；两份纯测试加入 test:all，Electron 专项保持单独串行运行。
 - 便携 Preview 继续使用 prepareReadingSession 的 VM、现有 Source snapshot 和同一 renderer，不运行 node crypto 或另一份指纹算法。
 
-- [ ] Step 1: 编写实际界面测试：增强 context 包加载可读；节点、边、attachment 解释和出处正确；summary 只展开，成员按钮只选择，进入按钮才到 L1；真实 Tab/Enter/Space 操作及 Back 恢复节点/关系 occurrence、展开、焦点和图滚动。
-- [ ] Step 2: 实现专项测试接入，更新旧测试使用进入按钮并保留原有身份、导航和保存隔离断言；新增“summary 不进入 L1”的断言，不能为了全绿删除原有检查。
-- [ ] Step 3: 在640×720、长解释及平行边副本上实测，断言窗口实际尺寸；运行 runbook 独立 Map 无 Plan 路径，确认解释和 unavailable 出处、全部图对象及主题仍可读。
-- [ ] Step 4: 导出明确增强 Map 的 context 包，记录所选 Map 字节 hash；构建便携 Preview，搬迁到仓库外的本任务临时目录并以离线只读方式加载。实测节点/边解释、来源快照、Topic/Back 和禁用保存；截获写操作确认不产生 human-review。
-- [ ] Step 5: 验证坏文档/Map/source 绑定保留旧会话；失败、取消、过期回复和成功切换保持解释隔离；部分坏出处、registry 漂移及打开后磁盘原文漂移不显示成功定位。一个有效出处不掩盖另一条失败来源。
-- [ ] Step 6: 串行运行 `npm.cmd run test:l0-orientation`、`npm.cmd run selftest`、`npm.cmd run test:l1-boundary`；运行 `npm.cmd run test:all`、validate、audit、check-overview、check:docs、verify:harness、git diff --check。输入判定与既有 warnings 记录原状，不修改历史实验。通过后提交 `test: verify L0 explanations across desktop and preview`。
+- [x] Step 1: 编写实际界面测试：增强 context 包加载可读；节点、边、attachment 解释和出处正确；summary 只展开，成员按钮只选择，进入按钮才到 L1；真实 Tab/Enter/Space 操作及 Back 恢复节点/关系 occurrence、展开、焦点和图滚动。
+- [x] Step 2: 实现专项测试接入，更新旧测试使用进入按钮并保留原有身份、导航和保存隔离断言；新增“summary 不进入 L1”的断言，不能为了全绿删除原有检查。
+- [x] Step 3: 在640×720、长解释及平行边副本上实测，断言窗口实际尺寸；运行 runbook 独立 Map 无 Plan 路径，确认解释和 unavailable 出处、全部图对象及主题仍可读。
+- [x] Step 4: 导出明确增强 Map 的 context 包，记录所选 Map 字节 hash；构建便携 Preview，搬迁到仓库外的本任务临时目录并以离线只读方式加载。实测节点/边解释、来源快照、Topic/Back 和禁用保存；截获写操作确认不产生 human-review。
+- [x] Step 5: 验证坏文档/Map/source 绑定保留旧会话；失败、取消、过期回复和成功切换保持解释隔离；部分坏出处、registry 漂移及打开后磁盘原文漂移不显示成功定位。一个有效出处不掩盖另一条失败来源。
+- [x] Step 6: 串行运行 `npm.cmd run test:l0-orientation`、`npm.cmd run selftest`、`npm.cmd run test:l1-boundary`；运行 `npm.cmd run test:all`、validate、audit、check-overview、check:docs、verify:harness、git diff --check。输入判定与既有 warnings 记录原状，不修改历史实验。通过后提交 `test: verify L0 explanations across desktop and preview`。
 
 ## Task 5: 独立审查、用户阅读验收与收口
 
 **Files:** F25 feature/verification、verification-summary、source-grounding、subagent-review、必要界面证据及 docs/progress；F23 合同只记录共享接口消费关系，保留 blocked。
 
-- [ ] Step 1: 汇总全部新增检查及原文依据记录；正式截图仅保留两类文档的关键导读/选中状态与640×720证据，不保存每次成功日志。
-- [ ] Step 2: 启动一名新的独立 reviewer，读取已确认设计、计划、本 feature 全部 diff 和关键测试证据。重点审查来源/版本绑定、边 occurrence、缺失状态、旧输入、实际交付和导航。使用本地/native agent，不向外部 DeepSeek 传私有材料。
-- [ ] Step 3: 对审查发现先登记 incident 再修复，复跑对应测试；若代码有新改动，复核全局门禁。记录复查结果；必要文件先加入合同 scope，不绕过门禁。
+- [x] Step 1: 汇总全部新增检查及原文依据记录；正式截图仅保留两类文档的关键导读/选中状态与640×720证据，不保存每次成功日志。
+- [x] Step 2: 启动一名新的独立 reviewer，读取已确认设计、计划、本 feature 全部 diff 和关键测试证据。重点审查来源/版本绑定、边 occurrence、缺失状态、旧输入、实际交付和导航。使用本地/native agent，不向外部 DeepSeek 传私有材料。
+- [x] Step 3: 对审查发现先登记 incident 再修复，复跑对应测试；若代码有新改动，复核全局门禁。记录复查结果；必要文件先加入合同 scope，不绕过门禁。
 - [ ] Step 4: 交付实际增强 context 资料包和两篇阅读预览，明确用户打开路径；让用户不打开原文复述核心问题、主要对象/关系及选择 Topic 的理由，记录日期、输入和实际结果。
-- [ ] Step 5: 尚无实际阅读判断时，保留 humanReviewRequired，标 blocked（等待阅读验收），不得以技术通过冒称完成。用户验收通过且所有 acceptance、命令、证据、独立审查满足后才同步 passing；F23/F17 不自动关闭。
+- [x] Step 5: 尚无实际阅读判断时，保留 humanReviewRequired，标 blocked（等待阅读验收），不得以技术通过冒称完成。用户验收通过且所有 acceptance、命令、证据、独立审查满足后才同步 passing；F23/F17 不自动关闭。
 - [ ] Step 6: 清理本任务临时输出，重新核对旧材料/用户审核未改；提交技术或最终验收结论，保持当前分支。推送或主分支合并按既有明确授权范围执行，本计划不新增 main 合并授权。
 
 ## 自查与阶段状态
 
 设计 §3 的导读/节点/关系/Topic/窄窗口由 Task 3、4覆盖；§4 的协议与来源由 Task 1、2覆盖；§5 的兼容、降级和会话由 Task 1、2、4覆盖；§6 的两类原文与实际理解由 Task 2、4、5覆盖；§7 的 F23 交接和文件边界由 Task 1、5覆盖。
 
-各任务共用上述接口与状态名；五项 Review Focus 都有指定测试。当前只完成计划自查，所有实施 checkbox 保持未勾选；没有声称未来测试已创建或通过。
+各任务共用上述接口与状态名；五项 Review Focus 都有指定测试。Task 1–4已实施，技术检查与独立审查已执行；Task 5用户实际阅读判断待验收。技术结果不能替代该项。
+
+实际交付文件已生成（见 verification-summary）。Task 5 Step4 中交付已完成，用户复述/选择理由仍待记录；Step5与6随最终门禁及状态收口更新。
+
+Step6 临时清理部分完成：专项 UUID 目录已清理，旧 L0 预览脚本的8个固定缓存文件删除被工具策略拒绝，保留记录且不绕过；因此该 checkbox 继续未勾选。技术结论可提交，用户实际理解也仍待记录。

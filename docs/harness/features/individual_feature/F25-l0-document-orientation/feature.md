@@ -2,11 +2,11 @@
 id: F25
 title: L0 Document Orientation and Explanation
 version: v0.1
-status: active
+status: blocked
 dependsOn: ["F18","F19","F21"]
 scope: {"code":["scripts/l0-view-model.js","app/renderer/l0-map.js","app/renderer/l0-layout.js","app/renderer/app.js","app/renderer/styles.css","app/renderer/index.html","app/main/main.js","app/main/reading-bundle.js","app/main/reading-session.js","app/shared/reading-projection.js","app/shared/reading-explanation.*","app/shared/reading-bundle-validation.js","scripts/build-preview.js","scripts/export-reading-bundle.js","scripts/check-map.js","schema/framework-map.schema.json","schema/reading-bundle.schema.json","package.json","app/renderer/l0-map.css","scripts/build-l0-preview.js","samples/context-consumption/*.reading.json","samples/operational-runbook/*.reading.json"],"tests":["scripts/test-l0-view-model.js","scripts/test-l0-layout.js","scripts/test-l0-preview.js","scripts/test-check-map.js","scripts/test-reading-bundle.js","scripts/test-reading-session.js","scripts/test-reading-bundle-projection.js","scripts/test-reading-bundle-preview.js","scripts/test-reading-navigation-electron.js","scripts/test-explore-electron.js","scripts/test-product-maturity-electron.js","scripts/test-l0-orientation*.js","scripts/test-reading-explanation*.js","scripts/test-reading-bundle-electron.js","scripts/test-l1-boundary-view-electron.js"],"docs":["docs/harness/PRODUCT_SPEC.md","docs/harness/ARCHITECTURE.md","docs/harness/DESIGN.md","docs/specs/framework-map-contract.md","docs/specs/reading-view-cognitive-contract.md","docs/specs/reading-view-layer-contracts.md","docs/specs/reading-bundle-contract.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F25-l0-document-orientation/**","docs/log/artifacts/F25-l0-document-orientation/**","docs/harness/features/individual_feature/F23-l1-topic-boundary-view/**","docs/progress.md","docs/harness/incidents/2026-10-04-reading-comprehension-feedback.md","samples/README.md","docs/harness/incidents/*-f25-*.md"]}
-evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 → L0 理解文章核心问题、关键对象和整体结构","选择节点/关系 → 阅读具体含义和依据 → 选择能解决当前疑问的 Topic","独立 Map / 旧包 / 缺解释输入 → 明确能力缺失且保留结构与导航","L0 → L1 → Back 恢复选择/滚动/焦点；真实窄窗口和只读 Preview"],"integrationEvidence":[],"knownUnverified":["实施进行中；新解释协议、展示及真实界面回归待验证","独立代码审查与用户实际阅读理解尚未验收"],"humanReviewRequired":["用户在不打开原文的情况下，能说明文章讨论的问题、主要对象及其连接含义，并知道下一步选择哪个 Topic"]}
+evidence: {"lastVerifiedAt":"2026-10-04","commands":[{"command":"npm.cmd run test:l0-orientation","result":"passed","output":"pure + real Electron passed"},{"command":"npm.cmd run selftest","result":"passed","output":"SELFTEST PASSED, F15/F18-F23/F25 regressions"},{"command":"npm.cmd run test:l1-boundary","result":"passed","output":"pure + real Electron passed"},{"command":"npm.cmd run test:all","result":"passed","output":"offline and relocated readonly old/legacy/enhanced Preview passed"},{"command":"node scripts/test-reading-bundle-preview.js","result":"passed","output":"final Preview passed; exercised fs.promises.writeFile interception zero"},{"command":"npm.cmd run validate","result":"passed","output":"PASSED"},{"command":"npm.cmd run audit","result":"passed","output":"PASSED"},{"command":"npm.cmd run check-overview","result":"passed","output":"PASS WITH WARNINGS: existing duplicate17/density1; no failures"},{"command":"npm.cmd run check:docs","result":"passed","output":"156 markdown files, 0 broken"},{"command":"npm.cmd run verify:harness","result":"passed","output":"24 features, 0 errors"},{"command":"node --check changed/new JS; git diff --check","result":"passed","output":"20 JS and diff passed; 6 protected inputs byte-identical"}],"manualSmoke":"父代理已核对两类文档的真实截图；用户实际阅读理解尚未验收。正式截图与原生操作证据见 F25 verification-summary。"}
+completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 → L0 理解文章核心问题、关键对象和整体结构","选择节点/关系 → 阅读具体含义和依据 → 选择能解决当前疑问的 Topic","独立 Map / 旧包 / 缺解释输入 → 明确能力缺失且保留结构与导航","L0 → L1 → Back 恢复选择/滚动/焦点；真实窄窗口和只读 Preview"],"integrationEvidence":["docs/log/artifacts/F25-l0-document-orientation/verification-summary.md","docs/log/artifacts/F25-l0-document-orientation/interface-evidence.json","docs/log/artifacts/F25-l0-document-orientation/subagent-review.md"],"knownUnverified":["用户实际阅读理解尚未验收；两类文章的复述与 Topic 选择理由待记录","旧 L0 测试缓存 workspace/tmp/tests/l0-preview-check 的8个文件，删除被工具策略拒绝；未删除"],"humanReviewRequired":["用户在不打开原文的情况下，能说明文章讨论的问题、主要对象及其连接含义，并知道下一步选择哪个 Topic"]}
 ---
 
 # F25 L0 Document Orientation and Explanation
@@ -17,7 +17,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 �
 
 ## Process preconditions
 
-- 用户于 2026-10-04 明确授权新建 L0 feature，并更新原 L1 feature；随后要求完成 L0 feature。当前唯一 active，书面设计已确认，实施计划已获确认，开始 Native 实施。
+- 用户于 2026-10-04 明确授权新建 L0 feature，并更新原 L1 feature；随后要求完成 L0 feature。本轮按唯一 active 推进，设计/计划已确认并完成 Native 实施；现已 blocked 等用户实际阅读判断。
 - [书面设计](../../../../log/artifacts/F25-l0-document-orientation/view-design.md)已获用户于 2026-10-04 确认（“可以，按你说的推荐那种来”），采用 Map 可选 readingGuide。[实施计划](../../../../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)已获用户确认（“可以，做吧”）；沿用 Native。先同步规范，再按计划实施。
 - 用户验收反馈见 [记录](../../../incidents/2026-10-04-reading-comprehension-feedback.md)。已有 L0/F23 图形、导航和数据测试属于技术基线，不证明本 feature 的阅读效果。
 - F18 输入/原文绑定、F19 导航、F21 键盘/窄窗口作为强制基线；不依赖 blocked 的 F08/F17/F23，避免通过新 feature 形成关闭循环或冒称旧视觉验收通过。
@@ -45,15 +45,15 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 �
 
 ## Acceptance Criteria
 
-- [ ] 首次进入 L0，可见有依据的文章定位/核心问题及必要范围提示；缺少明确命题时忠实披露，不能伪造作者结论。
+- [x] 首次进入 L0，可见有依据的文章定位/核心问题及必要范围提示；缺少明确命题时忠实披露，不能伪造作者结论。
 - [ ] 框架图仍显示现有完整对象与关系；关键对象的含义、职责与主干连接能被读者理解，不能只靠英文名称和通用关系词。
 - [ ] 选择节点或关系后披露具体语义、条件/边界及来源依据；内容增加理解，不只是重新列 incoming/outgoing 或重复箭头。
 - [ ] Topic 入口让读者知道深入后能回答什么问题；完整入口集合、多 Topic 和未知/空状态保留，无隐含 owner 或虚构顺序。
-- [ ] 解释资料与 Map/文档身份显式绑定，不能隐式串接 Map/Plan SU；缺失、不可解析、配对失败和漂移分别按协议处理，不能显示为已核实解释。
-- [ ] 独立 Map 不依赖 Plan 可用性；旧 Map/旧包和缺解释输入仍能阅读结构并明确解释能力缺失。解释相关新字段保持已确认的兼容性，不放宽现有验证口径。
-- [ ] 不制造中心命题、关系或归属，不将整篇正文/所有 Block 铺到 L0；概念型及过程型文章均有适合其既有语义的定位方式。
-- [ ] 身份/当前选择、Back/Resolve/Source/Explore 与会话隔离保持；Tab/Enter/Space、640×720、长文本、真实便携只读 Preview 通过。
-- [ ] 公共样本至少包含 context-consumption 和一篇不同类型文章；对照原文核查解释依据、重要边界与 Current/Target，不能只验证 HTML 存在。
+- [x] 解释资料与 Map/文档身份显式绑定，不能隐式串接 Map/Plan SU；缺失、不可解析、配对失败和漂移分别按协议处理，不能显示为已核实解释。
+- [x] 独立 Map 不依赖 Plan 可用性；旧 Map/旧包和缺解释输入仍能阅读结构并明确解释能力缺失。解释相关新字段保持已确认的兼容性，不放宽现有验证口径。
+- [x] 不制造中心命题、关系或归属，不将整篇正文/所有 Block 铺到 L0；概念型及过程型文章均有适合其既有语义的定位方式。
+- [x] 身份/当前选择、Back/Resolve/Source/Explore 与会话隔离保持；Tab/Enter/Space、640×720、长文本、真实便携只读 Preview 通过。
+- [x] 公共样本至少包含 context-consumption 和一篇不同类型文章；对照原文核查解释依据、重要边界与 Current/Target，不能只验证 HTML 存在。
 - [ ] 用户不打开原文，可以复述文章核心问题、主要对象及连接含义，并说明会选择哪个 Topic 继续看；结果记录日期/输入/实际判断。
 - [ ] 设计、受影响单元/集成/兼容检查、独立审查和实际用户验收完成；合同/index/progress 同步后才 passing。
 
@@ -68,4 +68,11 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 �
 
 - [登记与验证记录](../../../../log/artifacts/F25-l0-document-orientation/verification-summary.md)。
 - 设计、计划和解释依据按本 feature artifact 保存；代码实现后须有独立审查和实际用户验收。
-- 当前 active（实施阶段）；已确认设计、计划和文档门禁不构成产品实现或阅读效果通过。成功校验不保留永久 txt 日志。
+- 当前 blocked（等待实际阅读验收）；实现、技术回归与独立审查已完成，用户理解仍未确认。成功校验不保留永久 txt 日志。
+
+
+## Technical delivery — 2026-10-04
+
+Map 可选 readingGuide、共用绑定/出处投影、两类派生输入、L0 导读与对象/关系解释已接入；原生 Topic 进入与披露分开，旧输入/独立 Map/坏绑定/漂移如实处理。Reading/Review、真实键盘/窄窗口/Back 与便携 Preview 通过，独立审查问题已修复。
+
+尚未勾选涉及读者理解和整体完成的 acceptance，等待用户实际复述与主题选择。可操作增强包和两篇预览位置见 verification-summary；不因技术全绿标 passing。F23 v0.2 只接收共用接口，解释消费仍待实施。

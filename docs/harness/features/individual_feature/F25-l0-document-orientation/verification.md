@@ -2,7 +2,7 @@
 
 ## Required commands
 
-当前 active，书面设计已确认，处于实施计划审阅阶段：执行 check:docs、verify:harness 和 git diff --check。下列功能检查用于计划确认后的实施阶段；新测试文件是允许的目标，不声称已创建或执行。
+当前 blocked：设计/计划、实现、技术验证和独立审查完成，用户阅读理解待验收。下列命令已实际执行，详细结果在 F25 verification-summary；Human 行尚未通过。
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |
@@ -27,3 +27,6 @@
 ## Passing evidence
 
 实现前确认具体设计与解释数据所有权。实现后记录命令、输入、关键截图、依据核对、独立审查和用户实际判断。功能测试必须检查解释内容与真实来源/身份对应，不能只有字符串、按钮数或导航成功断言。技术门禁与阅读理解验收分开；未被用户实际验收前，不清空 humanReviewRequired 或标 passing。
+
+
+技术路径已由真实 Electron/搬迁 Preview 和父代理截图核对；上述 Manual paths 中涉及实际理解的项目保持未勾选，不能用自动化代替用户。增强包和两篇预览的明确位置见 [verification summary](../../../../log/artifacts/F25-l0-document-orientation/verification-summary.md)。
