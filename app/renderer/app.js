@@ -1077,6 +1077,7 @@ function viewL0() {
     // provenance → 打开右侧 Source 面板的对应章节（复用现有原文回查能力）
     onSourceRef: (ref) => { state.sessionToken ? openSource(ref,{namespace:'heading',key:ref.replace(/^§/,'')}) : openSource(ref); },
     onTopic: (id) => navigation.enter({type:'topic',id}),
+    onExplanationSource: (source) => openSource(source.key,source),
   });
   const toolbar=el('div','reading-nav'),back=el('button','btn','返回');back.id='reading-back';back.hidden=!navigation.size;back.addEventListener('click',()=>navigation.back());toolbar.append(back);host.prepend(toolbar);
   // Reading / Review 切换后保持视图状态（不重新计算任何数据）

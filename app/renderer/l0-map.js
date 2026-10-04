@@ -117,6 +117,11 @@ const qualifierLine = (q) => {
 /** 焦点面板（预渲染在 Review 的卡片里；Reading 选中时拷进 #l0-focus-slot）
  *  中英双标签：Review 看原词（Incoming/Outgoing/Attached/Provenance），Reading 说人话。
  *  切换只靠 CSS，不复制面板、不加交互。 */
+function renderExplanation(entry) {
+  if(!entry)return '<p class="guide-missing">未提供该项补充解释；以下保留原始结构信息。</p>';
+  const sources=entry.sources.map(source=>`<li><button class="guide-source" data-guide-source="${esc(source.key)}" data-guide-namespace="${esc(source.namespace)}"${source.state==='known'?'':' disabled'}>${esc(source.title||source.key)}</button>${source.state==='known'?'<span class="guide-source-state">快照出处可定位</span>':`<span class="guide-source-state">${esc(source.reason)}</span>`}<blockquote>${esc(source.quote)}</blockquote></li>`).join('');
+  return `<div class="guide-explanation" data-guide-state="${esc(entry.sourceState)}"><p class="guide-summary">${esc(entry.summary)}</p><p class="guide-detail">${esc(entry.detail)}</p><details class="guide-sources"><summary>原文依据 · ${entry.sourceState==='located'?'快照出处可定位':'已声明，出处未全部核对'}</summary><p class="note">解释针对加载时的资料快照；可定位出处不表示解释或设计已验证。</p><ul>${sources}</ul></details></div>`;
+}
 function renderFocusPanel(e) {
   const outRows = e.outgoing.filter(r=>r.type!=='relates-to').map((r) => `<li data-edge-ref="${esc(r.id || '')}"><span class="rel"><span class="rel-en">—${esc(r.type)}→</span><span class="rel-zh">${esc(relZh(r.type))} →</span></span> <span class="node">${esc(r.peerLabel)}</span>${r.selfLoop ? '<span class="flag self">自环</span>' : ''}</li>`).join('');
   const inRows = e.incoming.filter(r=>r.type!=='relates-to').map((r) => (r.selfLoop ? '' : `<li data-edge-ref="${esc(r.id || '')}"><span class="rel"><span class="rel-en">←${esc(r.type)}—</span><span class="rel-zh">← ${esc(relZh(r.type))}</span></span> <span class="node">${esc(r.peerLabel)}</span></li>`)).join('');
@@ -126,16 +131,17 @@ function renderFocusPanel(e) {
   return `
 <section class="focus-panel" data-focus-for="${esc(e.id)}" hidden>
   <header class="focus-head">
-    <span class="focus-title"><span class="lbl-en">Focused Relations</span><span class="lbl-zh">关联关系</span> · <span class="eid">${esc(e.id)}</span> ${esc(e.label)}</span>
+    <span class="focus-title"><span class="lbl-en">Meaning and Relations</span><span class="lbl-zh">含义与边界</span> · <span class="eid">${esc(e.id)}</span> ${esc(e.label)}</span>
     <button class="btn tiny ghost" data-focus-clear="1">清除选择（Esc）</button>
   </header>
-  <div class="focus-cols">
+  ${renderExplanation(e.explanation)}
+  <details class="guide-raw"><summary>原始关联与出处信息</summary><div class="focus-cols">
     <div class="focus-col"><h4><span class="lbl-en">Incoming</span><span class="lbl-zh">来自</span></h4><ul class="focus-list">${inRows || '<li class="muted">（无）</li>'}</ul></div>
     <div class="focus-col"><h4><span class="lbl-en">Outgoing</span><span class="lbl-zh">指向</span></h4><ul class="focus-list">${outRows || '<li class="muted">（无）</li>'}</ul></div>
     ${relatedRows?`<div class="focus-col"><h4>关联（无方向）</h4><ul>${relatedRows}</ul></div>`:''}
     <div class="focus-col"><h4><span class="lbl-en">Attached</span><span class="lbl-zh">约束</span></h4><ul class="focus-list">${attRows || '<li class="muted">（无）</li>'}</ul></div>
     <div class="focus-col"><h4><span class="lbl-en">Provenance</span><span class="lbl-zh">出处</span></h4><div class="focus-prov">${refChips([...e.provenance.sectionRefs, ...e.provenance.sourceUnitIds])}</div></div>
-  </div>
+  </div></details>
 </section>`;
 }
 
@@ -149,7 +155,7 @@ function renderGraphNode(n, vm) {
   const badgeItems = n.badgeIds.map((id, i) => {
     const el = vm.elements.find((x) => x.id === id);
     const df = L0Layout.displayFields(el || { id, label: n.badgeLabels[i] });
-    return `<li class="attach-item" data-element-id="${esc(id)}" data-host-ids="${esc(hostIdsOf(id))}" data-focus-target="${esc(id)}" title="${esc(n.badgeLabels[i] || '')}">⚑ ${esc(df.title)}</li>`;
+    return `<li class="attach-item" data-element-id="${esc(id)}" data-host-ids="${esc(hostIdsOf(id))}" data-focus-target="${esc(id)}"><button data-element-id="${esc(id)}" data-host-ids="${esc(hostIdsOf(id))}" data-focus-target="${esc(id)}" title="${esc(n.badgeLabels[i] || '')}">⚑ ${esc(df.title)}${el?.explanation?`<span class="attach-meaning">${esc(el.explanation.summary)}</span>`:''}</button></li>`;
   }).join('');
   const badgeBlock = n.badgeIds.length ? `
     <details class="node-attach" data-element-id="${esc(n.badgeIds[0])}" data-host-ids="${esc(hostIdsOf(n.badgeIds[0]))}" data-badge-only="1" data-focus-target="${esc(n.badgeIds[0])}">
@@ -161,6 +167,7 @@ function renderGraphNode(n, vm) {
         <span class="node-glyph" data-glyph="${esc(n.type)}" title="${esc(L0Layout.TYPE_GLYPH_LABEL[n.type] || n.type)}">${esc(n.glyph)}</span>
         <h3 class="node-title" title="${esc(n.title)}">${esc(n.title)}</h3>
         ${n.subtitle ? `<p class="node-sub" title="${esc(n.subtitle)}">${esc(shortSubtitle(n.subtitle))}</p>` : ''}
+        ${vm.elements.find(e=>e.id===n.id)?.explanation?`<p class="node-meaning">${esc(vm.elements.find(e=>e.id===n.id).explanation.summary)}</p>`:''}
         ${badgeBlock}
       </article>`;
 }
@@ -175,10 +182,10 @@ function renderReading(vm, layout) {
   const noEdge = layout.edges.length === 0;
   const titleOf = new Map(layout.nodes.map((n) => [n.id, n.title]));
   const edgePaths = layout.edges.map((p) => `
-          <path class="l0-edge kind-${esc(p.kind)}${p.selfLoop ? ' is-selfloop' : ''}" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-edge-type="${esc(p.type)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}" data-kind="${esc(p.kind)}" d="${esc(p.d)}"${p.type==='relates-to'?'':' marker-end="url(#l0-arrow)"'}><title>${esc(`${titleOf.get(p.from) || p.from} ${relZh(p.type)}${p.type==='relates-to'?'—':'→'} ${titleOf.get(p.to) || p.to}${p.label ? '：' + p.label : ''}`)}</title></path>`).join('');
+          <path class="l0-edge kind-${esc(p.kind)}${p.selfLoop ? ' is-selfloop' : ''}" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-edge-index="${p.edgeIndex}" data-edge-type="${esc(p.type)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}" data-kind="${esc(p.kind)}" d="${esc(p.d)}"${p.type==='relates-to'?'':' marker-end="url(#l0-arrow)"'}><title>${esc(`${titleOf.get(p.from) || p.from} ${relZh(p.type)}${p.type==='relates-to'?'—':'→'} ${titleOf.get(p.to) || p.to}${p.label ? '：' + p.label : ''}`)}</title></path>`).join('');
   // 线标签：Reading 说人话（使用 / 产出 / 依赖…），原始 relation 词留在 data-edge-type 与 Review View
   const edgeLabels = layout.edges.map((p) => `
-          <text class="l0-edge-label" x="${p.labelX}" y="${p.labelY}" text-anchor="middle" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-edge-type="${esc(p.type)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}">${esc(relZh(p.type))}${p.selfLoop ? ' ↺' : ''}</text>`).join('');
+          <text class="l0-edge-label" x="${p.labelX}" y="${p.labelY}" text-anchor="middle" data-focus-edge="1" data-edge-id="${esc(p.id)}" data-edge-index="${p.edgeIndex}" data-edge-type="${esc(p.type)}" data-from="${esc(p.from)}" data-to="${esc(p.to)}">${esc(relZh(p.type))}${p.selfLoop ? ' ↺' : ''}</text>`).join('');
   const nodes = layout.nodes.map((n) => renderGraphNode(n, vm)).join('');
   const orphanNote = layout.orphanBand
     ? `<div class="l0-orphan-note" style="top:${layout.orphanBand.y}px">不在任何 edge 上（${layout.orphanBand.count}）</div>`
@@ -202,6 +209,7 @@ function renderReading(vm, layout) {
     </div>
     ${noEdge ? '<p class="l0-no-edge">这份 map 没有任何 <code>edge</code> —— <b>没有主轴就不发明主轴</b>，所以这里不画任何线。</p>' : ''}
     <div class="l0-legend">${renderLegend(vm)}</div>
+    ${vm.edges.length?`<details class="guide-edge-list"><summary>查看连接的含义 · ${vm.edges.length} 条</summary><ul>${vm.edges.map(edge=>`<li><button data-focus-edge="1" data-edge-index="${edge.edgeIndex}" data-edge-id="${esc(edge.id||'')}" data-from="${esc(edge.from)}" data-to="${esc(edge.to)}">${esc(edge.fromLabel)} ${edge.type==='relates-to'?'—': '→'} ${esc(edge.toLabel)}<span>${esc(edge.explanation?.summary||edge.label||relZh(edge.type))}</span></button></li>`).join('')}</ul></details>`:''}
     <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>`;
 }
@@ -266,7 +274,7 @@ function renderEdgeRow(ed, vm) {
     return el ? `<span class="prov-group"><span class="eid">${esc(id)}</span> ${refChips([...el.provenance.sectionRefs, ...el.provenance.sourceUnitIds])}</span>` : '';
   }).join('');
   return `
-<li class="edge-row ${ed.selfLoop ? 'is-selfloop' : ''}" id="edge-${esc(ed.id || `${ed.from}-${ed.to}`)}" data-edge-id="${esc(ed.id || '')}" data-from="${esc(ed.from)}" data-to="${esc(ed.to)}" data-focus-edge="1">
+<li class="edge-row ${ed.selfLoop ? 'is-selfloop' : ''}" id="edge-row-${ed.edgeIndex}" data-edge-id="${esc(ed.id || '')}" data-edge-index="${ed.edgeIndex}" data-from="${esc(ed.from)}" data-to="${esc(ed.to)}" data-focus-edge="1">
   <span class="edge-line">
     <span class="node">${esc(ed.fromLabel)}</span>
     <span class="rel">—${esc(ed.type)}${ed.type==='relates-to'?'—':'→'}</span>
@@ -403,10 +411,13 @@ function renderTopicEntry(t) {
     </summary>
     <div class="topic-body">
       <div class="topic-prop">${esc(t.proposition)}</div>
+      ${renderExplanation(t.explanation)}
       <div class="card-row"><span class="k">elements</span><span class="v">${t.elementIds.length ? t.elementIds.map((id, i) => `<button class="chip link" data-focus-target="${esc(id)}">${esc(t.elementLabels[i])}</button>`).join('') : '<span class="muted">（该 Topic 没有 L0 element）</span>'}</span></div>
       <div class="card-row"><span class="k">出处</span><span class="v">${refChips(t.sectionRefs)}<span class="muted">${blockStatus}</span></span></div>
     </div>
   </details>
+  <p class="topic-question">${esc(t.explanation?.summary||t.proposition)}</p>
+  <button class="topic-enter" data-enter-topic="${esc(t.id)}">进入主题<span class="sr-only">：${esc(t.title)}</span></button>
 </li>`;
 }
 
@@ -437,6 +448,7 @@ function renderL0MapHTML(vm, opts = {}) {
 
   ${scope ? `<div class="l0-scope"><span class="k">这是什么文档</span> ${esc(scope)}</div>` : ''}
   ${nonGoal ? `<details class="l0-nongoal"><summary>本文不做什么 / 边界</summary><div>${esc(nonGoal)}</div></details>` : ''}
+  <section class="l0-orientation" aria-label="整篇导读"><h2>这篇文章在讨论什么</h2>${vm.readingGuide?.orientation.question?renderExplanation(vm.readingGuide.orientation.question):'<p class="guide-missing">未提供整篇导读；可先阅读文档定位与原始框架。</p>'}${vm.readingGuide?.orientation.overview?renderExplanation(vm.readingGuide.orientation.overview):''}${vm.thesis?`<details class="l0-thesis"><summary>文档中心命题</summary><p>${esc(vm.thesis)}</p></details>`:''}</section>
   ${renderHowTo()}
 
   <div class="l0-body">
@@ -444,12 +456,13 @@ function renderL0MapHTML(vm, opts = {}) {
       ${renderReading(vm, layout)}
       ${renderReviewBoard(vm, layout)}
       <div class="canonical-subjects">${vm.elements.map(e=>`<section id="element-${esc(e.id)}" data-canonical-element="${esc(e.id)}" tabindex="-1" hidden><h2>${esc(e.label)}</h2>${renderFocusPanel(e).replace(' hidden','').replace('data-focus-for','data-canonical-focus').replace('class="focus-panel"','class="canonical-relations"')}</section>`).join('')}</div>
+      <div hidden>${vm.edges.map(edge=>`<section data-guide-edge-for="${edge.edgeIndex}"><h3>${esc(edge.fromLabel)} ${edge.type==='relates-to'?'—':'→'} ${esc(edge.toLabel)}</h3>${renderExplanation(edge.explanation)}<details><summary>原始关系信息</summary><p>${esc(edge.type)} ${esc(edge.label||'')} ${esc(edge.note||'')} ${qualifierLine(edge.qualifiers)}</p></details></section>`).join('')}</div>
     </main>
 
     <aside class="l0-nav" id="topic-nav">
       <h2>Topic Navigation（完整入口索引 · ${f.topicCount}）</h2>
       <p class="note">这里与左边的图不是一一对应的：图中是<b>有关系的核心机制</b>，这里是<b>完整入口</b>。
-        没有 L0 element 的 Topic 也照样能进入。默认只给标题，展开才看命题与出处。</p>
+        没有 L0 element 的 Topic 也照样能进入。先看每个主题回答的问题，再进入主题；展开可查看命题与出处。</p>
       <ul class="topic-list">${vm.topics.map(renderTopicEntry).join('')}</ul>
       <div class="doc-entries">
         <h3>文档级入口</h3>
@@ -491,7 +504,7 @@ function bindInteractions(root, opts = {}) {
   const hitNode = (n) => { if (n) n.classList.add('is-hit'); };
   const hitAll = (sel) => root.querySelectorAll(sel).forEach(hitNode);
   /** 两个视图里同一条 edge 的所有表现（SVG 线 / 线上标签 / Review 行）一起处理 */
-  const edgeNodes = (id) => [...root.querySelectorAll('[data-edge-id]')].filter((n) => n.dataset.edgeId === id);
+  const edgeNodes = (id,index) => [...root.querySelectorAll('[data-edge-id]')].filter((n) => index!==undefined?n.dataset.edgeIndex===String(index):n.dataset.edgeId === id);
   /** 角标（约束）↔ 宿主：attachment 是双向的，点任一端都该把另一端一起点亮 */
   const hostIdsOf = (n) => (n.getAttribute('data-host-ids') || '').split(',').filter(Boolean);
   const hitBadgesHostedBy = (id) => {
@@ -536,8 +549,11 @@ function bindInteractions(root, opts = {}) {
     clear();
     stateRoot.classList.add('has-focus', 'focus-edge');
     const id = el.dataset.edgeId;
-    stateRoot.__selection={kind:'edge',id};
-    edgeNodes(id).forEach(hitNode);
+    const edgeIndex=el.dataset.edgeIndex===undefined?undefined:Number(el.dataset.edgeIndex);
+    stateRoot.__selection={kind:'edge',id,...(edgeIndex===undefined?{}:{edgeIndex})};
+    edgeNodes(id,edgeIndex).forEach(hitNode);
+    const panel=[...root.querySelectorAll('[data-guide-edge-for]')].find(node=>node.dataset.guideEdgeFor===String(edgeIndex));
+    const slot=root.querySelector('#l0-focus-slot');if(slot&&panel)slot.innerHTML=panel.outerHTML;
     [el.dataset.from, el.dataset.to].forEach((eid) => {
       hitAll(`[data-element-id="${eid}"]`);
       hitBadgesHostedBy(eid);
@@ -559,10 +575,14 @@ function bindInteractions(root, opts = {}) {
   root.__l0Interaction={clear,focusElement,restore(selection){
     if(!selection){clear();return;}
     if(selection.kind==='element')focusElement(selection.id);
-    if(selection.kind==='edge'){const edge=edgeNodes(selection.id)[0];if(edge)focusEdge(edge);}
+    if(selection.kind==='edge'){const edge=edgeNodes(selection.id,selection.edgeIndex)[0];if(edge)focusEdge(edge);}
     if(selection.kind==='topic'){const row=[...root.querySelectorAll('.topic-entry')].find(n=>n.dataset.topicId===selection.id);if(row)focusTopic(row);}
   }};
   root.addEventListener('click', (ev) => {
+    const guideSource=ev.target.closest('[data-guide-source]');
+    if(guideSource){ev.preventDefault();if(!guideSource.disabled)opts.onExplanationSource?.({namespace:guideSource.dataset.guideNamespace,key:guideSource.dataset.guideSource});return;}
+    const enter=ev.target.closest('[data-enter-topic]');
+    if(enter){ev.preventDefault();opts.onTopic?.(enter.dataset.enterTopic);return;}
     const src = ev.target.closest('[data-source-ref]');
     if (src) { ev.preventDefault(); if (opts.onSourceRef) opts.onSourceRef(src.getAttribute('data-source-ref')); else src.classList.add('is-hit'); return; }
     if (ev.target.closest('[data-focus-clear]')) { ev.preventDefault(); clear(); return; }
@@ -571,8 +591,7 @@ function bindInteractions(root, opts = {}) {
     const edgeEl = ev.target.closest('[data-focus-edge]');
     if (edgeEl) { ev.preventDefault(); focusEdge(edgeEl); return; }
     const topicRow = ev.target.closest('[data-topic-focus]');
-    if (topicRow && !ev.target.closest('[data-focus-target][data-element-id]')) {
-      if (opts.onTopic) { ev.preventDefault(); opts.onTopic(topicRow.dataset.topicFocus); return; }
+    if (topicRow && !inSummary && !ev.target.closest('[data-focus-target],button')) {
       if (!inSummary) ev.preventDefault();
       focusTopic(topicRow);
       return;

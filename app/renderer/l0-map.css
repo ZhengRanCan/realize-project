@@ -48,6 +48,28 @@
 
 /* body: 主区 + 导航区（两区，职责不同） */
 .l0-body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.l0-orientation { margin: 16px 0; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-soft); }
+.l0-orientation h2 { font-size: 17px; margin: 0 0 8px; }
+.guide-summary { font-weight: 600; margin: 8px 0; }
+.guide-detail { margin: 6px 0 12px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.guide-missing,.guide-source-state { color: var(--muted); font-size: 12px; }
+.guide-source-state { margin-left: 8px; }
+.guide-sources ul,.guide-edge-list ul { list-style: none; padding: 0; }
+.guide-sources blockquote { margin: 8px 0 14px; padding: 8px 12px; border-left: 3px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; }
+.guide-source,.topic-enter,.guide-edge-list button { border: 1px solid var(--line); background: white; color: var(--accent); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.guide-source:disabled { color: var(--muted); cursor: default; }
+.guide-edge-list { margin: 12px 0; }
+.guide-edge-list button { width: 100%; text-align: left; margin: 4px 0; }
+.guide-edge-list button span { display: block; color: var(--ink); margin-top: 4px; }
+.guide-raw { margin-top: 14px; }
+.topic-question { font-size: 13px; line-height: 1.5; margin: 8px 0; }
+.topic-enter { font-size: 12px; }
+.l0-node .node-meaning { font-size: 12px; line-height: 1.4; margin: 7px 0 0; padding-right: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.attach-item button { background: transparent; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.attach-meaning { display: block; font-size: 11px; white-space: normal; margin-top: 4px; }
+.l0-root button:focus-visible,.l0-root summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 700px) { .l0-nav { position: static !important; max-height: none !important; } .l0-orientation { padding: 12px; } }
 @media (max-width: 1100px) { .l0-body { grid-template-columns: 1fr; } }
 
 .block { margin-bottom: 22px; }

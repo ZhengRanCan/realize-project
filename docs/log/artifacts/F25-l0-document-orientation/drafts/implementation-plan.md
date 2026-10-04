@@ -112,7 +112,7 @@
 - L0 选择状态 edge 分支为 `{kind: 'edge', edgeIndex, id}`；新现场按 index 恢复，旧现场缺 index 时沿用旧 id 查找。此 occurrence 不进入 canonical resolver。
 - 明确的进入按钮为 `button[data-enter-topic="T-xx"]`，触发已有 opts.onTopic；summary/正文/成员按钮不触发进入。
 
-- [ ] Step 1: 编写失败断言：默认导读/短解释/Topic 问题可读，点击边披露该 occurrence 的具体含义；保留原名称与 thesis；长文本完整披露；解释 HTML 被转义；旧 Map 缺解释明确提示；graph 与 Review 两种读法不丢对象/关系。
+- [x] Step 1: 编写失败断言：默认导读/短解释/Topic 问题可读，点击边披露该 occurrence 的具体含义；保留原名称与 thesis；长文本完整披露；解释 HTML 被转义；旧 Map 缺解释明确提示；graph 与 Review 两种读法不丢对象/关系。
 
   ```js
   assert.ok(html.includes(vm.readingGuide.orientation.question.summary));
@@ -120,11 +120,11 @@
   assert.ok(html.includes('data-edge-index="0"'));
   assert.ok(!injectionHTML.includes('<img src=x onerror='));
   ```
-- [ ] Step 2: 运行新测试及 `node scripts/test-l0-preview.js`，确认新增展示断言尚未满足。
-- [ ] Step 3: 实现图前导读与详情；节点短解释至多显示两行，完整文字通过稳定详情披露。保留 attachment 角标的既有展开与 canonical element 落点，约束含义同样可读。具体解释先展示，原始关联表折叠可查；每条来源独立说明可用性，页面说明针对加载快照。
-- [ ] Step 4: 按 edgeIndex 选择、同步高亮和恢复关系；为 SVG 关系提供同 occurrence 的原生按钮以支持 Tab/Enter/Space。无向边仍无箭头，自环/平行边不合并，不制造新关系或私有导航栈。
-- [ ] Step 5: Topic 默认显示 guide.summary 或原始 proposition，明确进入按钮独立于 details。保留全部 Topic 和三态，多归属仅提示已有相关主题；事件绑定保持 abort/remount 机制，不重复处理。
-- [ ] Step 6: 实现640×720上下排列、独立图滚动和长解释披露。保留既有对比度与焦点样式；通过新测试、`npm.cmd run test:l0` 后提交 `feat: explain document framework before topic navigation`。
+- [x] Step 2: 运行新测试及 `node scripts/test-l0-preview.js`，确认新增展示断言尚未满足。
+- [x] Step 3: 实现图前导读与详情；节点短解释至多显示两行，完整文字通过稳定详情披露。保留 attachment 角标的既有展开与 canonical element 落点，约束含义同样可读。具体解释先展示，原始关联表折叠可查；每条来源独立说明可用性，页面说明针对加载快照。
+- [x] Step 4: 按 edgeIndex 选择、同步高亮和恢复关系；为 SVG 关系提供同 occurrence 的原生按钮以支持 Tab/Enter/Space。无向边仍无箭头，自环/平行边不合并，不制造新关系或私有导航栈。
+- [x] Step 5: Topic 默认显示 guide.summary 或原始 proposition，明确进入按钮独立于 details。保留全部 Topic 和三态，多归属仅提示已有相关主题；事件绑定保持 abort/remount 机制，不重复处理。
+- [x] Step 6: 实现640×720上下排列、独立图滚动和长解释披露。保留既有对比度与焦点样式；通过新测试、`npm.cmd run test:l0` 后提交 `feat: explain document framework before topic navigation`。
 
 ## Task 4: 实际 Electron、便携 Preview 与回归
 

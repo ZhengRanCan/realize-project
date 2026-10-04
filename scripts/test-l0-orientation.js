@@ -5,6 +5,7 @@ const {mapFingerprint,checkReadingGuideBinding}=require('../app/shared/reading-e
 const {buildSourceRegistry,sha256}=require('../app/shared/source-coordinates');
 const {validate}=require('../app/shared/schema-validator');
 const schema=require('../schema/framework-map.schema.json');
+const {renderL0MapHTML}=require('../app/renderer/l0-map');
 const root=path.resolve(__dirname,'..');
 for(const name of ['context-consumption','operational-runbook']){
  const dir=path.join(root,'samples',name),original=JSON.parse(fs.readFileSync(path.join(dir,'framework-map.json'),'utf8'));
@@ -16,6 +17,13 @@ for(const name of ['context-consumption','operational-runbook']){
  const guideContext={sourceSections:buildSourceRegistry(source.toString('utf8')),sourceIntegrity:'consistent',sourceSha256:sha256(source)};
  assert.deepEqual(checkReadingGuideBinding(enhanced,guideContext).errors,[]);
  const vm=buildL0ViewModel(enhanced,{guideContext}),standalone=buildL0ViewModel(enhanced);
+ const html=renderL0MapHTML(vm);
+ assert.ok(html.includes(vm.readingGuide.orientation.question.summary));
+ assert.ok(html.includes('data-enter-topic="T-01"'));
+ assert.ok(html.includes('data-edge-index="0"'));
+ assert.ok(html.includes(vm.readingGuide.elements['E-01'].detail));
+ const injection=structuredClone(enhanced);injection.readingGuide.elements[0].explanation.detail='<img src=x onerror=alert(1)>';
+ assert.ok(!renderL0MapHTML(buildL0ViewModel(injection)).includes('<img src=x onerror='));
  assert.equal(vm.readingGuide.state,'present');assert.equal(vm.document.thesis,original.thesis||null);
  assert.deepEqual(vm.edges.map(e=>e.edgeIndex),original.edges.map((_,i)=>i));
  assert.equal(Object.keys(vm.readingGuide.elements).length,original.elements.length);

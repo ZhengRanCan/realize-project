@@ -75,6 +75,7 @@ function buildL0ViewModel(map, opts = {}) {
   const labelOf = (id) => (elById.get(id) ? elById.get(id).label : `(未解析: ${id})`);
 
   const vmElements = elements.map((e) => ({
+    explanation: Object.hasOwn(readingGuide.elements,e.id)?readingGuide.elements[e.id]:null,
     id: e.id,
     label: e.label,
     type: e.type,
@@ -93,6 +94,7 @@ function buildL0ViewModel(map, opts = {}) {
 
   const vmEdges = edges.map((x, edgeIndex) => ({
     edgeIndex,
+    explanation: readingGuide.edges[edgeIndex] || null,
     id: x.id || null,
     from: x.from, to: x.to,
     fromLabel: labelOf(x.from), toLabel: labelOf(x.to),
@@ -113,6 +115,7 @@ function buildL0ViewModel(map, opts = {}) {
     const linked = elements.filter((e) => (e.topics || []).includes(t.id));
     return {
       id: t.id, title: t.title, proposition: t.proposition,
+      explanation: Object.hasOwn(readingGuide.topics,t.id)?readingGuide.topics[t.id]:null,
       sectionRefs: [...(t.sectionRefs || [])],
       ...(Object.prototype.hasOwnProperty.call(t, 'blockIds') ? { blockIds: [...t.blockIds] } : {}),
       elementIds: linked.map((e) => e.id),

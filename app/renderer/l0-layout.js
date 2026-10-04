@@ -159,7 +159,7 @@ function countCrossings(layers, edges, layerOf, posOf) {
  * 主入口
  * ------------------------------------------------------------------ */
 function computeL0Layout(vm, opts = {}) {
-  const g = Object.assign({}, GRID, opts.grid || {});
+  const g = Object.assign({}, GRID, vm.readingGuide?.state==='present'?{NODE_H:144}:{}, opts.grid || {});
   const colPitch = g.NODE_W + g.COL_GAP;
   const rowPitch = g.NODE_H + g.ROW_GAP;
 
@@ -426,6 +426,7 @@ function computeL0Layout(vm, opts = {}) {
       labelX = (sx + tx) / 2; labelY = (y1 + y2) / 2 - 6;
     }
     paths.push({
+      edgeIndex: ed.edgeIndex ?? i,
       id: ed.id || `${ed.from}->${ed.to}`,
       from: ed.from, to: ed.to, type: ed.type, label: ed.label || '',
       selfLoop: !!ed.selfLoop || ed.from === ed.to,
