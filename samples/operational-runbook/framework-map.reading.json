@@ -1,0 +1,973 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "DESIGN-YUSHI-AFTERSALES-RUNBOOK",
+    "title": "F13–F16 售后链路运行验证 & 部署手册",
+    "sourcePath": "测试文档/fixture-e-f13-f16-runbook.md",
+    "role": "target",
+    "scope": {
+      "text": "本手册把「F13–F16 全部 passing 所需要的剩余工作」拆成可由人工 reviewer 在本地或 CloudBase 环境逐步执行的操作步骤，并附回归用例与证据留存规范。"
+    }
+  },
+  "thesis": "售后链路是一条可执行的操作过程：用户申请/撤销 → 商家审批 → 补偿（含失败重试）→ 微信退款（发起、回调、查单纠偏）；它同时包含正常全链路、异常与越权路径、以及人工介入（仅管理员强制补偿 + 独立审查与 reviewer 决策），并由「连续 10 次查单失败置 REFUND_FAILED」给出有界失败规则。",
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "订单（售后与退款状态的载体）",
+      "type": "artifact",
+      "role": "input",
+      "topics": [
+        "T-02"
+      ],
+      "sectionRefs": [
+        "§1",
+        "§4.2",
+        "§4.3",
+        "§4.4"
+      ]
+    },
+    {
+      "id": "E-02",
+      "label": "submitAfterSales / cancelAfterSales（用户申请与撤销）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "T-02",
+        "T-03"
+      ],
+      "sectionRefs": [
+        "§4.2",
+        "§4.4"
+      ]
+    },
+    {
+      "id": "E-03",
+      "label": "processAfterSales（商家审批，REFUND_SUCCESS 触发补偿）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "T-02",
+        "T-05"
+      ],
+      "sectionRefs": [
+        "§4.2",
+        "§4.3",
+        "§4.4"
+      ]
+    },
+    {
+      "id": "E-04",
+      "label": "refundOrder（向微信发起退款）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "T-02"
+      ],
+      "sectionRefs": [
+        "§3.1",
+        "§4.2"
+      ]
+    },
+    {
+      "id": "E-05",
+      "label": "refundNotify（退款回调）",
+      "type": "process",
+      "role": "consumer",
+      "topics": [
+        "T-02"
+      ],
+      "sectionRefs": [
+        "§3.3",
+        "§4.5"
+      ]
+    },
+    {
+      "id": "E-06",
+      "label": "refundQueryCron（查单纠偏）",
+      "type": "process",
+      "role": "consumer",
+      "topics": [
+        "T-04"
+      ],
+      "sectionRefs": [
+        "§3.2",
+        "§4.6",
+        "§8"
+      ]
+    },
+    {
+      "id": "E-07",
+      "label": "retryAfterSalesCompensation（补偿失败重试）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "T-05"
+      ],
+      "sectionRefs": [
+        "§3.2",
+        "§4.7"
+      ]
+    },
+    {
+      "id": "E-08",
+      "label": "forceRestockAndAssets（仅管理员可调用的强制补偿）",
+      "type": "process",
+      "role": "producer",
+      "topics": [
+        "T-05"
+      ],
+      "sectionRefs": [
+        "§4.8"
+      ]
+    },
+    {
+      "id": "E-09",
+      "label": "库存 / 优惠券 / 积分资产",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": [
+        "T-03",
+        "T-05"
+      ],
+      "sectionRefs": [
+        "§4.1",
+        "§4.2",
+        "§4.3",
+        "§4.4"
+      ]
+    },
+    {
+      "id": "E-10",
+      "label": "售后与退款状态集（afterSalesStatus / refundStatus）",
+      "type": "state",
+      "role": "intermediate",
+      "topics": [
+        "T-04"
+      ],
+      "sectionRefs": [
+        "§4.2",
+        "§4.3",
+        "§4.6",
+        "§6.4",
+        "§8"
+      ]
+    },
+    {
+      "id": "E-11",
+      "label": "有界失败：连续 10 次查单失败置 REFUND_FAILED",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-04"
+      ],
+      "sectionRefs": [
+        "§6.4"
+      ]
+    },
+    {
+      "id": "E-12",
+      "label": "撤销不触发资产回补；非订单所有者不得撤销或操作",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-03"
+      ],
+      "sectionRefs": [
+        "§4.4"
+      ]
+    },
+    {
+      "id": "E-13",
+      "label": "证据留存与独立审查 / reviewer 决策（人工介入）",
+      "type": "process",
+      "role": "consumer",
+      "topics": [
+        "T-06"
+      ],
+      "sectionRefs": [
+        "§5",
+        "§6",
+        "§10"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "E-02",
+      "to": "E-01",
+      "type": "produces"
+    },
+    {
+      "from": "E-03",
+      "to": "E-01",
+      "type": "consumes"
+    },
+    {
+      "from": "E-03",
+      "to": "E-09",
+      "type": "produces"
+    },
+    {
+      "from": "E-04",
+      "to": "E-01",
+      "type": "consumes"
+    },
+    {
+      "from": "E-05",
+      "to": "E-01",
+      "type": "consumes"
+    },
+    {
+      "from": "E-06",
+      "to": "E-01",
+      "type": "consumes"
+    },
+    {
+      "from": "E-07",
+      "to": "E-09",
+      "type": "produces"
+    },
+    {
+      "from": "E-08",
+      "to": "E-09",
+      "type": "produces"
+    },
+    {
+      "from": "E-13",
+      "to": "E-01",
+      "type": "validates"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "E-10",
+      "attachedTo": [
+        "E-01",
+        "E-03",
+        "E-04",
+        "E-05",
+        "E-06"
+      ]
+    },
+    {
+      "elementId": "E-11",
+      "attachedTo": [
+        "E-06"
+      ]
+    },
+    {
+      "elementId": "E-12",
+      "attachedTo": [
+        "E-02",
+        "E-09"
+      ]
+    }
+  ],
+  "relationGap": [
+    {
+      "from": "E-06",
+      "to": "E-10",
+      "intendedMeaning": "查单连续失败累计到边界时，订单状态迁移为 REFUND_FAILED（process 导致 state 迁移）",
+      "reason": "existing vocabulary cannot express this without distortion：state 不能出现在 edges[]，只能用无类型 attachment 表达，迁移与阈值语义无法进入图",
+      "fixture": "E"
+    },
+    {
+      "from": "E-09",
+      "to": "E-10",
+      "intendedMeaning": "资产回补标记（stockRestored / couponRestored / pointsRestored）与订单售后状态必须成对一致，避免重复回补",
+      "reason": "existing vocabulary cannot express this without distortion：8 词里没有「成对 / 一致 / 互斥」这类关系词",
+      "fixture": "E"
+    }
+  ],
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "前置与部署",
+      "proposition": "执行前先做本地构建与密钥检查，再按依赖顺序部署云函数、配置定时触发器与 HTTP 网关。",
+      "sectionRefs": [
+        "§1",
+        "§2",
+        "§3"
+      ]
+    },
+    {
+      "id": "T-02",
+      "title": "正常全链路（未发货 / 已发货）",
+      "proposition": "两条正常路径：未发货仅退款在 APPROVED 后直接退款；已发货退货退款需经过回寄、验货再退款。",
+      "sectionRefs": [
+        "§4",
+        "§4.1",
+        "§4.2",
+        "§4.3",
+        "§4.5"
+      ]
+    },
+    {
+      "id": "T-03",
+      "title": "撤销与越权边界",
+      "proposition": "撤销只改售后状态，不触发库存、优惠券或积分回补；非订单所有者一律拒绝。",
+      "sectionRefs": [
+        "§4.4"
+      ]
+    },
+    {
+      "id": "T-04",
+      "title": "查单纠偏与有界失败",
+      "proposition": "退款状态靠查单纠偏推进；连续 10 次查单失败即置 REFUND_FAILED，不让它无限等待。",
+      "sectionRefs": [
+        "§4.6",
+        "§6.4"
+      ]
+    },
+    {
+      "id": "T-05",
+      "title": "补偿重试与人工强制补偿",
+      "proposition": "补偿失败由定时重试推进；需要人工兜底时走仅管理员可调用的强制补偿，且只补资产不改售后状态。",
+      "sectionRefs": [
+        "§4.7",
+        "§4.8"
+      ]
+    },
+    {
+      "id": "T-06",
+      "title": "证据留存与独立审查决策",
+      "proposition": "每个 Feature passing 前必须留存截图与日志；库内释放时机等争议由 reviewer 决策并签字留档。",
+      "sectionRefs": [
+        "§5",
+        "§6",
+        "§10"
+      ]
+    },
+    {
+      "id": "T-07",
+      "title": "真实环境切换、故障排查与域边界",
+      "proposition": "沙箱通过后按步骤切真实环境并回归；常见故障有对应排查方式；退款域与支付域保持独立。",
+      "sectionRefs": [
+        "§7",
+        "§8",
+        "§9"
+      ]
+    },
+    {
+      "id": "T-08",
+      "title": "修订记录",
+      "proposition": "手册自身的版本沿革。",
+      "sectionRefs": [
+        "§11"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "section (provisional)",
+    "elementCount": 13,
+    "topicCount": 8,
+    "edgeCount": 9,
+    "attachmentCount": 3,
+    "relationGapCount": 2,
+    "note": "E 没有 sourceUnits；溯源为原文小节（数字编号）。**刻意超出 preferred element budget 12**：压到 12 就必须丢掉有界失败规则或撤销/越权边界之一，二者都是决定性内容。"
+  },
+  "readingGuide": {
+    "version": 1,
+    "binding": {
+      "documentId": "DESIGN-YUSHI-AFTERSALES-RUNBOOK",
+      "mapSha256": "77093b051207fb49d5306ac25184dc667e3fc95ed3445825ff6439f15fa6e4ed",
+      "sourceSha256": "c55f2f55f851ddc79194af9a90023d78a38376553aba1e567228ddaf0ed67d97"
+    },
+    "orientation": {
+      "question": {
+        "summary": "售后退款链路如何运行、验证和上线，哪些边界须单独核查？",
+        "detail": "这是运行验证与部署手册，涵盖正常退款、撤销/越权、失败重试、查单上限、人工审查和真实切换。操作说明不代表本次环境已验收。",
+        "sources": [
+          {
+            "namespace": "heading",
+            "key": "F13–F16 售后链路运行验证 & 部署手册",
+            "quote": "拆成可由人工 reviewer 在本地或 CloudBase 环境逐步执行的操作步骤"
+          }
+        ]
+      },
+      "overview": {
+        "summary": "围绕订单看用户、商家、退款接口和资产补偿怎样配合。",
+        "detail": "申请/撤销、审批、退款发起/回调/查单和资产恢复配合运行；状态、权限与失败边界须分开检查。当前 F15 退款成功才补偿，提前释放库存待 reviewer 决策；沙箱通过后才进入真实环境。",
+        "sources": [
+          {
+            "namespace": "heading",
+            "key": "1",
+            "quote": "依赖：**F13 → F14 → F15 → F16**。"
+          },
+          {
+            "namespace": "heading",
+            "key": "4.8",
+            "quote": "仅管理员可调用；只补资产不改 `afterSalesStatus`。"
+          },
+          {
+            "namespace": "heading",
+            "key": "10",
+            "quote": "未发货仅退款应采用哪种实现？"
+          },
+          {
+            "namespace": "heading",
+            "key": "7",
+            "quote": "仅在沙箱 `passing` 之后执行。"
+          }
+        ]
+      }
+    },
+    "elements": [
+      {
+        "elementId": "E-01",
+        "explanation": {
+          "summary": "订单保存售后进度与退款进度。",
+          "detail": "订单是申请、审批、退款和纠偏共同处理的记录。售后状态与退款状态分开，不能仅凭一项状态推断资金和资产处理均已完成。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "afterSalesStatus='APPROVED'"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "refundStatus='PROCESSING'"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-02",
+        "explanation": {
+          "summary": "用户申请售后，或撤销已有申请。",
+          "detail": "操作改变订单售后记录；“产出”不是新建订单。撤销不回补库存、优惠券、积分；非订单所有者调用应被拒绝。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "afterSalesStatus='CANCELLED'"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "撤销后库存 / 优惠券 / 积分不应发生变化"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "非订单所有者"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-03",
+        "explanation": {
+          "summary": "商家审批推进售后，退款成功后触发补偿。",
+          "detail": "未发货与已发货采用不同审批路径。当前 F15 在 REFUND_SUCCESS 才触发补偿；提前释放库存是待 reviewer 确认的选择。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "REFUND_SUCCESS"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "这是个**已知的待办**"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-04",
+        "explanation": {
+          "summary": "向退款接口发起这张订单的退款。",
+          "detail": "申请退款后进入 PROCESSING，发起请求不代表到账。沙箱与真实环境必须区分，真实切换另有前置检查。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "refundStatus='PROCESSING'"
+            },
+            {
+              "namespace": "heading",
+              "key": "7",
+              "quote": "仅在沙箱 `passing` 之后执行。"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-05",
+        "explanation": {
+          "summary": "接收退款回调，推进订单与补偿链路。",
+          "detail": "回调处理退款结果，沙箱成功路径触发 REFUND_SUCCESS 和资产补偿。沙箱验证成功不等于真实退款已经验收。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "5.4",
+              "quote": "在沙箱退款成功后被调用"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.3",
+              "quote": "afterSalesStatus='REFUNDED', 库存 +1"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-06",
+        "explanation": {
+          "summary": "定时查询退款结果，纠正待处理状态。",
+          "detail": "查单通常每五分钟运行，检查退款结果并推进状态；连续查单失败有上限，不能无限等待。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.6",
+              "quote": "默认 5 分钟一次。"
+            },
+            {
+              "namespace": "heading",
+              "key": "6.4",
+              "quote": "连续 10 次查单失败置 `REFUND_FAILED`"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-07",
+        "explanation": {
+          "summary": "失败后重试库存、优惠券和积分补偿。",
+          "detail": "修复导致失败的数据后，重试未完成的资产恢复。重复或并发触发仍须只补偿一次。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.7",
+              "quote": "手动触发 retryAfterSalesCompensation"
+            },
+            {
+              "namespace": "heading",
+              "key": "6.3",
+              "quote": "并发 / 重复触发只补偿一次"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-08",
+        "explanation": {
+          "summary": "管理员手动补资产，不改售后状态。",
+          "detail": "人工兜底入口仅允许管理员调用；只补资产，不能顺带推进 afterSalesStatus。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.8",
+              "quote": "仅管理员可调用；只补资产不改 `afterSalesStatus`。"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-09",
+        "explanation": {
+          "summary": "补偿要恢复的库存、优惠券和积分。",
+          "detail": "资产由补偿链处理，撤销不回补。有效/过期优惠券区别处理，积分只退回一次，失败须留痕。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "撤销后库存 / 优惠券 / 积分不应发生变化"
+            },
+            {
+              "namespace": "heading",
+              "key": "6.3",
+              "quote": "有效优惠券恢复为可用，过期券保持过期并有记录"
+            },
+            {
+              "namespace": "heading",
+              "key": "6.3",
+              "quote": "使用积分的订单只退回一次"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-10",
+        "explanation": {
+          "summary": "售后状态和退款状态是两组不同进度。",
+          "detail": "审批、回寄、验货、退款发起与成功对应不同状态。结合审计证据判断进度；补偿失败时订单不得被标成成功。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.3",
+              "quote": "afterSalesStatus='WAIT_RETURN'"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.3",
+              "quote": "refundStatus='PROCESSING'"
+            },
+            {
+              "namespace": "heading",
+              "key": "6.3",
+              "quote": "补偿失败时"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-11",
+        "explanation": {
+          "summary": "连续十次查单失败，进入退款失败状态。",
+          "detail": "有界失败提供明确终止判据。这是原文要求核查的规则，不代表当前环境已实际通过。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "6.4",
+              "quote": "连续 10 次查单失败置 `REFUND_FAILED`"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-12",
+        "explanation": {
+          "summary": "撤销不回补资产，越权请求被拒绝。",
+          "detail": "撤销只改售后状态。非订单所有者不得撤销该订单，也不能用撤销绕过补偿时机和权限。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "撤销后库存 / 优惠券 / 积分不应发生变化"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "非订单所有者"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-13",
+        "explanation": {
+          "summary": "用截图、日志和独立审查判断是否通过。",
+          "detail": "每个 feature passing 前留存证据，检查正常和异常路径；库存释放争议由 reviewer 决策，空白签字不代表已批准。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "5",
+              "quote": "每个 Feature `passing` 前需留存以下截图 / 日志："
+            },
+            {
+              "namespace": "heading",
+              "key": "10",
+              "quote": "未发货仅退款应采用哪种实现？"
+            }
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "edgeIndex": 0,
+        "explanation": {
+          "summary": "申请/撤销更新订单售后记录。",
+          "detail": "订单已经存在，连接表示形成售后状态，不是创建新订单；撤销不回补资产。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "afterSalesStatus='CANCELLED'"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "撤销后库存 / 优惠券 / 积分不应发生变化"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 1,
+        "explanation": {
+          "summary": "审批根据订单路径推进售后。",
+          "detail": "未发货可走仅退款，已发货还需回寄/验货；审批不代表退款和补偿均已成功。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "afterSalesStatus='APPROVED'"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.3",
+              "quote": "afterSalesStatus='WAIT_RETURN'"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 2,
+        "explanation": {
+          "summary": "退款成功触发订单资产补偿。",
+          "detail": "当前 F15 到 REFUND_SUCCESS 才补偿；提前释放库存仍是需确认的决定。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "REFUND_SUCCESS"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "这是个**已知的待办**"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 3,
+        "explanation": {
+          "summary": "退款发起处理订单退款请求。",
+          "detail": "PROCESSING 表示处理中，不能当作已到账或资产已回补。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "refundStatus='PROCESSING'"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 4,
+        "explanation": {
+          "summary": "回调将退款结果用于推进订单。",
+          "detail": "沙箱成功回调推进 REFUNDED 并补偿；真实模式须核对配置和真实到账。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.3",
+              "quote": "afterSalesStatus='REFUNDED', 库存 +1"
+            },
+            {
+              "namespace": "heading",
+              "key": "7.2",
+              "quote": "在用户真实微信钱包确认到账"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 5,
+        "explanation": {
+          "summary": "查单处理未完成的退款订单。",
+          "detail": "查询纠偏有失败上限；连续十次失败进入 REFUND_FAILED。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.6",
+              "quote": "默认 5 分钟一次。"
+            },
+            {
+              "namespace": "heading",
+              "key": "6.4",
+              "quote": "连续 10 次查单失败置 `REFUND_FAILED`"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 6,
+        "explanation": {
+          "summary": "补偿重试恢复之前失败的资产。",
+          "detail": "修复数据后再重试，并发/重复触发仍只补偿一次。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.7",
+              "quote": "手动触发 retryAfterSalesCompensation"
+            },
+            {
+              "namespace": "heading",
+              "key": "6.3",
+              "quote": "并发 / 重复触发只补偿一次"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 7,
+        "explanation": {
+          "summary": "管理员强制补偿仅恢复资产。",
+          "detail": "必须检查管理员权限，不改 afterSalesStatus。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.8",
+              "quote": "仅管理员可调用；只补资产不改 `afterSalesStatus`。"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 8,
+        "explanation": {
+          "summary": "人工核查订单及完整链路证据。",
+          "detail": "检查正常、异常、幂等和权限并留存证据；此关系不代表订单已经实际通过验收。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "5",
+              "quote": "每个 Feature `passing` 前需留存以下截图 / 日志："
+            },
+            {
+              "namespace": "heading",
+              "key": "10",
+              "quote": "未发货仅退款应采用哪种实现？"
+            }
+          ]
+        }
+      }
+    ],
+    "topics": [
+      {
+        "topicId": "T-01",
+        "explanation": {
+          "summary": "运行之前要准备什么？",
+          "detail": "先检查本地代码/构建及部署依赖，配置定时触发器与退款回调网关。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "1",
+              "quote": "依赖：**F13 → F14 → F15 → F16**。"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-02",
+        "explanation": {
+          "summary": "未发货和已发货退款分别怎么走？",
+          "detail": "对照两条正常路径，区分审批、回寄/验货、退款请求和成功；库存释放时机仍需确认。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.3",
+              "quote": "afterSalesStatus='WAIT_RETURN'"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.2",
+              "quote": "这是个**已知的待办**"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-03",
+        "explanation": {
+          "summary": "谁能撤销，撤销会不会回补资产？",
+          "detail": "聚焦订单所有权和撤销边界，避免撤销触发库存、优惠券、积分回补。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "撤销后库存 / 优惠券 / 积分不应发生变化"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.4",
+              "quote": "非订单所有者"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-04",
+        "explanation": {
+          "summary": "查单如何纠偏，什么时候明确失败？",
+          "detail": "检查退款查单进度与连续十次失败规则，避免无限等待。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "6.4",
+              "quote": "连续 10 次查单失败置 `REFUND_FAILED`"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-05",
+        "explanation": {
+          "summary": "补偿失败时怎样重试或人工兜底？",
+          "detail": "区分自动重试和管理员强制补偿，保持幂等及只补资产的边界。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "4.7",
+              "quote": "手动触发 retryAfterSalesCompensation"
+            },
+            {
+              "namespace": "heading",
+              "key": "4.8",
+              "quote": "仅管理员可调用；只补资产不改 `afterSalesStatus`。"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-06",
+        "explanation": {
+          "summary": "要留什么证据，哪些决定需要 reviewer 确认？",
+          "detail": "从截图、日志和逐项检查判断完成程度；未填写的库存释放决定不代表批准。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "5",
+              "quote": "每个 Feature `passing` 前需留存以下截图 / 日志："
+            },
+            {
+              "namespace": "heading",
+              "key": "10",
+              "quote": "未发货仅退款应采用哪种实现？"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-07",
+        "explanation": {
+          "summary": "何时切真实环境，故障怎么查？",
+          "detail": "沙箱通过后才切真实环境，并核对回归和真实到账；退款与支付域边界仍保留。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "7",
+              "quote": "仅在沙箱 `passing` 之后执行。"
+            },
+            {
+              "namespace": "heading",
+              "key": "9",
+              "quote": "F01"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-08",
+        "explanation": {
+          "summary": "这份手册经历了哪些修订？",
+          "detail": "查看版本沿革，区别手册修订与业务链路已通过的证据。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "11",
+              "quote": "修订内容"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -86,7 +86,7 @@
 - Session 以当前明确选定包的上下文构造 guideContext；独立 Map 与独立 L0 Preview 省略该参数，来源 unavailable。
 - 所有选定 guide 的入口执行 schema + shared binding 校验后才提交或构建；旧 guide-absent 路径保持既有兼容判定，不能悄悄丢弃非法 guide。
 
-- [ ] Step 1: 先记录两篇 source/旧 Map 及 context Gold/Plan 的 SHA256。编写失败断言：旧 Map guide absent，增强 Map 保持全部节点/边/attachment/Topic 和 Block 三态、保留 thesis，独立 Map declared、包内相同输入 located、坏绑定拒绝且原 session 不变。
+- [x] Step 1: 先记录两篇 source/旧 Map 及 context Gold/Plan 的 SHA256。编写失败断言：旧 Map guide absent，增强 Map 保持全部节点/边/attachment/Topic 和 Block 三态、保留 thesis，独立 Map declared、包内相同输入 located、坏绑定拒绝且原 session 不变。
 
   ```js
   assert.equal(buildL0ViewModel(originalMap).readingGuide.state, 'absent');
@@ -94,11 +94,11 @@
   assert.equal(buildL0ViewModel(enhancedMap, {guideContext}).readingGuide.elements['E-01'].sourceState, 'located');
   assert.deepEqual(enhancedMap.edges, originalMap.edges);
   ```
-- [ ] Step 2: 运行 `node scripts/test-l0-orientation.js`，确认新 guide 投影断言失败。
-- [ ] Step 3: 对照两篇原文编写派生 guide，不改 Map 原字段；每个对象、实际边和 Topic 均提供具体解释及实际摘录，整篇导读有明确出处。context 样本保留消费与输出对齐、两条链、非等价和非因果边界；runbook 保留权限、撤销不回补、失败重试与失败上限及原文 Current/Target 口径。不使用原文操作命令作为本项目指令。
-- [ ] Step 4: 在 source-grounding.md 分别记录核心问题、对象定义、每类关系、关键边界与原文位置的核对；自动检查每条摘录落在唯一 heading 中，并检查剔除 guide 后派生 Map 与旧 Map 深相等、旧文件字节 hash 不变。
-- [ ] Step 5: 按接口实现纯投影与会话接入。main 独立 Map 校验失败不得先清空当前 session；build-l0-preview 只使用明确 --map，不读取旁边的解释文件或自动切换增强 Map。
-- [ ] Step 6: 运行新测试和 `node scripts/test-l0-view-model.js`、`node scripts/test-reading-session.js`、`node scripts/test-reading-bundle-projection.js`；通过后提交 `feat: project source grounded L0 explanations`。
+- [x] Step 2: 运行 `node scripts/test-l0-orientation.js`，确认新 guide 投影断言失败。
+- [x] Step 3: 对照两篇原文编写派生 guide，不改 Map 原字段；每个对象、实际边和 Topic 均提供具体解释及实际摘录，整篇导读有明确出处。context 样本保留消费与输出对齐、两条链、非等价和非因果边界；runbook 保留权限、撤销不回补、失败重试与失败上限及原文 Current/Target 口径。不使用原文操作命令作为本项目指令。
+- [x] Step 4: 在 source-grounding.md 分别记录核心问题、对象定义、每类关系、关键边界与原文位置的核对；自动检查每条摘录落在唯一 heading 中，并检查剔除 guide 后派生 Map 与旧 Map 深相等、旧文件字节 hash 不变。
+- [x] Step 5: 按接口实现纯投影与会话接入。main 独立 Map 校验失败不得先清空当前 session；build-l0-preview 只使用明确 --map，不读取旁边的解释文件或自动切换增强 Map。
+- [x] Step 6: 运行新测试和 `node scripts/test-l0-view-model.js`、`node scripts/test-reading-session.js`、`node scripts/test-reading-bundle-projection.js`；通过后提交 `feat: project source grounded L0 explanations`。
 
 ## Task 3: 导读、含义披露与明确 Topic 入口
 

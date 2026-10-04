@@ -1,0 +1,796 @@
+{
+  "mapVersion": 2,
+  "level": "L0",
+  "document": {
+    "id": "DESIGN-CONTEXT-CONSUMPTION",
+    "title": "Pre-class Fusion Context Consumption 语义模型",
+    "sourcePath": "测试文档/18-context-consumption-semantic-model.md",
+    "role": "target",
+    "scope": {
+      "text": "本文只讨论 Context Consumption 的产品语义层级，不是 Feature 合同、架构 SSOT、最终 schema 或实现授权。",
+      "sourceUnitIds": [
+        "SU-001"
+      ]
+    },
+    "nonGoalSummary": {
+      "text": "不采用 Context Influence 作为第四级；不承诺输出变化严格由 DeepTutor 上下文导致。",
+      "sourceUnitIds": [
+        "SU-007",
+        "SU-034",
+        "SU-083"
+      ]
+    }
+  },
+  "thesis": "上下文消费只发生在 Outline Generation Attempt —— Frozen Context 经服务端投影成为 outline 生成的真实输入，Scene 继承的是 context-shaped outline；Receipt / Availability / Consumption 是三个可以同时为真、但不能互相替代的语义层级。",
+  "elements": [
+    {
+      "id": "E-01",
+      "label": "Frozen Context",
+      "type": "artifact",
+      "role": "input",
+      "topics": [
+        "T-02"
+      ],
+      "sourceUnitIds": [
+        "SU-014",
+        "SU-020",
+        "SU-058",
+        "SU-065"
+      ]
+    },
+    {
+      "id": "E-02",
+      "label": "Generation-facing Projection",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": [
+        "T-02"
+      ],
+      "sourceUnitIds": [
+        "SU-046",
+        "SU-047",
+        "SU-048",
+        "SU-059",
+        "SU-080"
+      ]
+    },
+    {
+      "id": "E-03",
+      "label": "Outline Generation Attempt",
+      "type": "process",
+      "role": "instance",
+      "topics": [
+        "T-02",
+        "T-03"
+      ],
+      "sourceUnitIds": [
+        "SU-044",
+        "SU-046",
+        "SU-050",
+        "SU-076"
+      ]
+    },
+    {
+      "id": "E-04",
+      "label": "Context-shaped Outline Revision",
+      "type": "artifact",
+      "role": "intermediate",
+      "topics": [
+        "T-02",
+        "T-04"
+      ],
+      "sourceUnitIds": [
+        "SU-054",
+        "SU-056",
+        "SU-062",
+        "SU-079"
+      ]
+    },
+    {
+      "id": "E-05",
+      "label": "Scene Generation",
+      "type": "process",
+      "role": "consumer",
+      "topics": [
+        "T-02",
+        "T-04"
+      ],
+      "sourceUnitIds": [
+        "SU-051",
+        "SU-055",
+        "SU-075",
+        "SU-076"
+      ]
+    },
+    {
+      "id": "E-06",
+      "label": "Context Receipt",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": [
+        "T-01"
+      ],
+      "sourceUnitIds": [
+        "SU-004",
+        "SU-012",
+        "SU-014",
+        "SU-057"
+      ]
+    },
+    {
+      "id": "E-07",
+      "label": "Context Availability",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": [
+        "T-01"
+      ],
+      "sourceUnitIds": [
+        "SU-004",
+        "SU-017",
+        "SU-018",
+        "SU-058"
+      ]
+    },
+    {
+      "id": "E-08",
+      "label": "Context Consumption",
+      "type": "concept",
+      "role": "semantic-level",
+      "topics": [
+        "T-01",
+        "T-03"
+      ],
+      "sourceUnitIds": [
+        "SU-004",
+        "SU-022",
+        "SU-023",
+        "SU-024",
+        "SU-085"
+      ]
+    },
+    {
+      "id": "E-09",
+      "label": "Output Alignment",
+      "type": "concept",
+      "role": "output",
+      "topics": [
+        "T-04"
+      ],
+      "sourceUnitIds": [
+        "SU-010",
+        "SU-039",
+        "SU-078",
+        "SU-080"
+      ]
+    },
+    {
+      "id": "E-10",
+      "label": "Consumption ≠ Output Alignment",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-04"
+      ],
+      "sourceUnitIds": [
+        "SU-002",
+        "SU-008",
+        "SU-040",
+        "SU-079"
+      ]
+    },
+    {
+      "id": "E-11",
+      "label": "Context Influence 不得作为第四级",
+      "type": "constraint",
+      "role": "excluded",
+      "topics": [
+        "T-05"
+      ],
+      "sourceUnitIds": [
+        "SU-007",
+        "SU-032",
+        "SU-034",
+        "SU-084"
+      ]
+    },
+    {
+      "id": "E-12",
+      "label": "Receipt / Availability / Consumption 不能互相替代",
+      "type": "constraint",
+      "role": "boundary",
+      "topics": [
+        "T-01"
+      ],
+      "sourceUnitIds": [
+        "SU-005",
+        "SU-019",
+        "SU-025",
+        "SU-064"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "E-02",
+      "to": "E-01",
+      "type": "depends-on"
+    },
+    {
+      "from": "E-03",
+      "to": "E-02",
+      "type": "consumes"
+    },
+    {
+      "from": "E-03",
+      "to": "E-04",
+      "type": "produces"
+    },
+    {
+      "from": "E-05",
+      "to": "E-04",
+      "type": "consumes"
+    }
+  ],
+  "attachments": [
+    {
+      "elementId": "E-06",
+      "attachedTo": [
+        "E-01"
+      ]
+    },
+    {
+      "elementId": "E-07",
+      "attachedTo": [
+        "E-02"
+      ]
+    },
+    {
+      "elementId": "E-08",
+      "attachedTo": [
+        "E-03"
+      ]
+    },
+    {
+      "elementId": "E-09",
+      "attachedTo": [
+        "E-04",
+        "E-05"
+      ]
+    },
+    {
+      "elementId": "E-10",
+      "attachedTo": [
+        "E-08",
+        "E-09"
+      ]
+    },
+    {
+      "elementId": "E-11",
+      "attachedTo": [
+        "E-08"
+      ]
+    },
+    {
+      "elementId": "E-12",
+      "attachedTo": [
+        "E-06",
+        "E-07",
+        "E-08"
+      ]
+    }
+  ],
+  "topics": [
+    {
+      "id": "T-01",
+      "title": "三级递进语义",
+      "proposition": "Receipt、Availability、Consumption 是三个可以同时为真、但不能互相替代的语义层级 —— 上下文到了不等于可用，可用不等于被消费；被消费的是教学语义，不是实现控制对象。",
+      "blockIds": [
+        "O-02",
+        "O-07",
+        "O-08",
+        "O-09"
+      ]
+    },
+    {
+      "id": "T-02",
+      "title": "生成链路与消费点",
+      "proposition": "消费点是 outline generation：Frozen Context 派生出的 projection 必须成为 outline 生成的真实输入，而不是被附加在 Prompt 里；scene 继承的是 context-shaped outline。",
+      "blockIds": [
+        "O-04",
+        "O-04b",
+        "O-04c"
+      ]
+    },
+    {
+      "id": "T-03",
+      "title": "消费的证据与判定",
+      "proposition": "判定消费的最低证据是「某一次 Outline Generation Attempt 实际使用了 generation-facing projection」；函数调用、Prompt 字符串、成功返回都不能升级为 Consumption。",
+      "blockIds": [
+        "O-10",
+        "O-10b",
+        "O-16",
+        "O-14"
+      ]
+    },
+    {
+      "id": "T-04",
+      "title": "两条链的边界与状态组合",
+      "proposition": "Consumption 管「这次生成用了什么」，Output Alignment 管「生成出来体现了什么」；两链在 outline revision 处衔接，五种状态组合各有产品解释。",
+      "blockIds": [
+        "O-05",
+        "O-06",
+        "O-11b",
+        "O-13"
+      ]
+    },
+    {
+      "id": "T-05",
+      "title": "语义边界与非主张",
+      "proposition": "消费不要求盲目服从，也不要求输出明显不同；本篇不采用第四级 Context Influence，也不承诺某个输出变化严格由上下文导致。",
+      "blockIds": [
+        "O-03",
+        "O-10c",
+        "O-11",
+        "O-12",
+        "O-15"
+      ]
+    }
+  ],
+  "meta": {
+    "validationGranularity": "sourceUnit",
+    "elementCount": 12,
+    "topicCount": 5,
+    "edgeCount": 4,
+    "attachmentCount": 7,
+    "documentEntrySourceUnitIds": [
+      "SU-001",
+      "SU-007",
+      "SU-034",
+      "SU-083"
+    ],
+    "note": "手工产物，未使用 AI，未复用旧 21 个 block 的切法。topic 的 blockIds 按语义内聚重新推导，不是为了补 orphan block 而机械增加。"
+  },
+  "readingGuide": {
+    "version": 1,
+    "binding": {
+      "documentId": "DESIGN-CONTEXT-CONSUMPTION",
+      "mapSha256": "7a805a1d898505c1f29bc5ed4f652bdfaa18830d209c2d0b0f36f2d2e6cabcdc",
+      "sourceSha256": "338bb2d632f800b53b20b1fcaa10ec235fdf7154107acb7925f87da27cb11c6a"
+    },
+    "orientation": {
+      "question": {
+        "summary": "怎样区分上下文到达、可以使用和实际使用？它与结果对齐是什么关系？",
+        "detail": "本文讨论课前教学语义有没有真正参与课程生成。收到、可用与消费分别判断；最终输出是否体现教学要求由另一条链检查。",
+        "sources": [
+          {
+            "namespace": "heading",
+            "key": "一、核心决定",
+            "quote": "本次生成任务实际把其中的教学语义作为课程设计输入。"
+          },
+          {
+            "namespace": "heading",
+            "key": "二、Context-side chain 与 Output-side chain",
+            "quote": "两条相互关联但不互相吞并的链"
+          }
+        ]
+      },
+      "overview": {
+        "summary": "先看生成机制，再区分过程状态与输出判断。",
+        "detail": "图的主干说明冻结语义通过投影进入课纲尝试，生成的课纲再供 scene 使用。旁边的三级概念和边界解释哪些事实不能互相替代。这是产品语义模型，现有代码映射不表示实现已验收，也不承诺严格因果。",
+        "sources": [
+          {
+            "namespace": "heading",
+            "key": "九、与 OpenMAIC 现有生成链的职责映射",
+            "quote": "Scene generation 的主要消费对象应是 context-shaped outline，而不是完整 Frozen Context。"
+          },
+          {
+            "namespace": "heading",
+            "key": "一、核心决定",
+            "quote": "它们不能互相替代："
+          },
+          {
+            "namespace": "heading",
+            "key": "十五、产品边界与非主张",
+            "quote": "最终输出一定发生了由 DeepTutor 引起的变化；"
+          }
+        ]
+      }
+    },
+    "elements": [
+      {
+        "elementId": "E-01",
+        "explanation": {
+          "summary": "冻结后的教学语义，是生成输入的依据。",
+          "detail": "它承载经过验证和冻结的目标、知识范围及教学要求。保存了这份上下文不等于生成器实际使用了它；生成器应使用从它派生的教学语义。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "生成器应消费的是服务端从 Frozen Context 派生出的、适合课程设计的语义输入。"
+            },
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "Frozen Context 被成功保存；"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-02",
+        "explanation": {
+          "summary": "把冻结语义整理成课纲生成可使用的输入。",
+          "detail": "这是服务端从冻结上下文派生的生成投影。现有代码已有小型投影，但是否充分消费教学语义仍需区分，不能把投影已注入当作最终完成。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "服务端从 Frozen Context 派生出的、适合课程设计的语义输入"
+            },
+            {
+              "namespace": "heading",
+              "key": "九、与 OpenMAIC 现有生成链的职责映射",
+              "quote": "不能自动被视为最终完成状态"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-03",
+        "explanation": {
+          "summary": "一次实际生成课纲的尝试，消费在这里判断。",
+          "detail": "要判断这一次尝试是否真实使用教学语义，而非只看请求参数。一次请求可能重试；尝试使用了上下文但最后生成失败，也可能已经发生 Consumption。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "十一、Consumption Subject 与当前 OpenMAIC Attempt",
+              "quote": "请求中的一次实际生成尝试，可能有重试。"
+            },
+            {
+              "namespace": "heading",
+              "key": "十一、Consumption Subject 与当前 OpenMAIC Attempt",
+              "quote": "Consumption 可以在 outline 生成结果最终失败时仍然成立"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-04",
+        "explanation": {
+          "summary": "由上下文参与设计后形成的课纲版本。",
+          "detail": "课纲是 scene 后续生成的依据。它连接生成过程与输出检查，但拿到一个课纲版本本身不能证明消费成立，也不能证明结果已对齐。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "九、与 OpenMAIC 现有生成链的职责映射",
+              "quote": "context-shaped Outline Revision"
+            },
+            {
+              "namespace": "heading",
+              "key": "十一、Consumption Subject 与当前 OpenMAIC Attempt",
+              "quote": "outline 成功返回也不能自动证明 Consumption"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-05",
+        "explanation": {
+          "summary": "按已经形成的课纲生成具体页面内容。",
+          "detail": "Scene 主要实现已有课纲，继承必要 lineage 和局部设计约束；不应各自重新读取完整 Frozen Context 或另一版本上下文。原文也指出当前仍有直接附加 context 的路径，需要收敛。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "九、与 OpenMAIC 现有生成链的职责映射",
+              "quote": "Scene generation 的主要消费对象应是 context-shaped outline，而不是完整 Frozen Context。"
+            },
+            {
+              "namespace": "heading",
+              "key": "九、与 OpenMAIC 现有生成链的职责映射",
+              "quote": "scene prompt 直接附加 formal context"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-06",
+        "explanation": {
+          "summary": "Receipt：上下文确实到达了系统。",
+          "detail": "接收事实可关联请求或 session，但不能说明合法、冻结、可供当前请求使用，更不能说明生成器实际使用或最终结果对齐。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "三、Context Receipt：上下文到达系统",
+              "quote": "至少可以识别它属于某个请求或 session lineage。"
+            },
+            {
+              "namespace": "heading",
+              "key": "三、Context Receipt：上下文到达系统",
+              "quote": "当前生成一定可以使用它；"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-07",
+        "explanation": {
+          "summary": "Availability：本次生成可以合法使用上下文。",
+          "detail": "上下文合法、冻结、版本一致，并在当前 outline generation 的授权边界内可用。这只是准备就绪，不表示生成器已经真正使用。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "四、Context Availability：合法上下文可供本次生成使用",
+              "quote": "合法、冻结、版本一致的课前语义上下文已经准备好"
+            },
+            {
+              "namespace": "heading",
+              "key": "四、Context Availability：合法上下文可供本次生成使用",
+              "quote": "Availability 仍然不能说明生成器已经真正使用了上下文。"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-08",
+        "explanation": {
+          "summary": "Consumption：教学语义实际参与课程设计。",
+          "detail": "本次 outline generation 将冻结上下文中的教学语义作为真实设计输入。仅保存、附加 Prompt、接口返回或出现相同关键词都不足以证明；考虑建议后不采用也不能伪称已采用。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "并将其作为课程设计输入，而不是仅仅收到、保存或附加了上下文。"
+            },
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "context 被原样附加到 Prompt；"
+            },
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "但不能伪称为已经采用。"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-09",
+        "explanation": {
+          "summary": "Output Alignment：结果是否体现教学要求。",
+          "detail": "它检查最终 outline/scene 的可观察表达，关注结果体现了什么。与生成过程是否消费上下文相互关联，但二者不能替代，也不保证严格因果归因。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "八、与 Output Alignment 的边界",
+              "quote": "关注最终 outline / scene 是否体现相关教学要求。"
+            },
+            {
+              "namespace": "heading",
+              "key": "二、Context-side chain 与 Output-side chain",
+              "quote": "不需要额外承诺“某个具体输出变化严格由 DeepTutor 导致”。"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-10",
+        "explanation": {
+          "summary": "过程使用与结果体现，是两个不同判断。",
+          "detail": "上下文可能被使用而结果未对齐；结果看似对齐也可能来自默认模板或偶然相似。消费和输出对齐需要分别检查。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "八、与 Output Alignment 的边界",
+              "quote": "Consumption ≠ Output Alignment"
+            },
+            {
+              "namespace": "heading",
+              "key": "八、与 Output Alignment 的边界",
+              "quote": "结果可能来自默认模板、通用教学模式或偶然相似"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-11",
+        "explanation": {
+          "summary": "不把 Influence 增设为第四层。",
+          "detail": "可归因的输出变化需要更强的反事实或因果证据。它不是当前 Consumption 协议的必要成功状态，不能默认为产品承诺。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "六、为什么不把 Context Influence 作为第四级",
+              "quote": "需要反事实比较、控制变量或其他因果设计"
+            },
+            {
+              "namespace": "heading",
+              "key": "六、为什么不把 Context Influence 作为第四级",
+              "quote": "Context Influence` 不作为 Context Consumption 的第四级"
+            }
+          ]
+        }
+      },
+      {
+        "elementId": "E-12",
+        "explanation": {
+          "summary": "收到、可用、消费不能相互替代。",
+          "detail": "这三个概念分别回答到达、可用和实际参与设计的问题。它们可以递进地成立，但收到不能推出可用，可用不能推出消费。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "一、核心决定",
+              "quote": "它们不能互相替代："
+            },
+            {
+              "namespace": "heading",
+              "key": "一、核心决定",
+              "quote": "Availability ≠ Consumption"
+            }
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "edgeIndex": 0,
+        "explanation": {
+          "summary": "生成投影依赖冻结上下文。",
+          "detail": "投影来自服务端冻结教学语义，提供给课程设计任务；不把 raw Proposal 或内部响应直接当生成器输入。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "生成器应消费的是服务端从 Frozen Context 派生出的、适合课程设计的语义输入。"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 1,
+        "explanation": {
+          "summary": "课纲尝试使用投影中的教学语义。",
+          "detail": "这条连接要表达真实设计输入：教学语义可用于组织目标、范围、顺序和活动。仅把 context 附加在 Prompt 中，不足以证明消费。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "教学语义成为 outline-design task 的真实输入"
+            },
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "而不是装饰性文本或未使用附件。"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 2,
+        "explanation": {
+          "summary": "成功并被接受的尝试形成课纲版本。",
+          "detail": "一次实际尝试与被接受的课纲版本是不同对象。生成失败不必然否定该次消费；成功返回课纲也不自动证明消费。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "十一、Consumption Subject 与当前 OpenMAIC Attempt",
+              "quote": "生成成功并被接受后形成的课纲版本。"
+            },
+            {
+              "namespace": "heading",
+              "key": "十一、Consumption Subject 与当前 OpenMAIC Attempt",
+              "quote": "Consumption 可以在 outline 生成结果最终失败时仍然成立"
+            }
+          ]
+        }
+      },
+      {
+        "edgeIndex": 3,
+        "explanation": {
+          "summary": "Scene 继承上下文塑造后的课纲。",
+          "detail": "Scene 以课纲为主要消费对象，使用必要 lineage 和派生局部约束；不是每个 scene 再独立解释完整冻结上下文。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "九、与 OpenMAIC 现有生成链的职责映射",
+              "quote": "Scene generation 的主要消费对象应是 context-shaped outline，而不是完整 Frozen Context。"
+            }
+          ]
+        }
+      }
+    ],
+    "topics": [
+      {
+        "topicId": "T-01",
+        "explanation": {
+          "summary": "为什么收到、可用、实际使用不能互相替代？",
+          "detail": "比较 Receipt、Availability、Consumption 的定义和非等价边界，帮助判断当前事实究竟能说明哪一层。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "一、核心决定",
+              "quote": "它们不能互相替代："
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-02",
+        "explanation": {
+          "summary": "教学语义在哪一步真正进入课程生成？",
+          "detail": "从冻结上下文、服务端投影到 outline attempt，再看 scene 如何继承课纲；区分现有代码起点与目标责任。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "九、与 OpenMAIC 现有生成链的职责映射",
+              "quote": "Context Consumption 的 primary production responsibility 位于这条链路"
+            },
+            {
+              "namespace": "heading",
+              "key": "九、与 OpenMAIC 现有生成链的职责映射",
+              "quote": "不能自动被视为最终完成状态"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-03",
+        "explanation": {
+          "summary": "哪些事实能说明消费，哪些只能说明收到或可用？",
+          "detail": "围绕一次实际 Attempt 的输入与 lineage 判断，避免把保存、Prompt 注入、成功输出直接升级为消费证据。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "十一、Consumption Subject 与当前 OpenMAIC Attempt",
+              "quote": "Frozen Context × Outline Generation Attempt"
+            },
+            {
+              "namespace": "heading",
+              "key": "五、Context Consumption：教学语义实际参与生成",
+              "quote": "以下情况都不能单独证明 Consumption"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-04",
+        "explanation": {
+          "summary": "过程消费与输出对齐如何分开报告？",
+          "detail": "理解两条链及可能的状态组合：消费成立但结果未对齐，或输出看似对齐却没有消费依据。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "八、与 Output Alignment 的边界",
+              "quote": "Consumption ≠ Output Alignment"
+            },
+            {
+              "namespace": "heading",
+              "key": "八、与 Output Alignment 的边界",
+              "quote": "Consumption = no"
+            }
+          ]
+        }
+      },
+      {
+        "topicId": "T-05",
+        "explanation": {
+          "summary": "这篇模型明确不决定或不承诺什么？",
+          "detail": "核对产品语义与实现授权的边界，尤其是不增加 Influence 第四级、不承诺模型推理已验证或输出变化严格由上下文引起。",
+          "sources": [
+            {
+              "namespace": "heading",
+              "key": "十五、产品边界与非主张",
+              "quote": "本文确定 Context Consumption 的三级递进，但不决定："
+            },
+            {
+              "namespace": "heading",
+              "key": "十五、产品边界与非主张",
+              "quote": "模型内部推理被理解或被验证；"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

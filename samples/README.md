@@ -2,6 +2,8 @@
 
 每篇测试文章一个目录，原文与配套数据放在一起。原文、Gold、Map、Plan 和提示词迁移时保持字节；历史路径字段通过显式仓库映射读取，不改写 Plan fingerprint。
 
+F25 在 context-consumption 和 operational-runbook 各新增 framework-map.reading.json：复制原 Map 的全部结构，再附显式版本绑定、有摘录出处的 readingGuide。旧 Map/原文不改。打开或导出时明确选择所需 Map，不按文件名自动配对；资料包可核对出处，独立 Map 未加载原文时只展示已声明解释。
+
 | 文章目录 | 配套材料 |
 | --- | --- |
 | `context-consumption/` | source.md、design-review.json、overview-plan.json、source-sections.json、framework-map.json、human-review.sample.json |

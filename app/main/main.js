@@ -195,6 +195,11 @@ async function loadFrameworkMap(mapPath, epoch=beginSessionLoad()) {
   // view model 的实现在 scripts/ 下（已被 test-l0-view-model.js 覆盖 34 断言）
   const { buildL0ViewModel } = require(joinRepositoryPath(PROJECT_ROOT, 'scripts', 'l0-view-model.js'));
   const schema = JSON.parse(await fs.readFile(joinRepositoryPath(PROJECT_ROOT, 'schema', 'framework-map.schema.json'), 'utf8'));
+  if(Object.hasOwn(map,'readingGuide')){
+    const checked=validate(schema,map);if(!checked.valid)throw new Error(checked.errors.join('\n'));
+    const binding=require('../shared/reading-explanation').checkReadingGuideBinding(map);
+    if(binding.errors.length)throw new Error(binding.errors.join('\n'));
+  }
   const viewModel = buildL0ViewModel(map, {
     checkMapText,
     knownRoles: schema.$defs.element.properties.role['x-known-roles'],

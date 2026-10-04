@@ -56,6 +56,11 @@ function parseCheckMap(txt) {
  */
 function buildL0ViewModel(map, opts = {}) {
   if (!map || typeof map !== 'object') throw new Error('framework-map 不是对象');
+  if(Object.hasOwn(map,'readingGuide')){
+    const checked=require('../app/shared/schema-validator').validate(require('../schema/framework-map.schema.json'),map);
+    if(!checked.valid)throw new Error(checked.errors.join('\n'));
+  }
+  const readingGuide=require('../app/shared/reading-explanation').projectReadingGuide(map,opts.guideContext);
   const frozen = JSON.parse(JSON.stringify(map)); // 用于最后核对"未修改输入"
 
   const elements = map.elements || [];
@@ -86,7 +91,8 @@ function buildL0ViewModel(map, opts = {}) {
     attachmentAsHost: attachments.filter((a) => (a.attachedTo || []).includes(e.id)).map((a) => ({ elementId: a.elementId, elementLabel: labelOf(a.elementId) })),
   }));
 
-  const vmEdges = edges.map((x) => ({
+  const vmEdges = edges.map((x, edgeIndex) => ({
+    edgeIndex,
     id: x.id || null,
     from: x.from, to: x.to,
     fromLabel: labelOf(x.from), toLabel: labelOf(x.to),
@@ -163,9 +169,10 @@ function buildL0ViewModel(map, opts = {}) {
     generatedFrom: { mapVersion: map.mapVersion, level: map.level },
     document: {
       id: map.document.id, title: map.document.title, sourcePath: map.document.sourcePath,
-      role: map.document.role, entries: docEntries,
+      role: map.document.role, entries: docEntries, thesis: map.thesis || null,
     },
     thesis: map.thesis || null,
+    readingGuide,
     facts,
     elements: vmElements,
     edges: vmEdges,

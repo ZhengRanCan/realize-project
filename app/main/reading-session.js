@@ -19,7 +19,7 @@ async function prepareReadingSession(manifestPath) {
    for(const key of ['decisions','openQuestions','gaps']) humanReview[key]={...skeleton[key],...(saved[key]||{})};humanReviewExists=true;
   }catch(e){if(e.code!=='ENOENT') throw e;}
   const projection=projectReadingBundle(bundle),sessionToken=randomUUID();
-  const l0ViewModel=bundle.frameworkMap?buildL0ViewModel(bundle.frameworkMap,{knownRoles:require('../../schema/framework-map.schema.json').$defs.element.properties.role['x-known-roles']}):null;
+  const l0ViewModel=bundle.frameworkMap?buildL0ViewModel(bundle.frameworkMap,{knownRoles:require('../../schema/framework-map.schema.json').$defs.element.properties.role['x-known-roles'],guideContext:{sourceSections:bundle.sourceSections,sourceIntegrity:bundle.reports.sourceIntegrity,sourceSha256:bundle.sourceSha256}}):null;
   const loadResult={ok:true,errors:[],warnings:result.warnings,sessionToken,bundleInfo:{analysisId:bundle.manifest.analysisId,manifestPath:bundle.manifestPath,hasMap:Boolean(l0ViewModel)},l0ViewModel,...projection,model,modelPath:bundle.paths.designReview,humanReviewPath,humanReview,humanReviewExists,gate:semantics.evaluateGate(model,humanReview),summary:semantics.reviewSummary(model,humanReview)};
   return {ok:true,errors:[],warnings:result.warnings,session:{...loadResult,bundle,loadResult}};
  }catch(e){return {ok:false,stage:'session',errors:[e.message],warnings:[]};}
