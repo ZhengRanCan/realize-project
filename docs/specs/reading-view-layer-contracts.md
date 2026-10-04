@@ -55,7 +55,7 @@ L0 上出现的任何东西都必须已经是 `E-xx` 或 `T-xx`。
 
 ### 1.3 输入与身份
 
-唯一输入 `framework-map.json`；身份 = `element.id` / `topic.id`。
+唯一语义输入 `framework-map.json`（可含 readingGuide）；身份 = `element.id` / `topic.id`。原文 registry 只核对已声明解释的出处，不生成解释或借 Plan 定义。解释缺席保留结构并披露缺失，解释不构成新的语义对象或 coverage。
 溯源二选一（契约强制）：`sourceUnitIds` 或 `sectionRefs`。
 **不得依赖 `topic.blockIds` 存在**（该字段三态，absent = Unknown，见主契约 S1 / S7）。
 
@@ -82,7 +82,7 @@ L0 是阅读栈的底，**没有 Back**。**`Open in Reading` 一词只保留给
 
 唯一被批准的降级：attachment 上的元素 → `⚑ N` 角标。
 
-表示层动作：标题 1 行 / 副标题 2 行截断、topic 命题默认折叠而计数常驻。
+表示层动作：标题 1 行 / 副标题 2 行截断、节点短解释至多 2 行；Topic 关注问题（无 guide 时原 proposition）默认可见，完整解释按需展开，计数常驻。展开不进入 L1，使用明确进入主题动作。
 **截断后的完整内容必须有稳定 disclosure 路径**（selection detail / expand / 可访问 tooltip /
 detail slot 至少其一）；hover 只是增强。
 

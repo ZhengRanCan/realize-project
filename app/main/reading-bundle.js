@@ -23,7 +23,7 @@ async function readReadingBundle(manifestPath) {
    const actual=await resolveBundleFile(root,item.path);if(seen.has(actual.toLowerCase())) throw new Error('多个资料条目指向同一个文件');seen.add(actual.toLowerCase());paths[name]=actual;
    raw[name]=await fs.readFile(actual);if(sha256(raw[name])!==item.sha256) throw new Error(`${name}: 文件 SHA256 不匹配`);
   }
-  const input={manifest,sourceText:raw.source.toString('utf8'),planSha256:sha256(raw.plan)};
+  const input={manifest,sourceText:raw.source.toString('utf8'),sourceSha256:sha256(raw.source),planSha256:sha256(raw.plan)};
   for(const name of ['designReview','plan','sourceSections','generated','frameworkMap']) if(raw[name]) input[name]=JSON.parse(raw[name].toString('utf8'));
   const check=validateBundleData(input);
   if(check.errors.length) return {ok:false,stage:'integrity',...check};

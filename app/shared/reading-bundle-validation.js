@@ -1,7 +1,7 @@
 'use strict';
 const {validate}=require('./schema-validator');
 const {semanticCheck}=require('./review-model');
-const {buildSourceRegistry,parseDocHeadings}=require('./source-coordinates');
+const {buildSourceRegistry,parseDocHeadings,sha256}=require('./source-coordinates');
 const {checkPlan}=require('../../scripts/check-plan');
 const {checkOverview}=require('../../scripts/check-overview');
 const {checkMap}=require('../../scripts/check-map');
@@ -39,8 +39,15 @@ function validateBundleData(input) {
   if(check('frameworkMap',schemas.map,frameworkMap)) {
    if(!manifest.bindings.frameworkDocumentId || frameworkMap.document.id!==manifest.bindings.frameworkDocumentId) errors.push('frameworkDocumentId 不匹配');
    // The bundle binds files, not Map SU to Plan SU. No implicit namespace bridge.
-   reports.map=checkMap(frameworkMap,{docSections:parseDocHeadings(sourceText)});
+   const sourceSha256=input.sourceSha256||sha256(sourceText);
+   reports.map=checkMap(frameworkMap,{docSections:parseDocHeadings(sourceText),sourceSha256});
    errors.push(...reports.map.hard);warnings.push(...reports.map.warn);
+   if(!reports.map.hard.length){
+    reports.readingGuide=require('./reading-explanation').projectReadingGuide(frameworkMap,{sourceSections,sourceIntegrity:reports.sourceIntegrity,sourceSha256});
+    const guide=reports.readingGuide;
+    for(const entry of [...Object.values(guide.orientation),...Object.values(guide.elements),...Object.values(guide.edges),...Object.values(guide.topics)].filter(Boolean))
+     for(const source of entry.sources)if(source.state!=='known')warnings.push(`readingGuide ${source.key}: ${source.reason}`);
+   }
    const blockIds=new Set(plan.blocks.map(b=>b.id));
    for(const t of frameworkMap.topics) for(const id of t.blockIds||[]) if(!blockIds.has(id)) errors.push(`Topic ${t.id}: 悬空 Block ${id}`);
   }

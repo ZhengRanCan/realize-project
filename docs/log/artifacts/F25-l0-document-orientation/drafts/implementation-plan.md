@@ -10,7 +10,7 @@
 
 **Spec:** [已确认设计](../view-design.md)，2026-10-04 用户确认“可以，按你说的推荐那种来”。
 
-**Execution:** 沿用用户此前选择的 Native：主 agent 实施，最后由一名新独立 reviewer（使用当前可用最强 native 模型）审查本 feature 全部变更。所列 superpowers 子技能在本机未安装；沿用此前已采用的项目 Harness 执行与独立审查流程，不冒称调用缺失技能。本计划待用户审阅，尚未开始产品实现。
+**Execution:** 沿用用户此前选择的 Native：主 agent 实施，最后由一名新独立 reviewer（使用当前可用最强 native 模型）审查本 feature 全部变更。所列 superpowers 子技能在本机未安装；沿用此前已采用的项目 Harness 执行与独立审查流程，不冒称调用缺失技能。用户已于 2026-10-04 批准计划（“可以，做吧”），现按 Native 实施。
 
 ## Global Constraints
 
@@ -62,7 +62,7 @@
 - `EntryVM = {summary, detail, sourceState: 'declared'|'located', sources: SourceVM[]}`；located 仅表示所有已声明摘录在对应快照上能定位。
 - `SourceVM = {namespace: 'heading', key, quote, state: 'known'|'unknown'|'unavailable', reason?, title?}`；仅 known 可触发来源定位。
 
-- [ ] Step 1: 更新规范及合同的新增文件范围，再编写失败测试 `fingerprint_ignores_object_key_order_not_array_order`、`rejects_wrong_doc_map_source_binding`、`rejects_duplicate_or_dangling_entries`、`quote_and_namespace_states`。断言改变边数组顺序导致指纹变化、同名 SU 不影响配对、混合有效/无效来源的条目为 declared、CRLF 摘录按 LF 核对、重复 heading 不取第一条，输入深冻结后仍可调用。
+- [x] Step 1: 更新规范及合同的新增文件范围，再编写失败测试 `fingerprint_ignores_object_key_order_not_array_order`、`rejects_wrong_doc_map_source_binding`、`rejects_duplicate_or_dangling_entries`、`quote_and_namespace_states`。断言改变边数组顺序导致指纹变化、同名 SU 不影响配对、混合有效/无效来源的条目为 declared、CRLF 摘录按 LF 核对、重复 heading 不取第一条，输入深冻结后仍可调用。
 
   ```js
   assert.equal(mapFingerprint(enhancedMap), mapFingerprint(originalMap));
@@ -70,11 +70,11 @@
   assert.ok(checkReadingGuideBinding(enhancedMap, {sourceSha256: '0'.repeat(64)}).errors.length > 0);
   assert.equal(projectReadingGuide(mixedSourceMap, guideContext).elements['E-01'].sourceState, 'declared');
   ```
-- [ ] Step 2: 运行 `node scripts/test-reading-explanation.js`，确认失败来自尚未实现的接口/行为。
-- [ ] Step 3: 实现 schema 可选 readingGuide。必填 version=1、binding（documentId/mapSha256/sourceSha256，hash 为64位小写十六进制）、elements/edges/topics 数组（允许 []）；orientation 可选，question/overview 可分别缺席。每个条目只允许对应 elementId/edgeIndex/topicId 及 explanation；edgeIndex 为原 edges 数组的非负整数。解释 summary/detail 非空，sources 至少一项且只允许 heading/key/quote。所有新增对象禁止未知字段。
-- [ ] Step 4: 实现上述三个共享接口并接入 checkMap。旧 Map 的现有判定不变；现有 validator 为原结构读取的章节，不作为 guide 的原文核对输入。guide 只有显式 sourceSha256/registry 才可核对出处；不从 Map.sourcePath 读取，不从 Plan 补来源。
-- [ ] Step 5: Bundle validator 将实际原文 SHA256（清单已核对原始字节）用于绑定校验，将 sourceSections/sourceIntegrity 用于定位；绑定失败进入已有 errors，摘录/章节不可解析进入明确 warnings 与逐来源降级。Source 实时保护保持现状。
-- [ ] Step 6: 运行新测试、`npm.cmd run test:map`、`node scripts/test-reading-bundle.js`，通过后提交 `feat: validate map reading guide bindings`。
+- [x] Step 2: 运行 `node scripts/test-reading-explanation.js`，确认失败来自尚未实现的接口/行为。
+- [x] Step 3: 实现 schema 可选 readingGuide。必填 version=1、binding（documentId/mapSha256/sourceSha256，hash 为64位小写十六进制）、elements/edges/topics 数组（允许 []）；orientation 可选，question/overview 可分别缺席。每个条目只允许对应 elementId/edgeIndex/topicId 及 explanation；edgeIndex 为原 edges 数组的非负整数。解释 summary/detail 非空，sources 至少一项且只允许 heading/key/quote。所有新增对象禁止未知字段。
+- [x] Step 4: 实现上述三个共享接口并接入 checkMap。旧 Map 的现有判定不变；现有 validator 为原结构读取的章节，不作为 guide 的原文核对输入。guide 只有显式 sourceSha256/registry 才可核对出处；不从 Map.sourcePath 读取，不从 Plan 补来源。
+- [x] Step 5: Bundle validator 将实际原文 SHA256（清单已核对原始字节）用于绑定校验，将 sourceSections/sourceIntegrity 用于定位；绑定失败进入已有 errors，摘录/章节不可解析进入明确 warnings 与逐来源降级。Source 实时保护保持现状。
+- [x] Step 6: 运行新测试、`npm.cmd run test:map`、`node scripts/test-reading-bundle.js`，通过后提交 `feat: validate map reading guide bindings`。
 
 ## Task 2: 两类原文解释输入与会话投影
 

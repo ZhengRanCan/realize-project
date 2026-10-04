@@ -18,6 +18,8 @@
       "description": "可选。文档级中心命题；原文若没有明确中心命题可以省略。不参与任何 coverage。"
     },
 
+    "readingGuide": { "$ref": "#/$defs/readingGuide" },
+
     "elements": {
       "type": "array",
       "minItems": 1,
@@ -53,6 +55,182 @@
   },
 
   "$defs": {
+    "guideSource": {
+      "type": "object",
+      "required": [
+        "namespace",
+        "key",
+        "quote"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "namespace": {
+          "const": "heading"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "guideExplanation": {
+      "type": "object",
+      "required": [
+        "summary",
+        "detail",
+        "sources"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/guideSource"
+          }
+        }
+      }
+    },
+    "guideElement": {
+      "type": "object",
+      "required": [
+        "elementId",
+        "explanation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "elementId": {
+          "$ref": "#/$defs/id"
+        },
+        "explanation": {
+          "$ref": "#/$defs/guideExplanation"
+        }
+      }
+    },
+    "guideEdge": {
+      "type": "object",
+      "required": [
+        "edgeIndex",
+        "explanation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "edgeIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "explanation": {
+          "$ref": "#/$defs/guideExplanation"
+        }
+      }
+    },
+    "guideTopic": {
+      "type": "object",
+      "required": [
+        "topicId",
+        "explanation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "topicId": {
+          "$ref": "#/$defs/id"
+        },
+        "explanation": {
+          "$ref": "#/$defs/guideExplanation"
+        }
+      }
+    },
+    "guideOrientation": {
+      "type": "object",
+      "required": [],
+      "additionalProperties": false,
+      "properties": {
+        "question": {
+          "$ref": "#/$defs/guideExplanation"
+        },
+        "overview": {
+          "$ref": "#/$defs/guideExplanation"
+        }
+      }
+    },
+    "readingGuide": {
+      "type": "object",
+      "required": [
+        "version",
+        "binding",
+        "elements",
+        "edges",
+        "topics"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "binding": {
+          "type": "object",
+          "required": [
+            "documentId",
+            "mapSha256",
+            "sourceSha256"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "documentId": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "mapSha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "sourceSha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "orientation": {
+          "$ref": "#/$defs/guideOrientation"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/guideElement"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/guideEdge"
+          }
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/guideTopic"
+          }
+        }
+      }
+    }
+,
     "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
     "nonEmptyStringArray": {
       "type": "array",

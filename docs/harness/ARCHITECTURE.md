@@ -104,3 +104,7 @@ F23 首轮由现有 projectTopic 补齐原始显示信息副本，独立 L1 rend
 ## F25 shared explanation — 设计确认，尚未实施
 
 [设计](../log/artifacts/F25-l0-document-orientation/view-design.md)已确认 Map 可选 readingGuide 及一份 shared 解释/绑定规则，L0 与后续 F23 共用。载体绑定原文和 Map 结构指纹，不串接 Map/Plan SU。[实施计划](../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)待审阅；规范、schema、loader 和 projection 在实施前同步，不将未实现接口称为已生效架构。
+
+## F25 implementation boundary
+
+用户已批准设计和计划。reading-explanation 共用模块拥有 Map 核心指纹、guide 结构/引用/显式来源绑定、逐条出处状态；check-map、bundle validation 和 L0 VM 复用。模块在主进程及构建期运行，renderer 不计算指纹、读文件、补语义或调用模型。F23 后续复用，当前仅 L0 接入。

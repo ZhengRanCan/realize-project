@@ -37,3 +37,9 @@ prepare 只准备输入；最新 requestToken 的 commit 才切换 session。失
 离线导出显式输入，不调用模型；原始 Plan/Generated/Review/Map 字节保持不变。临时目录 read-back 通过后提交到未存在的输出目录。
 不覆盖同名包，不迁移历史 run；完整产品导出同时提供 Map。用户包和人工审核不进 Git。
 L0 只消费 Map；L2 采用 Plan LEFT JOIN Generated；L3 保持 Block 主体。Preview 与产品共用投影和 renderer。
+
+## Optional Map reading guide
+
+readingGuide 随显式选定的 Map 文件加载，清单不新增解释文件项；导出保留选定 Map 原始字节，不按目录猜增强版。文档/Map 指纹/显式 source hash 不匹配拒绝新会话；失败、取消或过期保持旧会话。
+
+资料包提供的 registry/sourceIntegrity 只核对 guide 的 heading 摘录；摘录或坐标不可解析则逐项来源不可用，解释为未核对声明，不拒绝已知结构。registry 漂移禁用来源。独立 Map 无原文仍可显示已声明解释，明确未加载原文，不能读 sourcePath 或依赖 Plan 补定义。Source 动作仍检查当前会话及磁盘完整性；静态 Preview 使用已绑定快照，不宣称持续核对磁盘。

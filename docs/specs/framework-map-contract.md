@@ -456,3 +456,11 @@ quoted Markdown        | 引用块里出现的 ## 是否算小节
 ```
 
 **判据（写完 parser 必问的一句）：** 这个 parser 是"认得多"，还是"认得对"？它有没有**知道自己跳过了什么**？
+
+## Optional readingGuide (F25)
+
+Map 可选 readingGuide，version=1；原 ontology、关系、attachment、Topic 和 coverage 不因解释改变。binding.documentId 与 Map.document.id 相等；mapSha256 是排除根 readingGuide 后递归排序对象键、保留数组原序、JSON UTF-8 的完整 SHA256；sourceSha256 是显式选定原文的原始字节 hash。
+
+orientation 可含 question/overview；elements、edges、topics 为数组，分别以 elementId、原 edges 数组 edgeIndex、topicId 引用现存对象。重复/悬空引用、非法结构或绑定不符为错误。解释统一为 summary/detail/sources，文字非空，sources 非空；来源仅接受 heading namespace、唯一 key 和原文 quote。不得按 Map/Plan SU、标题或文件名猜对应。
+
+唯一 heading 中的摘录精确匹配（仅换行统一为 LF）可定位出处，不能证明改写正确、命题已验证或作者批准。多出处逐项保留结果，部分失效不能被其它成功出处掩盖。guide 缺席或条目缺席不补写解释。

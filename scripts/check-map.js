@@ -68,6 +68,8 @@ function normalizeSections(input) {
  */
 function checkMap(map, opts = {}) {
   const hard = [], warn = [], info = [];
+  const guideBinding = require('../app/shared/reading-explanation').checkReadingGuideBinding(map, {sourceSha256:opts.sourceSha256});
+  hard.push(...guideBinding.errors);warn.push(...guideBinding.warnings);
   const granularity = (map.meta && map.meta.validationGranularity) || '(未标注)';
   const isSection = /section/i.test(granularity);
 

@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-04.
-- Active feature: F25 L0 Document Orientation and Explanation（active，书面设计已确认、实施计划待审阅）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
-- Next queued feature: F25 实施计划确认后实施；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
+- Active feature: F25 L0 Document Orientation and Explanation（active，设计和计划已确认，Native 实施中）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
+- Next queued feature: F25 正在实施；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
 - Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -39,7 +39,7 @@
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 | F23 | L1 Topic Boundary View v0.2 | `blocked` | 技术基线保留；补节点/关系解释与无边摘要，实际验收未通过 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
-| F25 | L0 Document Orientation and Explanation | `active` | 已确认 Map 内嵌解释方案；实施计划待审阅，产品尚未实施 |
+| F25 | L0 Document Orientation and Explanation | `active` | 设计/计划已确认；共享校验、导读及真实路径实施中 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -369,3 +369,9 @@ Source-verified Evidence
 - 已将独立 L0 预览、样式、两份新增派生 Map 和受进入动作影响的旧测试加入 scope；旧原文/Map/Gold/Plan 和历史实验不修改。
 - 共用解释模块由 F25 拥有，F23 后续复用；本轮不实现 L1 新解释，也不提前将 F23/F17 标通过。来源失效逐项披露，关系按原始 edge occurrence 配对，不用端点字符串合并平行边。
 - 沿用 Native 和本项目 Harness + 独立 reviewer；本机 executing-plans 子技能缺失，不冒称调用。计划待用户审阅；尚未修改规范正文、产品、schema、validator 或创建新样本。
+
+## 2026-10-04 — F25 Implementation Started
+
+- 用户批准实施计划（“可以，做吧”），按 Native 实施；解释资料、绑定、纯投影和 L0 renderer 共用一套规则。
+- 先同步规范：Map 可选 readingGuide，显式文档/核心 Map 指纹/原文字节 hash；heading 摘录只能证明可定位，不能证明解释语义正确。来源逐项披露，旧输入有效。
+- 共享接口、独立 Map/资料包加载、Topic 独立进入及关系 occurrence 会影响既有集成测试；按计划覆盖完整身份、三态、Source/session、Back 和只读 Preview。F23 的局部解释后续实施。

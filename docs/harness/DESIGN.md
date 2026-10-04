@@ -66,3 +66,7 @@ F23 的[展示设计](../log/artifacts/F23-l1-topic-boundary-view/view-design.md
 ## F25 L0 orientation — 设计确认，计划待审阅
 
 [书面设计](../log/artifacts/F25-l0-document-orientation/view-design.md)已获用户确认：图前整篇定位、节点短解释、选择后的对象/关系含义和 Topic 关注问题；解释随 Map 加载。[实施计划](../log/artifacts/F25-l0-document-orientation/drafts/implementation-plan.md)待审阅，现有规范继续适用；实施前更新正式接口与交互约定，再修改产品。不会用固定四阶段组织 L0 全文。
+
+## F25 L0 interaction
+
+用户已批准设计和计划。图前直接显示有依据的整篇问题/说明，保留 scope、非目标和已有 thesis；节点有短解释，完整含义在选择详情中披露。具体边解释按原始 occurrence 选择，原始身份和无向/自环语义保留。Topic 默认显示关注问题或原 proposition，原生展开与明确“进入主题”按钮分开。解释先于折叠原始关系表；每条来源独立说明可用性，快照可定位不标命题已验证。640×720 依次排列并保留图独立滚动，原生键盘/共享 Back/Source 会话保护继续适用。
