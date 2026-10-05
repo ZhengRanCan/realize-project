@@ -2,8 +2,8 @@
 id: F23
 title: L1 Topic Boundary View
 version: v0.2
-status: blocked
-dependsOn: ["F16","F18","F19"]
+status: active
+dependsOn: ["F16","F18","F19","F25"]
 scope: {"code":["app/shared/l1-topic-projection.js","app/shared/reading-projection.js","app/renderer/app.js","app/renderer/l0-map.js","app/renderer/index.html","app/renderer/styles.css","app/main/main.js","scripts/build-preview.js","package.json","app/renderer/l1-topic-view.*"],"tests":["scripts/test-l1-topic-projection.js","scripts/test-reading-bundle-projection.js","scripts/test-reading-navigation-electron.js","scripts/test-reading-integration-electron.js","scripts/test-product-maturity-electron.js","scripts/test-reading-bundle-preview.js","scripts/test-l0-preview.js","scripts/test-l1-boundary-view*.js"],"docs":["docs/harness/DESIGN.md","docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/specs/reading-view-layer-contracts.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F23-l1-topic-boundary-view/**","docs/log/artifacts/F23-l1-topic-boundary-view/**","docs/harness/features/individual_feature/F16-l2-runtime/**","docs/harness/features/individual_feature/F17-l1-runtime/**","docs/progress.md","docs/harness/incidents/2026-10-03-f23-boundary-review.md","docs/harness/incidents/2026-10-04-reading-comprehension-feedback.md","docs/harness/features/individual_feature/F25-l0-document-orientation/**","docs/log/artifacts/F25-l0-document-orientation/**"]}
 evidence: {"lastVerifiedAt":"2026-10-03","commands":[{"command":"npm.cmd run test:l1-boundary","result":"passed","output":"v0.1 技术基线：real Electron/SVG/keys/Source paths passed"},{"command":"npm.cmd run test:all","result":"passed","output":"v0.1 技术基线：offline + relocated readonly Preview passed"},{"command":"npm.cmd run selftest","result":"passed","output":"v0.1 技术基线：full Electron chain passed"},{"command":"npm.cmd run validate","result":"passed","output":"v0.1 技术基线：passed"},{"command":"npm.cmd run audit","result":"passed","output":"v0.1 技术基线：passed"},{"command":"npm.cmd run check-overview","result":"passed","output":"v0.1 技术基线：PASS WITH WARNINGS; existing warnings"},{"command":"npm.cmd run check:docs","result":"passed","output":"v0.1 技术基线：passed"},{"command":"npm.cmd run verify:harness","result":"passed","output":"v0.1 技术基线：passed"},{"command":"node --check modified/new JS; git diff --check","result":"passed","output":"v0.1 技术基线：passed"}],"manualSmoke":"2026-10-03 v0.1 技术路径通过；2026-10-04 实际验收未通过。v0.2 新解释要求尚未实施或验收。"}
 completionGate: {"version":"v0.2","l3":"required","userPath":["资料包 → L0 Topic → L1 边界图 → 返回恢复 L0 现场","无内部关系、有 crossing 的主题；无任何可绘制关系的主题；多 Topic 成员","640×720 窗口与键盘操作；便携 Preview 同一展示","T-01 无可绘制关系：理解 Receipt/Availability/Consumption 的含义、差异与非等价边界","T-02/T-03 有关系：能解释对象职责与内部/跨边界连接，而非复述名称和关系码","缺解释资料：仍显示已知结构并说明解释缺失，不逼用户靠 L2 补齐本层基本理解"],"integrationEvidence":["docs/log/artifacts/F23-l1-topic-boundary-view/verification-summary.md","真实 Electron/搬迁只读 Preview：完整图、原文、键盘窄窗口和返回现场通过；独立审查无剩余 P1/P2"],"knownUnverified":["L1 成员与关系的具体解释尚未补齐","无关系 Topic summary 仍只列名称，定义/区别/边界尚未完善","修订后的解释依据、真实界面与用户阅读理解尚未验收；L0 导读单独由 F25 处理"],"humanReviewRequired":["用户能解释当前主题的对象含义、内部及外部连接；没有可绘制关系时能讲清主要概念差异与边界，而无需先打开 L2"]}
@@ -22,7 +22,7 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["资料包 → L0 
 - 强制前置是已验证的数据接入、资料包/溯源和共享导航（F16/F18/F19）；沿用 F17 已有投影，不重新推断关系。
 - 已核对 Reading 主契约、Layer Contracts §2 与 harness DESIGN；[展示设计](../../../../log/artifacts/F23-l1-topic-boundary-view/view-design.md)已获用户确认（2026-10-03，“可以，做吧”）；[实施计划](../../../../log/artifacts/F23-l1-topic-boundary-view/drafts/implementation-plan.md)已获用户批准（“看着没问题，实施咯”），沿用 Native；首轮技术实施与独立复查已完成；2026-10-04 用户验收指出解释不足，需重新设计。
 - 反馈与原 feature 完成范围修正在 [incident](../../../incidents/2026-10-03-l1-l2-reading-gap.md)。
-- F25 的[解释资料设计](../../../../log/artifacts/F25-l0-document-orientation/view-design.md)已于 2026-10-04 获确认，采用 Map 可选 readingGuide。共享绑定/出处规则由 F25 实施，F23 后续消费其 GuideVM，不复制指纹或猜 Map/Plan SU 对应；当前新协议尚未实施，F23 v0.2 的局部解释设计与验收仍待完成。
+- F25 的[解释资料设计](../../../../log/artifacts/F25-l0-document-orientation/view-design.md)已于 2026-10-04 获确认，采用 Map 可选 readingGuide。共享绑定/出处规则由 F25 实施，F23 后续消费其 GuideVM，不复制指纹或猜 Map/Plan SU 对应；F25 已实施并 passing，F23 v0.2 的局部解释短设计和验收仍待完成。
 
 ## Scope
 
@@ -34,7 +34,7 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["资料包 → L0 
 - 复用 F19 的 ReadingAddress/stack、Element canonical resolver 和原文入口；保留 occurrence、展开、焦点、滚动状态。
 - 成员的必要定义/职责、关系的具体含义及条件/边界，在本层直接可读；可按需披露详情，基本解释不能全部折叠到辅助关系表或推给 L2。
 - 无关系摘要保留 Topic identity 和 Known(0)，用有依据的定义、差异/对照和边界说明主题；不为概念强造流程线。
-- 消费 F25 设计确认的共享解释规则/资料；来源与绑定不能按 SU 字符串、标题、文件名猜测。共享解释模块/规则由 F25 维护，本 feature 只消费并适配 L1 投影，不另建解析/配对规则；当前未选定或批准新协议。
+- 消费 F25 设计确认的共享解释规则/资料；来源与绑定不能按 SU 字符串、标题、文件名猜测。共享解释模块/规则由 F25 维护，本 feature 只消费并适配 L1 投影，不另建解析/配对规则；F25 协议已获确认并实现，本 feature 不另扩张输入协议。
 - 真实界面、键盘、窄窗口、退化路径和 portable Preview 回归；更新 F17 完成记录与当前机器保障边界。
 
 ### Out of scope
@@ -96,3 +96,10 @@ F23 完成后按 F17 重新打开的验收项复核并记录关闭依据，不�
 F25 已实现 app/shared/reading-explanation.js，GuideVM 含 orientation/elements/edges/topics 与逐来源状态；元素/主题按原身份、边按原 edges occurrence，heading 空间不推断 Map/Plan SU 对应。L0 会话已明确传原文 hash/registry/integrity；F23 v0.2 后续复用其规则，不能另写一份解析或直接展示 guide 原数据为已核实解释。缺项/declared/located 区别和 Snapshot 保护必须保持。
 
 L0 Topic 的展开不进入 L1，明确 data-enter-topic 才进入。原 F23 实际关系/键盘/Source/Back 检查在新入口下通过，但 v0.2 的节点/关系解释及概念主题摘要仍待设计与实施，blocked 未关闭。F25 pending 人工理解不作强制 passing 依赖；必要输入接口已经存在，F23 实施前再确认精确消费范围。
+
+
+## Start v0.2 refinement — 2026-10-05
+
+用户要求 F25 完成后继续“F26”，经核实明确指已有 L1 解释修正；继续使用 F23 v0.2，不新增或重编号。F25 已按本轮验收意见收口，共享 readingGuide/绑定/SourceVM 可直接消费，追加为强制前置。
+
+本次为既有 L1 展示/投影的 bounded 修正：复用既定解释和来源规则，保持 membership、关系边界、Block 三态和导航。先在聊天中确认短设计再实施，不新增架构方案或输入协议。当前 active 是设计阶段，尚未声称 v0.2 新解释已经接入或通过。

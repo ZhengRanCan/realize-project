@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-05.
-- Active feature: 无；F25 L0 Document Orientation and Explanation（passing，用户本轮唯一反馈已修正并收口）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
-- Next queued feature: 用户要求继续 F26；当前 registry 没有 F26，准确范围待确认，暂不擅自替换为 F23。F24 仍后置。
+- Active feature: F23 v0.2 L1 解释修正（active，确认短设计阶段）；F25 passing，F17 仍待 F23 的实际验收，F24 为 not_started。
+- Next queued feature: 先完成 F23 v0.2；用户已澄清“F26”指本项，沿用 F23 编号。F24 仍后置。
 - Latest completed feature: `F25` L0 Document Orientation and Explanation（2026-10-05）；图旁阅读面板与本轮唯一反馈修复通过技术回归及独立复查，用户同意本轮收口并继续后续。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -37,7 +37,7 @@
 | F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
-| F23 | L1 Topic Boundary View v0.2 | `blocked` | 技术基线保留；补节点/关系解释与无边摘要，实际验收未通过 |
+| F23 | L1 Topic Boundary View v0.2 | `active` | 复用 F25 解释资料，确认主题导读、节点/关系解释和无边对照的短设计 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
 
@@ -392,3 +392,5 @@ F25 收口的清理限制：旧 L0 预览测试的8个缓存文件删除被工�
 2026-10-05 图旁阅读面板技术交付：桌面两栏、窄窗口底部可收起，连接目录不再在长图下方；节点/边选择、隐藏焦点、canonical 返回和两标签独立滚动已验证。test:all/selftest、原文兼容、静态与文档门禁通过，独立复查无未关闭 P1/P2。预览已重建，实际用户复验待记录，F23/F17状态不变。
 
 2026-10-05 用户确认 F25 目前只有已处理的连接解释位置问题，要求完成后推进 F26。本轮以实际试读意见与唯一反馈闭环收口，未伪造口述/二次试读记录；旧缓存工具限制留作维护事项，不作为未知产品能力。F26 尚未在仓库登记，已询问具体指向；不擅自新建或重编号 F23。
+
+2026-10-05 用户澄清后续“F26”指 L1 解释修正，继续 F23 v0.2；F25 shared GuideVM 及来源规则现已可用，新增 F25 强制前置。当前设计阶段，维持旧技术基线，不冒称修订后 L1 已通过。
