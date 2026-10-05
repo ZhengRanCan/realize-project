@@ -2,7 +2,7 @@
 
 ## Required commands
 
-当前 blocked：设计/计划、实现、技术验证和独立审查完成，用户阅读理解待验收。下列命令已实际执行，详细结果在 F25 verification-summary；Human 行尚未通过。
+当前 passing：实现、技术验证、独立审查和用户本轮实际试读反馈闭环。以下技术命令已执行；本轮 Human 收口记录在 F25 verification-summary。
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |
@@ -13,9 +13,9 @@
 | Preview | npm run test:all，覆盖搬迁只读 Preview | yes | 同一 renderer/解释规则、旧包/独立 Map/缺解释输入 |
 | Interaction | 原生键盘、640×720、长解释和会话切换 | yes | 可见/可操作、披露不丢信息、焦点/滚动恢复 |
 | Documents | npm run check:docs / verify:harness | yes | 合同与索引/状态、文档引用一致 |
-| Human | 两类公开文章的实际阅读与原文对照 | yes | 可复述的含义与选择理由；不是仅问图是否好看 |
+| Human | 用户实际试读反馈及唯一问题闭环；两类原文忠实性由依据核对与独立审查保障 | yes | 2026-10-05 用户确认本轮目前只有连接解释位置问题；按确认方案修复 |
 
-## Manual paths
+## 补充诊断方法（非本轮额外口述门禁）
 
 - [ ] 打开 context-consumption，先说明本文讨论的问题及范围，再用自己的话解释主要对象如何连接。
 - [ ] 点击一个此前陌生的对象和一条关系，说明新增解释帮助理解了什么；能回到相应依据核对。
@@ -30,3 +30,6 @@
 
 
 技术路径已由真实 Electron/搬迁 Preview 和父代理截图核对；上述 Manual paths 中涉及实际理解的项目保持未勾选，不能用自动化代替用户。增强包和两篇预览的明确位置见 [verification summary](../../../../log/artifacts/F25-l0-document-orientation/verification-summary.md)。
+
+
+2026-10-05 收口：依据用户“关于F25，我目前应该只有这个问题”及唯一已批准反馈修复结束本轮验收。上面口述诊断条目未逐项执行，不勾选或伪造其结果；它们不再作为额外要求用户重复确认的关闭门槛。

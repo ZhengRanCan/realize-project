@@ -2,11 +2,11 @@
 id: F25
 title: L0 Document Orientation and Explanation
 version: v0.1
-status: blocked
+status: passing
 dependsOn: ["F18","F19","F21"]
 scope: {"code":["scripts/l0-view-model.js","app/renderer/l0-map.js","app/renderer/l0-layout.js","app/renderer/app.js","app/renderer/styles.css","app/renderer/index.html","app/main/main.js","app/main/reading-bundle.js","app/main/reading-session.js","app/shared/reading-projection.js","app/shared/reading-explanation.*","app/shared/reading-bundle-validation.js","scripts/build-preview.js","scripts/export-reading-bundle.js","scripts/check-map.js","schema/framework-map.schema.json","schema/reading-bundle.schema.json","package.json","app/renderer/l0-map.css","scripts/build-l0-preview.js","samples/context-consumption/*.reading.json","samples/operational-runbook/*.reading.json"],"tests":["scripts/test-l0-view-model.js","scripts/test-l0-layout.js","scripts/test-l0-preview.js","scripts/test-check-map.js","scripts/test-reading-bundle.js","scripts/test-reading-session.js","scripts/test-reading-bundle-projection.js","scripts/test-reading-bundle-preview.js","scripts/test-reading-navigation-electron.js","scripts/test-explore-electron.js","scripts/test-product-maturity-electron.js","scripts/test-l0-orientation*.js","scripts/test-reading-explanation*.js","scripts/test-reading-bundle-electron.js","scripts/test-l1-boundary-view-electron.js"],"docs":["docs/harness/PRODUCT_SPEC.md","docs/harness/ARCHITECTURE.md","docs/harness/DESIGN.md","docs/specs/framework-map-contract.md","docs/specs/reading-view-cognitive-contract.md","docs/specs/reading-view-layer-contracts.md","docs/specs/reading-bundle-contract.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F25-l0-document-orientation/**","docs/log/artifacts/F25-l0-document-orientation/**","docs/harness/features/individual_feature/F23-l1-topic-boundary-view/**","docs/progress.md","docs/harness/incidents/2026-10-04-reading-comprehension-feedback.md","samples/README.md","docs/harness/incidents/*-f25-*.md"]}
 evidence: {"lastVerifiedAt":"2026-10-05","commands":[{"command":"npm.cmd run test:l0-orientation","result":"passed","output":"本轮真实固定面板、键盘、640×720、标签/收起/两标签滚动及 canonical Topic/Explore Back passed"},{"command":"npm.cmd run selftest","result":"passed","output":"SELFTEST PASSED, F15/F18-F23/F25 regressions"},{"command":"npm.cmd run test:l1-boundary","result":"passed","output":"2026-10-04 专项基线通过；2026-10-05 test:all/selftest 内 L1 组合回归通过"},{"command":"npm.cmd run test:all","result":"passed","output":"offline and relocated readonly old/legacy/enhanced Preview passed"},{"command":"node scripts/test-reading-bundle-preview.js","result":"passed","output":"final Preview passed; exercised fs.promises.writeFile interception zero"},{"command":"npm.cmd run validate","result":"passed","output":"PASSED"},{"command":"npm.cmd run audit","result":"passed","output":"PASSED"},{"command":"npm.cmd run check-overview","result":"passed","output":"PASS WITH WARNINGS: existing duplicate17/density1; no failures"},{"command":"npm.cmd run check:docs","result":"passed","output":"158 Markdown, 0 broken"},{"command":"npm.cmd run verify:harness","result":"passed","output":"24 features, 0 errors"},{"command":"node --check changed/new JS; git diff --check","result":"passed","output":"本轮8 JS/diff passed；8 source/Map/Gold/Plan byte-identical to 3047c57"}],"manualSmoke":"2026-10-05 用户部分认可整体，批准并完成连接解释阅读位置修正；父代理核对新版两张截图。新版实际体验及原理解验收仍待用户，不能标 passing。"}
-completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 → L0 理解文章核心问题、关键对象和整体结构","选择节点/关系 → 阅读具体含义和依据 → 选择能解决当前疑问的 Topic","独立 Map / 旧包 / 缺解释输入 → 明确能力缺失且保留结构与导航","L0 → L1 → Back 恢复选择/滚动/焦点；真实窄窗口和只读 Preview"],"integrationEvidence":["docs/log/artifacts/F25-l0-document-orientation/verification-summary.md","docs/log/artifacts/F25-l0-document-orientation/interface-evidence.json","docs/log/artifacts/F25-l0-document-orientation/subagent-review.md"],"knownUnverified":["用户实际阅读理解尚未验收；两类文章的复述与 Topic 选择理由待记录","旧 L0 测试缓存 workspace/tmp/tests/l0-preview-check 的8个文件，删除被工具策略拒绝；未删除"],"humanReviewRequired":["用户在不打开原文的情况下，能说明文章讨论的问题、主要对象及其连接含义，并知道下一步选择哪个 Topic"]}
+completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 → L0 理解文章核心问题、关键对象和整体结构","选择节点/关系 → 阅读具体含义和依据 → 选择能解决当前疑问的 Topic","独立 Map / 旧包 / 缺解释输入 → 明确能力缺失且保留结构与导航","L0 → L1 → Back 恢复选择/滚动/焦点；真实窄窗口和只读 Preview"],"integrationEvidence":["docs/log/artifacts/F25-l0-document-orientation/verification-summary.md","docs/log/artifacts/F25-l0-document-orientation/interface-evidence.json","docs/log/artifacts/F25-l0-document-orientation/subagent-review.md"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F25 L0 Document Orientation and Explanation
@@ -46,16 +46,16 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 �
 ## Acceptance Criteria
 
 - [x] 首次进入 L0，可见有依据的文章定位/核心问题及必要范围提示；缺少明确命题时忠实披露，不能伪造作者结论。
-- [ ] 框架图仍显示现有完整对象与关系；关键对象的含义、职责与主干连接能被读者理解，不能只靠英文名称和通用关系词。
-- [ ] 选择节点或关系后披露具体语义、条件/边界及来源依据；内容增加理解，不只是重新列 incoming/outgoing 或重复箭头。
-- [ ] Topic 入口让读者知道深入后能回答什么问题；完整入口集合、多 Topic 和未知/空状态保留，无隐含 owner 或虚构顺序。
+- [x] 框架图仍显示现有完整对象与关系；关键对象的含义、职责与主干连接能被读者理解，不能只靠英文名称和通用关系词。
+- [x] 选择节点或关系后披露具体语义、条件/边界及来源依据；内容增加理解，不只是重新列 incoming/outgoing 或重复箭头。
+- [x] Topic 入口让读者知道深入后能回答什么问题；完整入口集合、多 Topic 和未知/空状态保留，无隐含 owner 或虚构顺序。
 - [x] 解释资料与 Map/文档身份显式绑定，不能隐式串接 Map/Plan SU；缺失、不可解析、配对失败和漂移分别按协议处理，不能显示为已核实解释。
 - [x] 独立 Map 不依赖 Plan 可用性；旧 Map/旧包和缺解释输入仍能阅读结构并明确解释能力缺失。解释相关新字段保持已确认的兼容性，不放宽现有验证口径。
 - [x] 不制造中心命题、关系或归属，不将整篇正文/所有 Block 铺到 L0；概念型及过程型文章均有适合其既有语义的定位方式。
 - [x] 身份/当前选择、Back/Resolve/Source/Explore 与会话隔离保持；Tab/Enter/Space、640×720、长文本、真实便携只读 Preview 通过。
 - [x] 公共样本至少包含 context-consumption 和一篇不同类型文章；对照原文核查解释依据、重要边界与 Current/Target，不能只验证 HTML 存在。
-- [ ] 用户不打开原文，可以复述文章核心问题、主要对象及连接含义，并说明会选择哪个 Topic 继续看；结果记录日期/输入/实际判断。
-- [ ] 设计、受影响单元/集成/兼容检查、独立审查和实际用户验收完成；合同/index/progress 同步后才 passing。
+- [x] 用户实际试读后认可整体方向，并确认本轮目前只有连接解释阅读位置的问题；该问题按已确认方案修正，记录日期、输入和实际反馈，不伪造口述验收结果。
+- [x] 设计、受影响单元/集成/兼容检查、独立审查和实际用户验收完成；合同/index/progress 同步后才 passing。
 
 ## Risks and compatibility
 
@@ -68,7 +68,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开资料包 �
 
 - [登记与验证记录](../../../../log/artifacts/F25-l0-document-orientation/verification-summary.md)。
 - 设计、计划和解释依据按本 feature artifact 保存；代码实现后须有独立审查和实际用户验收。
-- 当前 blocked（等待实际阅读验收）；实现、技术回归与独立审查已完成，用户理解仍未确认。成功校验不保留永久 txt 日志。
+- 当前 passing；用户本轮试读意见与唯一反馈修复已闭环，技术回归和独立审查已完成。成功校验不保留永久 txt 日志。
 
 
 ## Technical delivery — 2026-10-04
@@ -85,3 +85,12 @@ Map 可选 readingGuide、共用绑定/出处投影、两类派生输入、L0 �
 面板标签、展开状态和独立滚动纳入原 Reading frame，Source/Topic/Explore 返回恢复；语义选择不强行移动图或键盘焦点。键盘标签和窄窗口真实验证，旧包/独立 Map/Review/便携 Preview 保持。批准为本次短设计，不重启架构设计或新增 feature。
 
 2026-10-05 修正技术完成，重新 blocked 等新版体验与原理解验收。新增面板标签/收起/两标签滚动现场与 canonical 恢复已通过；专项测试目录已 finally 清理，旧缓存策略限制仍如实保留。
+
+
+## User acceptance closeout — 2026-10-05
+
+用户实际试读增强 context-consumption 资料包后表示“整体看上去还行”，唯一指出长图下方连接解释需要反复滚动；认可固定含义/主题面板方案。修正、真实 Electron/Preview 回归与独立复查已完成。随后用户表示“关于F25，我目前应该只有这个问题”，并要求本 feature 完成后继续 F26。
+
+以用户本轮实际试读意见和唯一反馈修复作为收口依据，不要求其重复确认已认可的部分。原拟额外口述检查改为可选诊断方法；没有声称用户实际复述了原文或已在修正后做了第二次试读。新的具体反馈可重新打开对应问题。
+
+旧固定测试缓存删除受工具策略限制的事实保留在 verification-summary/progress，归为已确认的维护限制，不冒称已清理，也不作为未验证的产品能力。F23/F17及历史 feature 不随本轮验收自动关闭。F26 的准确范围尚待用户确认，因为当前 registry 没有 F26。

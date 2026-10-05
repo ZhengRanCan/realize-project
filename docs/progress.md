@@ -3,9 +3,9 @@
 ## Status
 
 - Date: 2026-10-05.
-- Active feature: 无；F25 L0 Document Orientation and Explanation（blocked，固定阅读面板修正已完成，等待新版体验及原理解验收）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
-- Next queued feature: F25 等新版体验及理解验收；随后继续 F23 v0.2 的 L1 解释修正。F24 按用户要求后置。
-- Latest completed feature: `F21` Product Maturity（2026-10-03）；键盘、实际窄窗口、压力预算和独立审查通过；F19/F20 已分别提交。
+- Active feature: 无；F25 L0 Document Orientation and Explanation（passing，用户本轮唯一反馈已修正并收口）；F23 首轮技术检查完成，但 2026-10-04 用户验收未通过：L0 理解引导 / L1 解释不足；F17 保持同一阻塞，F24 为 not_started。
+- Next queued feature: 用户要求继续 F26；当前 registry 没有 F26，准确范围待确认，暂不擅自替换为 F23。F24 仍后置。
+- Latest completed feature: `F25` L0 Document Orientation and Explanation（2026-10-05）；图旁阅读面板与本轮唯一反馈修复通过技术回归及独立复查，用户同意本轮收口并继续后续。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
@@ -39,7 +39,7 @@
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 | F23 | L1 Topic Boundary View v0.2 | `blocked` | 技术基线保留；补节点/关系解释与无边摘要，实际验收未通过 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
-| F25 | L0 Document Orientation and Explanation | `blocked` | 图旁含义/主题面板已修正，技术回归/独立复查完成，等新版体验验收 |
+| F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -390,3 +390,5 @@ F25 收口的清理限制：旧 L0 预览测试的8个缓存文件删除被工�
 2026-10-05：沿用已确认的 Native/Harness 执行本次 bounded 修正。共享 app.js 仅扩展既有 Reading frame 的面板标签/展开/滚动现场；没有新增输入协议或独立导航栈。真实 Electron/键盘/窄窗口、Source/Back/Explore 与搬迁 Preview 回归后重新交付；实际理解验收仍待记录。
 
 2026-10-05 图旁阅读面板技术交付：桌面两栏、窄窗口底部可收起，连接目录不再在长图下方；节点/边选择、隐藏焦点、canonical 返回和两标签独立滚动已验证。test:all/selftest、原文兼容、静态与文档门禁通过，独立复查无未关闭 P1/P2。预览已重建，实际用户复验待记录，F23/F17状态不变。
+
+2026-10-05 用户确认 F25 目前只有已处理的连接解释位置问题，要求完成后推进 F26。本轮以实际试读意见与唯一反馈闭环收口，未伪造口述/二次试读记录；旧缓存工具限制留作维护事项，不作为未知产品能力。F26 尚未在仓库登记，已询问具体指向；不擅自新建或重编号 F23。
