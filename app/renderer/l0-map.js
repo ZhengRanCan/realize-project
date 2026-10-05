@@ -209,8 +209,6 @@ function renderReading(vm, layout) {
     </div>
     ${noEdge ? '<p class="l0-no-edge">这份 map 没有任何 <code>edge</code> —— <b>没有主轴就不发明主轴</b>，所以这里不画任何线。</p>' : ''}
     <div class="l0-legend">${renderLegend(vm)}</div>
-    ${vm.edges.length?`<details class="guide-edge-list"><summary>查看连接的含义 · ${vm.edges.length} 条</summary><ul>${vm.edges.map(edge=>`<li><button data-focus-edge="1" data-edge-index="${edge.edgeIndex}" data-edge-id="${esc(edge.id||`${edge.from}->${edge.to}`)}" data-from="${esc(edge.from)}" data-to="${esc(edge.to)}">${esc(edge.fromLabel)} ${edge.type==='relates-to'?'—': '→'} ${esc(edge.toLabel)}<span>${esc(edge.explanation?.summary||edge.label||relZh(edge.type))}</span></button></li>`).join('')}</ul></details>`:''}
-    <div class="l0-focus-slot" id="l0-focus-slot"></div>
   </section>`;
 }
 
@@ -461,7 +459,23 @@ function renderL0MapHTML(vm, opts = {}) {
       <div hidden>${vm.edges.map(edge=>`<section data-guide-edge-for="${edge.edgeIndex}"><h3>${esc(edge.fromLabel)} ${edge.type==='relates-to'?'—':'→'} ${esc(edge.toLabel)}</h3>${renderExplanation(edge.explanation)}<details><summary>原始关系信息</summary><p>${esc(edge.type)} ${esc(edge.label||'')} ${esc(edge.note||'')} ${qualifierLine(edge.qualifiers)}</p></details></section>`).join('')}</div>
     </main>
 
-    <aside class="l0-nav" id="topic-nav">
+    <aside class="l0-reading-panel" data-panel-tab="topics" data-panel-collapsed="false" aria-label="阅读面板">
+      <div class="l0-panel-head">
+        <div role="tablist" aria-label="阅读面板内容">
+          <button id="l0-tab-meaning" role="tab" aria-controls="l0-panel-meaning" aria-selected="false" tabindex="-1" data-panel-tab-button="meaning">含义</button>
+          <button id="l0-tab-topics" role="tab" aria-controls="l0-panel-topics" aria-selected="true" tabindex="0" data-panel-tab-button="topics">主题</button>
+        </div>
+        <button data-panel-collapse aria-expanded="true" aria-label="收起阅读面板">收起</button>
+      </div>
+      <div class="l0-panel-scroll" id="l0-panel-meaning" role="tabpanel" aria-labelledby="l0-tab-meaning" tabindex="0" hidden>
+        <div class="l0-focus-slot" id="l0-focus-slot"></div>
+        <p class="l0-panel-empty">点击图中的节点或连线，在这里阅读含义与依据。</p>
+    ${vm.edges.length?`<details class="guide-edge-list" open><summary>查看连接的含义 · ${vm.edges.length} 条</summary><ul>${vm.edges.map(edge=>`<li><button data-focus-edge="1" data-edge-index="${edge.edgeIndex}" data-edge-id="${esc(edge.id||`${edge.from}->${edge.to}`)}" data-from="${esc(edge.from)}" data-to="${esc(edge.to)}">${esc(edge.fromLabel)} ${edge.type==='relates-to'?'—': '→'} ${esc(edge.toLabel)}<span>${esc(edge.explanation?.summary||edge.label||relZh(edge.type))}</span></button></li>`).join('')}</ul></details>`:''}
+
+
+      </div>
+      <div class="l0-panel-scroll" id="l0-panel-topics" role="tabpanel" aria-labelledby="l0-tab-topics" tabindex="0">
+    <section class="l0-nav" id="topic-nav">
       <h2>Topic Navigation（完整入口索引 · ${f.topicCount}）</h2>
       <p class="note">这里与左边的图不是一一对应的：图中是<b>有关系的核心机制</b>，这里是<b>完整入口</b>。
         没有 L0 element 的 Topic 也照样能进入。先看每个主题回答的问题，再进入主题；展开可查看命题与出处。</p>
@@ -470,6 +484,8 @@ function renderL0MapHTML(vm, opts = {}) {
       <div class="doc-entries">
         <h3>文档级入口</h3>
         ${vm.document.entries.map((d) => `<div class="doc-entry"><span class="k">${esc(d.key)}</span><div>${esc(d.text)}</div><div class="v">${refChips(d.sectionRefs.concat(d.sourceUnitIds))}</div></div>`).join('') || '<div class="muted">（无）</div>'}
+      </div>
+    </section>
       </div>
     </aside>
   </div>
@@ -487,6 +503,40 @@ function bindInteractions(root, opts = {}) {
   // mount() 的宿主可能是 #main（Electron），而状态 class 的 CSS 作用域是 `.l0-root`：
   // 必须把 class 加到真正的 .l0-root 上，否则降噪/命中样式在 Electron 下不生效。
   const stateRoot = root.classList && root.classList.contains('l0-root') ? root : (root.querySelector('.l0-root') || root);
+  const panel=root.querySelector('.l0-reading-panel');
+  const panelScroll={meaning:{top:0,left:0},topics:{top:0,left:0}};
+  function rememberPanelScroll(){const tab=panel?.dataset.panelTab,body=root.querySelector('#l0-panel-'+tab);if(body&&!body.hidden)panelScroll[tab]={top:body.scrollTop,left:body.scrollLeft};}
+  function panelState(){rememberPanelScroll();return panel?{tab:panel.dataset.panelTab,collapsed:panel.dataset.panelCollapsed==='true',scroll:structuredClone(panelScroll)}:null;}
+  function setPanel({tab=panel?.dataset.panelTab||'topics',collapsed=false,scroll}={}){
+    if(!panel)return;
+    if(scroll){for(const key of ['meaning','topics'])if(scroll[key])panelScroll[key]={top:Math.max(0,Number(scroll[key].top)||0),left:Math.max(0,Number(scroll[key].left)||0)};}else rememberPanelScroll();
+    const focusedBody=panel.contains(document.activeElement)?document.activeElement.closest('[role=tabpanel]'):null;
+    if(!['meaning','topics'].includes(tab))tab='topics';
+    panel.dataset.panelTab=tab;panel.dataset.panelCollapsed=String(collapsed);
+    panel.querySelectorAll('[data-panel-tab-button]').forEach(button=>{const active=button.dataset.panelTabButton===tab;button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;});
+    panel.querySelectorAll('[role=tabpanel]').forEach(body=>{body.hidden=collapsed||body.id!=='l0-panel-'+tab;});
+    const toggle=panel.querySelector('[data-panel-collapse]');toggle.setAttribute('aria-expanded',String(!collapsed));toggle.textContent=collapsed?'展开':'收起';toggle.setAttribute('aria-label',collapsed?'展开阅读面板':'收起阅读面板');
+    const body=root.querySelector('#l0-panel-'+tab);if(body&&!body.hidden){body.scrollTop=panelScroll[tab].top;body.scrollLeft=panelScroll[tab].left;}
+    if(focusedBody?.hidden)(collapsed?toggle:panel.querySelector('[data-panel-tab-button='+tab+']')).focus({preventScroll:true});
+  }
+  const showMeaning=()=>{setPanel({tab:'meaning'});const body=root.querySelector('#l0-panel-meaning');if(body){body.scrollTop=0;panelScroll.meaning={top:0,left:0};}};
+  setPanel({collapsed:window.matchMedia('(max-width:1100px)').matches});
+  const main=root.closest('#main')||root.querySelector('#main'),scrollHost=main||window;
+  let panelFrame=null;
+  function updatePanelSize(){
+    panelFrame=null;if(!panel||!panel.isConnected)return;
+    const narrow=window.matchMedia('(max-width:1100px)').matches;
+    const bounds=main?.getBoundingClientRect();
+    const available=narrow?(bounds?.height||innerHeight)*.55:(bounds?.bottom||innerHeight)-Math.max(bounds?.top||0,panel.getBoundingClientRect().top)-12;
+    const value=Math.floor(Math.max(96,Math.min(innerHeight-24,available)))+'px';
+    if(panel.style.getPropertyValue('--l0-panel-height')!==value)panel.style.setProperty('--l0-panel-height',value);
+  }
+  function schedulePanelSize(){if(panelFrame===null)panelFrame=requestAnimationFrame(updatePanelSize);}
+  scrollHost.addEventListener('scroll',schedulePanelSize,{passive:true,signal});window.addEventListener('resize',schedulePanelSize,{passive:true,signal});
+  const observer=main?new ResizeObserver(schedulePanelSize):null;observer?.observe(main);
+  signal.addEventListener('abort',()=>{observer?.disconnect();if(panelFrame!==null)cancelAnimationFrame(panelFrame);},{once:true});
+  schedulePanelSize();
+
 
   const clear = () => {
     stateRoot.__selection = null;
@@ -496,7 +546,10 @@ function bindInteractions(root, opts = {}) {
     root.querySelectorAll('[data-focus-for]').forEach((p) => { p.hidden = true; });
     root.querySelectorAll('.is-hit,.is-open').forEach((n) => n.classList.remove('is-hit', 'is-open'));
     const slot = root.querySelector('#l0-focus-slot');
+    const slotHadFocus=slot?.contains(document.activeElement);
     if (slot) slot.innerHTML = '';
+    if(slotHadFocus)panel.querySelector('[data-panel-tab-button=meaning]').focus({preventScroll:true});
+    root.querySelectorAll('.guide-edge-list button').forEach(button=>button.setAttribute('aria-pressed','false'));
     if (opts.onClear) opts.onClear();
   };
   /**
@@ -546,6 +599,7 @@ function bindInteractions(root, opts = {}) {
       const slot = root.querySelector('#l0-focus-slot');
       if (slot) slot.innerHTML = panel.outerHTML.replace(' hidden', '').replace('<section class="focus-panel"', '<section class="focus-panel focus-inline"');
     }
+    showMeaning();
   }
 
   function focusEdge(el) {
@@ -561,6 +615,8 @@ function bindInteractions(root, opts = {}) {
       hitAll(`[data-element-id="${eid}"]`);
       hitBadgesHostedBy(eid);
     });
+    root.querySelectorAll('.guide-edge-list button').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.edgeIndex)===edgeIndex)));
+    showMeaning();
     el.classList.add('is-open'); // Review 行会因此展开 qualifier / provenance
   }
 
@@ -575,13 +631,16 @@ function bindInteractions(root, opts = {}) {
     });
   }
 
-  root.__l0Interaction={clear,focusElement,restore(selection){
+  root.__l0Interaction={clear,focusElement,panelState,setPanel,restore(selection){
     if(!selection){clear();return;}
     if(selection.kind==='element')focusElement(selection.id);
     if(selection.kind==='edge'){const edge=edgeNodes(selection.id,selection.edgeIndex)[0];if(edge)focusEdge(edge);}
     if(selection.kind==='topic'){const row=[...root.querySelectorAll('.topic-entry')].find(n=>n.dataset.topicId===selection.id);if(row)focusTopic(row);}
   }};
   root.addEventListener('click', (ev) => {
+    const panelTab=ev.target.closest('[data-panel-tab-button]');
+    if(panelTab){setPanel({tab:panelTab.dataset.panelTabButton});return;}
+    if(ev.target.closest('[data-panel-collapse]')){setPanel({...panelState(),collapsed:!panelState().collapsed});return;}
     const guideSource=ev.target.closest('[data-guide-source]');
     if(guideSource){ev.preventDefault();if(!guideSource.disabled)opts.onExplanationSource?.({namespace:guideSource.dataset.guideNamespace,key:guideSource.dataset.guideSource});return;}
     const enter=ev.target.closest('[data-enter-topic]');
@@ -611,6 +670,10 @@ function bindInteractions(root, opts = {}) {
 
   root.addEventListener('keydown', (ev) => {
     if(ev.isComposing||ev.ctrlKey||ev.altKey||ev.metaKey||ev.target.closest('input,textarea,select,[contenteditable]'))return;
+    const tab=ev.target.closest('[data-panel-tab-button]');
+    if(tab&&['ArrowLeft','ArrowRight','Home','End'].includes(ev.key)){
+      ev.preventDefault();const tabs=[...panel.querySelectorAll('[data-panel-tab-button]')];const index=ev.key==='Home'?0:ev.key==='End'?1:(tabs.indexOf(tab)+1)%2;setPanel({tab:tabs[index].dataset.panelTabButton});tabs[index].focus({preventScroll:true});return;
+    }
     if (ev.key === 'Escape' && !ev.defaultPrevented) clear();
     // 键盘可达：Enter / Space 也能选中当前节点（tabindex=0 已在节点上）
     if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList && ev.target.classList.contains('l0-node')) {
@@ -626,6 +689,8 @@ if (typeof window !== 'undefined') {
   window.L0Map = {
     renderL0MapHTML, bindInteractions,
     getSelection(root){return structuredClone(root.querySelector('.l0-root')?.__selection||null);},
+    getPanelState(root){return root.__l0Interaction?.panelState()||null;},
+    restorePanelState(root,state){if(state)root.__l0Interaction?.setPanel(state);},
     restoreSelection(root,selection){root.__l0Interaction?.restore(selection);},
     revealElement(root,id){root.__l0Interaction?.focusElement(id);const target=[...root.querySelectorAll('[data-canonical-element]')].find(n=>n.dataset.canonicalElement===id);if(target){target.hidden=false;}return target;},
     mount(root, vm, opts = {}) {

@@ -295,3 +295,23 @@
 
 .edge-explain { margin:8px 0; border:1px solid var(--line); border-radius:6px; background:white; color:var(--accent); padding:5px 8px; cursor:pointer; }
 .topic-enter:disabled { color:var(--muted); cursor:default; }
+
+/* F25: meaning stays beside the graph; each panel retains its own scroll. */
+.l0-reading-panel { position:sticky; top:12px; height:var(--l0-panel-height,calc(100vh - 40px)); min-width:0; display:flex; flex-direction:column; border:1px solid var(--line); border-radius:10px; background:var(--bg-soft); overflow:hidden; }
+.l0-panel-head { display:flex; justify-content:space-between; gap:8px; padding:10px; flex-shrink:0; border-bottom:1px solid var(--line); }
+.l0-panel-head [role=tablist] { display:flex; gap:6px; }
+.l0-panel-head button { font:inherit; font-size:13px; padding:5px 12px; color:var(--ink); background:white; border:1px solid var(--line); border-radius:6px; cursor:pointer; }
+.l0-panel-head [aria-selected=true] { color:var(--accent); border-color:var(--accent); background:#eff6ff; font-weight:600; }
+.l0-panel-scroll { flex:1; min-height:0; overflow:auto; padding:12px; overflow-wrap:anywhere; }
+.l0-panel-scroll[hidden] { display:none; }
+.l0-reading-panel[data-panel-collapsed=true] { height:auto; }
+.l0-reading-panel .l0-nav { position:static; border:0; padding:0; overflow:visible; max-height:none; }
+.l0-panel-empty { margin:0 0 12px; font-size:13px; color:var(--muted); }
+.l0-focus-slot:not(:empty) + .l0-panel-empty { display:none; }
+.l0-reading-panel .guide-edge-list { margin:14px 0 0; }
+.l0-reading-panel .guide-edge-list button[aria-pressed=true] { background:#eff6ff; border-color:var(--accent); }
+.l0-reading-panel .guide-edge-list button { white-space:normal; overflow-wrap:anywhere; }
+@media(max-width:1100px) {
+ .l0-reading-panel { position:fixed; z-index:15; left:12px; right:12px; bottom:12px; top:auto; box-shadow:0 4px 20px #0003; }
+ .l0-root { padding-bottom:80px; }
+}

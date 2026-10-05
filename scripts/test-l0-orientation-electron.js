@@ -8,7 +8,7 @@ const {sha256}=require('../app/shared/source-coordinates');
 const exec=(win,code)=>win.webContents.executeJavaScript(code);
 const settle=win=>exec(win,'new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');
 async function size(win,width,height){win.setContentSize(width,height);await exec(win,`new Promise((r,j)=>{const until=Date.now()+3000;function p(){if(innerWidth===${width}&&innerHeight===${height})return requestAnimationFrame(r);if(Date.now()>until)return j(Error('viewport resize timeout'));requestAnimationFrame(p);}p();})`);}
-async function check(win,code,label){const result=await exec(win,code);if(result!==true)throw new Error('F25 '+label+' '+JSON.stringify(await exec(win,"({view:window.__state.view,selection:window.L0Map.getSelection(document.getElementById('main')),focus:document.activeElement.outerHTML.slice(0,200),graph:{top:document.querySelector('.l0-graph-wrap')?.scrollTop,left:document.querySelector('.l0-graph-wrap')?.scrollLeft},edgeOpen:document.querySelector('.guide-edge-list')?.open})")));}
+async function check(win,code,label){const result=await exec(win,code);if(result!==true)throw new Error('F25 '+label+' '+JSON.stringify(await exec(win,"({view:window.__state.view,selection:window.L0Map.getSelection(document.getElementById('main')),focus:document.activeElement.outerHTML.slice(0,200),graph:{top:document.querySelector('.l0-graph-wrap')?.scrollTop,left:document.querySelector('.l0-graph-wrap')?.scrollLeft},pane:window.L0Map.getPanelState(document.getElementById('main')),meaningTop:document.querySelector('#l0-panel-meaning')?.scrollTop,meaningMax:document.querySelector('#l0-panel-meaning')?.scrollHeight-document.querySelector('#l0-panel-meaning')?.clientHeight,edgeOpen:document.querySelector('.guide-edge-list')?.open})")));}
 async function key(win,keyCode){
  const code=keyCode==='Enter'?'Return':keyCode==='Space'?' ':keyCode;
  win.webContents.sendInputEvent({type:'keyDown',keyCode:code});
@@ -18,7 +18,7 @@ async function key(win,keyCode){
 async function exerciseOrientation(win){
  win.focus();win.webContents.focus();
  await check(win,"window.__state.view==='l0'&&document.querySelector('.l0-orientation').textContent.includes(window.__state.l0ViewModel.readingGuide.orientation.question.summary)",'actual document question');
- await exec(win,"document.querySelector('.topic-entry details').open=false;document.querySelector('.topic-entry summary').click()");
+ await exec(win,"document.querySelector('[data-panel-tab-button=topics]').click();document.querySelector('.topic-entry details').open=false;document.querySelector('.topic-entry summary').click()");
  await check(win,"window.__state.view==='l0'&&document.querySelector('.topic-entry details').open",'disclosure does not navigate');
  await exec(win,"document.querySelector('.topic-entry [data-focus-target]').click()");
  await check(win,"window.__state.view==='l0'&&L0Map.getSelection(document.getElementById('main')).kind==='element'",'Topic member selects without navigation');
@@ -33,24 +33,58 @@ async function exerciseOrientation(win){
  await exec(win,"document.querySelector('.guide-edge-list').open=true;document.querySelector('.guide-edge-list [data-edge-index=\"0\"]').focus()");await key(win,'Space');
  await check(win,"L0Map.getSelection(document.getElementById('main')).edgeIndex===0&&document.getElementById('l0-focus-slot').textContent.includes(window.__state.l0ViewModel.edges[0].explanation.detail)",'edge occurrence / Space');
  await key(win,'Tab');await check(win,"document.activeElement!==document.body",'native Tab');
- const frame=await exec(win,"(()=>{const graph=document.querySelector('.l0-graph-wrap');graph.scrollTop=90;graph.scrollLeft=60;document.querySelector('[data-enter-topic=\"T-02\"]').focus();return {selection:L0Map.getSelection(document.getElementById('main')),top:graph.scrollTop,left:graph.scrollLeft};})()");
+ const frame=await exec(win,"(()=>{document.querySelector('[data-panel-tab-button=topics]').click();const graph=document.querySelector('.l0-graph-wrap');graph.scrollTop=90;graph.scrollLeft=60;document.querySelector('[data-enter-topic=\"T-02\"]').focus();return {selection:L0Map.getSelection(document.getElementById('main')),top:graph.scrollTop,left:graph.scrollLeft};})()");
  await key(win,'Enter');await check(win,"window.__state.view==='l1'&&window.__state.l1Topic.topic.id==='T-02'",'explicit Topic Enter');
  await exec(win,"document.getElementById('l1-back').click()");await settle(win);
  await check(win,`(()=>{const g=document.querySelector('.l0-graph-wrap');return JSON.stringify(L0Map.getSelection(document.getElementById('main')))===${JSON.stringify(JSON.stringify(frame.selection))}&&g.scrollTop===${frame.top}&&g.scrollLeft===${frame.left}&&document.activeElement.dataset.enterTopic==='T-02'&&document.querySelector('.guide-edge-list').open;})()`,'Back occurrence / disclosure / focus / graph scrolling expected '+JSON.stringify(frame));
  return 'F25 actual orientation, node/edge meaning, heading source, native keys and Topic Back passed';
 }
+async function exerciseReadingPanel(win){
+ win.focus();win.webContents.focus();
+ await exec(win,"document.querySelector('[data-panel-tab-button=topics]').click();document.querySelector('.topic-entry details').open=true;document.querySelector('.topic-entry [data-focus-target]').focus()");await key(win,'Enter');
+ await check(win,"document.activeElement.id==='l0-tab-meaning'&&document.activeElement.checkVisibility()",'hidden Topic member focus moves to visible meaning tab');
+ await exec(win,"document.querySelector('.l0-body').scrollIntoView({block:'start'});document.querySelector('.l0-graph-wrap').scrollTop=85;document.querySelector('.l0-graph-wrap').scrollLeft=40");await settle(win);
+ await exec(win,"document.querySelector('.l0-node').focus()");await settle(win);
+ const before=await exec(win,"({top:document.querySelector('.l0-graph-wrap').scrollTop,left:document.querySelector('.l0-graph-wrap').scrollLeft,main:document.getElementById('main').scrollTop})");
+ await key(win,'Enter');
+ await check(win,`(()=>{const graph=document.querySelector('.l0-graph-wrap'),panel=document.querySelector('.l0-reading-panel'),detail=document.querySelector('#l0-focus-slot .guide-detail'),r=panel.getBoundingClientRect(),d=detail.getBoundingClientRect();return panel.dataset.panelTab==='meaning'&&panel.dataset.panelCollapsed==='false'&&detail.checkVisibility()&&r.top>=0&&r.bottom<=innerHeight&&d.top>=r.top&&d.top<r.bottom&&graph.scrollTop===${before.top}&&graph.scrollLeft===${before.left}&&document.getElementById('main').scrollTop===${before.main}&&document.activeElement.classList.contains('l0-node');})()`,'meaning visible beside graph without scrolling/focus loss');
+ await exec(win,"document.querySelector('#l0-tab-meaning').focus()");await key(win,'Right');
+ await check(win,"document.activeElement.id==='l0-tab-topics'&&document.querySelector('#l0-panel-topics').checkVisibility()&&!document.querySelector('#l0-panel-meaning').checkVisibility()",'native Arrow tab selection');
+ await key(win,'Left');await check(win,"document.activeElement.id==='l0-tab-meaning'&&document.querySelector('#l0-panel-meaning').checkVisibility()",'native Arrow back');
+ await exec(win,"document.querySelector('.guide-edge-list').open=true;document.querySelector('.guide-edge-list [data-edge-index=\"1\"]').click()");
+ await check(win,`document.querySelector('#l0-focus-slot').textContent.includes(window.__state.l0ViewModel.edges[1].explanation.detail)&&document.querySelector('.l0-graph-wrap').scrollTop===${before.top}&&document.querySelector('.l0-graph-wrap').scrollLeft===${before.left}&&document.getElementById('main').scrollTop===${before.main}`,'next connection updates pane without moving graph');
+ await exec(win,"document.querySelector('[data-panel-collapse]').click()");
+ await check(win,"document.querySelector('.l0-reading-panel').dataset.panelCollapsed==='true'&&!document.querySelector('#l0-panel-meaning').checkVisibility()",'panel collapses without losing selection');
+ await exec(win,"document.querySelector('[data-panel-collapse]').click();document.querySelector('#l0-panel-meaning').scrollTop=10");
+ const meaningScroll=await exec(win,"document.querySelector('#l0-panel-meaning').scrollTop");assert.ok(meaningScroll>0,'meaning pane actually scrolled');
+ await exec(win,"document.querySelector('[data-panel-tab-button=topics]').click();document.querySelector('#l0-panel-topics').scrollTop=45;document.querySelector('[data-enter-topic=\"T-02\"]').focus()");
+ const frame=await exec(win,"({panel:L0Map.getPanelState(document.getElementById('main')),scroll:document.querySelector('#l0-panel-topics').scrollTop,selection:L0Map.getSelection(document.getElementById('main'))})");
+ await key(win,'Enter');await exec(win,"document.getElementById('l1-back').click()");await settle(win);
+ await check(win,`JSON.stringify(L0Map.getPanelState(document.getElementById('main')))===${JSON.stringify(JSON.stringify(frame.panel))}&&document.querySelector('#l0-panel-topics').scrollTop===${frame.scroll}&&JSON.stringify(L0Map.getSelection(document.getElementById('main')))===${JSON.stringify(JSON.stringify(frame.selection))}&&document.activeElement.dataset.enterTopic==='T-02'`,'Topic Back restores panel tab, scroll, edge and focus');
+ await exec(win,"document.querySelector('[data-panel-tab-button=meaning]').click()");
+ await check(win,`document.querySelector('#l0-panel-meaning').scrollTop===${meaningScroll}`,'Back preserves inactive meaning pane scroll '+meaningScroll);
+ await exec(win,"window.__readingNavigation.resolve({kind:'element',id:'E-01'})");
+ await exec(win,"document.querySelector('[data-panel-tab-button=topics]').click();document.querySelector('[data-enter-topic=\"T-02\"]').focus()");await key(win,'Enter');await exec(win,"document.getElementById('l1-back').click()");await settle(win);
+ await check(win,"L0Map.getPanelState(document.getElementById('main')).tab==='topics'&&document.getElementById('element-E-01').checkVisibility()&&document.activeElement.dataset.enterTopic==='T-02'",'canonical Element Back cannot overwrite saved panel tab/focus');
+ await exec(win,"document.querySelector('[data-panel-collapse]').click();document.getElementById('btn-explore').focus();document.getElementById('btn-explore').click();document.getElementById('explore-back-reading').click()");await settle(win);
+ await check(win,"L0Map.getPanelState(document.getElementById('main')).tab==='topics'&&L0Map.getPanelState(document.getElementById('main')).collapsed&&document.getElementById('element-E-01').checkVisibility()&&document.activeElement.id==='btn-explore'",'canonical Element Explore Back restores collapsed pane');
+ await exec(win,"document.getElementById('reading-back').click()");await settle(win);
+ return 'F25 fixed reading panel: actual simultaneous meaning/graph, native tabs, collapse and pane Back passed';
+}
 async function runOrientationIntegration(win){
  const parent=path.resolve('workspace/tmp/tests'),prefix=path.join(parent,'f25-orientation-');await fs.mkdir(parent,{recursive:true});
  const root=await fs.mkdtemp(prefix),oldSize=win.getContentSize(),oldZoom=win.webContents.getZoomFactor();
  const record=process.argv.includes('--record-l0-orientation-evidence'),out=path.resolve('docs/log/artifacts/F25-l0-document-orientation');
- const shots=[];
+ const shots=[];const panelRecord=process.argv.includes('--record-l0-panel-evidence');
+ async function panelShot(name){if(!panelRecord)return;await exec(win,"document.querySelector('[data-panel-tab-button=meaning]').click();document.querySelector('.toast')?.remove()");await settle(win);const capture=await win.webContents.capturePage();await fs.writeFile(path.join(out,name),capture.toPNG());}
+
  async function shot(name){await exec(win,"document.querySelector('.toast')?.remove()");await settle(win);const capture=await win.webContents.capturePage(),viewport=await exec(win,'({width:innerWidth,height:innerHeight})');assert.deepEqual(capture.getSize(),viewport);const dimensions=await exec(win,"({scrollY:window.scrollY,mainWidth:document.getElementById('main').clientWidth,contentWidth:document.getElementById('main').scrollWidth,mainBox:document.getElementById('main').getBoundingClientRect().toJSON(),screen:document.getElementById('screen-review').getBoundingClientRect().toJSON()})");assert.equal(dimensions.scrollY,0,'outer page stays in viewport');assert.equal(dimensions.mainWidth,dimensions.contentWidth,'main has no horizontal overflow');assert.equal(dimensions.screen.bottom,viewport.height,'screen fills viewport');if(record){await fs.writeFile(path.join(out,name),capture.toPNG());shots.push({file:name,...viewport});}}
  const inputs={source:path.resolve('samples/context-consumption/source.md'),design:path.resolve('samples/context-consumption/design-review.json'),plan:path.resolve('samples/context-consumption/overview-plan.json'),generated:path.resolve('artifacts/experiments/stage2-full/overview.generated.json'),map:path.resolve('samples/context-consumption/framework-map.reading.json')};
  async function load(file){const result=await exec(win,`window.__state.dirty=false;window.__loadBundle(${JSON.stringify(file)})`);assert.equal(result.ok,true,JSON.stringify(result));await settle(win);}
  try{
   win.webContents.setZoomFactor(1);await size(win,1280,900);
   const fixture=await exportReadingBundle({...inputs,out:path.join(root,'analysis'),analysisId:'f25-test'});
-  await load(fixture.manifestPath);const report=await exerciseOrientation(win);
+  await load(fixture.manifestPath);const panelReport=await exerciseReadingPanel(win);await panelShot('reading-panel-desktop.png');const report=await exerciseOrientation(win);
   await exec(win,"document.querySelector('[data-l0-view=review]').click();document.querySelector('#edge-row-1 .edge-explain').focus()");await key(win,'Space');
   await check(win,"document.querySelector('.l0-root').dataset.view==='review'&&L0Map.getSelection(document.getElementById('main')).edgeIndex===1&&document.querySelector('#edge-row-1 .guide-detail').checkVisibility()&&document.querySelector('#edge-row-1 .guide-detail').textContent===window.__state.l0ViewModel.edges[1].explanation.detail",'Review mode native relation meaning');
   await exec(win,"document.querySelector('#edge-row-1 .guide-sources summary').focus()");await key(win,'Enter');
@@ -60,7 +94,7 @@ async function runOrientationIntegration(win){
   await size(win,640,720);
   await check(win,'innerWidth===640&&innerHeight===720&&document.documentElement.scrollWidth<=innerWidth','actual narrow viewport / no page overflow');
   await exec(win,"document.querySelector('.l0-orientation').scrollIntoView({block:'start'})");await shot('context-narrow.png');
-  await exerciseOrientation(win);
+  await exerciseReadingPanel(win);await panelShot('reading-panel-narrow.png');await exerciseOrientation(win);
   const loaded=await readReadingBundle(fixture.manifestPath),mapFile=loaded.bundle.paths.frameworkMap,sourceFile=loaded.bundle.paths.source,manifest=loaded.bundle.manifest;
   async function mapCase(map){await fs.writeFile(mapFile,JSON.stringify(map));manifest.files.frameworkMap.sha256=sha256(await fs.readFile(mapFile));await fs.writeFile(fixture.manifestPath,JSON.stringify(manifest));}
   const original=JSON.parse(await fs.readFile(mapFile,'utf8'));
@@ -115,7 +149,7 @@ async function runOrientationIntegration(win){
   assert.equal((await exec(win,`loadL0(${JSON.stringify(path.resolve('samples/context-consumption/framework-map.json'))})`)).ok,true);
   await check(win,"window.__state.l0ViewModel.readingGuide.state==='absent'&&document.querySelector('.guide-missing')&&!document.querySelector('[data-guide-source]')",'legacy Map does not carry old guide');
   if(record)await fs.writeFile(path.join(out,'interface-evidence.json'),JSON.stringify({feature:'F25',screenshots:shots,mapSha256:sha256(await fs.readFile(inputs.map)),runbookMapSha256:sha256(await fs.readFile(runbook)),result:report},null,2)+'\n');
-  return report+'; narrow/parallel/long/partial/bad binding/live drift/legacy/independent runbook passed';
+  return report+'; '+panelReport+'; narrow/parallel/long/partial/bad binding/live drift/legacy/independent runbook passed';
  }finally{win.setContentSize(...oldSize);win.webContents.setZoomFactor(oldZoom);assert.ok(path.resolve(root).startsWith(prefix));await fs.rm(root,{recursive:true,force:true});}
 }
-module.exports={exerciseOrientation,runOrientationIntegration};
+module.exports={exerciseOrientation,exerciseReadingPanel,runOrientationIntegration};

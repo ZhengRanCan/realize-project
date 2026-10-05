@@ -8,7 +8,7 @@ function measurePure(name,map){const start=performance.now(),vm=buildL0ViewModel
 const exec=(win,code)=>win.webContents.executeJavaScript(code);
 const pause=()=>new Promise(r=>setTimeout(r,100));
 async function key(win,keyCode,modifiers=[]){const code=keyCode==='Enter'?'Return':keyCode==='Space'?' ':keyCode;win.webContents.sendInputEvent({type:'keyDown',keyCode:code,modifiers});if(keyCode==='Enter'||keyCode==='Space')win.webContents.sendInputEvent({type:'char',keyCode:keyCode==='Enter'?'\r':' ',modifiers});win.webContents.sendInputEvent({type:'keyUp',keyCode:code,modifiers});await pause();}
-async function focus(win,selector){await exec(win,`document.querySelector(${JSON.stringify(selector)}).focus()`);}
+async function focus(win,selector){await exec(win,`(()=>{const node=document.querySelector(${JSON.stringify(selector)});if(node.closest('#l0-panel-topics'))document.querySelector('[data-panel-tab-button=topics]').click();if(node.closest('#l0-panel-meaning'))document.querySelector('[data-panel-tab-button=meaning]').click();node.focus();})()`);}
 async function check(win,code,label){const result=await exec(win,code);if(result!==true)throw new Error('F21 '+label+' '+JSON.stringify(await exec(win,"({width:innerWidth,height:innerHeight,active:document.activeElement.outerHTML.slice(0,300),view:window.__state.view,overflow:document.documentElement.scrollWidth})")));}
 async function exerciseMaturity(win){
  win.focus();win.webContents.focus();

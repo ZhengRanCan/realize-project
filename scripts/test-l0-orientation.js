@@ -19,6 +19,10 @@ for(const name of ['context-consumption','operational-runbook']){
  const vm=buildL0ViewModel(enhanced,{guideContext}),standalone=buildL0ViewModel(enhanced);
  const html=renderL0MapHTML(vm);
  assert.ok(html.includes(vm.readingGuide.orientation.question.summary));
+ assert.ok(html.includes('class="l0-reading-panel"'),'adjacent reading panel');
+ const reading=html.slice(html.indexOf('<section class="l0-reading"'),html.indexOf('</section>',html.indexOf('<section class="l0-reading"')));
+ assert.ok(!reading.includes('guide-edge-list')&&!reading.includes('l0-focus-slot'),'long graph no longer followed by meaning controls');
+ assert.ok(html.indexOf('id="l0-panel-meaning"')<html.indexOf('id="l0-focus-slot"'),'selection meaning belongs to adjacent panel');
  assert.ok(html.includes('data-enter-topic="T-01"'));
  assert.ok(html.includes('data-edge-index="0"'));
  assert.ok(html.includes(vm.readingGuide.elements['E-01'].detail));

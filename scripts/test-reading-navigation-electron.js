@@ -9,7 +9,7 @@ async function exerciseNavigation(win){
   check(t,'Topic entry');const main=document.getElementById('main');
   const graphNode=main.querySelector('.l0-node');graphNode?.click();const selection=L0Map.getSelection(main);check(selection?.kind==='element','fresh Map selection');
   const fold=main.querySelector('.l0-howto');fold.open=true;
-  const trigger=main.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"] [data-enter-topic]');trigger.focus();main.scrollTop=80;
+  main.querySelector('[data-panel-tab-button=topics]').click();const trigger=main.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"] [data-enter-topic]');trigger.focus();main.scrollTop=80;
   const mapScroll=main.scrollTop;trigger.click();check(s.view==='l1','enter L1');
   const blockButton=main.querySelector('[data-l1-block]'),id=blockButton.dataset.l1Block;blockButton.focus();blockButton.click();check(s.readingTopicId===t.topic.id&&s.view==='overview','occurrence Block');
   const inspection=main.querySelector('[data-inspect-block="'+id+'"]');inspection.focus();const blockScroll=main.scrollTop;

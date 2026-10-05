@@ -1306,6 +1306,7 @@ async function runVerifyPreview(filePath) {
         ok(await require('../../scripts/test-l1-boundary-view-electron').exerciseBoundaryView(win));
         if(await win.webContents.executeJavaScript("window.__state.l0ViewModel.readingGuide?.state==='present'")){
           await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
+          ok(await require('../../scripts/test-l0-orientation-electron').exerciseReadingPanel(win));
           ok(await require('../../scripts/test-l0-orientation-electron').exerciseOrientation(win));
         }
       } else {

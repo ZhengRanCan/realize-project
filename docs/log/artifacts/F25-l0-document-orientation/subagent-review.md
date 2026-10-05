@@ -13,3 +13,8 @@ Three UI findings were corrected and rechecked:
 Reviewer final conclusion: no remaining actionable P1/P2 findings. Bounded render repro confirmed all nine runbook relations have explanations/native buttons and all eight standalone Topic buttons are disabled. Source fidelity, namespace isolation, partial/drifted/missing states, parallel occurrence, escaping, session isolation and Preview boundaries had no further actionable findings.
 
 Reviewer did not run Electron or repeat parent regression suites. Parent owns the actual results in [verification summary](verification-summary.md). Actual user understanding remains unaccepted. Late unattended-test stability and write-interception additions were rechecked independently; no actionable P1/P2 findings. Focus targets are visible, scaling/throttling controls only affect unattended checks, writeFile monkey patch restores on success/failure. The interceptor observes exercised fs.promises.writeFile calls; it does not cover every filesystem API or startup operation.
+
+
+## Reading panel refinement — 2026-10-05
+
+Fresh native /root/f25_panel_review 独立检查本轮 diff 与两张真实截图，发现 canonical Back 恢复顺序覆盖面板标签/收起，修正后复查通过；对新增两标签滚动记忆再次复核，无未关闭 P1/P2。没有重复父代理 Electron 或发送私有材料给外部模型。详细范围/结果见 [panel verification](reading-panel-verification.md)。

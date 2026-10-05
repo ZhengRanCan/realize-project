@@ -1480,10 +1480,10 @@ function captureReadingFrame(){
  if(['L2','L3'].includes(address.level))address.blockId=blockId;
  const selected=window.L0Map.getSelection($('#main'));if(selected?.kind==='element')address.elementId=selected.id;
  const context={view:state.view,focusRef:state.focusRef?{...state.focusRef}:null,readingAddress:state.readingAddress?{...state.readingAddress}:null,topicId:state.l1Topic?.topic.id||null,readingTopicId:state.readingTopicId,readingBlockId:state.readingBlockId,
-  l0View:state.l0View,selection:selected,l1Selection:window.L1TopicView.getSelection($('#main')),canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
+  l0View:state.l0View,l0Panel:window.L0Map.getPanelState($('#main')),selection:selected,l1Selection:window.L1TopicView.getSelection($('#main')),canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
   activeBlockId:state.activeBlockId,inspection:state.inspectionSubject?{...state.inspectionSubject}:null,coordinate:state.inspectionCoordinate?{...state.inspectionCoordinate}:null,
   details:[...document.querySelectorAll('#main details,#source-body details')].map(n=>({location:domLocation(n),open:n.open})),
-  focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#main .l1-graph-wrap,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
+  focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#main .l0-panel-scroll,#main .l1-graph-wrap,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
  return {address,context};
 }
 function updateNavigationControls(){
@@ -1531,6 +1531,7 @@ function restoreReadingFrame(frame,isCurrent){
   window.L1TopicView.restoreSelection($('#main'),c.l1Selection);
   // A canonical element is a visible subject, not just the hidden Review card.
   if(c.canonicalElementId)window.L0Map.revealElement($('#main'),c.canonicalElementId);
+  window.L0Map.restorePanelState($('#main'),c.l0Panel);
   for(const detail of c.details){const node=locateDOM(detail.location);if(node?.tagName==='DETAILS')node.open=detail.open;}
   locateDOM(c.focus)?.focus({preventScroll:true});
   const scroll=()=>{if(!isCurrent()||generation!==navigation.generation)return;for(const item of c.scroll){const node=locateDOM(item.location);if(node){node.scrollTop=item.top;node.scrollLeft=item.left;}}window.scrollTo(c.windowScroll.x,c.windowScroll.y);};

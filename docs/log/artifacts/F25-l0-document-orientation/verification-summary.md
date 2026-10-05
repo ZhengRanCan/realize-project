@@ -82,3 +82,8 @@ L0 先展示文章问题和整体解释；节点有短解释，节点/实际关�
 最终 check:docs：156 Markdown /0 broken；verify:harness：24 features /0 errors；node --check：20个变动 JS；git diff --check 通过。6个受保护输入与 f261740 逐字节一致，交付 Map hash 与清单一致且包内没有自动审核文件。F25 blocked 等实际理解，另有测试缓存删除受工具限制；产品无已知实现错误。读者理解相关 acceptance 和 humanReviewRequired 保留。
 
 最终代码再次串行执行 test:all / selftest：通过，SELFTEST PASSED。F25 UUID 测试目录已 finally 清理；旧 L0 预览脚本生成的 workspace/tmp/tests/l0-preview-check 中8个缓存文件，整目录及更窄的逐文件删除均被工具策略拒绝（blocked by policy），未删除、未转移，也未改用其他方式绕过。其他任务缓存和用户资料未扫删。技术检查点本地提交于既有 codex/f11-f21-conformance。
+
+
+## Reading panel refinement — 2026-10-05
+
+用户实际试读认可整体方向，指出长图下方连接解释需要反复滚动；批准把它移至图旁含义/主题面板，小窗口底部可收起。修正结果、真实截图、回归与独立复查见 [reading panel verification](reading-panel-verification.md)。原解释及输入保持字节，预览已重建；仍待用户新版体验与理解验收，不能以短设计批准替代。
