@@ -582,7 +582,12 @@ function closeSource(restoreFocus=false) {
   state.inspectionRequest++;
   $('#source-panel').classList.add('hidden');
   $('#screen-review').classList.remove('with-source');
-  if(restoreFocus)locateDOM(state.sourceReturnFocus)?.focus({preventScroll:true});state.sourceReturnFocus=null;
+  if(restoreFocus){
+    let target=locateDOM(state.sourceReturnFocus);
+    if(target&&!target.getClientRects().length&&target.closest('#l1-selection-detail'))target=$('#l1-detail-toggle');
+    target?.focus({preventScroll:true});
+  }
+  state.sourceReturnFocus=null;
 }
 
 function renderSourcePanel(label) {
@@ -1101,6 +1106,7 @@ function viewL1() {
   canSourceRef:ref=>Boolean(state.sessionToken)&&topic.sourceReferences?.some(r=>r.ref===ref&&r.state==='known'),
   sourceRefReason:ref=>topic.sourceReferences?.find(r=>r.ref===ref)?.reason,
   onSourceRef:ref=>openSource(ref,{namespace:'heading',key:ref.replace(/^§/,'')}),
+  onExplanationSource:source=>openSource(source.key,source),
  });
 }
 
@@ -1480,10 +1486,10 @@ function captureReadingFrame(){
  if(['L2','L3'].includes(address.level))address.blockId=blockId;
  const selected=window.L0Map.getSelection($('#main'));if(selected?.kind==='element')address.elementId=selected.id;
  const context={view:state.view,focusRef:state.focusRef?{...state.focusRef}:null,readingAddress:state.readingAddress?{...state.readingAddress}:null,topicId:state.l1Topic?.topic.id||null,readingTopicId:state.readingTopicId,readingBlockId:state.readingBlockId,
-  l0View:state.l0View,l0Panel:window.L0Map.getPanelState($('#main')),selection:selected,l1Selection:window.L1TopicView.getSelection($('#main')),canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
+  l0View:state.l0View,l0Panel:window.L0Map.getPanelState($('#main')),selection:selected,l1Selection:window.L1TopicView.getSelection($('#main')),l1Detail:window.L1TopicView.getDetailState($('#main')),canonicalElementId:$('#main [data-canonical-element]:not([hidden])')?.dataset.canonicalElement||null,blockExpanded:{...state.blockExpanded},expanded:{...state.expanded},onlyPending:state.onlyPending,focusedDecisionId:state.focusedDecisionId,
   activeBlockId:state.activeBlockId,inspection:state.inspectionSubject?{...state.inspectionSubject}:null,coordinate:state.inspectionCoordinate?{...state.inspectionCoordinate}:null,
   details:[...document.querySelectorAll('#main details,#source-body details')].map(n=>({location:domLocation(n),open:n.open})),
-  focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#main .l0-panel-scroll,#main .l1-graph-wrap,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
+  focus:domLocation(document.activeElement),scroll:[...document.querySelectorAll('#main,#main .l0-graph-wrap,#main .l0-nav,#main .l0-panel-scroll,#main .l1-graph-wrap,#main .l1-detail-body,#source-body')].map(n=>({location:domLocation(n),top:n.scrollTop,left:n.scrollLeft})),windowScroll:{x:window.scrollX,y:window.scrollY},hash:location.hash};
  return {address,context};
 }
 function updateNavigationControls(){
@@ -1505,7 +1511,7 @@ function showReadingAction(action){
  closeInspection(false);
  if(action.type==='topic'){
   const topic=state.l1Topics?.[action.id];if(!topic)return {ok:false,reason:'unknown-topic'};
-  state.l1Topic=topic;state.readingTopicId=action.id;state.readingBlockId=null;state.view='l1';render();$('#l1-back')?.focus({preventScroll:true});return {ok:true};
+  state.l1Topic=topic;state.readingTopicId=action.id;state.readingBlockId=null;state.view='l1';render();$('#main').scrollTop=0;$('#main').scrollLeft=0;$('#l1-back')?.focus({preventScroll:true});return {ok:true};
  }
  if(action.type==='block'||(action.type==='canonical'&&action.address.level==='L2')){
   const id=action.id||action.address.blockId;if(!allBlocks().some(b=>b.id===id))return {ok:false,reason:'unknown-block'};
@@ -1529,6 +1535,7 @@ function restoreReadingFrame(frame,isCurrent){
   if(!isCurrent()||generation!==navigation.generation)return {ok:false,reason:'stale'};
   window.L0Map.restoreSelection($('#main'),c.selection);
   window.L1TopicView.restoreSelection($('#main'),c.l1Selection);
+  window.L1TopicView.restoreDetailState($('#main'),c.l1Detail);
   // A canonical element is a visible subject, not just the hidden Review card.
   if(c.canonicalElementId)window.L0Map.revealElement($('#main'),c.canonicalElementId);
   window.L0Map.restorePanelState($('#main'),c.l0Panel);

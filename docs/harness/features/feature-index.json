@@ -149,7 +149,7 @@
   {
     "id": "F23",
     "title": "L1 Topic Boundary View",
-    "status": "active",
+    "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F23-l1-topic-boundary-view",
     "version": "v0.2"
   },

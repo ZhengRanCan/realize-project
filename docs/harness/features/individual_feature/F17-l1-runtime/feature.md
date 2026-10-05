@@ -6,7 +6,7 @@ status: blocked
 dependsOn: []
 scope: {"code":["app/shared/l1-topic-projection.js","app/renderer/l0-map.js","app/renderer/app.js","app/main/main.js"],"tests":["scripts/test-l0-preview.js","scripts/test-l1-topic-projection.js"],"docs":["docs/specs/reading-view-layer-contracts.md","docs/specs/reading-view-cognitive-contract.md","docs/log/artifacts/F17-l1-runtime/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"2026-10-01","commands":[{"command":"node scripts/test-l1-topic-projection.js","result":"passed","output":"9 assertions passed"},{"command":"npm run selftest","result":"passed","output":"Topic to L1 to Back passed"}],"manualSmoke":"Electron selftest passed."}
-completionGate: {"version":"v0.2","l3":"required","userPath":["有可绘制关系时查看 L1 主题局部/边界图；无关系时查看合法 summary","Topic → L1 → 返回恢复现场，已有投影语义不改变"],"integrationEvidence":["2026-10-01 projection 与 Topic/Back 已通过；这些是技术基线，不证明视觉体验完成"],"knownUnverified":["F23 已补齐图及技术回归；2026-10-04 用户验收未通过，L1 解释不足"],"humanReviewRequired":["F23 实际图完成后由用户确认局部结构与外部连接可理解"]}
+completionGate: {"version":"v0.2","l3":"required","userPath":["有可绘制关系时查看 L1 主题局部/边界图；无关系时查看合法 summary","Topic → L1 → 返回恢复现场，已有投影语义不改变"],"integrationEvidence":["2026-10-01 projection 与 Topic/Back 已通过；这些是技术基线，不证明视觉体验完成"],"knownUnverified":["2026-10-05 F23 v0.2 已补齐解释及技术回归；修正版的实际阅读验收尚未完成"],"humanReviewRequired":["F23 实际图完成后由用户确认局部结构与外部连接可理解"]}
 ---
 
 # F17 L1 Topic Runtime
@@ -86,3 +86,7 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["有可绘制关�
 ## F23 technical recheck — 2026-10-03
 
 局部图、crossing-only、合法 summary 与真实导航/Preview 回归已通过，见 [F23 验证](../../../../log/artifacts/F23-l1-topic-boundary-view/verification-summary.md)。原 identity/membership/边界分类保留。2026-10-04 用户可理解性验收未通过，继续 blocked，不将自动化通过写作人工结论。
+
+## F23 v0.2 technical recheck — 2026-10-05
+
+节点/关系解释与无关系主题定义对照已接入，共享语义及导航回归通过，见 [v0.2 验证](../../../../log/artifacts/F23-l1-topic-boundary-view/explanation-verification.md)。原 identity/membership/边界分类未变。修正版尚待用户试读；F17 继续 blocked，不用设计确认或技术测试替代实际阅读验收。

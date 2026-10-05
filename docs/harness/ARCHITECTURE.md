@@ -108,3 +108,10 @@ F23 首轮由现有 projectTopic 补齐原始显示信息副本，独立 L1 rend
 ## F25 implementation boundary
 
 用户已批准设计和计划。reading-explanation 共用模块拥有 Map 核心指纹、guide 结构/引用/显式来源绑定、逐条出处状态；check-map、bundle validation 和 L0 VM 复用。模块在主进程及构建期运行，renderer 不计算指纹、读文件、补语义或调用模型。F23 后续复用，当前仅 L0 接入。
+
+
+## F23 v0.2 shared explanation consumption
+
+projectTopic 复用 reading-explanation 的投影，显式传当前 bundle 原文字节 hash、registry/integrity；独立 Map 没有来源上下文只作声明。Topic、Inside/Outside 与每个原始 edge occurrence 的解释按本 Map 的身份/索引附加到冻结展示副本。边界分类、membership、Block 三态与 Plan 权威不变，不跨 Map/Plan SU 关联，不新增解释文件或协议。
+
+renderer 只消费 GuideVM，Source 经既有 openSource(namespace,key) 与 session API。Reading frame 扩展 L1 详情展开/滚动现场，复用现有栈；不增加独立导航或源码 I/O。当前开始实施，完成证据另记 F23 artifact。

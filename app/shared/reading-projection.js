@@ -65,7 +65,7 @@ function projectReadingBundle(input) {
       realizedCoverage:!raw?{space:'RealizedCoverage',state:'unavailable'}:!p.covers.length?{space:'RealizedCoverage',state:'not-applicable'}:{space:'RealizedCoverage',state:'available',total:p.covers.length,covered:p.covers.length-missing.length,missing},
       provenanceAssurance:provenance('indeterminate'),fragmentEntries});
   })}));
-  const l1Topics=frameworkMap?Object.fromEntries(frameworkMap.topics.map(t=>[t.id,projectTopic(frameworkMap,t.id,{plan,sourceSections:input.sourceSections,sourceIntegrity:input.reports?.sourceIntegrity})])):null;
+  const l1Topics=frameworkMap?Object.fromEntries(frameworkMap.topics.map(t=>[t.id,projectTopic(frameworkMap,t.id,{plan,sourceSections:input.sourceSections,sourceIntegrity:input.reports?.sourceIntegrity,sourceSha256:input.sourceSha256})])):null;
   return {l2ViewModel:Object.freeze({kind:'L2ViewModel',sections}),l1Topics};
 }
 module.exports = { knowledge, capability, generated, provenance, assertSpace, claimVerificationCapability, projectReadingSubject, projectL2Overview, projectReadingBundle, STAGE_ORDER };

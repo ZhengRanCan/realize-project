@@ -782,3 +782,25 @@ table.matrix .rowhead { background: var(--bg-2); }
 .l1-member-list { display:flex;gap:12px;flex-wrap:wrap; }
 .l1-member-list .l1-node { position:relative;width:236px;min-height:104px;max-width:100%; }
 @media(max-width:1100px) { .l1-workspace { grid-template-columns:minmax(0,1fr); } .l1-graph-wrap { max-height:420px; } }
+
+/* F23 v0.2: definitions and relation meanings use the bound guide snapshot. */
+.l1-explanation-summary { font-weight:600; margin:8px 0; }
+.l1-explanation-text { white-space:pre-wrap; line-height:1.7; overflow-wrap:anywhere; }
+.l1-explanation-missing { font-size:13px; color:var(--fg-dim); }
+.l1-explanation-sources ul { list-style:none; padding:0; }
+.l1-explanation-sources blockquote { margin:8px 0 12px; padding:8px 10px; border-left:3px solid var(--line); white-space:pre-wrap; overflow-wrap:anywhere; }
+.l1-node-meaning { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:12px; line-height:1.45; }
+.l1-relation-label span { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; white-space:normal; line-height:1.4; }
+.l1-member-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
+.l1-summary-card { border:1px solid var(--line); border-radius:10px; padding:12px; background:var(--bg-2); min-width:0; }
+.l1-summary-card > .l1-node { width:100%; min-height:0; height:auto; background:var(--bg); }
+.l1-summary-kind { margin:0 0 8px; font-size:12px; color:var(--fg-dim); }
+.l1-selection-detail { position:sticky; top:12px; max-height:var(--l1-detail-height,60vh); display:flex; flex-direction:column; padding:0; overflow:hidden; background:var(--bg); }
+.l1-detail-head { display:flex; gap:10px; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.l1-detail-head h2 { font-size:14px; margin:0; }
+.l1-detail-body { padding:12px; min-height:0; overflow:auto; }
+.l1-detail-body[hidden] { display:none; }
+@media(max-width:1100px) {
+ .l1-selection-detail { position:fixed; z-index:15; left:12px; right:12px; bottom:12px; top:auto; box-shadow:0 4px 20px #0003; }
+ .l1-topic-view { padding-bottom:100px; }
+}

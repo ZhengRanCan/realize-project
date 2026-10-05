@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-05.
-- Active feature: F23 v0.2 L1 解释修正（active，确认短设计阶段）；F25 passing，F17 仍待 F23 的实际验收，F24 为 not_started。
-- Next queued feature: 先完成 F23 v0.2；用户已澄清“F26”指本项，沿用 F23 编号。F24 仍后置。
+- Active feature: 无；F23 v0.2 已完成解释修正和技术回归，blocked 等待用户试读；F25 passing，F17 仍待 F23 实际验收，F24 为 not_started。
+- Next queued feature: 先验收 F23 v0.2；用户已澄清“F26”指本项，沿用 F23 编号。F24 仍后置。
 - Latest completed feature: `F25` L0 Document Orientation and Explanation（2026-10-05）；图旁阅读面板与本轮唯一反馈修复通过技术回归及独立复查，用户同意本轮收口并继续后续。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 未开始，不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -31,13 +31,13 @@
 | F14 | Adversarial Semantic Tests (B2) | `passing` | 六组隔离对抗断言通过 |
 | F15 | Projection Integration Invariants | `passing` | F19–F21后补真实模块/DOM、Back与Known(0)落点证据，独立审查通过 |
 | F16 | L2 Block Runtime（第一个产品采纳） | `passing` | 仅数据投影接入完成；独立单 Block 展示由 F24 补齐 |
-| F17 | L1 Topic Runtime | `blocked` | 投影/入口已通过；F23 已补齐图及技术回归；用户验收指出解释不足，待修订 |
+| F17 | L1 Topic Runtime | `blocked` | F23 v0.2 已修订解释并通过回归；待用户试读修正版 |
 | F18 | L3 Inspector | `passing` | 资料包 → Map → Topic → Block → 独立的原文与审阅材料核查路径通过 |
 | F19 | Reading Navigation and Resolver | `passing` | 统一导航/定位、真实逐层返回、便携Preview与独立审查通过；Explore组合路径由F20验证 |
 | F20 | Explore v1 | `passing` | 四层切入、实体关系Focus、共享Back/Resolve、portablePreview和独立审查通过 |
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
-| F23 | L1 Topic Boundary View v0.2 | `active` | 复用 F25 解释资料，确认主题导读、节点/关系解释和无边对照的短设计 |
+| F23 | L1 Topic Boundary View v0.2 | `blocked` | 主题导读、节点/连接解释、无边对照、Source/键盘/窄窗口/Preview 及独立复查通过；待实际阅读验收 |
 | F24 | L2 Independent Block Reading View | `not_started` | 已建合同；待 F23 后实现单 Block 独立解释页与组合路径验收 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
 
@@ -394,3 +394,5 @@ F25 收口的清理限制：旧 L0 预览测试的8个缓存文件删除被工�
 2026-10-05 用户确认 F25 目前只有已处理的连接解释位置问题，要求完成后推进 F26。本轮以实际试读意见与唯一反馈闭环收口，未伪造口述/二次试读记录；旧缓存工具限制留作维护事项，不作为未知产品能力。F26 尚未在仓库登记，已询问具体指向；不擅自新建或重编号 F23。
 
 2026-10-05 用户澄清后续“F26”指 L1 解释修正，继续 F23 v0.2；F25 shared GuideVM 及来源规则现已可用，新增 F25 强制前置。当前设计阶段，维持旧技术基线，不冒称修订后 L1 已通过。
+
+F23 v0.2 短设计已获确认：仅扩展冻结 L1 展示副本的解释/原 edgeIndex，Source hash 显式来自 bundle，复用 F25 源规则；共享 Reading frame 仅增加 L1 详情展开/滚动。未改输入、原文/Map/Gold 或 shared 判定口径。

@@ -48,3 +48,28 @@ const known = projectTopic({...map,topics:[{...map.topics[0],blockIds:['O-1']}]}
 assert.equal(known.blockOrganization.state,'known'); assert.deepEqual(known.blockOrganization.ids,['O-1']);
 assert.equal(Object.hasOwn(known,'blockEntries'),false);
 console.log('L1 topic projection/runtime: baseline + boundary display, metadata, states and deep purity passed');
+
+// v0.2: explanation follows this Map's identity and original edge occurrence.
+{
+ const enhanced=require('../samples/context-consumption/framework-map.reading.json');
+ const {buildSourceRegistry,sha256}=require('../app/shared/source-coordinates');
+ const source=fs.readFileSync('samples/context-consumption/source.md'),context={sourceSections:buildSourceRegistry(source.toString('utf8')),sourceIntegrity:'consistent',sourceSha256:sha256(source)};
+ const topic=projectTopic(enhanced,'T-03',context);
+ assert.equal(topic.explanationState,'present');
+ assert.equal(topic.topic.explanation.summary,enhanced.readingGuide.topics.find(t=>t.topicId==='T-03').explanation.summary);
+ assert.deepEqual(topic.relations.map(r=>r.edgeIndex),[1,2]);
+ assert.equal(topic.relations[0].explanation.summary,enhanced.readingGuide.edges.find(e=>e.edgeIndex===1).explanation.summary);
+ for(const e of [...topic.inside,...topic.outside])assert.equal(e.explanation.sourceState,'located');
+ assert.equal(projectTopic(enhanced,'T-01').inside[0].explanation.sourceState,'declared');
+ assert.equal(projectTopic(enhanced,'T-02',{...context,sourceIntegrity:'drifted'}).relations[0].explanation.sourceState,'declared');
+ const partial=structuredClone(enhanced);partial.readingGuide.elements.find(e=>e.elementId==='E-03').explanation.sources.push({namespace:'heading',key:'missing',quote:'missing'});
+ assert.equal(projectTopic(partial,'T-03',context).inside[0].explanation.sourceState,'declared');
+ const wrong=structuredClone(enhanced);wrong.readingGuide.binding.sourceSha256='0'.repeat(64);assert.throws(()=>projectTopic(wrong,'T-03',context),/hash/);
+ const before=JSON.stringify(enhanced);const frozen=projectTopic(enhanced,'T-01',context);assert.ok(Object.isFrozen(frozen.inside[0].explanation.sources));assert.equal(JSON.stringify(enhanced),before);
+}
+
+{
+ const enhanced=structuredClone(require('../samples/context-consumption/framework-map.reading.json'));
+ enhanced.readingGuide.topics=[];enhanced.readingGuide.elements=[];enhanced.readingGuide.edges=[];
+ const partial=projectTopic(enhanced,'T-03');assert.equal(partial.topic.explanation,null);assert.ok([...partial.inside,...partial.outside].every(e=>e.explanation===null));assert.ok(partial.relations.every(e=>e.explanation===null));assert.equal(partial.relations.length,2);
+}

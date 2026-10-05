@@ -2,6 +2,7 @@
 
 const directional = new Set(['consumes', 'produces', 'depends-on', 'contains', 'validates', 'controls', 'constrains', 'transforms-to']);
 const {resolveSourceCoordinate} = require('./source-coordinates');
+const {projectReadingGuide}=require('./reading-explanation');
 // The display projection owns its copies, including optional nested metadata.
 function copyFrozen(value) {
   if (Array.isArray(value)) return Object.freeze(value.map(copyFrozen));
@@ -11,9 +12,10 @@ function copyFrozen(value) {
 function pick(value, keys) {
   return Object.fromEntries(keys.filter(key => Object.prototype.hasOwnProperty.call(value, key)).map(key => [key, value[key]]));
 }
-function projectTopic(map, topicId, {plan,sourceSections,sourceIntegrity}={}) {
+function projectTopic(map, topicId, {plan,sourceSections,sourceIntegrity,sourceSha256}={}) {
   const topic = map.topics.find((item) => item.id === topicId);
   if (!topic) throw new Error(`unknown topic ${topicId}`);
+  const guide=projectReadingGuide(map,{sourceSections,sourceIntegrity,sourceSha256});
   const inside = map.elements.filter((element) => element.topics.includes(topicId));
   const ids = new Set(inside.map((element) => element.id));
   const classify = (edge) => {
@@ -23,7 +25,7 @@ function projectTopic(map, topicId, {plan,sourceSections,sourceIntegrity}={}) {
     if (!directional.has(edge.type)) return 'crossing';
     return toInside ? 'inbound' : 'outbound';
   };
-  const relations = map.edges.map((edge) => ({ edge, role: classify(edge) })).filter(({ role }) => role !== 'external');
+  const relations = map.edges.map((edge,edgeIndex) => ({ edge, edgeIndex, role: classify(edge) })).filter(({ role }) => role !== 'external');
   const relationClasses = { internal: [], inbound: [], outbound: [], crossing: [] };
   relations.forEach(({ edge, role }) => relationClasses[role].push(edge.id));
   const blockOrganization = Object.prototype.hasOwnProperty.call(topic, 'blockIds')
@@ -42,10 +44,11 @@ function projectTopic(map, topicId, {plan,sourceSections,sourceIntegrity}={}) {
   const result = {
     kind: 'L1TopicViewModel',
     document: pick(map.document || {}, ['id', 'title', 'sourcePath', 'role']),
-    topic: pick(topic, ['id', 'title', 'proposition', 'sectionRefs']),
-    inside: inside.map(e => pick(e, elementFields)),
-    outside: map.elements.filter(e => outsideIds.has(e.id)).map(e => pick(e, elementFields)),
-    relations: relations.map(({edge, role}) => ({...pick(edge, ['id', 'from', 'to', 'type', 'label', 'qualifiers', 'note']), role})),
+    topic: {...pick(topic, ['id', 'title', 'proposition', 'sectionRefs']),explanation:guide.topics[topic.id]||null},
+    explanationState:guide.state,
+    inside: inside.map(e => ({...pick(e, elementFields),explanation:guide.elements[e.id]||null})),
+    outside: map.elements.filter(e => outsideIds.has(e.id)).map(e => ({...pick(e, elementFields),explanation:guide.elements[e.id]||null})),
+    relations: relations.map(({edge, edgeIndex, role}) => ({...pick(edge, ['id', 'from', 'to', 'type', 'label', 'qualifiers', 'note']), role,edgeIndex,explanation:guide.edges[edgeIndex]||null})),
     relationClasses, blockOrganization, sourceReferences,
     representation: relations.length ? 'boundary-map' : 'boundary-summary',
   };

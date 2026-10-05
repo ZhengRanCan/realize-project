@@ -1,6 +1,6 @@
 # F23 Implementation Verification
 
-Technical verification date: 2026-10-03. Current acceptance (2026-10-04): not passed; user reports insufficient L0 orientation and L1 explanation. First implementation and independent code review remain valid technical evidence; F23/F17 stay blocked for design revision. F24 has not started.
+Current delivery: 2026-10-05 v0.2 explanation refinement is implemented and technically verified; actual user reading acceptance remains pending. See [v0.2 explanation verification](explanation-verification.md). F23/F17 remain blocked; F24 has not started. The sections below preserve the 2026-10-03 v0.1 technical baseline and the 2026-10-04 failed reading acceptance; they do not claim acceptance of the revised interface.
 
 The user approved the [design](view-design.md) with “可以，做吧” and the [Native implementation plan](drafts/implementation-plan.md) with “看着没问题，实施咯”. These approve implementation, not the resulting interface.
 

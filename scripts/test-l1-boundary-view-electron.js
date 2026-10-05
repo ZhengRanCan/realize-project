@@ -137,10 +137,11 @@ async function runBoundaryIntegration(win){
   await check(win,`!document.querySelector('.l1-heading [data-l1-source]')&&document.querySelector('.l1-heading details').textContent.includes('来源标签重复')&&window.__state.l1Topic.sourceReferences.find(r=>r.ref===${JSON.stringify(headingRef)}).state==='unknown'`,'accepted consistent duplicate heading stays unavailable');
   await assert.rejects(fs.access(path.join(path.dirname(fixture.manifestPath),'human-review.json')));
   if(record)await fs.writeFile(path.join(out,'interface-evidence.json'),JSON.stringify({date:new Date().toISOString(),input:'public context-consumption Gold; schema/check-map-valid test copies',shots,report},null,2)+'\n');
-  return report+'; 640×720, valid public-derived corner cases, no Plan, symmetric public sample, new session and no auto-save passed';
+  const explanations=await require('./test-l1-boundary-view-explanations-electron').runExplanationIntegration(win);
+  return report+'; '+explanations+'; 640×720, valid public-derived corner cases, no Plan, symmetric public sample, new session and no auto-save passed';
  }finally{
   win.webContents.setZoomFactor(oldZoom);win.setContentSize(...oldSize);
   assert.ok(path.resolve(root).startsWith(prefix));await fs.rm(root,{recursive:true,force:true});
  }
 }
-module.exports={runBoundaryIntegration,exerciseBoundaryView};
+module.exports={runBoundaryIntegration,exerciseBoundaryView,verifyGraph};

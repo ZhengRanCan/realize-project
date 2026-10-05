@@ -96,3 +96,22 @@ for(const name of ['context-consumption','operational-runbook','goal-plan-task-s
  for(const topic of sample.topics){const vm=projectTopic(sample,topic.id);if(vm.relations.length)geometry(vm);}
 }
 console.log('L1 boundary view: full identity/edge sets, geometry, deterministic purity, parallel/self/symmetric, escaping and degradation passed');
+
+// Explanations are available before further reading, without invented concept edges.
+{
+ const enhanced=require('../samples/context-consumption/framework-map.reading.json');
+ const vm=projectTopic(enhanced,'T-01'),html=renderTopicHTML(vm);
+ for(const e of vm.inside)assert.ok(html.includes(e.explanation.detail),e.id+' direct definition');
+ assert.ok(html.indexOf(vm.inside[0].explanation.detail)<html.indexOf('class="l1-blocks"'));
+ assert.equal((html.match(/data-l1-node=/g)||[]).length,4);assert.ok(!html.includes('<svg'));
+ assert.ok(html.includes('不能互相替代')||html.includes('不能相互替代'));
+ const graph=projectTopic(enhanced,'T-03');geometry(graph);
+ assert.ok(renderTopicHTML(graph).includes(graph.relations[0].explanation.summary));
+ const injection=structuredClone(enhanced);injection.readingGuide.elements[0].explanation.detail='<img src=x onerror=alert(1)>';
+ assert.ok(!renderTopicHTML(projectTopic(injection,'T-02')).includes('<img src=x onerror='));
+}
+
+for(const name of ['context-consumption','operational-runbook']){
+ const enhanced=require(`../samples/${name}/framework-map.reading.json`);
+ for(const t of enhanced.topics){const vm=projectTopic(enhanced,t.id);if(vm.relations.length)geometry(vm);}
+}
