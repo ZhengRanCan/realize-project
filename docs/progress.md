@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-06.
-- Active feature: 无；Reading第一版已收口。F26/F31–F33及F27–F30均not_started，本轮只做Harness先行的任务拆分与合同迁移。
-- Next step: 交由师弟接手F26：读合同/verification与ref详细接口问答，按已定TypeScript落实接口设计与实施计划；长篇架构讨论仅按需参考。后续顺序F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30，当前未开始runtime代码或模型运行。
+- Active feature: `F26`；Single-Agent Harness Core 正式详细设计与实施计划已形成，等待用户确认后进入代码实施。
+- Next step: 审阅 `F26-single-agent-harness/detailed-design.md` 与 `implementation-plan.md`；确认后按 TypeScript 独立构建边界实现协议、State/Trace、Registry、Runner/fake Provider 与 DeepSeek 离线 adapter。后续顺序 F31 → F32 → F33 → F27 → F28 → F29 → F30。
 - Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
 - Git strategy: 用户要求本轮将全部当前交接提交推送到`origin/codex/f11-f21-conformance`，包括此前未推送的Reading实现与规划文档；不合并main。推送确认以Git远端结果为准。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -40,7 +40,7 @@
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
 | F24 | L2 Independent Block Reading View | `passing` | 两项反馈修正/真实回归/独立复查完成，用户确认第一版基本完成 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
-| F26 | Single-Agent Harness Core v0.4 | `not_started` | 原实验迁F33；Core删除Reading依赖，只执行通用Context/完成Policy，默认no-tool拒绝两次停止；待详细接口设计 |
+| F26 | Single-Agent Harness Core v0.4 | `active` | 正式详细设计与实施计划已写，等待用户确认后开始TypeScript运行时代码；尚无模型run |
 | F27 | AI Configuration v0.2 | `not_started` | 保留编号后移，等待F33；消费Harness Provider接口及实验参数结论 |
 | F28 | Document Analysis Entry v0.2 | `not_started` | 等待F27；输入范围和交接结合F33结论细化 |
 | F29 | End-to-end Analysis v0.3 | `not_started` | 等待Harness/F33及F27/F28；Electron消费现成runtime，不另写loop |
@@ -419,3 +419,4 @@ F25 收口的清理限制：旧 L0 预览测试的8个缓存文件删除被工�
 2026-10-05 用户澄清后续“F26”指 L1 解释修正，继续 F23 v0.2；F25 shared GuideVM 及来源规则现已可用，新增 F25 强制前置。当前设计阶段，维持旧技术基线，不冒称修订后 L1 已通过。
 
 F23 v0.2 短设计已获确认：仅扩展冻结 L1 展示副本的解释/原 edgeIndex，Source hash 显式来自 bundle，复用 F25 源规则；共享 Reading frame 仅增加 L1 详情展开/滚动。未改输入、原文/Map/Gold 或 shared 判定口径。
+
