@@ -1,5 +1,7 @@
 # F24 Registration
 
+Current: 2026-10-06, active design stage. 用户接受 L1 修正版并要求继续 L2；F23/F17 已 passing。现有 Block 投影、表达 renderer 和导航已核对，独立页面短设计待用户确认；产品代码尚未修改。
+
 Date: 2026-10-03. Status: not_started.
 
 用户批准登记 F24，合同与验收标准已建立，产品代码尚未修改。

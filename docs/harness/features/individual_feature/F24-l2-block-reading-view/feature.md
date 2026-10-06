@@ -2,7 +2,7 @@
 id: F24
 title: L2 Independent Block Reading View
 version: v0.1
-status: not_started
+status: active
 dependsOn: ["F23","F16","F18","F19","F20","F21"]
 scope: {"code":["app/shared/reading-projection.js","app/renderer/app.js","app/renderer/reading-navigation.js","app/renderer/index.html","app/renderer/styles.css","app/main/main.js","scripts/build-preview.js","package.json","app/renderer/l2-block-view.*"],"tests":["scripts/test-reading-runtime.js","scripts/test-reading-navigation-electron.js","scripts/test-reading-integration.js","scripts/test-reading-integration-electron.js","scripts/test-explore-electron.js","scripts/test-product-maturity-electron.js","scripts/test-reading-bundle-preview.js","scripts/test-l0-preview.js","scripts/test-l2-block-view*.js"],"docs":["docs/harness/DESIGN.md","docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/specs/reading-view-layer-contracts.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F24-l2-block-reading-view/**","docs/log/artifacts/F24-l2-block-reading-view/**","docs/harness/features/individual_feature/F16-l2-runtime/**","docs/harness/features/individual_feature/F17-l1-runtime/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
@@ -17,7 +17,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["L1 → 关联 Blo
 
 ## Process preconditions
 
-- 用户于 2026-10-03 批准 F23/F24 的拆分；本轮只登记合同，详细页面设计与实施计划在实现前完成。
+- 用户于 2026-10-03 批准 F23/F24 的拆分；登记时只建立合同；2026-10-06 用户要求继续 L2。现有 Block/shape renderer、投影及导航均已存在，本次走 bounded 页面改造，在聊天确认具体短设计后沿用 Native 实施，不另起架构 spec 或计划文档。
 - F23 先完成并验收，随后 F24 组合 L1 → L2 → L3 的阅读体验。
 - F16/F18 的 Plan LEFT JOIN Generated 投影、F19 导航、F20 Explore 和 F21 键盘/窗口回归作为强制基线。
 - 依据主契约 Decision B–F、Layer Contracts §3、shape-catalog 与 harness DESIGN；不把独立页面改动解释为重开 identity/authority 规范。
@@ -64,6 +64,10 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["L1 → 关联 Blo
 
 ## Completion evidence
 
-本任务尚未实施。证据登记在 `docs/log/artifacts/F24-l2-block-reading-view/`。
+本任务于 2026-10-06 开始设计，产品代码尚未修改。证据登记在 `docs/log/artifacts/F24-l2-block-reading-view/`。
 只保留设计、计划、verification-summary、独立审查及必要截图，不保留成功校验 txt。
 F16 的数据接入 passing 不代表本 feature 的界面验收；Reading 整体体验需 F23/F24 和实际人工判断完成。
+
+## Start — 2026-10-06
+
+用户接受 F23 的 L1 修正版并要求推进 L2。F23/F17 已同步收口，F24 为当前唯一 active。已核对现有 renderBlock/content renderers 与 shared navigation：现状是在整篇 Overview 渲染所有 Block 后滚动定位，修正为同一主体/同一表达/同一导航的独立单 Block 视图。短设计尚待确认，不将本次启动视为产品实现或界面验收。
