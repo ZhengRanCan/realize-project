@@ -5,8 +5,8 @@ version: v0.4
 status: active
 dependsOn: []
 scope: {"code":["app/agent/core/*.ts","app/agent/providers/*.ts","app/agent/tools/registry*.ts","app/agent/trace/*.ts","app/agent/index*.ts","package.json","tsconfig.agent*.json","package-lock.json"],"tests":["scripts/test-agent-core*.js","scripts/test-agent-provider*.js","scripts/test-agent-registry*.js","scripts/test-agent-trace*.js","scripts/test-agent-types*.ts"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F26-single-agent-harness/**","docs/log/artifacts/F26-single-agent-harness/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
-evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 单Agent模型/tool/observation循环 → 显式状态和trace → 程序判定终止","未知工具/无效调用/预算耗尽/取消 → 明确失败或取消，不假完成"],"integrationEvidence":[],"knownUnverified":["新增运行时的接口设计与实施计划未批准","通用Provider/宿主Context Policy、预算与停止状态尚未实施；领域图与资料包归F31/F32"],"humanReviewRequired":["用户确认核心接口、可追踪循环与受控终止行为；不以此代替真实AI质量验收"]}
+evidence: {"lastVerifiedAt":"2026-10-06","commands":[{"command":"npm run typecheck:agent","result":"passed"},{"command":"npm run test:agent:clean","result":"passed"},{"command":"node scripts/harness-gate.mjs","result":"passed"},{"command":"npm run test:all（在check:docs前的既有回归及check:docs后的剩余命令分段执行）","result":"passed-with-environment-limit"},{"command":"node scripts/test-reading-bundle-preview.js（沙箱外）","result":"passed"}],"manualSmoke":"CommonJS dist/agent入口由全部JS测试实际加载；fake Provider多轮、no-progress、未知工具、预算、usage未知和取消迟到路径通过。"}
+completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 单Agent模型/tool/observation循环 → 显式状态和trace → 程序判定终止","未知工具/无效调用/预算耗尽/取消 → 明确失败或取消，不假完成"],"integrationEvidence":["scripts/test-agent-core.js","scripts/test-agent-provider.js","scripts/test-agent-registry.js","scripts/test-agent-trace.js"],"knownUnverified":["当前交付目录缺少22个历史workspace预览/分析文件，check:docs因此不能在本目录全绿；新F26文档无断链","独立代码审查尚未完成"],"humanReviewRequired":["用户确认核心接口、可追踪循环与受控终止行为；不以此代替真实AI质量验收"]}
 ---
 
 # F26 Single-Agent Harness Core
@@ -70,6 +70,8 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 
 ## Active implementation — 2026-10-06
 
 用户要求继续推进后，F26 成为唯一 active feature。正式接口以 [detailed-design.md](detailed-design.md) 为准，实施顺序与验证切片见 [implementation-plan.md](implementation-plan.md)。两份文档尚待用户确认；确认前不创建运行时代码或安装 TypeScript 依赖。
+
+用户随后确认继续，TypeScript Core、Runner、State/Trace、ToolRegistry、fake Provider 和 DeepSeek 离线 adapter 已实现。专项 strict typecheck、清洁构建、协议/故障矩阵和旧功能回归已执行；尚待独立审查、历史 workspace 链接环境补齐及用户边界验收，因此保持 active，不提前标记 passing，也不宣称真实文档分析质量已验证。
 
 ## Pre-implementation feedback correction — 2026-10-06
 

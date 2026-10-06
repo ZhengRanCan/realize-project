@@ -115,7 +115,7 @@ RunState 保存 runId、status、step/tool-call/no-progress 计数、budget、us
 
 Host 的 `cancel()` 触发本 run 的 AbortController。取消优先于 provider/tool 的 AbortError；一旦 stopped，termination immutable。优先级固定为：cancel → runtime invariant → provider error → hard budget → completion pass → no progress → continue。
 
-`stepCount` 在发起 provider 请求前递增，`toolCallCount` 在每个工具调用获准开始前递增。拒绝的未知/非法工具仍产生 observation，但不计执行次数；trace 另记 received/rejected。一次 response 含多个调用时依次处理，达到预算后剩余调用不启动并以 budget 终止。
+`stepCount` 在发起 provider 请求前递增，`toolCallCount` 在每个收到并开始处理的工具调用前递增；可恢复拒绝也计入调用预算，避免模型用无效调用绕过上限。trace 另记 received/rejected。一次 response 含多个调用时依次处理，达到预算后剩余调用不启动并以 budget 终止。
 
 ## 6. Loop semantics
 

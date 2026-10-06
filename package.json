@@ -5,6 +5,10 @@
   "description": "AI Design Review MVP - Markdown design document -> structured design-review.json -> Electron Review UI -> human-review.json",
   "main": "app/main/main.js",
   "scripts": {
+    "typecheck:agent": "tsc --project tsconfig.agent.json --noEmit",
+    "build:agent": "tsc --project tsconfig.agent.json",
+    "test:agent": "tsc --project tsconfig.agent.json && node scripts/test-agent-types.js && node scripts/test-agent-registry.js && node scripts/test-agent-provider.js && node scripts/test-agent-trace.js && node scripts/test-agent-core.js",
+    "test:agent:clean": "node scripts/test-agent-clean.js",
     "start": "electron .",
     "selftest": "electron . --selftest",
     "validate": "node scripts/validate-fixture.js",
@@ -48,6 +52,9 @@
     "test:l2-block": "node scripts/test-l2-block-view.js && electron . --selftest-l2-block"
   },
   "devDependencies": {
-    "electron": "^31.7.7"
+    "@types/node": "20.19.43",
+    "electron": "^31.7.7",
+    "typescript": "5.9.3"
   }
 }
+

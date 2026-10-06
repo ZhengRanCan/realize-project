@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-06.
-- Active feature: `F26`；Single-Agent Harness Core 正式详细设计与实施计划已形成，等待用户确认后进入代码实施。
-- Next step: 审阅 `F26-single-agent-harness/detailed-design.md` 与 `implementation-plan.md`；确认后按 TypeScript 独立构建边界实现协议、State/Trace、Registry、Runner/fake Provider 与 DeepSeek 离线 adapter。后续顺序 F31 → F32 → F33 → F27 → F28 → F29 → F30。
+- Active feature: `F26`；Single-Agent Harness Core 的 TypeScript 内核和离线故障矩阵已实现并通过专项验证，尚待独立审查与用户边界验收。
+- Next step: 审查 Runner/Registry/取消与trace边界，完成用户验收后收口F26并激活F31。后续顺序 F31 → F32 → F33 → F27 → F28 → F29 → F30。
 - Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
 - Git strategy: 用户要求本轮将全部当前交接提交推送到`origin/codex/f11-f21-conformance`，包括此前未推送的Reading实现与规划文档；不合并main。推送确认以Git远端结果为准。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -40,7 +40,7 @@
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
 | F24 | L2 Independent Block Reading View | `passing` | 两项反馈修正/真实回归/独立复查完成，用户确认第一版基本完成 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
-| F26 | Single-Agent Harness Core v0.4 | `active` | 正式详细设计与实施计划已写，等待用户确认后开始TypeScript运行时代码；尚无模型run |
+| F26 | Single-Agent Harness Core v0.4 | `active` | TypeScript内核、fake循环、DeepSeek离线adapter和故障矩阵已完成；待独立审查、用户边界验收。无真实模型run |
 | F27 | AI Configuration v0.2 | `not_started` | 保留编号后移，等待F33；消费Harness Provider接口及实验参数结论 |
 | F28 | Document Analysis Entry v0.2 | `not_started` | 等待F27；输入范围和交接结合F33结论细化 |
 | F29 | End-to-end Analysis v0.3 | `not_started` | 等待Harness/F33及F27/F28；Electron消费现成runtime，不另写loop |
