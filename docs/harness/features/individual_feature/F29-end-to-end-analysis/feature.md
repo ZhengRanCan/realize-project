@@ -1,12 +1,12 @@
 ---
 id: F29
 title: End-to-end Analysis
-version: v0.2
+version: v0.3
 status: not_started
 dependsOn: ["F32","F33","F27","F28","F18","F23","F24","F25"]
-scope: {"code":["app/main/analysis-*.js","app/shared/analysis-*.js","app/renderer/analysis-*.js","app/main/main.js","app/main/preload.js","app/main/reading-bundle.js","app/main/reading-session.js","app/renderer/app.js","app/renderer/index.html","app/renderer/styles.css","scripts/helpers/analysis-*.js","package.json","app/agent/index*.js"],"tests":["scripts/test-analysis-*.js","scripts/test-reading-session.js","scripts/test-reading-bundle*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/harness/DESIGN.md","docs/harness/INITIALIZATION_CONTRACT.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F29-end-to-end-analysis/**","docs/log/artifacts/F29-end-to-end-analysis/**","docs/progress.md","workspace/README.md","prompts/README.md"]}
+scope: {"code":["app/main/analysis-*.js","app/shared/analysis-*.js","app/renderer/analysis-*.js","app/main/main.js","app/main/preload.js","app/main/reading-bundle.js","app/main/reading-session.js","app/renderer/app.js","app/renderer/index.html","app/renderer/styles.css","scripts/helpers/analysis-*.js","package.json","app/agent/index*.ts"],"tests":["scripts/test-analysis-*.js","scripts/test-reading-session.js","scripts/test-reading-bundle*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/harness/DESIGN.md","docs/harness/INITIALIZATION_CONTRACT.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F29-end-to-end-analysis/**","docs/log/artifacts/F29-end-to-end-analysis/**","docs/progress.md","workspace/README.md","prompts/README.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.2","l3":"required","userPath":["确认模型/文档 → 开始分析 → 阶段状态 → 校验/装配 → 打开当次完整L0/L1/L2 → 原文核查","失败/取消/部分完成/过期回复 → 诚实状态且保留旧结果与人工审核"],"integrationEvidence":[],"knownUnverified":["Harness及F33生成质量/失败处理尚待实现验证","任务接口/存储/取消/有限重试设计及完整产品链路尚未实施"],"humanReviewRequired":["用户使用自己的文档完整分析并接受实际结果和失败处理体验"]}
+completionGate: {"version":"v0.3","l3":"required","userPath":["确认模型/文档 → 开始分析 → 阶段状态 → 校验/装配 → 打开当次完整L0/L1/L2 → 原文核查","失败/取消/部分完成/过期回复 → 诚实状态且保留旧结果与人工审核"],"integrationEvidence":[],"knownUnverified":["Harness及F33生成质量/失败处理尚待实现验证","任务接口/存储/取消/有限重试设计及完整产品链路尚未实施"],"humanReviewRequired":["用户使用自己的文档完整分析并接受实际结果和失败处理体验"]}
 ---
 
 # F29 End-to-end Analysis
@@ -24,6 +24,8 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["确认模型/文�
 ## Scope
 
 ### Allowed changes
+
+- Electron旧模块保持JavaScript，消费TypeScript runtime的CommonJS编译公共入口；启动/测试/打包具备构建依赖，不直接加载.ts或依赖旧dist。
 
 - 把F26/F31/F32已验证runtime接为产品任务；原文、坐标、Review、Map/解释、Plan、逐 Block 表达、装配及资料包配对完整衔接。
 - 主进程负责请求、凭据、文件和校验，renderer 只发动作并呈现最小任务状态；调用现成runtime，最小产品适配，不在Electron另写生成loop/领域校验；内核/工具修正返回对应feature并更新scope。

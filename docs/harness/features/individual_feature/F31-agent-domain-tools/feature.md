@@ -1,12 +1,12 @@
 ---
 id: F31
 title: Agent Domain Workspace and Tools
-version: v0.3
+version: v0.4
 status: not_started
 dependsOn: ["F26"]
-scope: {"code":["app/agent/tools/source*.js","app/agent/tools/contract*.js","app/agent/tools/artifact*.js","app/agent/tools/validation*.js","app/agent/tools/domain*.js","scripts/check-map.js","scripts/check-plan.js","scripts/check-block.js","scripts/check-overview.js","prompts/agent-system*.md","package.json","app/agent/domain/*.js"],"tests":["scripts/test-agent-domain*.js","scripts/test-agent-artifact*.js","scripts/test-check-map.js","scripts/test-check-plan.js","scripts/test-check-block.js","scripts/test-semantic-grounding.js","scripts/test-agent-bootstrap*.js","scripts/test-agent-dependencies*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F31-agent-domain-tools/**","docs/log/artifacts/F31-agent-domain-tools/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
+scope: {"code":["app/agent/tools/source*.ts","app/agent/tools/contract*.ts","app/agent/tools/artifact*.ts","app/agent/tools/validation*.ts","app/agent/tools/domain*.ts","scripts/check-map.js","scripts/check-plan.js","scripts/check-block.js","scripts/check-overview.js","prompts/agent-system*.md","package.json","app/agent/domain/*.ts"],"tests":["scripts/test-agent-domain*.js","scripts/test-agent-artifact*.js","scripts/test-check-map.js","scripts/test-check-plan.js","scripts/test-check-block.js","scripts/test-semantic-grounding.js","scripts/test-agent-bootstrap*.js","scripts/test-agent-dependencies*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F31-agent-domain-tools/**","docs/log/artifacts/F31-agent-domain-tools/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.3","l3":"required","userPath":["Host prepare_run_input → 原字节/hash/确定性coordinates/run workspace → Agent starts","Agent调用受控Source/Contract/Artifact工具 → 当前run产物 → 既有validator结果","不允许的读取/写入/引用/参数 → 明确拒绝且不改旧文件"],"integrationEvidence":[],"knownUnverified":["工具签名、Host bootstrap、artifact生命周期/直接依赖/工作目录已有草案，实施接口/计划未确认","Review生产及领域Context Policy、版本/证明账本尚未实施"],"humanReviewRequired":["用户确认领域工具足以生产现有资料包必需数据且权限边界清楚"]}
+completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_input → 原字节/hash/确定性coordinates/run workspace → Agent starts","Agent调用受控Source/Contract/Artifact工具 → 当前run产物 → 既有validator结果","不允许的读取/写入/引用/参数 → 明确拒绝且不改旧文件"],"integrationEvidence":[],"knownUnverified":["工具签名、Host bootstrap、artifact生命周期/直接依赖/工作目录已有草案，实施接口/计划未确认","Review生产及领域Context Policy、版本/证明账本尚未实施"],"humanReviewRequired":["用户确认领域工具足以生产现有资料包必需数据且权限边界清楚"]}
 ---
 
 # F31 Agent Domain Workspace and Tools
@@ -24,6 +24,8 @@ completionGate: {"version":"v0.3","l3":"required","userPath":["Host prepare_run_
 ## Scope
 
 ### Allowed changes
+
+- 新增app/agent源代码采用TypeScript，独立strict类型检查/编译；旧Electron、shared与scripts维持JavaScript。实现消费编译公共入口，JSON/工具数据仍走运行时校验。
 
 - 唯一拥有canonical prompts/agent-system*.md的领域语义；F32只读，F33新建版本化实验变体，不覆盖canonical。
 
@@ -77,3 +79,7 @@ completionGate: {"version":"v0.3","l3":"required","userPath":["Host prepare_run_
 ## Ownership cleanup — 2026-10-06
 
 第二轮反馈认可feature分层。本轮收紧legacy/canonical prompt写权限，补齐Context非固定workflow、graph-driven失效及独立QualityEvaluation绑定验收；仍not_started，未运行模型或实现代码。
+
+## TypeScript boundary — 2026-10-06
+
+用户明确选择新app/agent采用TypeScript，旧Electron模块不迁移。仅更新语言/构建与interop合同，实际tsconfig、开发依赖、源代码和命令在实施时建立；当前仍not_started。

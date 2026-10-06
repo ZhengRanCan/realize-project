@@ -1,12 +1,12 @@
 ---
 id: F26
 title: Single-Agent Harness Core
-version: v0.3
+version: v0.4
 status: not_started
 dependsOn: []
-scope: {"code":["app/agent/core/*.js","app/agent/providers/*.js","app/agent/tools/registry*.js","app/agent/trace/*.js","app/agent/index*.js","package.json"],"tests":["scripts/test-agent-core*.js","scripts/test-agent-provider*.js","scripts/test-agent-registry*.js","scripts/test-agent-trace*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F26-single-agent-harness/**","docs/log/artifacts/F26-single-agent-harness/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
+scope: {"code":["app/agent/core/*.ts","app/agent/providers/*.ts","app/agent/tools/registry*.ts","app/agent/trace/*.ts","app/agent/index*.ts","package.json","tsconfig.agent*.json","package-lock.json"],"tests":["scripts/test-agent-core*.js","scripts/test-agent-provider*.js","scripts/test-agent-registry*.js","scripts/test-agent-trace*.js","scripts/test-agent-types*.ts"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F26-single-agent-harness/**","docs/log/artifacts/F26-single-agent-harness/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.3","l3":"required","userPath":["受控输入 → 单Agent模型/tool/observation循环 → 显式状态和trace → 程序判定终止","未知工具/无效调用/预算耗尽/取消 → 明确失败或取消，不假完成"],"integrationEvidence":[],"knownUnverified":["新增运行时的接口设计与实施计划未批准","通用Provider/宿主Context Policy、预算与停止状态尚未实施；领域图与资料包归F31/F32"],"humanReviewRequired":["用户确认核心接口、可追踪循环与受控终止行为；不以此代替真实AI质量验收"]}
+completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 单Agent模型/tool/observation循环 → 显式状态和trace → 程序判定终止","未知工具/无效调用/预算耗尽/取消 → 明确失败或取消，不假完成"],"integrationEvidence":[],"knownUnverified":["新增运行时的接口设计与实施计划未批准","通用Provider/宿主Context Policy、预算与停止状态尚未实施；领域图与资料包归F31/F32"],"humanReviewRequired":["用户确认核心接口、可追踪循环与受控终止行为；不以此代替真实AI质量验收"]}
 ---
 
 # F26 Single-Agent Harness Core
@@ -28,6 +28,8 @@ completionGate: {"version":"v0.3","l3":"required","userPath":["受控输入 → 
 
 ### Allowed changes
 
+- 新增app/agent源代码采用TypeScript，独立strict类型检查/编译；旧Electron、shared与scripts维持JavaScript。实现消费编译公共入口，JSON/工具数据仍走运行时校验。
+
 - Agent Definition / Runner、ProviderAdapter、Context、通用RunState、ToolRegistry 和基础 TraceRecorder；按职责形成少量模块，不搬入大型框架目录。
 - 首个 DeepSeek adapter 与离线 fake Provider；统一 response/tool call/usage/error 格式，Runner 不依赖厂商协议。
 - 工具名称/参数/权限校验、调用 ID 与 observation 对应；第一版写操作串行，有限循环与明确终止原因。
@@ -44,6 +46,9 @@ completionGate: {"version":"v0.3","l3":"required","userPath":["受控输入 → 
 - Electron 配置/文件入口/进度 UI、Reading 扩展、迁移 Gold 或历史实验。
 
 ## Acceptance Criteria
+
+- [ ] 通用协议以TypeScript定义，独立strict检查与清洁构建通过；旧JS消费者实际加载CommonJS编译入口，不直接require .ts，不依赖残留dist。
+- [ ] 外部model/tool/file输入为unknown，经运行时验证后归一化；不以类型断言/any绕过Schema或权限，旧模块不发生全仓语言迁移。
 
 - [ ] Agent、Runner、Provider、Context、State、Registry、Trace 接口和职责明确；CLI/未来 Electron 可复用同一运行时。
 - [ ] fake Provider 驱动真实循环，覆盖多轮工具 observation、普通文本无工具、拒绝未知工具/错误参数及错误返回；调用 ID 正确且无悬空结果。
@@ -65,3 +70,7 @@ completionGate: {"version":"v0.3","l3":"required","userPath":["受控输入 → 
 ## Pre-implementation feedback correction — 2026-10-06
 
 按用户粘贴的反馈删除Reading依赖与阶段Context规则；默认无工具退出语义、通用停止状态和宿主不透明领域状态已写入设计草案。仅修订合同，仍not_started；不将登记检查当Core完成证据。
+
+## TypeScript boundary — 2026-10-06
+
+用户明确选择新app/agent采用TypeScript，旧Electron模块不迁移。仅更新语言/构建与interop合同，实际tsconfig、开发依赖、源代码和命令在实施时建立；当前仍not_started。

@@ -4,6 +4,7 @@
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |
+| TypeScript | Agent独立strict typecheck/build（实施计划登记命令） | yes | 新TS源代码/协议，不迁移旧JS；消费真实编译产物 |
 | Static | 修改 JS 的node --check；git diff --check | yes | 实施后登记 |
 | Completion | 当前版本/依赖闭包/缺项及伪完成测试，计划登记确切命令 | yes | 上游修改后旧证明失效 |
 | Integration | 受控Provider → 真实Runner/工具/validator/assemble/export/verify | yes | 完整包与失败轨迹，不stub领域实现 |

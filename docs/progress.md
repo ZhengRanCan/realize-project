@@ -4,7 +4,7 @@
 
 - Date: 2026-10-06.
 - Active feature: 无；Reading第一版已收口。F26/F31–F33及F27–F30均not_started，本轮只做Harness先行的任务拆分与合同迁移。
-- Next step: 先确认F26最小Harness的书面接口设计与实施计划，再按F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30推进；当前不开始代码或模型运行。
+- Next step: 新app/agent已选TypeScript，旧Electron模块保留JavaScript；先确认F26类型协议、独立编译/JS interop的书面接口设计与实施计划，再按F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30推进；当前不开始代码或模型运行。
 - Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前首版已确认，本轮不操作 main 合并。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 技术交付作为本地检查点保留，未推送、不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -40,13 +40,13 @@
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
 | F24 | L2 Independent Block Reading View | `passing` | 两项反馈修正/真实回归/独立复查完成，用户确认第一版基本完成 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
-| F26 | Single-Agent Harness Core v0.3 | `not_started` | 原实验迁F33；Core删除Reading依赖，只执行通用Context/完成Policy，默认no-tool拒绝两次停止；待详细接口设计 |
+| F26 | Single-Agent Harness Core v0.4 | `not_started` | 原实验迁F33；Core删除Reading依赖，只执行通用Context/完成Policy，默认no-tool拒绝两次停止；待详细接口设计 |
 | F27 | AI Configuration v0.2 | `not_started` | 保留编号后移，等待F33；消费Harness Provider接口及实验参数结论 |
 | F28 | Document Analysis Entry v0.2 | `not_started` | 等待F27；输入范围和交接结合F33结论细化 |
-| F29 | End-to-end Analysis v0.2 | `not_started` | 等待Harness/F33及F27/F28；Electron消费现成runtime，不另写loop |
+| F29 | End-to-end Analysis v0.3 | `not_started` | 等待Harness/F33及F27/F28；Electron消费现成runtime，不另写loop |
 | F30 | Analysis Entry UI Refinement | `not_started` | 等待F29实际入口链路与截图 |
-| F31 | Agent Domain Workspace and Tools v0.3 | `not_started` | 等待F26；Host bootstrap/确定性坐标、领域workspace/Context、生命周期/直接依赖与工具 |
-| F32 | Agent Completion Gate and Bundle Integration v0.3 | `not_started` | 等待F31；精确proof closure、结构/质量状态分离及bundle集成 |
+| F31 | Agent Domain Workspace and Tools v0.4 | `not_started` | 等待F26；Host bootstrap/确定性坐标、领域workspace/Context、生命周期/直接依赖与工具 |
+| F32 | Agent Completion Gate and Bundle Integration v0.4 | `not_started` | 等待F31；精确proof closure、结构/质量状态分离及bundle集成 |
 | F33 | AI Integration Experiment v0.3 | `not_started` | 从原F26迁移，等待F32；scope仅driver/eval/agent模板，trajectory与真实DeepSeek行为评价 |
 
 ### 阶段划分（2026-09-29 登记）

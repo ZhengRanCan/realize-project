@@ -172,7 +172,7 @@
     "title": "Single-Agent Harness Core",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F26-single-agent-harness",
-    "version": "v0.3"
+    "version": "v0.4"
   },
   {
     "id": "F27",
@@ -193,7 +193,7 @@
     "title": "End-to-end Analysis",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F29-end-to-end-analysis",
-    "version": "v0.2"
+    "version": "v0.3"
   },
   {
     "id": "F30",
@@ -207,14 +207,14 @@
     "title": "Agent Domain Workspace and Tools",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F31-agent-domain-tools",
-    "version": "v0.3"
+    "version": "v0.4"
   },
   {
     "id": "F32",
     "title": "Agent Completion Gate and Bundle Integration",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F32-agent-completion-integration",
-    "version": "v0.3"
+    "version": "v0.4"
   },
   {
     "id": "F33",

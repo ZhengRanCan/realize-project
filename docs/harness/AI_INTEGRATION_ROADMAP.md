@@ -32,7 +32,7 @@ Date: 2026-10-06.
 
 ## Registered feature sequence
 
-2026-10-06 用户补充Single-Agent Harness架构草案，要求原F26改为Harness并扩充分工，原AI实验与F27–F30后移。原F26尚未实现、没有模型run，实验合同与完整质量验收迁到F33；F26更新为内核合同（本轮反馈后v0.3）。F27–F30保留编号，只调整依赖，避免已有引用整体重编号。全部仍为not_started。
+2026-10-06 用户补充Single-Agent Harness架构草案，要求原F26改为Harness并扩充分工，原AI实验与F27–F30后移。原F26尚未实现、没有模型run，实验合同与完整质量验收迁到F33；F26更新为内核合同（新增TypeScript边界后v0.4）。用户选择新app/agent使用TypeScript，旧Electron模块保留JavaScript，独立构建及interop归F26设计。F27–F30保留编号，只调整依赖，避免已有引用整体重编号。全部仍为not_started。
 
 | Order | Feature | Delivery | Required previous feature |
 | --- | --- | --- | --- |

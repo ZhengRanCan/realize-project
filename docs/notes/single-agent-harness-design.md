@@ -20,6 +20,16 @@ Date: 2026-10-06. Status: task-design draft, not implemented.
 
 当前按推荐方向登记合同。是否引入具体依赖、最终目录与精确接口，属于书面实现设计待确认事项，不由材料中的命令或本轮登记自动批准。
 
+## Language and build boundary — user choice
+
+2026-10-06 用户选择：新增app/agent使用TypeScript，Electron其余旧模块暂不迁移。F26接口设计首先定义AgentRequest、AgentResponse、ToolCall、RunState、AgentError、Context Policy和CompletionDecision等通用协议类型；领域协议仍归F31/F32，不进入Core。
+
+类型检查限定在app/agent及对应新增类型测试，启用strict。旧app/main、preload、renderer、shared和scripts保留JavaScript，不启用全仓allowJs/checkJs迁移。模型/工具/文件输入在边界仍当unknown，经运行时校验后使用；TypeScript声明或类型断言不能代替Schema、validator或权限判定，也不以any吞掉协议边界。
+
+F26实施时提供独立tsconfig.agent构建配置和固定的开发依赖版本。为兼容当前CommonJS旧入口，Agent源代码先编译成CommonJS JavaScript，建议产物在dist/agent，公共入口为dist/agent/index.js；旧CLI/Electron main消费编译入口，不直接require TypeScript源文件。构建目录沿用已有dist忽略规则；不手改生成JavaScript，不把依赖安装或构建已完成作为本轮结论。
+
+未来实施计划需登记并接通Agent独立typecheck/build命令、JS旧消费者的最小typed adapter/声明、清洁构建及启动/测试前构建依赖。新增类型协议测试检查非法组合，离线行为测试消费真实编译产物；打包/部署需包含产物，不能依赖本机残留dist或开发期loader。编译target/module resolution与Node类型版本在F26详细设计对照实际Node/Electron运行时确定，不扩大到旧模块迁移。
+
 ## Minimal boundaries
 
 建议代码位置为独立于 Electron 的 `app/agent/`；消费方可为 CLI 与未来 main。只在实施对应职责时建立文件，不一次性生成模板的所有目录。
@@ -198,8 +208,8 @@ F26–F32负责离线故障矩阵。F33的离线测试只测driver、指标汇�
 
 | Feature | Delivery | Does not prove |
 | --- | --- | --- |
-| F26 Single-Agent Harness Core v0.3 | 可替换Provider的单Agent loop、State/Context/Registry、预算/取消和基础trace | 完整文档已生成 |
-| F31 Agent Domain Workspace and Tools v0.3 | 真实受控Source/Contract/Artifact/validator能力，含Review与Guide路径 | 模型生成质量 |
+| F26 Single-Agent Harness Core v0.4 | 可替换Provider的单Agent loop、State/Context/Registry、预算/取消和基础trace | 完整文档已生成 |
+| F31 Agent Domain Workspace and Tools v0.4 | 真实受控Source/Contract/Artifact/validator能力，含Review与Guide路径 | 模型生成质量 |
 | F32 Completion Gate and Bundle Integration | 当前版本门禁、真实工具/装配/导出/Renderer的离线集成 | 真实模型能独立产出高质量内容 |
 | F33 AI Integration Experiment | 原F26的真实DeepSeek生成/重复/质量/失败实验，消费同一runtime | 所有模型/文档均稳定 |
 | F27 → F28 → F29 → F30 | 配置、选文档、调用现成runtime及入口UI | Harness需在UI里另写一套 |

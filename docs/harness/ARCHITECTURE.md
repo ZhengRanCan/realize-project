@@ -8,6 +8,8 @@
 
 ## Module boundaries
 
+用户于2026-10-06确认新app/agent使用TypeScript，旧Electron/renderer/shared/scripts保留JavaScript。Agent独立strict类型检查与编译，旧CommonJS入口消费dist/agent的生成公共入口；外部JSON/tool/IPC仍通过运行时校验，类型声明不替代既有规则。具体构建/interop配置归F26实施设计，本轮没有安装编译器或迁移旧模块。
+
 F18 的加载协议见 `docs/specs/reading-bundle-contract.md`。main 读取资料包并注入显式校验上下文，
 shared 只投影已验证的数据；两阶段 prepare/commit 保证加载失败、取消或过期回复不切换 session。
 Plan / Generated / Map 保留各自 identity；来源 registry 随资料包绑定。离线导出复用校验链，保留输入原始字节。

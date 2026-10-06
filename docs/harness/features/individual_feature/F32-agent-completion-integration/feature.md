@@ -1,12 +1,12 @@
 ---
 id: F32
 title: Agent Completion Gate and Bundle Integration
-version: v0.3
+version: v0.4
 status: not_started
 dependsOn: ["F31","F18","F23","F24","F25"]
-scope: {"code":["app/agent/tools/assembly*.js","app/agent/tools/bundle*.js","app/agent/trace/*.js","app/agent/index*.js","scripts/assemble-overview.js","scripts/export-reading-bundle.js","scripts/agent-run*.js","package.json","app/agent/domain/completion*.js","app/agent/domain/dependencies*.js"],"tests":["scripts/test-agent-completion*.js","scripts/test-agent-integration*.js","scripts/test-reading-bundle*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F32-agent-completion-integration/**","docs/log/artifacts/F32-agent-completion-integration/**","docs/progress.md","workspace/README.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
+scope: {"code":["app/agent/tools/assembly*.ts","app/agent/tools/bundle*.ts","app/agent/trace/*.ts","app/agent/index*.ts","scripts/assemble-overview.js","scripts/export-reading-bundle.js","scripts/agent-run*.js","package.json","app/agent/domain/completion*.ts","app/agent/domain/dependencies*.ts"],"tests":["scripts/test-agent-completion*.js","scripts/test-agent-integration*.js","scripts/test-reading-bundle*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F32-agent-completion-integration/**","docs/log/artifacts/F32-agent-completion-integration/**","docs/progress.md","workspace/README.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.3","l3":"required","userPath":["离线受控模型驱动真实内核/工具/校验 → 装配 → verify_bundle → 现有L0/L1/L2","伪完成/上游变更/缺Block/取消 → 不完成、不发布旧校验对应的新包"],"integrationEvidence":[],"knownUnverified":["直接依赖/当前校验闭包与结构/质量状态已有设计草案，接口和实施计划尚未确认","真实模型生成质量独立归F33；结构交付默认为quality_status=unreviewed"],"humanReviewRequired":["用户确认程序完成标准、轨迹和原Renderer结果交接；不把结构完成称为语义理解通过"]}
+completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模型驱动真实内核/工具/校验 → 装配 → verify_bundle → 现有L0/L1/L2","伪完成/上游变更/缺Block/取消 → 不完成、不发布旧校验对应的新包"],"integrationEvidence":[],"knownUnverified":["直接依赖/当前校验闭包与结构/质量状态已有设计草案，接口和实施计划尚未确认","真实模型生成质量独立归F33；结构交付默认为quality_status=unreviewed"],"humanReviewRequired":["用户确认程序完成标准、轨迹和原Renderer结果交接；不把结构完成称为语义理解通过"]}
 ---
 
 # F32 Agent Completion Gate and Bundle Integration
@@ -24,6 +24,8 @@ completionGate: {"version":"v0.3","l3":"required","userPath":["离线受控模�
 ## Scope
 
 ### Allowed changes
+
+- 新增app/agent源代码采用TypeScript，独立strict类型检查/编译；旧Electron、shared与scripts维持JavaScript。实现消费编译公共入口，JSON/工具数据仍走运行时校验。
 
 - 只读取canonical领域prompt，完成保证来自宿主代码；向Agent返回具体当前缺项/证明失败，prompt文字不构成PASS依据。
 
@@ -75,3 +77,7 @@ completionGate: {"version":"v0.3","l3":"required","userPath":["离线受控模�
 ## Ownership cleanup — 2026-10-06
 
 第二轮反馈认可feature分层。本轮收紧legacy/canonical prompt写权限，补齐Context非固定workflow、graph-driven失效及独立QualityEvaluation绑定验收；仍not_started，未运行模型或实现代码。
+
+## TypeScript boundary — 2026-10-06
+
+用户明确选择新app/agent采用TypeScript，旧Electron模块不迁移。仅更新语言/构建与interop合同，实际tsconfig、开发依赖、源代码和命令在实施时建立；当前仍not_started。

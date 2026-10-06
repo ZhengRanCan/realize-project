@@ -4,6 +4,7 @@
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |
+| TypeScript | Agent独立strict typecheck/build（实施计划登记命令） | yes | 新TS源代码/协议，不迁移旧JS；消费真实编译产物 |
 | Static | 修改 JS 的 node --check；git diff --check | yes | 实施后登记 |
 | Tools | source/contract/artifact/validation 工具测试，计划登记确切命令 | yes | 实际文件/对象与校验结果 |
 | Bootstrap | Host prepare_run_input与现有registry重建/导出一致性 | yes | 原字节、坐标/hash与run布局；非Agent Tool |
