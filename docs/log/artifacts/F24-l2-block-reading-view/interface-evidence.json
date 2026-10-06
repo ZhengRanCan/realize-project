@@ -1,39 +1,51 @@
 {
   "date": "2026-10-06",
-  "baseline": "91c25a8",
+  "baseline": "4beeaae",
   "capture": "real Electron capturePage, CSS viewport equals PNG dimensions asserted",
   "input": "public context-consumption enhanced Map + Gold Plan/Generated; validated temporary test copies under owned workspace/tmp/tests UUID",
-  "humanAcceptance": "pending",
+  "humanAcceptance": "actual user feedback fixed; repeat reading acceptance pending",
   "files": [
     {
       "file": "l1-related-desktop.png",
       "width": 1280,
       "height": 900,
-      "sha256": "07aa90229f06d7ff1cdc8282c1bce50200f08d2ef90e984c02ace3f2f4b235b5"
+      "sha256": "0a49f68c2a18c1de18ae18e77233d6811c1f9c900bea6aa70f7e19d4b5f49a43"
     },
     {
       "file": "l1-related-narrow.png",
       "width": 640,
       "height": 720,
-      "sha256": "b514846764d3747ff900df0c15afc61119c28f333e789c62e9abfdaf2f400e3b"
+      "sha256": "99720325f0c571f5a60a494de71a18708c587834951226a3c720f93d0d3e8be1"
     },
     {
       "file": "l2-flow-desktop.png",
       "width": 1280,
       "height": 900,
-      "sha256": "8f3602d044e8083792ab6d7f78ca1ec14a92f419f9573bd108de40498d057242"
+      "sha256": "1b35ca97fcdc2e74cebd71882d033fd5d9de24d9d40e2afc63a4b6fb98a12718"
     },
     {
       "file": "l2-contrast-desktop.png",
       "width": 1280,
       "height": 900,
-      "sha256": "d798feefc68051f78845a1b9f958b7246c783fd4ce4bedbdad9c48a9d7de6ef4"
+      "sha256": "6de37b56de63c842ba44cb6bbb373b5a9436746c12012f60f08b35477c0712f9"
     },
     {
       "file": "l2-flow-narrow.png",
       "width": 640,
       "height": 720,
-      "sha256": "dadfcf9abf066e4deca8d9e2829d825c38728336b96c67cb06383e5bab328014"
+      "sha256": "e48dc755160becdef3d2fff1364ade3332e27d1ef76ae9f5177c51fc8c479511"
+    },
+    {
+      "file": "l2-concepts-desktop.png",
+      "width": 1280,
+      "height": 900,
+      "sha256": "2f741328ab5d9a0c1a604941bcf61efc8cfd58f4bba4521b8b7e088195bd7ad9"
+    },
+    {
+      "file": "l2-concepts-narrow.png",
+      "width": 640,
+      "height": 720,
+      "sha256": "79439e972b74aae8baee294a54f339e14be2adeb00ef2abd0b35943edb51d189"
     }
   ]
 }

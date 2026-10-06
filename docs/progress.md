@@ -3,7 +3,7 @@
 ## Status
 
 - Date: 2026-10-06.
-- Active feature: 无；F24 技术实施与独立审查通过，blocked 等待用户试读；F23 v0.2 / F17 已 passing。
+- Active feature: 无；F24两项实际阅读反馈已修正并验证，blocked待复验；F23 v0.2 / F17 已 passing。
 - Next step: 试读 F24 的流程/对照解释页及 L1 相关解释标签；验收后关闭本项。
 - Latest completed feature: `F23 v0.2` / `F17`（2026-10-06）；用户对 L1 修正版反馈“看着也算还行”并要求继续 L2，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 技术交付作为本地检查点保留，未推送、不提前合并 main。
@@ -38,7 +38,7 @@
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
-| F24 | L2 Independent Block Reading View | `blocked` | 单块解释页与 L1 标签完成；原表达/Source/Back/640×720/Preview及独立复查通过，待用户试读 |
+| F24 | L2 Independent Block Reading View | `blocked` | 核查信息移图下，元素直接点击/键盘查出处，原表达和来源路径保留；技术验证通过待用户复验 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
 
 ### 阶段划分（2026-09-29 登记）

@@ -821,3 +821,7 @@ table.matrix .rowhead { background: var(--bg-2); }
 .l2-generation-warning { padding:10px; border-left:3px solid var(--fg-dim); background:var(--bg-2); }
 .l2-page .block-head .block-title { display:none; }
 .l2-page .block-body { overflow-x:auto; }
+.l2-fragment-target { cursor:pointer; }
+.l2-fragment-target:hover { outline:1px solid var(--line-strong); outline-offset:3px; }
+.l2-cell-inspect { display:block; width:100%; padding:0; border:0; background:transparent; color:inherit; font:inherit; text-align:inherit; cursor:pointer; }
+.l2-cell-inspect:hover { outline:1px solid var(--line-strong); outline-offset:3px; }

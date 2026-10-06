@@ -10,11 +10,34 @@ async function exerciseL2(win){
  const subjects=await exec(win,"window.__state.l2ViewModel.sections.flatMap(s=>s.blocks).map(b=>b.id)");
  // Compare every expression with the unchanged explicit Overview renderer,
  // then require the independent page to contain exactly one Plan identity.
- const expected=await exec(win,"(()=>{const n=window.__readingNavigation,s=window.__state;s.l2ViewModel.sections.flatMap(x=>x.blocks).forEach(b=>s.blockExpanded[b.id]=true);n.enter({type:'view',view:'overview'});return Object.fromEntries([...document.querySelectorAll('#main .block')].map(b=>[b.dataset.blockId,b.querySelector('.block-body').innerHTML]));})()");
+ const expected=await exec(win,"(()=>{const n=window.__readingNavigation,s=window.__state;s.l2ViewModel.sections.flatMap(x=>x.blocks).forEach(b=>s.blockExpanded[b.id]=true);n.enter({type:'view',view:'overview'});return Object.fromEntries([...document.querySelectorAll('#main .block')].map(b=>{const body=b.querySelector('.block-body').cloneNode(true),paths=[...body.querySelectorAll('[data-fragment-path]')].map(n=>n.dataset.fragmentPath);body.querySelectorAll('.fragment-inspect').forEach(n=>n.remove());return [b.dataset.blockId,{html:body.innerHTML,paths}];}));})()");
  await exec(win,'window.__readingNavigation.back()');
  for(const id of subjects){
   await exec(win,`window.__readingNavigation.resolve({kind:'block',id:${JSON.stringify(id)}})`);await settle(win);
-  await check(win,`(()=>{const m=document.getElementById('main'),b=document.getElementById('block-'+${JSON.stringify(id)});return window.__state.view==='l2'&&m.querySelectorAll('section.block').length===1&&m.querySelectorAll('.stage-head,.overview-end').length===0&&document.querySelectorAll('[id="block-${id}"]').length===1&&b.checkVisibility()&&document.activeElement===b&&b.querySelector('.block-body').innerHTML===${JSON.stringify(expected[id])}&&getComputedStyle(document.querySelector('.toc-pane')).display==='none'&&window.__state.readingTopicId===null&&m.scrollTop===0&&m.querySelector('.l2-heading h1').getBoundingClientRect().top>=m.getBoundingClientRect().top;})()`,'single canonical subject, complete original expression '+id);
+  await check(win,`(()=>{const m=document.getElementById('main'),b=document.getElementById('block-'+${JSON.stringify(id)}),body=b.querySelector('.block-body').cloneNode(true);body.querySelectorAll('.l2-cell-inspect').forEach(n=>n.replaceWith(...n.childNodes));body.querySelectorAll('.l2-fragment-target').forEach(n=>{n.classList.remove('l2-fragment-target');for(const attr of ['role','tabindex','aria-label','title','data-fragment-path'])n.removeAttribute(attr);});return window.__state.view==='l2'&&m.querySelectorAll('section.block').length===1&&m.querySelectorAll('.stage-head,.overview-end').length===0&&document.querySelectorAll('[id="block-${id}"]').length===1&&b.checkVisibility()&&document.activeElement===b&&b.querySelectorAll('.fragment-inspect').length===0&&JSON.stringify([...b.querySelectorAll('[data-fragment-path]')].map(n=>n.dataset.fragmentPath))===${JSON.stringify(JSON.stringify(expected[id].paths))}&&body.innerHTML===${JSON.stringify(expected[id].html)}&&(b.compareDocumentPosition(m.querySelector('.l2-context'))&Node.DOCUMENT_POSITION_FOLLOWING)!==0&&getComputedStyle(document.querySelector('.toc-pane')).display==='none'&&window.__state.readingTopicId===null&&m.scrollTop===0&&m.querySelector('.l2-heading h1').getBoundingClientRect().top>=m.getBoundingClientRect().top;})()`,'single canonical subject, original expression and context below '+id);
+  await exec(win,'window.__readingNavigation.back()');
+ }
+ await exec(win,"window.__readingNavigation.resolve({kind:'block',id:'O-02'})");
+ for(const keyCode of ['Enter','Space']){
+  await exec(win,"document.querySelector('.rung[data-fragment-path=\"tiers[0]\"]').focus()");
+  const depth=await exec(win,'window.__readingNavigation.size');await key(win,keyCode);
+  await exec(win,"new Promise((r,j)=>{const stop=Date.now()+4000;function p(){if(window.__state.inspectionSubject?.fragmentPath==='tiers[0]')return r();if(Date.now()>stop)return j(Error('Receipt inspection'));requestAnimationFrame(p)}p()})");
+  await check(win,`window.__state.inspectionSubject.blockId==='O-02'&&window.__state.inspectionSubject.fragmentPath==='tiers[0]'&&window.__readingNavigation.size===${depth+1}`,'Receipt itself is keyboard action, one inspection '+keyCode);
+  await exec(win,'window.__readingNavigation.back()');await settle(win);
+  await check(win,"document.activeElement.matches('.rung[data-fragment-path=\"tiers[0]\"]')&&document.activeElement.checkVisibility()",'Receipt Back restores actual element focus');
+ }
+ await exec(win,"document.querySelector('.rung[data-fragment-path=\"tiers[0]\"] .rung-tag').click()");
+ await exec(win,"new Promise((r,j)=>{const stop=Date.now()+4000;function p(){if(window.__state.inspectionSubject?.fragmentPath==='tiers[0]')return r();if(Date.now()>stop)return j(Error('Receipt click'));requestAnimationFrame(p)}p()})");
+ await check(win,"window.__state.inspectionSubject.blockId==='O-02'",'Receipt label mouse click opens same fragment');await exec(win,'window.__readingNavigation.back();window.__readingNavigation.back()');
+ const matrix=await exec(win,"window.__state.l2ViewModel.sections.flatMap(s=>s.blocks).find(b=>b.content?.type==='matrix'&&b.fragmentEntries.some(f=>f.path.startsWith('rows[')&&f.sourceUnitIds.length))?.id");
+ if(matrix){
+  await exec(win,`window.__readingNavigation.resolve({kind:'block',id:${JSON.stringify(matrix)}})`);
+  for(const keyCode of ['Enter','Space']){
+   const path=await exec(win,"(()=>{const b=document.querySelector('td .l2-cell-inspect[data-fragment-path]');b.focus();return b.dataset.fragmentPath;})()");const depth=await exec(win,'window.__readingNavigation.size');await key(win,keyCode);
+   await exec(win,`new Promise((r,j)=>{const stop=Date.now()+4000;function p(){if(window.__state.inspectionSubject?.fragmentPath===${JSON.stringify(path)})return r();if(Date.now()>stop)return j(Error('matrix inspection'));requestAnimationFrame(p)}p()})`);
+   await check(win,`window.__readingNavigation.size===${depth+1}&&window.__state.inspectionSubject.blockId===${JSON.stringify(matrix)}&&Boolean(document.querySelector('tbody tr td'))`,'native table cell keeps table, one inspection '+keyCode);
+   await exec(win,'window.__readingNavigation.back()');await settle(win);await check(win,"document.activeElement.matches('td .l2-cell-inspect')&&document.activeElement.checkVisibility()",'table cell Back restores actual native button');
+  }
   await exec(win,'window.__readingNavigation.back()');
  }
  if(await exec(win,'Boolean(window.__state.l0ViewModel)')){
@@ -54,8 +77,10 @@ async function runL2Integration(win){
   await exec(win,"document.querySelector('[data-enter-topic=\"T-02\"]').click();document.querySelector('[data-l1-relation-button]').click();document.getElementById('l1-tab-related').click();document.querySelector('.l1-workspace').scrollIntoView({block:'start'})");await shot('l1-related-desktop.png');
   await exec(win,"document.querySelector('[data-l1-block=\"O-04\"]').click()");await shot('l2-flow-desktop.png');await exec(win,'window.__readingNavigation.back();window.__readingNavigation.back()');
   await exec(win,"window.__readingNavigation.resolve({kind:'block',id:'O-04b'})");await shot('l2-contrast-desktop.png');await exec(win,'window.__readingNavigation.back()');
+  await exec(win,"window.__readingNavigation.resolve({kind:'block',id:'O-02'})");await shot('l2-concepts-desktop.png');await exec(win,'window.__readingNavigation.back()');
   await size(640,720);await exerciseL2(win);await exec(win,"document.querySelector('[data-enter-topic=\"T-02\"]').click();document.getElementById('l1-tab-related').click();document.querySelector('.l1-workspace').scrollIntoView({block:'start'})");await shot('l1-related-narrow.png');await exec(win,"document.querySelector('[data-l1-block=\"O-04\"]').click()");await shot('l2-flow-narrow.png');
   await check(win,"innerWidth===640&&innerHeight===720&&document.documentElement.scrollWidth<=innerWidth&&document.querySelectorAll('#main section.block').length===1",'narrow page fits one subject');await exec(win,'window.__readingNavigation.back();window.__readingNavigation.back()');
+  await exec(win,"window.__readingNavigation.resolve({kind:'block',id:'O-02'})");await shot('l2-concepts-narrow.png');await exec(win,'window.__readingNavigation.back()');
   const options={source:path.resolve('samples/context-consumption/source.md'),design:path.resolve('samples/context-consumption/design-review.json'),plan:path.resolve('samples/context-consumption/overview-plan.json')};
   const map=JSON.parse(await fs.readFile('samples/context-consumption/framework-map.json','utf8'));map.topics.forEach(t=>t.blockIds=[]);const mapPath=path.join(root,'empty-map.json');await fs.writeFile(mapPath,JSON.stringify(map));
   const unknown=await exportReadingBundle({...options,map:mapPath,out:path.join(root,'unknown'),analysisId:'f24-unknown'});

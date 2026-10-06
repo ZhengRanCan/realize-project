@@ -1,14 +1,14 @@
 # F24 Implementation Verification
 
-Current: 2026-10-06. 技术实施、真实 Electron/Preview 回归与独立审查通过；F24 blocked 等待用户实际试读。用户批准页面及标签设计（“行，做吧”），不据此声称修正版界面验收。
+Current: 2026-10-06. 技术实施、真实 Electron/Preview 回归与独立审查通过；F24 blocked 等待反馈修正版复验。用户已试读并提出核查位置和出处框问题，本轮已修正。用户批准页面及标签设计（“行，做吧”），不据此声称修正版界面验收。
 
 ## Delivered behavior
 
 - L1 图下的进一步阅读入口已移入同一右侧面板的“相关解释”标签；“含义与依据”保留当前选择解释。点击对象/连接自动切回含义，原关联入口与 Unknown/Known(0)/Known(n) 保持。
 - L2 只显示当前 Plan Block，保留唯一可见可聚焦的 canonical anchor。标题、文档、进入 Topic 或独立打开上下文在顶部；没有其它 Block 主体、全文阶段标题或按编号 Next/Previous。
-- 表达仍由原 content renderer 生成。21 个主体的 HTML 与显式旧 Overview 逐一相等，原 flow/matrix/diff/steps/ladder 等内容完整；没有为缺表达补造图。
+- 表达仍由原 content renderer 生成。21 个主体剥离纯交互后的原表达 HTML 与显式旧 Overview 逐一相等，原 flow/matrix/diff/steps/ladder 等内容完整；没有为缺表达补造图。
 - 规划语义范围、生成与覆盖、主题关联、审阅关联分别披露；生成警告不等于设计或依据判定，PASS 默认不突出。有部分未知 Topic 关联时不能推断 orphan，独立打开不冒充某个 Topic 归属。
-- Block/fragment 的原文核查与 L3、Explore、逐层 Back 沿用既有 session/resolver/stack。返回恢复 L1 标签、选择、焦点、图和面板滚动，及 L2 的披露和滚动。
+- Block/fragment 的原文核查与 L3、Explore、逐层 Back 沿用既有 session/resolver/stack。返回恢复 L1 标签、选择、焦点、图和面板滚动，及 L2 的披露和滚动。资料与核查信息在表达下方，L2各fragment原元素直接点击/键盘查出处，不额外占一行出处框。
 - 无 Map 的有效资料包通过旧 Overview 上的“独立阅读”进入相同页面。真实校验的无 Generated、部分 Generated、明确空 Topic 关联包仍保留主体与规划出处，无自动保存。
 
 ## Verification
@@ -43,7 +43,7 @@ Current: 2026-10-06. 技术实施、真实 Electron/Preview 回归与独立审�
 
 本机试读：重启 Electron，打开 `workspace/analyses/context-consumption/f25-reading/reading-bundle.json`，进入“生成链路与消费点”，在右侧“相关解释”打开 O-04 / O-04b。也可打开重建的便携 Preview：`workspace/previews/f24-reading-preview.html`。
 
-F24 当前仅等待用户实际确认阅读范围清楚、代表性表达便于理解。原 L2 数据接入由 F16 保障，当前页面由 F24 验收；既有样本内容质量不因技术一致性自动升级。
+F24 当前等待用户对两项反馈修正版复验，原未完成的实际可理解性判据仍保留。原 L2 数据接入由 F16 保障，当前页面由 F24 验收；既有样本内容质量不因技术一致性自动升级。
 
 ## Registration history
 
@@ -64,3 +64,9 @@ Date: 2026-10-03. Status: not_started.
 - git diff --check：通过。
 
 这些结果仅证明登记文件自洽，不作为功能完成或界面验收证据。产品代码未修改，未运行产品测试。
+
+## User feedback fix verification — 2026-10-06
+
+用户要求资料核查移到框架图后、删除独立出处框并让Receipt等元素可点击。先补真实21块布局/无额外框/原表达树与fragment path保护断言失败，再修正。Receipt label鼠标点击和Receipt/真实matrix cell的Enter、Space各自只产生一个原fragment核查；Back恢复原元素焦点，来源与父Block不变。完整selftest、本轮test:all搬迁Preview与Native复查通过；旧Overview仍使用原出处按钮。
+
+新增[概念页桌面](l2-concepts-desktop.png)及[窄窗口](l2-concepts-narrow.png)实际证据；核查披露在主体后，来源关联未删除。正式图像metadata同步重录hash。未把这次明确修改要求写成最终实际验收。

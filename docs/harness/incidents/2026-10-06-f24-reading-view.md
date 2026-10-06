@@ -15,3 +15,9 @@ Date: 2026-10-06. 用户确认单 Block L2 与 L1 右侧共用标签设计。
 最终完整selftest曾一次在既有F19最后返回Map的selection断言失败。未改产品或放宽断言，同一最终差异单独重跑完整链通过；搬迁Preview的同一F19路径也通过。此记录不推断未知失败原因，不把失败输出删除或改写成首次全绿。
 
 最终独立复查无剩余P1/P2；真实L2专项/全部selftest/搬迁Preview均通过，用户试读尚待完成。
+
+## User reading feedback
+
+用户截图显示O-02的核查披露位于主体前，rung Receipt/Availability/Consumption每项下面额外占一行出处框，破坏阶梯对照。按用户明确设计，把披露移至主体下方，L2 fragment本身作点击/键盘入口；保持原身份、内容、sourceUnitIds、fragment path、L3/Back，不修改旧Overview展示。
+
+反馈修正版的21块原表达/fragment paths、核查在主体后/无额外框、Receipt与真实table cell键盘、鼠标、L3/Back/full selftest/搬迁Preview已通过，Native复查无确认P1/P2；保留人工复验未完成。

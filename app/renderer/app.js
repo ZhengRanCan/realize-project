@@ -1470,7 +1470,26 @@ function bindFragmentInspection(host,block) {
   if((m=path.match(/^panels\[(\d+)\](?:\.items\[(\d+)\])?$/))){const panel=host.querySelectorAll('.cl-panel')[+m[1]];return m[2]===undefined?panel?.querySelector('.cl-title'):panel?.querySelectorAll('li')[+m[2]];}
   if((m=path.match(/^sides\[(\d+)\](?:\.lines\[(\d+)\])?$/))){const side=host.querySelectorAll('.diff-col')[+m[1]];return m[2]===undefined?side?.querySelector('.diff-head'):side?.querySelectorAll('.diff-line')[+m[2]];}
  };
- for(const fragment of block.fragmentEntries||[]){if(!fragment.sourceUnitIds.length)continue;const element=target(fragment.path);if(!element)continue;const button=el('button','fragment-inspect','出处');button.dataset.fragmentPath=fragment.path;button.setAttribute('aria-label','查看'+fragment.kind+'出处');button.addEventListener('click',event=>{event.stopPropagation();openInspection(block.id,fragment.path);});element.append(button);}
+ for(const fragment of block.fragmentEntries||[]){
+  if(!fragment.sourceUnitIds.length)continue;const element=target(fragment.path);if(!element)continue;
+  if(state.view!=='l2'){
+   const button=el('button','fragment-inspect','出处');button.dataset.fragmentPath=fragment.path;button.setAttribute('aria-label','查看'+fragment.kind+'出处');button.addEventListener('click',event=>{event.stopPropagation();openInspection(block.id,fragment.path);});element.append(button);continue;
+  }
+  // Keep the expression itself as the control. Table cells retain their role;
+  // a native button inside the cell carries its existing content and action.
+  let control=element;
+  if(element.matches('td,th')){control=el('button','l2-cell-inspect');control.type='button';control.append(...element.childNodes);element.append(control);}
+  else {control.classList.add('l2-fragment-target');control.tabIndex=0;control.setAttribute('role','button');}
+  control.dataset.fragmentPath=fragment.path;control.title='点击查看此项出处';control.setAttribute('aria-label',control.textContent.trim()+'，查看出处');
+  control.addEventListener('click',event=>{
+   const nested=event.target.closest('button,a,summary,[data-obj-id]');if(nested&&nested!==control)return;
+   event.stopPropagation();openInspection(block.id,fragment.path);
+  });
+  if(control.tagName!=='BUTTON')control.addEventListener('keydown',event=>{
+   if(event.target!==control||!['Enter',' '].includes(event.key))return;
+   event.preventDefault();event.stopPropagation();if(!event.repeat)control.click();
+  });
+ }
 }
 window.__loadBundle=loadBundle;window.__openInspection=openInspection;window.__closeInspection=closeInspection;
 
