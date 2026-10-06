@@ -7,7 +7,9 @@ export class DeepSeekAdapter implements ProviderAdapter {
   async request(request: ModelRequest): Promise<unknown> {
     const payload = {
       model: request.model,
-      messages: [{ role: "system", content: request.context.systemInstructions }, ...request.context.messages],
+      messages: [{ role: "system", content: request.context.systemInstructions }, ...request.context.messages.map((message) => message.role === "tool"
+        ? { role: "tool", content: message.content, tool_call_id: message.callId }
+        : { role: message.role, content: message.content })],
       tools: request.tools.map((tool) => ({ type: "function", function: { name: tool.name, description: tool.description, parameters: tool.inputSchema } })),
       tool_choice: "auto",
       ...(request.limits.maxOutputTokens === undefined ? {} : { max_tokens: request.limits.maxOutputTokens }),

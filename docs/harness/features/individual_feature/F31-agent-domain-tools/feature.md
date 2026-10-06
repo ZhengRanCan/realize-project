@@ -2,7 +2,7 @@
 id: F31
 title: Agent Domain Workspace and Tools
 version: v0.4
-status: not_started
+status: active
 dependsOn: ["F26"]
 scope: {"code":["app/agent/tools/source*.ts","app/agent/tools/contract*.ts","app/agent/tools/artifact*.ts","app/agent/tools/validation*.ts","app/agent/tools/domain*.ts","scripts/check-map.js","scripts/check-plan.js","scripts/check-block.js","scripts/check-overview.js","prompts/agent-system*.md","package.json","app/agent/domain/*.ts"],"tests":["scripts/test-agent-domain*.js","scripts/test-agent-artifact*.js","scripts/test-check-map.js","scripts/test-check-plan.js","scripts/test-check-block.js","scripts/test-semantic-grounding.js","scripts/test-agent-bootstrap*.js","scripts/test-agent-dependencies*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F31-agent-domain-tools/**","docs/log/artifacts/F31-agent-domain-tools/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}

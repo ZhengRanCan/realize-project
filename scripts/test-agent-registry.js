@@ -11,5 +11,16 @@ const registry = new ToolRegistry([{ name: "echo", description: "Echo text", inp
   assert.deepEqual(await registry.execute({ callId: "c3", name: "echo", arguments: { text: "ok" } }, { signal, runState: state }), { kind: "tool", callId: "c3", toolName: "echo", status: "success", output: { echoed: "ok" } });
   await assert.rejects(() => registry.execute({ callId: "c3", name: "echo", arguments: { text: "again" } }, { signal, runState: state }), /Duplicate callId/);
   assert.throws(() => new ToolRegistry([{ name: "x", description: "x", inputSchema: { type: "object", patternProperties: {} }, execute() {} }]), /unsupported/);
+  const mutableSchema = { type: "object", additionalProperties: false };
+  const isolated = new ToolRegistry([{ name: "safe", description: "safe", inputSchema: mutableSchema, execute: () => "ok" }]);
+  mutableSchema.additionalProperties = true; isolated.schemas()[0].inputSchema.additionalProperties = true;
+  assert.equal((await isolated.execute({ callId: "same", name: "safe", arguments: { extra: 1 } }, { signal, runState: state })).error.code, "invalid_arguments");
+  assert.equal((await isolated.execute({ callId: "same", name: "safe", arguments: {} }, { signal, runState: { ...state, runId: "r2" } })).status, "success");
+  assert.equal((await isolated.execute({ callId: "b:c", name: "safe", arguments: {} }, { signal, runState: { ...state, runId: "a" } })).status, "success");
+  assert.equal((await isolated.execute({ callId: "c", name: "safe", arguments: {} }, { signal, runState: { ...state, runId: "a:b" } })).status, "success");
+  assert.throws(() => new ToolRegistry([{ name: "bad", description: "bad", inputSchema: { type: "array", items: 0 }, execute() {} }]), (error) => error.code === "invalid_schema");
+  assert.throws(() => new ToolRegistry([{ name: "bad", description: "bad", inputSchema: { type: "string", minLength: -1 }, execute() {} }]), (error) => error.code === "invalid_schema");
+  const timed = new ToolRegistry([{ name: "slow", description: "slow", inputSchema: { type: "object" }, timeoutMs: 5, execute: (_args, { signal: toolSignal }) => new Promise((_resolve, reject) => toolSignal.addEventListener("abort", () => { const e = new Error("aborted"); e.name = "AbortError"; reject(e); }, { once: true })) }]);
+  assert.equal((await timed.execute({ callId: "t1", name: "slow", arguments: {} }, { signal, runState: state })).error.code, "tool_timeout");
   console.log("agent registry: passed");
 })().catch((error) => { console.error(error); process.exitCode = 1; });

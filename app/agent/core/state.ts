@@ -4,6 +4,7 @@ import type { BudgetLimits, RunState, TerminationReason, Usage } from "./protoco
 export class StateController<TDomainRef> {
   readonly #now: () => string;
   #state: RunState<TDomainRef>;
+  #usageKnown = { inputTokens: true, outputTokens: true, totalTokens: true };
 
   constructor(runId: string, domainStateRef: TDomainRef, limits: BudgetLimits, now: () => string = () => new Date().toISOString()) {
     this.#now = now;
@@ -30,11 +31,12 @@ export class StateController<TDomainRef> {
   resetNoProgress(): void { this.#state.consecutiveNoProgress = 0; }
   incrementNoProgress(): number { this.#state.consecutiveNoProgress += 1; return this.#state.consecutiveNoProgress; }
   addUsage(usage: Usage | null): void {
-    if (!usage) return;
+    if (!usage) { this.#usageKnown = { inputTokens: false, outputTokens: false, totalTokens: false }; return; }
     const observed = this.#state.budget.observed;
-    observed.inputTokens = addKnown(observed.inputTokens, usage.inputTokens);
-    observed.outputTokens = addKnown(observed.outputTokens, usage.outputTokens);
-    observed.totalTokens = addKnown(observed.totalTokens, usage.totalTokens);
+    for (const key of ["inputTokens", "outputTokens", "totalTokens"] as const) {
+      if (usage[key] === null) this.#usageKnown[key] = false;
+      observed[key] = this.#usageKnown[key] ? addKnown(observed[key], usage[key]) : null;
+    }
   }
   stop(reason: TerminationReason, code: string, message: string): boolean {
     if (this.#state.status === "stopped") return false;

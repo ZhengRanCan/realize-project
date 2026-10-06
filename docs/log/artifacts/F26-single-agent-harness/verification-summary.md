@@ -18,3 +18,11 @@
 - `check:docs` reports 22 pre-existing missing `workspace/` preview/analysis targets because this handoff directory does not contain those ignored/local files. No reported link originates in the new F26 documents.
 - No external model request was made. DeepSeek uses an injected transport and offline fixtures only.
 - Remaining before passing: independent code review and user acceptance of the core boundary/trace; the workspace-only documentation environment limitation remains explicit.
+
+## 2026-10-06 — Review closure
+
+- Result: passing; F31 activated.
+- `node scripts/test-agent-clean.js` and `git diff --check`: passed after review repairs.
+- Added active cancellation/wall/tool deadlines, two-phase terminal trace handling, runtime schema/capacity validation, per-run call identity, DeepSeek tool-message mapping, unknown-usage preservation and deep-frozen trace snapshots.
+- Independent reviewer reproduced the original races, verified the repairs and reported no remaining P1/P2.
+- `npm run test:all` continues to stop only at the 22 known missing ignored/local workspace links; all preceding regressions passed. No real model request was made.

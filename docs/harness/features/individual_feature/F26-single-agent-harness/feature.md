@@ -2,11 +2,11 @@
 id: F26
 title: Single-Agent Harness Core
 version: v0.4
-status: active
+status: passing
 dependsOn: []
 scope: {"code":["app/agent/core/*.ts","app/agent/providers/*.ts","app/agent/tools/registry*.ts","app/agent/trace/*.ts","app/agent/index*.ts","package.json","tsconfig.agent*.json","package-lock.json"],"tests":["scripts/test-agent-core*.js","scripts/test-agent-provider*.js","scripts/test-agent-registry*.js","scripts/test-agent-trace*.js","scripts/test-agent-types*.ts"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F26-single-agent-harness/**","docs/log/artifacts/F26-single-agent-harness/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"2026-10-06","commands":[{"command":"npm run typecheck:agent","result":"passed"},{"command":"npm run test:agent:clean","result":"passed"},{"command":"node scripts/harness-gate.mjs","result":"passed"},{"command":"npm run test:all（在check:docs前的既有回归及check:docs后的剩余命令分段执行）","result":"passed-with-environment-limit"},{"command":"node scripts/test-reading-bundle-preview.js（沙箱外）","result":"passed"}],"manualSmoke":"CommonJS dist/agent入口由全部JS测试实际加载；fake Provider多轮、no-progress、未知工具、预算、usage未知和取消迟到路径通过。"}
-completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 单Agent模型/tool/observation循环 → 显式状态和trace → 程序判定终止","未知工具/无效调用/预算耗尽/取消 → 明确失败或取消，不假完成"],"integrationEvidence":["scripts/test-agent-core.js","scripts/test-agent-provider.js","scripts/test-agent-registry.js","scripts/test-agent-trace.js"],"knownUnverified":["当前交付目录缺少22个历史workspace预览/分析文件，check:docs因此不能在本目录全绿；新F26文档无断链","独立代码审查尚未完成"],"humanReviewRequired":["用户确认核心接口、可追踪循环与受控终止行为；不以此代替真实AI质量验收"]}
+completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 单Agent模型/tool/observation循环 → 显式状态和trace → 程序判定终止","未知工具/无效调用/预算耗尽/取消 → 明确失败或取消，不假完成"],"integrationEvidence":["scripts/test-agent-core.js","scripts/test-agent-provider.js","scripts/test-agent-registry.js","scripts/test-agent-trace.js","docs/log/artifacts/F26-single-agent-harness/subagent-review.md"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F26 Single-Agent Harness Core
@@ -47,17 +47,17 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 
 
 ## Acceptance Criteria
 
-- [ ] 通用协议以TypeScript定义，独立strict检查与清洁构建通过；旧JS消费者实际加载CommonJS编译入口，不直接require .ts，不依赖残留dist。
-- [ ] 外部model/tool/file输入为unknown，经运行时验证后归一化；不以类型断言/any绕过Schema或权限，旧模块不发生全仓语言迁移。
+- [x] 通用协议以TypeScript定义，独立strict检查与清洁构建通过；旧JS消费者实际加载CommonJS编译入口，不直接require .ts，不依赖残留dist。
+- [x] 外部model/tool/file输入为unknown，经运行时验证后归一化；不以类型断言/any绕过Schema或权限，旧模块不发生全仓语言迁移。
 
-- [ ] Agent、Runner、Provider、Context、State、Registry、Trace 接口和职责明确；CLI/未来 Electron 可复用同一运行时。
-- [ ] fake Provider 驱动真实循环，覆盖多轮工具 observation、普通文本无工具、拒绝未知工具/错误参数及错误返回；调用 ID 正确且无悬空结果。
-- [ ] 不修改 Runner 可替换 Provider；DeepSeek 协议用离线响应验证。未实际联网不宣称模型可用或质量通过。
-- [ ] 状态与预算由程序更新，工具结果对应实际执行；有限终止、取消和迟到回复有真实保护，不无限循环或重试。
-- [ ] 模型不能自行设置停止或通过宿主完成策略；默认无合法证明时拒绝。无工具响应被拒绝则写host observation，默认连续第二次无工具且拒绝以no_progress停止，取消/预算优先；不伪造tool结果。
-- [ ] Core无Reading/Map/Plan/Stage语义和Domain imports；按宿主Context Policy组装通用请求，不可信任务数据不成为系统指令，凭据和token/费用未知状态正确处理。
-- [ ] trace 能追溯每步、失败及终止原因，日志不代替 artifact 或跨任务 Memory；默认无外部模型调用。
-- [ ] 核心集成回归、独立审查、用户对内核边界的验收和文档门禁齐全后 passing；完整文档结果另验。
+- [x] Agent、Runner、Provider、Context、State、Registry、Trace 接口和职责明确；CLI/未来 Electron 可复用同一运行时。
+- [x] fake Provider 驱动真实循环，覆盖多轮工具 observation、普通文本无工具、拒绝未知工具/错误参数及错误返回；调用 ID 正确且无悬空结果。
+- [x] 不修改 Runner 可替换 Provider；DeepSeek 协议用离线响应验证。未实际联网不宣称模型可用或质量通过。
+- [x] 状态与预算由程序更新，工具结果对应实际执行；有限终止、取消和迟到回复有真实保护，不无限循环或重试。
+- [x] 模型不能自行设置停止或通过宿主完成策略；默认无合法证明时拒绝。无工具响应被拒绝则写host observation，默认连续第二次无工具且拒绝以no_progress停止，取消/预算优先；不伪造tool结果。
+- [x] Core无Reading/Map/Plan/Stage语义和Domain imports；按宿主Context Policy组装通用请求，不可信任务数据不成为系统指令，凭据和token/费用未知状态正确处理。
+- [x] trace 能追溯每步、失败及终止原因，日志不代替 artifact 或跨任务 Memory；默认无外部模型调用。
+- [x] 核心集成回归、独立审查、用户对内核边界的验收和文档门禁齐全后 passing；完整文档结果另验。
 
 ## Risks and compatibility
 

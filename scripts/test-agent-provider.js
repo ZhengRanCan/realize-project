@@ -12,5 +12,7 @@ const base = { requestId: "q1", runId: "r1", step: 1, model: "deepseek-test", co
   const malformed = new DeepSeekAdapter({ async send() { return { choices: [{ finish_reason: "tool_calls", message: { tool_calls: [{ id: "c2", function: { name: "echo", arguments: "not-json" } }] } }] }; } });
   assert.equal((await malformed.request(base)).toolCalls[0].arguments, "not-json");
   await assert.rejects(() => new DeepSeekAdapter({ async send() { throw new Error("offline"); } }).request(base), ProviderError);
+  await adapter.request({ ...base, context: { ...base.context, messages: [{ role: "tool", content: "done", callId: "wire-1" }] } });
+  assert.equal(sent.messages[1].tool_call_id, "wire-1"); assert.equal("callId" in sent.messages[1], false);
   console.log("agent provider: passed");
 })().catch((error) => { console.error(error); process.exitCode = 1; });
