@@ -1,12 +1,12 @@
 ---
 id: F28
 title: Document Analysis Entry
-version: v0.1
+version: v0.2
 status: not_started
 dependsOn: ["F27"]
 scope: {"code":["app/main/document-input*.js","app/main/main.js","app/main/preload.js","app/shared/document-input*.js","app/renderer/document-entry*.js","app/renderer/app.js","app/renderer/index.html","app/renderer/styles.css","package.json"],"tests":["scripts/test-document-input*.js","scripts/test-document-entry*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/harness/DESIGN.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F28-document-analysis-entry/**","docs/log/artifacts/F28-document-analysis-entry/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["打开软件 → 确认当前模型 → 选择一篇文档 → 确认本次输入","取消/更换文档或遇到文件错误 → 保留有效选择或明确提示"],"integrationEvidence":[],"knownUnverified":["具体输入范围与大小限制待F26结论后确认","文档选择/快照与F29任务交接接口尚未设计或实施"],"humanReviewRequired":["用户确认第一次打开软件能明确知道如何选文档及下一步"]}
+completionGate: {"version":"v0.2","l3":"required","userPath":["打开软件 → 确认当前模型 → 选择一篇文档 → 确认本次输入","取消/更换文档或遇到文件错误 → 保留有效选择或明确提示"],"integrationEvidence":[],"knownUnverified":["具体输入范围与大小限制待Harness接口及F33实验结论后确认","文档选择/快照与F29任务交接接口尚未设计或实施"],"humanReviewRequired":["用户确认第一次打开软件能明确知道如何选文档及下一步"]}
 ---
 
 # F28 Document Analysis Entry
@@ -17,8 +17,8 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开软件 → 
 
 ## Process preconditions
 
-- 用户于 2026-10-06 批准登记，当前不实施；F26 新想法待补充，F27 尚未开始。
-- 依据 [阶段路线](../../../AI_INTEGRATION_ROADMAP.md)，首版暂按现有 Markdown 能力登记；开工前结合 F26 确认格式、编码和容量限制。
+- 用户于 2026-10-06 批准登记，当前不实施；F26/F31/F32 Harness及F33实验待完成，F27 尚未开始。
+- 依据 [阶段路线](../../../AI_INTEGRATION_ROADMAP.md)，首版暂按现有 Markdown 能力登记；开工前结合 F33 确认格式、编码和容量限制。
 - F28 负责选文档和准备输入，F29 负责真正调用模型、任务状态和完成跳转。登记不把这两个阶段混为已完成的用户链路。
 
 ## Scope
@@ -55,3 +55,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开软件 → 
 ## Completion evidence
 
 实施后记录于 `docs/log/artifacts/F28-document-analysis-entry/`；包含实际文件选择与失败路径、输入绑定、独立审查和人工入口验收。当前仅登记。
+
+## Harness-first rescheduling — 2026-10-06
+
+按用户要求保留编号并后移：F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30。原F26真实AI实验迁到F33，当前feature仍not_started；旧登记段落只记录历史。产品目标保留，配置/输入/调用接口在Harness及实验结论后细化。

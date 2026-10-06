@@ -1,5 +1,11 @@
 # Architecture
 
+## Planned Single-Agent Harness — 2026-10-06
+
+用户要求先建设最小Single-Agent runtime，再做真实AI实验与产品入口。计划顺序为F26内核 → F31领域工具 → F32完成门禁/资料包集成 → F33真实AI实验 → F27–F30产品接入。边界与合同映射见[设计草案](../notes/single-agent-harness-design.md)及[路线](AI_INTEGRATION_ROADMAP.md)。本节为待实施规划，不表示模块已存在；下文现有架构仍描述当前代码。
+
+新runtime暂建议置于app/agent，与Electron解耦。Provider拥有模型调用，Runner拥有loop，宿主工具拥有文件/校验/提交权限；Renderer继续只消费已验证投影。复用既有validator/装配/导出，不把会调用模型的旧脚本包成工具形成第二个loop。RunState/trace独立于Reading session与人工审批；Agent完成判定核对当前版本，不替代内容质量eval或human-review。
+
 ## Module boundaries
 
 F18 的加载协议见 `docs/specs/reading-bundle-contract.md`。main 读取资料包并注入显式校验上下文，

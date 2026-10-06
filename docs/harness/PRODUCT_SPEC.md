@@ -28,7 +28,7 @@
 
 用户确认 L0 / L1 / L2 第一版作为当前使用基线，后续根据实际使用反馈继续优化。当前交付重点转向：用户能确认已保存的 AI 配置，选择自己的文档，显式开始分析，看到阶段状态，并在完成后进入现有分层解释界面。AI 沿用已确定的数据结构和 Renderer，不新增阅读层能力。
 
-先做 AI 实验与入口链路；解释页顶部的信息架构和视觉布局待真实使用后基于截图讨论。阶段顺序与实验提案见 [AI Integration Roadmap](AI_INTEGRATION_ROADMAP.md)。
+用户随后要求先建设最小Single-Agent Harness，再做真实AI实验与入口链路；解释页顶部的信息架构和视觉布局待真实使用后基于截图讨论。阶段顺序与实验提案见 [AI Integration Roadmap](AI_INTEGRATION_ROADMAP.md)。
 
 ## Out of scope
 

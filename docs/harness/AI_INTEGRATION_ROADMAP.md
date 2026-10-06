@@ -10,7 +10,7 @@ Date: 2026-10-06.
 
 下一阶段的成功标志是：第一次打开软件的用户能确认 AI 模型，选择自己的文档，开始分析，看到阶段状态，最终进入完整的文档解释界面。AI 替代人工准备和实验生成过程，沿用已有数据结构、分析逻辑和 Renderer。
 
-优先顺序：AI 接入实验 → AI 配置 → 文档选择 → 完整分析链路 → 入口 UI 整理 → 实际使用 → 根据截图讨论解释页面顶部 → 后续各层改进。
+更新后的优先顺序：Single-Agent Harness内核 → 领域工具 → 完成门禁/资料包集成 → 真实AI实验 → AI配置 → 文档选择 → 完整产品分析链路 → 入口UI整理 → 实际使用 → 根据截图讨论解释页面顶部 → 后续各层改进。
 
 历史记录、批量文档、复杂参数、Prompt 编辑暂缓。解释页顶部的 Visual Overview / Decision Review / L0 等导航暂不重排；后续逐区域讨论用途、显示频率和所在层级。
 
@@ -32,21 +32,26 @@ Date: 2026-10-06.
 
 ## Registered feature sequence
 
-2026-10-06 用户批准新建 F27–F30，现已登记为 not_started，均有 feature/verification 合同。用户表示 F26 稍后补充新想法，F26 合同保持原状，暂不推进实验。F27–F30 的目标和职责先登记，模型接口、流水线衔接和视觉实现仍在开工前依据 F26 结论细化。此前聊天中“F26”的 L1 解释修正由 F23 v0.2 承接，registry 没有独立 F26，本次编号从当前最大 F25 后续接。
+2026-10-06 用户补充Single-Agent Harness架构草案，要求原F26改为Harness并扩充分工，原AI实验与F27–F30后移。原F26尚未实现、没有模型run，实验合同与完整质量验收迁到F33；F26更新为v0.2内核合同。F27–F30保留编号，只调整依赖，避免已有引用整体重编号。全部仍为not_started。
 
-| Feature | Observable outcome | Depends on |
-| --- | --- | --- |
-| F26 AI Integration Experiment | 完整数据生产缺口、DeepSeek 重复结果、质量抽查、失败分类及首版接入建议有可追溯证据 | 现有首版 renderer / contracts |
-| F27 AI Configuration | 可保存/修改/清除基础 Provider、Model、凭据和必要参数，入口明确当前模型 | F26 接口与能力选择结论 |
-| F28 Document Analysis Entry | 确认模型 → 选择文档 → 确认本次输入，入口清楚且文件错误可理解 | F27；输入格式和边界确认 |
-| F29 End-to-end Analysis | 点击分析 → 阶段状态 → 校验 / 装配 → 当前资料包 → 现有 L0 / L1 / L2，失败/取消保留旧结果 | F26–F28 |
-| F30 Analysis Entry UI Refinement | 首次使用的顺序、默认状态、错误与完成动作清楚，真实首次操作验收 | F29 实际流程 |
+| Order | Feature | Delivery | Required previous feature |
+| --- | --- | --- | --- |
+| 1 | [F26 Single-Agent Harness Core](features/individual_feature/F26-single-agent-harness/feature.md) | 单Agent loop、Provider、Context/State、Registry、基础trace、预算/取消 | 现有Reading基线 |
+| 2 | [F31 Agent Domain Tools](features/individual_feature/F31-agent-domain-tools/feature.md) | Source/Contract、全部必需artifact写入（含Review）、既有validator适配与版本边界 | F26 |
+| 3 | [F32 Completion Gate and Bundle Integration](features/individual_feature/F32-agent-completion-integration/feature.md) | 当前版本完成门禁、真实装配/export/verify、离线完整工具链与Renderer交接 | F31 |
+| 4 | [F33 AI Integration Experiment](features/individual_feature/F33-ai-integration-experiment/feature.md) | 原F26实验：真实DeepSeek生成、重复稳定性/质量/成本/失败抽查，使用同一runtime | F32 |
+| 5 | [F27 AI Configuration](features/individual_feature/F27-ai-configuration/feature.md) | 基础配置保存/确认；接口和参数依Harness及实验结论 | F33 |
+| 6 | [F28 Document Analysis Entry](features/individual_feature/F28-document-analysis-entry/feature.md) | 确认模型、选文档、当前输入快照与状态 | F27 |
+| 7 | [F29 End-to-end Analysis](features/individual_feature/F29-end-to-end-analysis/feature.md) | Electron调用现成runtime，任务状态、取消与打开本次结果 | F28与Harness/实验 |
+| 8 | [F30 Analysis Entry UI Refinement](features/individual_feature/F30-analysis-entry-ui/feature.md) | 基于实际完整链路整理首次入口体验 | F29 |
 
-合同入口：[F27 AI 配置](features/individual_feature/F27-ai-configuration/feature.md) · [F28 文档选择](features/individual_feature/F28-document-analysis-entry/feature.md) · [F29 完整分析链路](features/individual_feature/F29-end-to-end-analysis/feature.md) · [F30 入口 UI 优化](features/individual_feature/F30-analysis-entry-ui/feature.md)。强制依赖按 F26 → F27 → F28 → F29 → F30 登记；登记不启动实现或外部模型调用。
+执行顺序为 **F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30**；harness按依赖选任务，编号较小不表示忽略前置。此前聊天“F26”的L1解释修正由F23 v0.2承接；本轮更改的是后来实际登记的AI实验，二者不混。
 
-F28 不展示假的“分析完成”；实际分析任务由 F29 接通。入口 UI 在 F27/F28 就要基本可用，F30 依据已跑通的真实链路统一整理。
+[设计草案](../notes/single-agent-harness-design.md)记录参考附件、推荐方案与当前待确认的接口边界。登记不开始产品代码、依赖安装或外部模型运行。F26/F31/F32分别验内核、领域工具与离线完整集成；只有F33对真实模型生成质量作结论。
 
-## F26 experiment proposal
+F28只准备输入，F29接通产品调用；F27/F28自身需要基本可用，F30不作为拖延入口可用性的理由。模型入口采用同一runtime，不在Electron内维护第二个Agent loop。
+
+## F33 experiment proposal (moved from original F26)
 
 2026-10-06 已核对 [DeepSeek 官方模型说明](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)：建议先以官方 `deepseek-flash` 为候选基准，具体端点仍需与用户可用服务核对。模型别名/版本可能变化，每次运行记录实际 model 和服务，执行前再次核对；官方支持 JSON 输出不等于自动符合本项目 Schema。
 
@@ -54,7 +59,7 @@ F28 不展示假的“分析完成”；实际分析任务由 F29 接通。入�
 
 建议首轮使用已知 context-consumption 原文作基准，再选一篇非 Gold 的文档检查样本依赖；先用用户选择的 DeepSeek，同文档/模型至少两次。具体模型、第二篇文档和调用预算确认后再运行；后续其它模型使用同一评价方式比较。单一模型试验只能建立基准，不宣称已比较不同模型的质量或选出最优模型。
 
-实验首先明确并验证完整生产路径：
+实验在F26/F31/F32已通过的runtime上验证完整生产路径；所用Gold诊断与真实自主生成明确区分：
 
 ```text
 当前文档快照 + 确定性章节坐标
@@ -89,6 +94,6 @@ Review 的生成、Map 与 Plan 的显式 Block 引用、Guide 与 Map/原文绑
 
 ## Evidence and storage
 
-实验原始请求/响应、失败和参数放独立 `artifacts/experiments/` run，结论与质量抽查放 `docs/log/artifacts/F26-ai-integration-experiment/`，通过实验索引关联。可打开的本地分析资料放 `workspace/analyses/<document>/<analysis>/`，同篇配套文件放一起。密钥不记录；私有文档和包含其内容的产物不入库。成功校验日志不新增永久 txt，临时文件遵守 agent.md 清理规则。
+实验原始请求/响应、失败和参数放独立 `artifacts/experiments/` run，结论与质量抽查放 `docs/log/artifacts/F33-ai-integration-experiment/`，通过实验索引关联。可打开的本地分析资料放 `workspace/analyses/<document>/<analysis>/`，同篇配套文件放一起。密钥不记录；私有文档和包含其内容的产物不入库。成功校验日志不新增永久 txt，临时文件遵守 agent.md 清理规则。
 
-本轮交付是阶段登记与实验合同草案；没有执行新模型实验、没有增加产品代码。首轮 Provider 已选择 DeepSeek，尚未确定具体模型/端点或取得实验结果。
+本轮交付是Harness拆分、合同迁移与依赖调整；没有执行新模型实验、没有增加产品代码。首轮 Provider 已选择 DeepSeek，尚未确定具体模型/端点或取得实验结果。

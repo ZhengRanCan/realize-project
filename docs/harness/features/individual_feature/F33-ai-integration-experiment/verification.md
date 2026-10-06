@@ -1,6 +1,6 @@
-# F26 Verification
+# F33 Verification
 
-本轮仅登记。下列均为实施后的要求，没有运行或声称通过模型实验。
+原F26实验现迁至F33，等待F32通过。本轮仅登记。下列均为实施后的要求，没有运行或声称通过模型实验。
 
 ## Required commands
 
@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | Static | 修改 JS 的 node --check；git diff --check | yes | 实施后记录 |
 | Offline | 新实验驱动的离线测试（实施时登记确切命令），现有 test:ai-map / test:grounding | yes | 正常输入及传输/格式/引用/部分失败 |
-| Live | 经确认的 DeepSeek 模型、两篇文档、同输入至少两次；逐 run 登记命令/参数 | yes | 原始 run / 指纹 / 校验 / 质量抽查 |
+| Live | 同一Single-Agent runtime与经确认的 DeepSeek 模型、两篇文档、同输入至少两次；逐 run 登记命令/参数 | yes | 原始 run / 指纹 / 校验 / 质量抽查 |
 | Validation | 各 run 的适用 check-map / check-plan / check-block / check-overview 及 bundle 校验 | yes | 实际错误和警告，不能只记进程成功 |
 | System | 现有 Electron / Preview 打开当次完整资料包；npm run selftest | yes | L0/L1/L2、来源与导航 |
 | Regression | npm run test:all；npm run check:experiments | yes | 现有合同不被放宽，实验索引一致 |

@@ -62,7 +62,7 @@
 | 改视觉、交互、键盘路径、折叠行为或页面文案 | `docs/harness/DESIGN.md` |
 | 新克隆跑起来 / 找标准验证命令 / 遇到受限环境 | `docs/harness/INITIALIZATION_CONTRACT.md` |
 | 知道现在做到哪、下一步做什么、卡在哪 | `docs/progress.md` |
-| 推进 AI 接入、模型配置与文档分析入口 | `docs/harness/AI_INTEGRATION_ROADMAP.md` → 当前 feature 合同 |
+| 推进 Single-Agent Harness、AI 实验与文档分析入口 | `docs/harness/AI_INTEGRATION_ROADMAP.md` → 当前 feature 合同；设计讨论见 `docs/notes/single-agent-harness-design.md` |
 | 领取或新建一个 feature | `docs/harness/features/feature-index.json` → `docs/harness/features/README.md` |
 | 写 / 改 feature 合同 | `docs/harness/features/feature-template.md`、`verification-template.md` |
 | 查某个跨 feature、难以逆转的决策为什么这么定 | `docs/decisions.md` |
@@ -120,7 +120,7 @@
 
 ## 开发约定
 
-2026-10-06 用户确认 L0 / L1 / L2 第一版作为当前基线，暂缓主动扩展 Reading。下一阶段按 AI 接入实验 → AI 配置 → 文档选择 → 完整分析链路 → 入口 UI 优化推进；解释页顶部重排待实际使用后基于截图讨论。F26–F30 已登记为 not_started，用户稍后补充 F26 新想法，当前不推进实验。详细目标、合同入口及依赖见 `docs/harness/AI_INTEGRATION_ROADMAP.md`；登记路线不等于已运行模型或已批准所有实现细节。
+2026-10-06 用户确认 L0 / L1 / L2 第一版作为当前基线，暂缓主动扩展 Reading。用户随后要求Harness先行：F26内核 → F31领域工具 → F32完成门禁/资料包集成 → F33真实AI实验 → F27配置 → F28文档选择 → F29产品链路 → F30入口UI。原F26实验迁到F33；F27–F30保留编号，通过依赖后移，全部not_started。解释页顶部重排待实际使用后基于截图讨论。详细目标、合同入口及依赖见 `docs/harness/AI_INTEGRATION_ROADMAP.md`；登记路线不等于已运行模型或已批准所有实现细节。
 
 修改项目时优先沿用现有资产，不要另起一套：
 

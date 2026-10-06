@@ -1,12 +1,12 @@
 ---
 id: F27
 title: AI Configuration
-version: v0.1
+version: v0.2
 status: not_started
-dependsOn: ["F26"]
+dependsOn: ["F33"]
 scope: {"code":["app/main/ai-config*.js","app/main/main.js","app/main/preload.js","app/shared/ai-config*.js","app/renderer/ai-config*.js","app/renderer/app.js","app/renderer/index.html","app/renderer/styles.css","package.json"],"tests":["scripts/test-ai-config*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/harness/DESIGN.md","docs/harness/INITIALIZATION_CONTRACT.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F27-ai-configuration/**","docs/log/artifacts/F27-ai-configuration/**","docs/progress.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.1","l3":"required","userPath":["打开AI配置 → 保存Provider/Model及凭据 → 重启 → 确认当前模型","修改或清除配置 → 后续分析使用新配置；已启动任务保留原配置"],"integrationEvidence":[],"knownUnverified":["F26实验尚未完成，模型接口和必要参数未定","配置存储、凭据保护及IPC实现设计未确认；未实施"],"humanReviewRequired":["用户确认基础配置流程与当前模型信息清楚可用"]}
+completionGate: {"version":"v0.2","l3":"required","userPath":["打开AI配置 → 保存Provider/Model及凭据 → 重启 → 确认当前模型","修改或清除配置 → 后续分析使用新配置；已启动任务保留原配置"],"integrationEvidence":[],"knownUnverified":["F33实验尚未完成，模型接口和必要参数未定","配置存储、凭据保护及IPC实现设计未确认；未实施"],"humanReviewRequired":["用户确认基础配置流程与当前模型信息清楚可用"]}
 ---
 
 # F27 AI Configuration
@@ -17,8 +17,8 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开AI配置 �
 
 ## Process preconditions
 
-- 2026-10-06 用户明确要求先登记 F27–F30，F26 等用户补充新想法。本 feature 仅登记，不启动实现。
-- 依据 [阶段路线](../../../AI_INTEGRATION_ROADMAP.md)；首轮 Provider 选择 DeepSeek。实际支持的模型、接口与必要参数由 F26 结论确定，不在登记阶段冻结。
+- 2026-10-06 用户明确要求先登记 F27–F30，Harness与F33实验尚未完成。本 feature 仅登记，不启动实现。
+- 依据 [阶段路线](../../../AI_INTEGRATION_ROADMAP.md)；首轮 Provider 选择 DeepSeek。实际支持的模型、接口与必要参数由 F33 结论确定，不在登记阶段冻结。
 - 开工前确认存储、最小 IPC 和界面设计，同步 ARCHITECTURE / CONSTRAINTS / DESIGN；共享边界变化需说明影响和验证方法。
 
 ## Scope
@@ -55,3 +55,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["打开AI配置 �
 ## Completion evidence
 
 实施时在 `docs/log/artifacts/F27-ai-configuration/` 记录验证、实际界面路径及独立审查。登记本身不证明存储或安全行为已实现；当前不创建假的完成证据。
+
+## Harness-first rescheduling — 2026-10-06
+
+按用户要求保留编号并后移：F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30。原F26真实AI实验迁到F33，当前feature仍not_started；旧登记段落只记录历史。产品目标保留，配置/输入/调用接口在Harness及实验结论后细化。

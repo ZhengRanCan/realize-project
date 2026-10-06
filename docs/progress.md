@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-06.
-- Active feature: 无；L0/L1/L2 第一版已收口。F26–F30 均为 not_started；本轮按用户要求登记 F27–F30。
-- Next step: 等用户补充 F26 新想法后再调整实验。F27–F30 已登记，按依赖顺序实施，当前不启动任何 feature；暂缓 Reading 扩展。
+- Active feature: 无；Reading第一版已收口。F26/F31–F33及F27–F30均not_started，本轮只做Harness先行的任务拆分与合同迁移。
+- Next step: 先确认F26最小Harness的书面接口设计与实施计划，再按F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30推进；当前不开始代码或模型运行。
 - Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前首版已确认，本轮不操作 main 合并。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 技术交付作为本地检查点保留，未推送、不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -40,11 +40,14 @@
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
 | F24 | L2 Independent Block Reading View | `passing` | 两项反馈修正/真实回归/独立复查完成，用户确认第一版基本完成 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
-| F26 | AI Integration Experiment | `not_started` | 首轮选择 DeepSeek；用户将补充新想法，当前不改合同或运行模型 |
-| F27 | AI Configuration | `not_started` | 合同已登记，等待 F26 接口/参数结论及存储设计 |
-| F28 | Document Analysis Entry | `not_started` | 合同已登记，等待 F27；输入范围/快照交接开工前细化 |
-| F29 | End-to-end Analysis | `not_started` | 合同已登记，等待 F26–F28；任务/失败/结果提交设计未实施 |
-| F30 | Analysis Entry UI Refinement | `not_started` | 合同已登记，等待 F29 实际入口链路与截图 |
+| F26 | Single-Agent Harness Core v0.2 | `not_started` | 原实验已迁F33，当前登记内核/Provider/State/Context/Registry/trace/预算；设计待确认 |
+| F27 | AI Configuration v0.2 | `not_started` | 保留编号后移，等待F33；消费Harness Provider接口及实验参数结论 |
+| F28 | Document Analysis Entry v0.2 | `not_started` | 等待F27；输入范围和交接结合F33结论细化 |
+| F29 | End-to-end Analysis v0.2 | `not_started` | 等待Harness/F33及F27/F28；Electron消费现成runtime，不另写loop |
+| F30 | Analysis Entry UI Refinement | `not_started` | 等待F29实际入口链路与截图 |
+| F31 | Agent Domain Tools | `not_started` | 等待F26；当前run受控领域工具、Review及validator适配 |
+| F32 | Agent Completion Gate and Bundle Integration | `not_started` | 等待F31；版本/依赖闭包、完整bundle和离线集成 |
+| F33 | AI Integration Experiment | `not_started` | 从原F26迁移，等待F32；首轮DeepSeek真实生成/重复/质量验证 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -77,13 +80,13 @@ Renderer 不重新推断 semantic relation
 
 首轮试用发现的 L1/L2 缺口已由 F23/F24 修正。2026-10-06 用户确认第一版基本完成，当前以此为使用基线；该确认不表示跨文档通用质量已经验证，后续实际反馈继续登记。
 
-## 当前下一阶段 — AI 与分析入口（2026-10-06）
+## 当前下一阶段 — Harness / AI / 分析入口（2026-10-06）
 
-用户明确要求暂停主动扩展 Reading，先完成“自己的文档 → AI 分析 → 完整结果”。首轮选择 DeepSeek，先建立重复稳定性/质量基准，其它模型对比后置。
+用户补充Single-Agent Harness架构草案，明确要求原F26改为Harness并扩充分工，AI实验和F27–F30后移。保留入口feature编号，通过强制依赖保证执行顺序：**F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30**。
 
-F26 AI 接入实验 → F27 AI 配置 → F28 文档选择入口 → F29 完整分析链路 → F30 入口 UI 整理。用户已批准新建，F26–F30 全部登记为 not_started。F26 稍后补充新想法，本轮合同不改；F27–F30 的实现细节在开工前依据实验结论确认。现有脚本依赖预备 Review/样本坐标，且 Map 与 Plan、readingGuide 尚未串成完整生产路径；不能把某个模型单阶段成功当成完整结果。
+F26只建设小内核（含Provider/Context/State/Registry/基础trace与预算），F31接真实领域工具（补齐Review必需数据），F32验证当前版本完成门禁和真实工具/装配/bundle/Renderer离线链，F33独立验证真实DeepSeek质量与重复稳定性。原实验合同在未开始/无run状态完整迁移；F27–F30目标保留，F29负责产品调用现成runtime。
 
-路线与实验提案见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，登记合同见 [F26](harness/features/individual_feature/F26-ai-integration-experiment/feature.md)。当前只有文档登记，没有新增产品代码、模型调用或配置存储；具体 Provider 端点/模型仍待确定。实际使用后再基于截图讨论解释页顶部，历史记录/批量分析/复杂参数/Prompt 编辑均暂缓。
+路线及合同入口见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，职责/附加项目边界见 [设计草案](notes/single-agent-harness-design.md)。本轮没有产品代码、依赖安装或模型调用；书面接口设计与实施计划尚未批准。暂停Reading扩展，实际使用后再基于截图讨论解释页顶部。
 
 ## 历史阶段路线（2026-09-29 登记）
 
@@ -123,10 +126,10 @@ F15  集成不变量                 renderer 纪律 / Decision B 导航 / Decis
 
 ```text
 $ npm run verify:harness
-Harness gate: 29 features, 0 errors.        # 2026-10-06，补登记 F27–F30
+Harness gate: 32 features, 0 errors.        # 2026-10-06，Harness先行拆分/原实验迁移
 
 $ npm run check:docs
-Doc links: 173 markdown files checked, 0 broken.
+Doc links: 180 markdown files checked, 0 broken.
 
 $ npm run check:experiments
 experiments index: 66 units + 17 artifacts, up to date. # 既有检查记录，本轮未改实验目录
