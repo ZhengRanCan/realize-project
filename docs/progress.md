@@ -3,8 +3,8 @@
 ## Status
 
 - Date: 2026-10-06.
-- Active feature: 无；用户确认 L0/L1/L2 第一版基本完成，F24 收口 passing；F26 AI 接入实验已登记 not_started。
-- Next step: 首轮先用 DeepSeek，确定具体模型/端点、实验输入和范围，推进 F26 完整数据生产实验；暂缓 Reading 扩展。
+- Active feature: 无；L0/L1/L2 第一版已收口。F26–F30 均为 not_started；本轮按用户要求登记 F27–F30。
+- Next step: 等用户补充 F26 新想法后再调整实验。F27–F30 已登记，按依赖顺序实施，当前不启动任何 feature；暂缓 Reading 扩展。
 - Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
 - Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前首版已确认，本轮不操作 main 合并。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 技术交付作为本地检查点保留，未推送、不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -40,7 +40,11 @@
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
 | F24 | L2 Independent Block Reading View | `passing` | 两项反馈修正/真实回归/独立复查完成，用户确认第一版基本完成 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
-| F26 | AI Integration Experiment | `not_started` | 首轮 Provider 已选 DeepSeek；待具体模型/端点与实验范围确认，未运行模型 |
+| F26 | AI Integration Experiment | `not_started` | 首轮选择 DeepSeek；用户将补充新想法，当前不改合同或运行模型 |
+| F27 | AI Configuration | `not_started` | 合同已登记，等待 F26 接口/参数结论及存储设计 |
+| F28 | Document Analysis Entry | `not_started` | 合同已登记，等待 F27；输入范围/快照交接开工前细化 |
+| F29 | End-to-end Analysis | `not_started` | 合同已登记，等待 F26–F28；任务/失败/结果提交设计未实施 |
+| F30 | Analysis Entry UI Refinement | `not_started` | 合同已登记，等待 F29 实际入口链路与截图 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -77,7 +81,7 @@ Renderer 不重新推断 semantic relation
 
 用户明确要求暂停主动扩展 Reading，先完成“自己的文档 → AI 分析 → 完整结果”。首轮选择 DeepSeek，先建立重复稳定性/质量基准，其它模型对比后置。
 
-F26 AI 接入实验 → F27 AI 配置 → F28 文档选择入口 → F29 完整分析链路 → F30 入口 UI 整理。只登记 F26，F27–F30 是待实验后细化的建议拆分。现有脚本依赖预备 Review/样本坐标，且 Map 与 Plan、readingGuide 尚未串成完整生产路径；不能把某个模型单阶段成功当成完整结果。
+F26 AI 接入实验 → F27 AI 配置 → F28 文档选择入口 → F29 完整分析链路 → F30 入口 UI 整理。用户已批准新建，F26–F30 全部登记为 not_started。F26 稍后补充新想法，本轮合同不改；F27–F30 的实现细节在开工前依据实验结论确认。现有脚本依赖预备 Review/样本坐标，且 Map 与 Plan、readingGuide 尚未串成完整生产路径；不能把某个模型单阶段成功当成完整结果。
 
 路线与实验提案见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，登记合同见 [F26](harness/features/individual_feature/F26-ai-integration-experiment/feature.md)。当前只有文档登记，没有新增产品代码、模型调用或配置存储；具体 Provider 端点/模型仍待确定。实际使用后再基于截图讨论解释页顶部，历史记录/批量分析/复杂参数/Prompt 编辑均暂缓。
 
@@ -119,10 +123,10 @@ F15  集成不变量                 renderer 纪律 / Decision B 导航 / Decis
 
 ```text
 $ npm run verify:harness
-Harness gate: 25 features, 0 errors.        # 2026-10-06，F24 首版收口、登记 F26
+Harness gate: 29 features, 0 errors.        # 2026-10-06，补登记 F27–F30
 
 $ npm run check:docs
-Doc links: 165 markdown files checked, 0 broken.
+Doc links: 173 markdown files checked, 0 broken.
 
 $ npm run check:experiments
 experiments index: 66 units + 17 artifacts, up to date. # 既有检查记录，本轮未改实验目录

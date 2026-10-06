@@ -173,5 +173,33 @@
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F26-ai-integration-experiment",
     "version": "v0.1"
+  },
+  {
+    "id": "F27",
+    "title": "AI Configuration",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F27-ai-configuration",
+    "version": "v0.1"
+  },
+  {
+    "id": "F28",
+    "title": "Document Analysis Entry",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F28-document-analysis-entry",
+    "version": "v0.1"
+  },
+  {
+    "id": "F29",
+    "title": "End-to-end Analysis",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F29-end-to-end-analysis",
+    "version": "v0.1"
+  },
+  {
+    "id": "F30",
+    "title": "Analysis Entry UI Refinement",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F30-analysis-entry-ui",
+    "version": "v0.1"
   }
 ]

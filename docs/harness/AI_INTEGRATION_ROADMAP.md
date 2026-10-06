@@ -30,9 +30,9 @@ Date: 2026-10-06.
 
 现有 ARCHITECTURE 的阶段图是职责说明；其中 Stage 1b 等不代表已有可直接串联的完整实现。F07/F10 的历史问题保留，不能通过新阶段登记自动变成 passing。
 
-## Proposed feature sequence
+## Registered feature sequence
 
-只先登记 F26；F27–F30 为建议拆分，待实验结论后细化合同，未开始实施。此前聊天中“F26”的 L1 解释修正由 F23 v0.2 承接，registry 没有独立 F26，本次编号从当前最大 F25 后续接。
+2026-10-06 用户批准新建 F27–F30，现已登记为 not_started，均有 feature/verification 合同。用户表示 F26 稍后补充新想法，F26 合同保持原状，暂不推进实验。F27–F30 的目标和职责先登记，模型接口、流水线衔接和视觉实现仍在开工前依据 F26 结论细化。此前聊天中“F26”的 L1 解释修正由 F23 v0.2 承接，registry 没有独立 F26，本次编号从当前最大 F25 后续接。
 
 | Feature | Observable outcome | Depends on |
 | --- | --- | --- |
@@ -41,6 +41,8 @@ Date: 2026-10-06.
 | F28 Document Analysis Entry | 确认模型 → 选择文档 → 确认本次输入，入口清楚且文件错误可理解 | F27；输入格式和边界确认 |
 | F29 End-to-end Analysis | 点击分析 → 阶段状态 → 校验 / 装配 → 当前资料包 → 现有 L0 / L1 / L2，失败/取消保留旧结果 | F26–F28 |
 | F30 Analysis Entry UI Refinement | 首次使用的顺序、默认状态、错误与完成动作清楚，真实首次操作验收 | F29 实际流程 |
+
+合同入口：[F27 AI 配置](features/individual_feature/F27-ai-configuration/feature.md) · [F28 文档选择](features/individual_feature/F28-document-analysis-entry/feature.md) · [F29 完整分析链路](features/individual_feature/F29-end-to-end-analysis/feature.md) · [F30 入口 UI 优化](features/individual_feature/F30-analysis-entry-ui/feature.md)。强制依赖按 F26 → F27 → F28 → F29 → F30 登记；登记不启动实现或外部模型调用。
 
 F28 不展示假的“分析完成”；实际分析任务由 F29 接通。入口 UI 在 F27/F28 就要基本可用，F30 依据已跑通的真实链路统一整理。
 
