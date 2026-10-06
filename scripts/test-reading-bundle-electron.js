@@ -24,7 +24,8 @@ async function runBundleIntegration(win) {
    check(window.__state.view==='l0','default Map');
    const topic=Object.values(window.__state.l1Topics).find(t=>t.blockEntries?.length);check(topic,'known Topic');
    document.querySelector('[data-enter-topic="'+topic.topic.id+'"]').click();check(window.__state.view==='l1','Topic click');
-   const button=document.querySelector('[data-l1-block]');button.click();check(window.__state.view==='overview','Block click');
+   document.querySelector('[data-l1-tab=related]').click();check(document.querySelector('#l1-related').checkVisibility(),'related panel visible');
+   const button=document.querySelector('[data-l1-block]');button.click();check(window.__state.view==='l2','Block click');
    const id=button.dataset.l1Block;
    const before=document.getElementById('main').scrollTop;
    document.querySelector('[data-inspect-block="'+id+'"]').click();

@@ -2,13 +2,13 @@
 
 ## Required commands
 
-本轮只登记合同。下列新增测试目标需实现并接入后才可执行和登记结果。
+2026-10-06 已实施并完成下列技术验证，见 artifact 验证记录；人工阅读验收尚未完成。
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |
 | Static | 对修改/新增 JS 逐个 node --check；git diff --check | yes | 静态检查结果 |
 | Projection | node scripts/test-reading-runtime.js；node scripts/test-reading-integration.js | yes | identity、authority、缺失、coverage 纯度 |
-| View | 新增界面结构测试，接入 test:all 后执行 | yes after implementation | 当前 subject 完整、其他主体未渲染、原始 fragment/source 保持 |
+| View | node scripts/test-l2-block-view.js（已接入 test:all） | yes | 当前 subject 完整、其他主体未渲染、原始 fragment/source 保持 |
 | System | npm run selftest，接入 test-l2-block-view-electron.js | yes | 实际 L1/L2/L3、Explore/Resolve/Back、焦点/session |
 | Preview | npm run test:all（含搬迁资料包的真实 Preview） | yes | 新旧适用范围明确，共用实现、只读不保存 |
 | Compatibility | npm run validate / npm run audit / npm run check-overview | yes | 数据语义与 verdict 保持 |
@@ -17,12 +17,12 @@
 
 ## User paths
 
-- [ ] L0 → L1“生成链路与消费点”→ O-04：只见当前解释单元，展示已有表达；不跳到整篇总览中。
-- [ ] 流程、对照、矩阵等公共表达样本：内容完整、长文本可披露、当前阅读范围清晰，缺数据诚实说明。
-- [ ] 查 Block 出处、查 fragment 出处、打开原文并逐层返回；恢复原 L2 和 L1 现场。
-- [ ] Explore → 在阅读中打开 Block → 同一独立 L2 → 返回 Explore → 返回原阅读现场。
-- [ ] 有效 Plan Block 缺 Generated/缺单块表达、无 Topic occurrence、Known(0) 等路径不造内容、不丢身份。
-- [ ] 640×720、Tab/Enter/Space/Esc、延迟 Source/session 切换、搬迁 Preview、只读和无自动保存通过。
+- [x] L0 → L1“生成链路与消费点”→ O-04：只见当前解释单元，展示已有表达；不跳到整篇总览中。
+- [x] 流程、对照、矩阵等公共表达样本：内容完整、长文本可披露、当前阅读范围清晰，缺数据诚实说明。
+- [x] 查 Block 出处、查 fragment 出处、打开原文并逐层返回；恢复原 L2 和 L1 现场。
+- [x] Explore → 在阅读中打开 Block → 同一独立 L2 → 返回 Explore → 返回原阅读现场。
+- [x] 有效 Plan Block 缺 Generated/缺单块表达、无 Topic occurrence、Known(0) 等路径不造内容、不丢身份。
+- [x] 640×720、Tab/Enter/Space/Esc、延迟 Source/session 切换、搬迁 Preview、只读和无自动保存通过。
 - [ ] 用户对实际独立 L2 的范围与视觉解释给出验收判断。
 
 ## Passing evidence

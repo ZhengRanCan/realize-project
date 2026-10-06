@@ -8,7 +8,7 @@ function measurePure(name,map){const start=performance.now(),vm=buildL0ViewModel
 const exec=(win,code)=>win.webContents.executeJavaScript(code);
 const pause=()=>new Promise(r=>setTimeout(r,100));
 async function key(win,keyCode,modifiers=[]){const code=keyCode==='Enter'?'Return':keyCode==='Space'?' ':keyCode;win.webContents.sendInputEvent({type:'keyDown',keyCode:code,modifiers});if(keyCode==='Enter'||keyCode==='Space')win.webContents.sendInputEvent({type:'char',keyCode:keyCode==='Enter'?'\r':' ',modifiers});win.webContents.sendInputEvent({type:'keyUp',keyCode:code,modifiers});await pause();}
-async function focus(win,selector){await exec(win,`(()=>{const node=document.querySelector(${JSON.stringify(selector)});if(node.closest('#l0-panel-topics'))document.querySelector('[data-panel-tab-button=topics]').click();if(node.closest('#l0-panel-meaning'))document.querySelector('[data-panel-tab-button=meaning]').click();node.focus();})()`);}
+async function focus(win,selector){await exec(win,`(()=>{const node=document.querySelector(${JSON.stringify(selector)});if(node.closest('#l0-panel-topics'))document.querySelector('[data-panel-tab-button=topics]').click();if(node.closest('#l0-panel-meaning'))document.querySelector('[data-panel-tab-button=meaning]').click();if(node.closest('#l1-related'))document.querySelector('[data-l1-tab=related]').click();node.focus();})()`);}
 async function check(win,code,label){const result=await exec(win,code);if(result!==true)throw new Error('F21 '+label+' '+JSON.stringify(await exec(win,"({width:innerWidth,height:innerHeight,active:document.activeElement.outerHTML.slice(0,300),view:window.__state.view,overflow:document.documentElement.scrollWidth})")));}
 async function exerciseMaturity(win){
  win.focus();win.webContents.focus();
@@ -22,14 +22,14 @@ async function exerciseMaturity(win){
  await check(win,"window.__state.view==='l1'",'keyboard Topic');
  await focus(win,'[data-l1-block]');await key(win,'Space');
  const id=await exec(win,'window.__state.readingBlockId');
- await check(win,"window.__state.view==='overview'&&Boolean(window.__state.readingBlockId)",'keyboard Block');
+ await check(win,"window.__state.view==='l2'&&Boolean(window.__state.readingBlockId)",'keyboard Block');
  await focus(win,'[data-inspect-block="'+id+'"]');await key(win,'Enter');
  await check(win,"Boolean(window.__state.inspectionSubject)&&document.activeElement.id==='l3-close'",'keyboard inspector');
  await key(win,'Escape');await check(win,"!window.__state.inspectionSubject&&document.activeElement.dataset.inspectBlock===window.__state.readingBlockId",'Escape L3 restores origin focus');
  await focus(win,'#btn-explore');await key(win,'Enter');
  await check(win,"window.__state.view==='explore'",'keyboard Explore');
- await key(win,'Escape');await check(win,"window.__state.view==='overview'&&document.activeElement.id==='btn-explore'",'Escape Explore restores Reading');
- await key(win,'Escape');await check(win,"window.__state.view==='l1'",'Escape Block');
+ await key(win,'Escape');await check(win,"window.__state.view==='l2'&&document.activeElement.id==='btn-explore'",'Escape Explore restores Reading');
+ await key(win,'Escape');await check(win,"window.__state.view==='l1'&&L1TopicView.getDetailState(document.getElementById('main')).tab==='related'&&document.activeElement.hasAttribute('data-l1-block')&&document.activeElement.checkVisibility()",'Escape Block restores related tab and focus');
  await key(win,'Escape');await check(win,"window.__state.view==='l0'&&document.activeElement.hasAttribute('data-enter-topic')",'Escape Topic');
  await check(win,"document.getElementById('reading-location').getAttribute('aria-live')==='polite'&&document.getElementById('save-state').getAttribute('aria-live')==='polite'",'live location/save state');
  // Native SELECT Escape and injected composing/editable events must leave route and review unchanged.

@@ -804,3 +804,20 @@ table.matrix .rowhead { background: var(--bg-2); }
  .l1-selection-detail { position:fixed; z-index:15; left:12px; right:12px; bottom:12px; top:auto; box-shadow:0 4px 20px #0003; }
  .l1-topic-view { padding-bottom:100px; }
 }
+
+/* F24: one reading pane for L1, one explanation subject for L2. */
+.l1-panel-tabs { display:flex; gap:4px; padding:4px 8px; flex-shrink:0; border-bottom:1px solid var(--line); }
+.l1-panel-tabs button { flex:1; font:inherit; font-size:13px; cursor:pointer; padding:8px 4px; border:0; border-radius:5px; background:var(--bg); color:var(--fg); }
+.l1-panel-tabs [aria-selected="true"] { background:var(--accent-bg); color:var(--accent); font-weight:600; }
+.l1-detail-body [hidden] { display:none; }
+.l1-detail-body .l1-blocks { margin:0; padding:0; border:0; }
+.l1-detail-body .l1-block-entries { flex-direction:column; }
+.l1-detail-body .l1-block-entries .btn { width:100%; }
+#screen-review[data-view="l2"] .toc-pane { display:none; }
+.l2-page { min-width:0; overflow-wrap:anywhere; }
+.l2-heading h1 { font-size:24px; margin:8px 0; }
+.l2-context { margin:16px 0; border:1px solid var(--line); border-radius:8px; padding:12px; }
+.l2-context h2 { font-size:15px; margin-top:20px; }
+.l2-generation-warning { padding:10px; border-left:3px solid var(--fg-dim); background:var(--bg-2); }
+.l2-page .block-head .block-title { display:none; }
+.l2-page .block-body { overflow-x:auto; }

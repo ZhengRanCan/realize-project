@@ -175,8 +175,7 @@ const L1TopicView = (() => {
         <details><summary>文档身份与主题出处</summary><p>${esc(doc.id)} · ${esc(doc.role)}</p><p class="mono">${esc(doc.sourcePath)}</p><p>${provenance(vm.topic,options)}</p></details></header>
       <p class="l1-counts">涉及 ${vm.inside.length} 个对象 · 内部 ${vm.relations.length-crossing} 条关系 · 跨主题边界 ${crossing} 条</p>
       <p class="muted small">对象可同时参与多个主题。箭头表示已有方向；没有箭头的线只表示关联。</p>
-      <div class="l1-workspace">${graph}<aside class="l1-selection-detail" id="l1-selection-detail" aria-label="所选对象或关系详情"><div class="l1-detail-head"><h2>含义与依据</h2><button class="btn tiny" id="l1-detail-toggle" aria-expanded="true">收起</button></div><div class="l1-detail-body"><p class="muted">点击对象或关系标签，查看完整解释、名称和出处。</p></div></aside></div>
-      <section class="l1-blocks" data-block-organization="${esc(organization.state)}"><h2>进一步阅读</h2><p>${orgText}</p><div class="l1-block-entries">${blockHTML}</div></section>
+      <div class="l1-workspace">${graph}<aside class="l1-selection-detail" id="l1-selection-detail" aria-label="所选对象或关系详情"><div class="l1-detail-head"><h2>阅读面板</h2><button class="btn tiny" id="l1-detail-toggle" aria-expanded="true">收起</button></div><div class="l1-panel-tabs" role="tablist" aria-label="主题阅读"><button id="l1-tab-meaning" role="tab" aria-controls="l1-meaning" aria-selected="true" data-l1-tab="meaning">含义与依据</button><button id="l1-tab-related" role="tab" aria-controls="l1-related" aria-selected="false" data-l1-tab="related" tabindex="-1">相关解释</button></div><div class="l1-detail-body"><section id="l1-meaning" role="tabpanel" aria-labelledby="l1-tab-meaning"><p class="muted">点击对象或关系标签，查看完整解释、名称和出处。</p></section><section id="l1-related" class="l1-blocks" role="tabpanel" aria-labelledby="l1-tab-related" data-block-organization="${esc(organization.state)}" hidden><p>${orgText}</p><div class="l1-block-entries">${blockHTML}</div></section></div></aside></div>
       <details class="l1-all-details"><summary>成员与关系详情（${vm.inside.length} 个成员 / ${vm.relations.length} 条关系）</summary>
         ${vm.inside.map(e=>`<details><summary>${esc(e.id)} · ${esc(e.label)}</summary>${elementDetail(e,'inside',options)}</details>`).join('')}
         ${vm.relations.map(r=>`<details><summary data-l1-role="${esc(r.role)}">${esc(r.from)} —${esc(r.type)}${r.type==='relates-to'?'—':'→'} ${esc(r.to)}</summary>${relationDetail(r,vm,options)}</details>`).join('')}</details>
@@ -191,10 +190,18 @@ const L1TopicView = (() => {
     host.__l1Abort?.abort();host.__l1Abort=new AbortController();
     const signal=host.__l1Abort.signal;
     host.innerHTML=renderTopicHTML(vm,options);
-    const root=host.querySelector('.l1-topic-view'),panel=root.querySelector('#l1-selection-detail'),slot=panel.querySelector('.l1-detail-body'),toggle=panel.querySelector('#l1-detail-toggle');
-    let detailScroll=0;
-    root.__getDetailState=()=>{if(!slot.hidden)detailScroll=slot.scrollTop;return {collapsed:slot.hidden,scroll:detailScroll};};
-    root.__setDetailState=({collapsed=false,scroll}={})=>{const hadFocus=slot.contains(document.activeElement);if(scroll!==undefined)detailScroll=scroll;else if(!slot.hidden)detailScroll=slot.scrollTop;slot.hidden=collapsed;panel.dataset.collapsed=String(collapsed);toggle.textContent=collapsed?'展开':'收起';toggle.setAttribute('aria-expanded',String(!collapsed));toggle.setAttribute('aria-label',collapsed?'展开含义与依据':'收起含义与依据');if(!collapsed)slot.scrollTop=detailScroll;if(hadFocus&&collapsed)toggle.focus({preventScroll:true});};
+    const root=host.querySelector('.l1-topic-view'),panel=root.querySelector('#l1-selection-detail'),body=panel.querySelector('.l1-detail-body'),slot=panel.querySelector('#l1-meaning'),related=panel.querySelector('#l1-related'),toggle=panel.querySelector('#l1-detail-toggle');
+    let activeTab='meaning',scrolls={meaning:0,related:0};
+    root.__getDetailState=()=>{if(!body.hidden)scrolls[activeTab]=body.scrollTop;return {collapsed:body.hidden,tab:activeTab,scroll:scrolls.meaning,relatedScroll:scrolls.related};};
+    root.__setDetailState=({collapsed=false,tab=activeTab,scroll,relatedScroll}={})=>{
+      const hadFocus=body.contains(document.activeElement);
+      if(!body.hidden)scrolls[activeTab]=body.scrollTop;
+      if(scroll!==undefined)scrolls.meaning=scroll;if(relatedScroll!==undefined)scrolls.related=relatedScroll;
+      activeTab=tab==='related'?'related':'meaning';body.hidden=collapsed;slot.hidden=activeTab!=='meaning';related.hidden=activeTab!=='related';
+      for(const button of panel.querySelectorAll('[data-l1-tab]')){const selected=button.dataset.l1Tab===activeTab;button.setAttribute('aria-selected',String(selected));button.tabIndex=selected?0:-1;}
+      panel.dataset.collapsed=String(collapsed);toggle.textContent=collapsed?'展开':'收起';toggle.setAttribute('aria-expanded',String(!collapsed));toggle.setAttribute('aria-label',collapsed?'展开阅读面板':'收起阅读面板');
+      if(!collapsed)body.scrollTop=scrolls[activeTab];if(hadFocus&&(collapsed||!document.activeElement.checkVisibility()))toggle.focus({preventScroll:true});
+    };
     root.__setDetailState({collapsed:window.matchMedia('(max-width:1100px)').matches});
     const main=host.closest('#main');let pending=null;
     const resize=()=>{pending=null;if(!panel.isConnected)return;const bounds=main?.getBoundingClientRect(),narrow=window.matchMedia('(max-width:1100px)').matches;const available=narrow?(bounds?.height||innerHeight)*.55:(bounds?.bottom||innerHeight)-Math.max(bounds?.top||0,panel.getBoundingClientRect().top)-12;panel.style.setProperty('--l1-detail-height',Math.floor(Math.max(96,Math.min(innerHeight-24,available)))+'px');};
@@ -208,7 +215,7 @@ const L1TopicView = (() => {
       root.querySelectorAll('.is-hit').forEach(n=>n.classList.remove('is-hit'));
       root.querySelectorAll('[aria-pressed]').forEach(n=>n.setAttribute('aria-pressed','false'));
       slot.innerHTML=e?elementDetail(e,vm.inside.some(n=>n.id===e.id)?'inside':'outside',options):r?relationDetail(r,vm,options):'<p class="muted">点击对象或关系标签，查看完整名称、说明和出处标识。</p>';
-      root.__setDetailState({collapsed:false,scroll:0});if(hadDetailFocus)toggle.focus({preventScroll:true});
+      root.__setDetailState({collapsed:false,tab:'meaning',scroll:0});if(hadDetailFocus)toggle.focus({preventScroll:true});
       for(const n of root.querySelectorAll('[data-l1-node]'))if(e?n.dataset.l1Node===e.id:r?[r.from,r.to].includes(n.dataset.l1Node):false){n.classList.add('is-hit');if(e)n.setAttribute('aria-pressed','true');}
       for(const n of root.querySelectorAll('[data-l1-relation],[data-l1-relation-button]')) {
         const index=Number(n.dataset.l1Relation??n.dataset.l1RelationButton),edge=vm.relations[index];
@@ -217,7 +224,8 @@ const L1TopicView = (() => {
     };
     root.addEventListener('click',event=>{
       const button=event.target.closest('button');if(!button)return;
-      if(button.id==='l1-detail-toggle')root.__setDetailState({collapsed:!slot.hidden});
+      if(button.id==='l1-detail-toggle')root.__setDetailState({collapsed:!body.hidden});
+      else if(button.hasAttribute('data-l1-tab'))root.__setDetailState({collapsed:false,tab:button.dataset.l1Tab});
       else if(button.hasAttribute('data-l1-guide-source')){if(!button.disabled)options.onExplanationSource?.({namespace:button.dataset.l1GuideNamespace,key:button.dataset.l1GuideSource});}
       else if(button.id==='l1-back')options.onBack?.();
       else if(button.hasAttribute('data-l1-node'))root.__select({kind:'element',id:button.dataset.l1Node});
@@ -225,6 +233,11 @@ const L1TopicView = (() => {
       else if(button.hasAttribute('data-l1-element-open'))options.onElement?.(button.dataset.l1ElementOpen);
       else if(button.hasAttribute('data-l1-block'))options.onBlock?.(button.dataset.l1Block);
       else if(button.hasAttribute('data-l1-source'))options.onSourceRef?.(button.dataset.l1Source);
+    },{signal});
+    root.addEventListener('keydown',event=>{
+      const button=event.target.closest('[data-l1-tab]');if(!button||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      event.preventDefault();const tab=event.key==='Home'?'meaning':event.key==='End'?'related':button.dataset.l1Tab==='meaning'?'related':'meaning';
+      root.__setDetailState({collapsed:false,tab});panel.querySelector('[data-l1-tab="'+tab+'"]').focus({preventScroll:true});
     },{signal});
     if(priorSelection)restoreSelection(host,priorSelection);
   }

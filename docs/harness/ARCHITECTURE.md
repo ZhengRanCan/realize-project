@@ -115,3 +115,7 @@ F23 首轮由现有 projectTopic 补齐原始显示信息副本，独立 L1 rend
 projectTopic 复用 reading-explanation 的投影，显式传当前 bundle 原文字节 hash、registry/integrity；独立 Map 没有来源上下文只作声明。Topic、Inside/Outside 与每个原始 edge occurrence 的解释按本 Map 的身份/索引附加到冻结展示副本。边界分类、membership、Block 三态与 Plan 权威不变，不跨 Map/Plan SU 关联，不新增解释文件或协议。
 
 renderer 只消费 GuideVM，Source 经既有 openSource(namespace,key) 与 session API。Reading frame 扩展 L1 详情展开/滚动现场，复用现有栈；不增加独立导航或源码 I/O。当前开始实施，完成证据另记 F23 artifact。
+
+## F24 delivery adaptation — 2026-10-06
+
+L2BlockView 为现有冻结 L2 Block 的展示适配器，content renderer 与 fragment 来源绑定由 app.js 既有函数注入；不复制 parser/validation/source 判定。Block 打开/Resolve 使用既有 controller 与 O-xx canonical anchor，reading frame 保留进入 Topic occurrence；独立 l2 view 和显式旧 overview 区分。L1 的统一面板 frame 增加标签与两类滚动状态，仍使用 F19 同一导航栈。

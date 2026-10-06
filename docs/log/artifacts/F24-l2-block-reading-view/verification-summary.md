@@ -1,6 +1,51 @@
-# F24 Registration
+# F24 Implementation Verification
 
-Current: 2026-10-06, active design stage. 用户接受 L1 修正版并要求继续 L2；F23/F17 已 passing。现有 Block 投影、表达 renderer 和导航已核对，独立页面短设计待用户确认；产品代码尚未修改。
+Current: 2026-10-06. 技术实施、真实 Electron/Preview 回归与独立审查通过；F24 blocked 等待用户实际试读。用户批准页面及标签设计（“行，做吧”），不据此声称修正版界面验收。
+
+## Delivered behavior
+
+- L1 图下的进一步阅读入口已移入同一右侧面板的“相关解释”标签；“含义与依据”保留当前选择解释。点击对象/连接自动切回含义，原关联入口与 Unknown/Known(0)/Known(n) 保持。
+- L2 只显示当前 Plan Block，保留唯一可见可聚焦的 canonical anchor。标题、文档、进入 Topic 或独立打开上下文在顶部；没有其它 Block 主体、全文阶段标题或按编号 Next/Previous。
+- 表达仍由原 content renderer 生成。21 个主体的 HTML 与显式旧 Overview 逐一相等，原 flow/matrix/diff/steps/ladder 等内容完整；没有为缺表达补造图。
+- 规划语义范围、生成与覆盖、主题关联、审阅关联分别披露；生成警告不等于设计或依据判定，PASS 默认不突出。有部分未知 Topic 关联时不能推断 orphan，独立打开不冒充某个 Topic 归属。
+- Block/fragment 的原文核查与 L3、Explore、逐层 Back 沿用既有 session/resolver/stack。返回恢复 L1 标签、选择、焦点、图和面板滚动，及 L2 的披露和滚动。
+- 无 Map 的有效资料包通过旧 Overview 上的“独立阅读”进入相同页面。真实校验的无 Generated、部分 Generated、明确空 Topic 关联包仍保留主体与规划出处，无自动保存。
+
+## Verification
+
+| Command | Result |
+| --- | --- |
+| `npm.cmd run test:l2-block` | 纯输入/identity/occurrence/escape 与真实 21 块表达一致性、唯一主体、原生标签/键盘、L3/fragment/Explore/Back、640×720、真实降级包通过 |
+| `npm.cmd run selftest` | 最终完整 Electron 链及 F15/F18–F25 回归通过 |
+| `npm.cmd run test:all` | 全离线、原语义/validator回归及搬迁 legacy/enhanced Preview；实际 Preview 同一 L2 单块与 L1 标签/返回检查通过 |
+| `npm.cmd run validate` / `npm.cmd run audit` | 原 fixture/schema/Overview 一致性通过 |
+| `npm.cmd run check-overview` | PASS WITH WARNINGS；已有重复×17 / 密度×1，零 failure |
+| `node --check` / `git diff --check` | 16 个修改/新增 JavaScript 与 diff 检查通过 |
+| `npm.cmd run check:docs` / `npm.cmd run verify:harness` | 最终文档链接与 feature 合同/索引状态门禁通过 |
+
+九个现有 source/Map/enhanced Map/Gold/Plan/Generated 文件相对 `91c25a8` 字节未变；输入合同/schema/validator与模型任务未修改，不运行模型。测试使用自己的 UUID 目录并在 finally 清理；不新增成功校验 txt。
+
+真实截图和独立审查发现入口沿用旧 scrollIntoView 隐藏标题的 P2，已记录、修复、补失败先行的实际可见性回归并重录。一次完整 selftest 在既有 F19 Map selection 最后恢复断言失败；未改产品/未放宽断言，同一最终差异单独重跑整个链通过，搬迁 Preview 同一路径也通过。失败原因没有被证明，不作归因；记录见 [incident](../../../harness/incidents/2026-10-06-f24-reading-view.md)。既有 Electron cache 访问诊断不作为测试结论。
+
+[Native 独立审查](subagent-review.md)及修复后复查无剩余 P1/P2；自动化和截图检查不替代用户阅读验收。
+
+## Interface evidence and trial
+
+[Capture metadata](interface-evidence.json)记录真实 PNG/CSS viewport 尺寸及文件 hash，非设计稿。
+
+| File | View | Window |
+| --- | --- | --- |
+| [右侧相关解释](l1-related-desktop.png) | T-02 图和原区块入口同时可见 | 1280×900 |
+| [底部相关解释](l1-related-narrow.png) | 640×720 可收起共用标签面板 | 640×720 |
+| [独立流程](l2-flow-desktop.png) | O-04 Current/Target flow，标题与 Topic 来源在顶部 | 1280×900 |
+| [独立对照](l2-contrast-desktop.png) | O-04b，对照表达保留 | 1280×900 |
+| [窄窗口解释页](l2-flow-narrow.png) | 标题与正文同一滚动页，布局不溢出 | 640×720 |
+
+本机试读：重启 Electron，打开 `workspace/analyses/context-consumption/f25-reading/reading-bundle.json`，进入“生成链路与消费点”，在右侧“相关解释”打开 O-04 / O-04b。也可打开重建的便携 Preview：`workspace/previews/f24-reading-preview.html`。
+
+F24 当前仅等待用户实际确认阅读范围清楚、代表性表达便于理解。原 L2 数据接入由 F16 保障，当前页面由 F24 验收；既有样本内容质量不因技术一致性自动升级。
+
+## Registration history
 
 Date: 2026-10-03. Status: not_started.
 

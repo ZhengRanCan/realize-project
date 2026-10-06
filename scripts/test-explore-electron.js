@@ -18,9 +18,10 @@ async function exerciseExplore(win){return win.webContents.executeJavaScript(`(a
  check(s.view==='l0'&&document.getElementById('element-'+element.ref.id).checkVisibility(),'Open in Reading uses canonical Element');
  document.getElementById('reading-back').click();check(s.view==='explore'&&s.focusRef.id===element.ref.id,'canonical Back restores Explore');
  document.getElementById('explore-back-reading').click();check(s.view==='l1'&&s.l1Topic.topic.id===topic.topic.id,'L1 Back Reading');
+ main.querySelector('[data-l1-tab=related]').click();check(main.querySelector('#l1-related').checkVisibility(),'related panel visible');
  const block=main.querySelector('[data-l1-block]');const id=block.dataset.l1Block;block.click();
  enter(element.ref);enter({kind:'topic',id:topic.topic.id});document.getElementById('explore-back-reading').click();
- check(s.view==='overview'&&s.readingTopicId===topic.topic.id&&s.readingBlockId===id,'L2 occurrence after Focus changes');
+ check(s.view==='l2'&&s.readingTopicId===topic.topic.id&&s.readingBlockId===id,'L2 occurrence after Focus changes');
  const fragment=main.querySelector('#block-'+id+' [data-fragment-path]');
  await window.__openInspection(id,fragment?.dataset.fragmentPath);
  const source=document.querySelector('[data-source-unit-id] button');source.click();await wait();

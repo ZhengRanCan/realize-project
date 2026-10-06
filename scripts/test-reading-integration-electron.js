@@ -9,13 +9,17 @@ async function exerciseIntegration(win){return win.webContents.executeJavaScript
  window.__openExplore(element);document.getElementById('explore-back-reading').click();
  check(s.view==='l0'&&JSON.stringify(L0Map.getSelection(main))===JSON.stringify(selection),'Back restores actual selection');check(n.snapshot().resolverCalls===before,'Back never Resolve');
  n.resolve({kind:'block',id:ids[0]});
- const rendered=[...main.querySelectorAll('section.block[id^="block-"]')].map(b=>b.id.replace(/^block-/,''));check(new Set(rendered).size===rendered.length&&JSON.stringify([...rendered].sort())===JSON.stringify([...ids].sort()),'L2 DOM identity exactly existing Plan');
+ const selected=[...main.querySelectorAll('section.block[id^="block-"]')];check(s.view==='l2'&&selected.length===1&&selected[0].id==='block-'+ids[0]&&selected[0].checkVisibility()&&!selected[0].classList.contains('collapsed'),'L2 DOM only original selected Block, visible and expanded');
  for(const b of s.l2ViewModel.sections.flatMap(section=>section.blocks))check(b.provenanceAssurance.state==='indeterminate'&&b.reviewObjectLinks.relation==='related-to','L2 state/relation not upgraded');
  await window.__openInspection(ids[0]);const host=document.getElementById('source-body');check(host.dataset.claimVerification==='absent'&&host.dataset.provenance==='indeterminate','L3 DOM distinguishes Absent/Indeterminate');
  check(!host.textContent.includes('unverified')&&!host.textContent.includes('unsupported'),'no invented verification code');
  window.__closeInspection();n.back();
  const anchors=[...main.querySelectorAll('[data-canonical-element]')].map(e=>e.dataset.canonicalElement),expected=s.l0ViewModel.elements.map(e=>e.id);check(new Set(anchors).size===anchors.length&&JSON.stringify([...anchors].sort())===JSON.stringify([...expected].sort()),'one original canonical identity per Element');
  check(JSON.stringify({l0:s.l0ViewModel,l2:s.l2ViewModel,l1:s.l1Topics})===original,'renderer inputs unchanged');
+ // Preserve complete Plan identity coverage on the explicit legacy overview entry.
+ document.querySelector('.nav-item[data-view=overview]').click();
+ const rendered=[...main.querySelectorAll('section.block[id^="block-"]')].map(b=>b.id.replace(/^block-/,''));check(s.view==='overview'&&new Set(rendered).size===rendered.length&&JSON.stringify([...rendered].sort())===JSON.stringify([...ids].sort()),'manual overview DOM identity exactly existing Plan');
+ n.back();check(s.view==='l0'&&JSON.stringify(L0Map.getSelection(main))===JSON.stringify(selection),'manual overview Back restores Map selection');
  check(n.size===0,'single stack returned to origin');
  return 'F15 actual L0/Explore Back, L2/L3 DOM identity/authority/Absent/Indeterminate and input purity passed';
 })()`);}

@@ -98,3 +98,7 @@ F16 才是把 `artifact → renderer` 改成 `artifact → semantic projection �
 
 - Verification evidence: 本目录的 `verification-summary.md`
 - Independent review: 本目录的 `subagent-review.md`（代码变更必需）
+
+## F24 presentation delivery — 2026-10-06
+
+F24 已将原L2数据接入独立单Block视图，复用原表达renderer；Plan身份/范围、Generated可缺失、覆盖与审阅关系不变，旧Overview仍保留。当前技术回归及独立审查通过，实际用户阅读验收仍待完成。F16的passing继续仅表示数据运行时采纳，不能替代F24界面验收；详见[F24验证](../../../../log/artifacts/F24-l2-block-reading-view/verification-summary.md)。

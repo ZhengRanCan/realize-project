@@ -156,7 +156,7 @@
   {
     "id": "F24",
     "title": "L2 Independent Block Reading View",
-    "status": "active",
+    "status": "blocked",
     "feature_folder": "docs/harness/features/individual_feature/F24-l2-block-reading-view",
     "version": "v0.1"
   },

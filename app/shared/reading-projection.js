@@ -63,7 +63,9 @@ function projectReadingBundle(input) {
       sourceRefs:[...new Set(p.sourceRefs.map(r=>r.section))],reviewObjectLinks:{space:'KnowledgeState',state:p.reviewObjects.length?'known':'empty',relation:'related-to',values:[...p.reviewObjects]},
       generatedExpression:generated(expression===undefined?'unknown':raw?'present':'missing'),generationIntegrity:integrity,
       realizedCoverage:!raw?{space:'RealizedCoverage',state:'unavailable'}:!p.covers.length?{space:'RealizedCoverage',state:'not-applicable'}:{space:'RealizedCoverage',state:'available',total:p.covers.length,covered:p.covers.length-missing.length,missing},
-      provenanceAssurance:provenance('indeterminate'),fragmentEntries});
+      provenanceAssurance:provenance('indeterminate'),fragmentEntries,
+      plannedUnits:Object.freeze(p.covers.map(id=>{const u=plan.sourceUnits.find(u=>u.id===id);return Object.freeze({id,statement:u.statement});})),
+      topicOccurrences:Object.freeze({space:'KnowledgeState',state:!frameworkMap||frameworkMap.topics.some(t=>!Object.hasOwn(t,'blockIds'))?'unknown':frameworkMap.topics.some(t=>t.blockIds.includes(p.id))?'known':'empty',values:Object.freeze((frameworkMap?.topics||[]).filter(t=>t.blockIds?.includes(p.id)).map(t=>Object.freeze({id:t.id,title:t.title})))})});
   })}));
   const l1Topics=frameworkMap?Object.fromEntries(frameworkMap.topics.map(t=>[t.id,projectTopic(frameworkMap,t.id,{plan,sourceSections:input.sourceSections,sourceIntegrity:input.reports?.sourceIntegrity,sourceSha256:input.sourceSha256})])):null;
   return {l2ViewModel:Object.freeze({kind:'L2ViewModel',sections}),l1Topics};

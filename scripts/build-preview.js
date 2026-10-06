@@ -53,7 +53,7 @@ window.designReview={paths:async()=>({defaultFixture:'(preview)'}),loadFixture:a
 };
 </script>`;
  html=html.replace('<script src="vendor/mermaid.min.js"></script>',()=>shim+'\n<script src="vendor/mermaid.min.js"></script>');
- const scripts=['vendor/mermaid.min.js','../shared/semantics.js','../shared/reading-navigation.js','reading-navigation.js','../shared/explore-projection.js','explore.js','l0-layout.js','l0-map.js','l1-topic-view.js','l3-inspector.js','app.js'];
+ const scripts=['vendor/mermaid.min.js','../shared/semantics.js','../shared/reading-navigation.js','reading-navigation.js','../shared/explore-projection.js','explore.js','l0-layout.js','l0-map.js','l1-topic-view.js','l2-block-view.js','l3-inspector.js','app.js'];
  for(const file of scripts){const code=await fs.readFile(resolveRepositoryPath(ROOT,'app/renderer',file),'utf8');html=html.replace(`<script src="${file}"></script>`,()=>`<script>${code.replace(/<\/script/gi,'<\\/script')}</script>`);}
  html=html.replace(/<\/body>\s*<\/html>\s*$/,()=>`<script>window.__applyLoadResult(window.__PREVIEW__.loadResult);document.getElementById('btn-save').disabled=true;document.getElementById('btn-save').textContent='静态预览 · 审核保存不可用';</script>\n</body></html>`);
  const out=resolveRepositoryPath(options.out||repositoryPath('workspace/previews/overview.html'));await fs.mkdir(path.dirname(out),{recursive:true});await fs.writeFile(out,html,'utf8');return {out,blocks:input.plan.blocks.length};

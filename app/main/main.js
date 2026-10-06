@@ -30,7 +30,8 @@ const bundleSessions=createReadingSessionController();
 const PROJECT_ROOT = resolveRepositoryPath(__dirname, '..', '..');
 const BOUNDARY_TEST = process.argv.includes('--selftest-l1-boundary');
 const ORIENTATION_TEST = process.argv.includes('--selftest-l0-orientation');
-const SELF_TEST = process.argv.includes('--selftest') || BOUNDARY_TEST || ORIENTATION_TEST;
+const L2_TEST=process.argv.includes('--selftest-l2-block');
+const SELF_TEST = process.argv.includes('--selftest') || BOUNDARY_TEST || ORIENTATION_TEST || L2_TEST;
 /** `--verify-preview <file>`：加载生成的 preview HTML 并断言 DOM（实验性验证，不改 UI）。 */
 const VERIFY_PREVIEW = (() => {
   const i = process.argv.indexOf('--verify-preview');
@@ -432,6 +433,7 @@ async function runSelfTest() {
       win.webContents.once('did-finish-load', resolve);
     });
 
+    if(L2_TEST){ok(await require('../../scripts/test-l2-block-view-electron').runL2Integration(win));emit();app.exit(0);return;}
     if (ORIENTATION_TEST) {
       ok(await require('../../scripts/test-l0-orientation-electron').runOrientationIntegration(win));
       emit();app.exit(0);return;
@@ -1226,6 +1228,7 @@ async function runSelfTest() {
     ok(await require('../../scripts/test-product-maturity-electron').runMaturityIntegration(win));
     ok(await require('../../scripts/test-reading-integration-electron').runIntegrationInvariants(win));
     ok(await require('../../scripts/test-l1-boundary-view-electron').runBoundaryIntegration(win));
+    ok(await require('../../scripts/test-l2-block-view-electron').runL2Integration(win));
     ok(await require('../../scripts/test-l0-orientation-electron').runOrientationIntegration(win));
 
     emit();
@@ -1280,7 +1283,7 @@ async function runVerifyPreview(filePath) {
       const result=await win.webContents.executeJavaScript(`(async()=>{
         const s=window.__state;
         if(s.view!==(s.l0ViewModel?'l0':'overview'))throw new Error('Preview default view');
-        if(s.l0ViewModel){const t=Object.values(s.l1Topics).find(t=>t.blockEntries?.length);document.querySelector('[data-enter-topic="'+t.topic.id+'"]').click();document.querySelector('[data-l1-block]').click();}
+        if(s.l0ViewModel){const t=Object.values(s.l1Topics).find(t=>t.blockEntries?.length);document.querySelector('[data-enter-topic="'+t.topic.id+'"]').click();document.querySelector('[data-l1-tab=related]').click();document.querySelector('[data-l1-block]').click();}
         const id=s.l2ViewModel.sections[0].blocks[0].id;
         await window.__openInspection(id);
         const sourceButton=document.querySelector('[data-source-unit-id] button');if(!sourceButton)throw new Error('moved SU entry');sourceButton.click();await new Promise(r=>setTimeout(r,50));
@@ -1304,6 +1307,8 @@ async function runVerifyPreview(filePath) {
         ok(await require('../../scripts/test-reading-integration-electron').exerciseIntegration(win));
         await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
         ok(await require('../../scripts/test-l1-boundary-view-electron').exerciseBoundaryView(win));
+        await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
+        ok(await require('../../scripts/test-l2-block-view-electron').exerciseL2(win));
         if(await win.webContents.executeJavaScript("window.__state.l0ViewModel.readingGuide?.state==='present'")){
           await win.webContents.executeJavaScript('window.__applyLoadResult(window.__PREVIEW__.loadResult)');
           ok(await require('../../scripts/test-l1-boundary-view-explanations-electron').exerciseExplanations(win));

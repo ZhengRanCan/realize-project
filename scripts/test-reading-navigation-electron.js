@@ -11,7 +11,8 @@ async function exerciseNavigation(win){
   const fold=main.querySelector('.l0-howto');fold.open=true;
   main.querySelector('[data-panel-tab-button=topics]').click();const trigger=main.querySelector('.topic-entry[data-topic-focus="'+t.topic.id+'"] [data-enter-topic]');trigger.focus();main.scrollTop=80;
   const mapScroll=main.scrollTop;trigger.click();check(s.view==='l1','enter L1');
-  const blockButton=main.querySelector('[data-l1-block]'),id=blockButton.dataset.l1Block;blockButton.focus();blockButton.click();check(s.readingTopicId===t.topic.id&&s.view==='overview','occurrence Block');
+  main.querySelector('[data-l1-tab=related]').click();check(main.querySelector('#l1-related').checkVisibility(),'related panel visible');
+  const blockButton=main.querySelector('[data-l1-block]'),id=blockButton.dataset.l1Block;blockButton.focus();blockButton.click();check(s.readingTopicId===t.topic.id&&s.view==='l2','occurrence Block');
   const inspection=main.querySelector('[data-inspect-block="'+id+'"]');inspection.focus();const blockScroll=main.scrollTop;
   await window.__openInspection(id);check(s.inspectionSubject.blockId===id,'L3');check(n.size===3,'one stack');
   n.back();check(!s.inspectionSubject&&s.readingTopicId===t.topic.id,'L3 Back occurrence');check(main.scrollTop===blockScroll,'Block scroll');check(document.activeElement.dataset.inspectBlock===id,'Block focus');
@@ -23,12 +24,12 @@ async function exerciseNavigation(win){
   check(document.getElementById(anchor.id).checkVisibility()&&document.activeElement.dataset.l0View==='reading','canonical subject preserved after moving focus');
   document.getElementById('reading-back').click();check(s.readingTopicId===t.topic.id&&s.readingBlockId===id,'Resolve Back original occurrence');check(n.snapshot().resolverCalls===calls+1,'Back no resolver');
   for(const kind of ['topic','source-unit','review','evidence','fragment']){const before=n.size,view=s.view;check(!n.resolve({kind,id:'SU-001'}).ok,'unsupported '+kind);check(n.size===before&&s.view===view,'unsupported unchanged');}
-  document.getElementById('reading-back').click();check(s.view==='l1'&&s.l1Topic.topic.id===t.topic.id,'L2 Back Topic');check(document.activeElement.dataset.l1Block===id,'Topic focus');
+  document.getElementById('reading-back').click();check(s.view==='l1'&&s.l1Topic.topic.id===t.topic.id,'L2 Back Topic');check(document.activeElement.dataset.l1Block===id&&document.activeElement.checkVisibility()&&L1TopicView.getDetailState(main).tab==='related','Topic related tab and focus');
   document.getElementById('l1-back').click();check(s.view==='l0','L1 Back Map');await wait();
   check(main.scrollTop===mapScroll,'Map scroll');check(document.activeElement.hasAttribute('data-enter-topic'),'Map focus');check(main.querySelector('.l0-howto').open,'Map disclosure');check(JSON.stringify(L0Map.getSelection(main))===JSON.stringify(selection),'Map selection');
   check(n.size===0,'empty stack');check(!n.back().ok&&s.view==='l0','empty no home');
   const attachment=s.l0ViewModel.attachments[0]?.elementId;if(attachment){await n.resolve({kind:'element',id:attachment});check(document.getElementById('element-'+attachment).checkVisibility(),'attachment canonical');n.back();}
-  await n.resolve({kind:'block',id});check(s.view==='overview'&&s.readingTopicId===null,'canonical Block no inferred Topic');
+  await n.resolve({kind:'block',id});check(s.view==='l2'&&s.readingTopicId===null,'canonical Block no inferred Topic');
   const fragment=main.querySelector('#block-'+id+' [data-fragment-path]');
   if(fragment){fragment.focus();await window.__openInspection(id,fragment.dataset.fragmentPath);check(!location.hash.includes('fragment'),'no durable fragment');n.back();check(document.activeElement.dataset.fragmentPath===fragment.dataset.fragmentPath,'fragment focus restored');}
   n.back();check(s.view==='l0','canonical Block Back');
@@ -71,7 +72,7 @@ async function runNavigationIntegration(win){
   assert.equal((await execute(`window.__loadBundle(${JSON.stringify(c.manifestPath)})`)).ok,true);
   assert.equal(await execute("Object.values(window.__state.l1Topics).every(t=>t.blockOrganization.state==='empty')"),true);
   await execute("window.__readingNavigation.resolve({kind:'block',id:'O-01'})");
-  assert.equal(await execute("document.getElementById('block-O-01').checkVisibility()&&document.activeElement.id==='block-O-01'&&window.__state.readingTopicId===null&&window.__state.l2ViewModel.sections[0].blocks[0].generatedExpression.state==='unknown'"),true);
+  assert.equal(await execute("window.__state.view==='l2'&&document.querySelectorAll('section.block').length===1&&document.getElementById('block-O-01').checkVisibility()&&document.activeElement.id==='block-O-01'&&window.__state.readingTopicId===null&&window.__state.l2ViewModel.sections[0].blocks[0].generatedExpression.state==='unknown'"),true);
   delete manifest.files.frameworkMap;delete manifest.bindings.frameworkDocumentId;await fs.writeFile(c.manifestPath,JSON.stringify(manifest));
   assert.equal((await execute(`window.__loadBundle(${JSON.stringify(c.manifestPath)})`)).ok,true);
   assert.equal(await execute("window.__readingNavigation.resolve({kind:'block',id:'O-01'}).ok&&!window.__readingNavigation.resolve({kind:'element',id:'E-01'}).ok"),true);

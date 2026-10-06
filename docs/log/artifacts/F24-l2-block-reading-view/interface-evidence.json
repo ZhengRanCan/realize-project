@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-06",
+  "baseline": "91c25a8",
+  "capture": "real Electron capturePage, CSS viewport equals PNG dimensions asserted",
+  "input": "public context-consumption enhanced Map + Gold Plan/Generated; validated temporary test copies under owned workspace/tmp/tests UUID",
+  "humanAcceptance": "pending",
+  "files": [
+    {
+      "file": "l1-related-desktop.png",
+      "width": 1280,
+      "height": 900,
+      "sha256": "07aa90229f06d7ff1cdc8282c1bce50200f08d2ef90e984c02ace3f2f4b235b5"
+    },
+    {
+      "file": "l1-related-narrow.png",
+      "width": 640,
+      "height": 720,
+      "sha256": "b514846764d3747ff900df0c15afc61119c28f333e789c62e9abfdaf2f400e3b"
+    },
+    {
+      "file": "l2-flow-desktop.png",
+      "width": 1280,
+      "height": 900,
+      "sha256": "8f3602d044e8083792ab6d7f78ca1ec14a92f419f9573bd108de40498d057242"
+    },
+    {
+      "file": "l2-contrast-desktop.png",
+      "width": 1280,
+      "height": 900,
+      "sha256": "d798feefc68051f78845a1b9f958b7246c783fd4ce4bedbdad9c48a9d7de6ef4"
+    },
+    {
+      "file": "l2-flow-narrow.png",
+      "width": 640,
+      "height": 720,
+      "sha256": "dadfcf9abf066e4deca8d9e2829d825c38728336b96c67cb06383e5bab328014"
+    }
+  ]
+}
