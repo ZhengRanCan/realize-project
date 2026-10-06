@@ -4,9 +4,9 @@
 
 - Date: 2026-10-06.
 - Active feature: 无；Reading第一版已收口。F26/F31–F33及F27–F30均not_started，本轮只做Harness先行的任务拆分与合同迁移。
-- Next step: 新app/agent已选TypeScript，旧Electron模块保留JavaScript；先确认F26类型协议、独立编译/JS interop的书面接口设计与实施计划，再按F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30推进；当前不开始代码或模型运行。
+- Next step: 交由师弟接手F26：读合同/verification与ref详细接口问答，按已定TypeScript落实接口设计与实施计划；长篇架构讨论仅按需参考。后续顺序F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30，当前未开始runtime代码或模型运行。
 - Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
-- Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前首版已确认，本轮不操作 main 合并。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 技术交付作为本地检查点保留，未推送、不提前合并 main。
+- Git strategy: 用户要求本轮将全部当前交接提交推送到`origin/codex/f11-f21-conformance`，包括此前未推送的Reading实现与规划文档；不合并main。推送确认以Git远端结果为准。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
   （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
@@ -86,7 +86,15 @@ Renderer 不重新推断 semantic relation
 
 开工前反馈已落实：F26是无Reading依赖的通用Core，F31负责Host原文/坐标bootstrap、领域Context/Workspace与产物直接依赖；F32验证精确proof closure和结构交付，F33收窄为driver/eval、真实DeepSeek行为及trajectory评价。设计稿补齐生命周期/直接依赖表/run布局和状态命名；不按Stage顺序失效全部产物，结构完成不代表质量已评。原实验合同在未开始/无run状态完整迁移；F27–F30目标保留，F29负责产品调用现成runtime。
 
-路线及合同入口见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，职责/附加项目边界见 [设计草案](notes/single-agent-harness-design.md)。第二轮反馈认可拆分，本轮只清理所有权并核查设计稿：F31移出旧脚本正常写scope，canonical prompt独占；Context与proof图驱动的验收补齐，quality evidence绑定原bundle且不改包。本轮没有产品代码、依赖安装或模型调用；书面接口设计与实施计划尚未批准。反馈及修订见 [contract review](harness/incidents/2026-10-06-harness-contract-review.md)。暂停Reading扩展，实际使用后再基于截图讨论解释页顶部。
+路线及合同入口见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，默认设计输入为当前合同及F26的[详细接口问答](harness/features/individual_feature/F26-single-agent-harness/ref/f26_detailed_interface_design_draft.md)；[长篇架构背景](notes/single-agent-harness-design.md)已降为按需参考，不是必读或authority。第二轮反馈认可拆分，本轮只清理所有权并核查设计稿：F31移出旧脚本正常写scope，canonical prompt独占；Context与proof图驱动的验收补齐，quality evidence绑定原bundle且不改包。本轮没有产品代码、依赖安装或模型调用；书面接口设计与实施计划尚未批准。反馈及修订见 [contract review](harness/incidents/2026-10-06-harness-contract-review.md)。暂停Reading扩展，实际使用后再基于截图讨论解释页顶部。
+
+## 开发交接 — 2026-10-06
+
+- Reading首版实现与验收已收口；F26/F31–F33/F27–F30仍not_started，不把合同准备当作Agent已实现。
+- 首项F26的默认阅读顺序：feature-index/progress → F26 feature/verification → ref/f26_detailed_interface_design_draft.md；不加载所有ref或长架构文全文。
+- 新app/agent用TypeScript，旧Electron模块保留JS；问答中的旧JS选项、状态/停止原因别名须在正式详细设计中统一到当前合同口径。
+- 先形成F26正式接口设计与实施计划，再编码、验证与验收；尚未安装TS工具链或运行真实AI实验。F31/F32需要在各自feature内冻结局部数据模型，背景文不替代这一过程。
+- 继续在codex/f11-f21-conformance工作；此次Git推送覆盖当前受跟踪代码和文档。本机workspace分析包/预览/配置依既有规则不入库；新克隆的构建与验证命令见初始化合同。
 
 ## 历史阶段路线（2026-09-29 登记）
 
@@ -129,7 +137,7 @@ $ npm run verify:harness
 Harness gate: 32 features, 0 errors.        # 2026-10-06，Harness先行拆分/原实验迁移
 
 $ npm run check:docs
-Doc links: 182 markdown files checked, 0 broken.
+Doc links: 183 markdown files checked, 0 broken.
 
 $ npm run check:experiments
 experiments index: 66 units + 17 artifacts, up to date. # 既有检查记录，本轮未改实验目录

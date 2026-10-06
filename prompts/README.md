@@ -18,5 +18,5 @@ Electron 打开已有分析资料包时不执行这些模板。
 
 ## Planned Single-Agent prompts
 
-下列仅为所有权约定，尚未新增模板或消费者；上表仍是当前五份实际模板。F31维护canonical `agent-system*.md` 的领域语义；F32只读取并由代码产生完成反馈，完成权威不放在prompt。F33只新建 `experiments/agent-system-*.md` 版本与 `eval*.md`，每run冻结实际发送文本/hash，不覆盖canonical。边界见 [Harness设计稿](../docs/notes/single-agent-harness-design.md)。
+下列仅为所有权约定，尚未新增模板或消费者；上表仍是当前五份实际模板。F31维护canonical `agent-system*.md` 的领域语义；F32只读取并由代码产生完成反馈，完成权威不放在prompt。F33只新建 `experiments/agent-system-*.md` 版本与 `eval*.md`，每run冻结实际发送文本/hash，不覆盖canonical。当前边界以F31/F32/F33合同及未来正式局部设计为准；[旧Harness架构讨论](../docs/notes/single-agent-harness-design.md)仅按需参考。
 只有显式运行生成命令才会调用模型；标准测试使用 stub，整理和阅读资料包不调用模型。

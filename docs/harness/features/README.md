@@ -10,6 +10,8 @@
 3. 否则选择依赖均为 `passing` 且编号最小的 `not_started` feature。
 4. 只读该 feature 的 `feature.md` 与 `verification.md`。
 
+F26进入详细设计时，再读其`ref/f26_detailed_interface_design_draft.md`作为用户问答输入，按当前合同冻结接口。`docs/notes/single-agent-harness-design.md`已降为按需背景，不默认加载全文；其他ref也不自动全读。
+
 合法状态为 `not_started`、`active`、`blocked`、`passing`。同一时间**最多一个** feature 为 `active`。
 
 ## 本项目的 `dependsOn` 口径

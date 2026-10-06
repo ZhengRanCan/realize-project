@@ -62,7 +62,8 @@
 | 改视觉、交互、键盘路径、折叠行为或页面文案 | `docs/harness/DESIGN.md` |
 | 新克隆跑起来 / 找标准验证命令 / 遇到受限环境 | `docs/harness/INITIALIZATION_CONTRACT.md` |
 | 知道现在做到哪、下一步做什么、卡在哪 | `docs/progress.md` |
-| 推进 Single-Agent Harness、AI 实验与文档分析入口 | `docs/harness/AI_INTEGRATION_ROADMAP.md` → 当前 feature 合同；设计讨论见 `docs/notes/single-agent-harness-design.md` |
+| 推进 Single-Agent Harness、AI 实验与文档分析入口 | `docs/harness/AI_INTEGRATION_ROADMAP.md` → 当前 feature 合同/verification；F26设计输入见同目录 `ref/f26_detailed_interface_design_draft.md` |
+| 按需追查 Harness 架构选项、跨feature讨论来历 | `docs/notes/single-agent-harness-design.md`（NON-NORMATIVE背景参考；不默认加载全文） |
 | 领取或新建一个 feature | `docs/harness/features/feature-index.json` → `docs/harness/features/README.md` |
 | 写 / 改 feature 合同 | `docs/harness/features/feature-template.md`、`verification-template.md` |
 | 查某个跨 feature、难以逆转的决策为什么这么定 | `docs/decisions.md` |

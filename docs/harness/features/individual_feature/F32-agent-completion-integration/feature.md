@@ -17,7 +17,7 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模�
 
 ## Process preconditions
 
-- F26/F31 提供真实内核与工具；当前仅登记，开工前确认[架构草案](../../../../notes/single-agent-harness-design.md)中的完成与发布边界。
+- F26/F31提供真实内核与工具；依据本合同、F31冻结的依赖账本接口及既有bundle规范，在本feature内明确完成/发布的正式设计。[架构背景](../../../../notes/single-agent-harness-design.md)仅按需追查，不是已冻结协议或开工前必读。
 - 模型响应可用离线受控轨迹驱动；工具、validator、文件与 bundle 必须真实执行。F33 再证明实际模型能独立生成这些内容。
 - 完成门禁不是 Decision 的人工审批 Gate，也不等于内容质量 eval。
 
@@ -31,7 +31,7 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模�
 
 - 状态分离：Core run_status=stopped仅表示循环停止；领域artifact_status=structurally_complete与completionGate=PASS表示结构交付，quality_status默认unreviewed，F33独立更新；不写笼统质量成功。
 
-- 领域完成策略依设计稿的Proof key与root closure：检查当前inventory/Review/Map/selection/Plan、全部所需表达、Guide/来源、装配、Topic→Block配对和staged bundle证明；Core只调用宿主策略。
+- 领域完成策略消费F31正式冻结的Proof key/直接依赖接口，在本feature内定义root closure：检查当前inventory/Review/Map/selection/Plan、全部所需表达、Guide/来源、装配、Topic→Block配对和staged bundle证明；Core只调用宿主策略。
 - 现有 assemble/export/verify 领域工具和最小独立CLI入口；复用导出校验，不重新定义文件协议或哈希兼容规则。
 - 直接依赖/版本闭包：只撤销读取了变化输入的证明及依赖它的完成证明，保留artifact字节；Map变化不自动失效Plan/Block，M/P配对另行重验。当前S/P/Block/Review/规则指纹必须匹配，不信任模型PASS。
 - 完成请求拒绝时向Agent返回具体缺项；在有限预算内允许模型修正候选，保留原始失败及修正次数，不程序补语义。
@@ -64,7 +64,7 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模�
 
 ## Risks and compatibility
 
-“曾通过”不是“当前通过”。必须记录设计稿定义的Proof key和实际直接依赖闭包，而不是几个布尔字段或Stage顺序。原资料包可读取的降级语义保留，但完整分析成功与可打开的部分结果严格区分。trace是运行证据，artifact是任务结果，二者都不是跨任务Memory。
+“曾通过”不是“当前通过”。必须消费F31冻结的Proof key和实际直接依赖闭包，而不是几个布尔字段或Stage顺序。原资料包可读取的降级语义保留，但完整分析成功与可打开的部分结果严格区分。trace是运行证据，artifact是任务结果，二者都不是跨任务Memory。
 
 ## Completion evidence
 

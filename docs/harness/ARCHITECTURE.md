@@ -2,7 +2,7 @@
 
 ## Planned Single-Agent Harness — 2026-10-06
 
-用户要求先建设最小Single-Agent runtime，再做真实AI实验与产品入口。计划顺序为F26内核 → F31领域工具 → F32完成门禁/资料包集成 → F33真实AI实验 → F27–F30产品接入。边界与合同映射见[设计草案](../notes/single-agent-harness-design.md)及[路线](AI_INTEGRATION_ROADMAP.md)。本节为待实施规划，不表示模块已存在；下文现有架构仍描述当前代码。
+用户要求先建设最小Single-Agent runtime，再做真实AI实验与产品入口。计划顺序为F26内核 → F31领域工具 → F32完成门禁/资料包集成 → F33真实AI实验 → F27–F30产品接入。任务/边界以[路线](AI_INTEGRATION_ROADMAP.md)所链接的当前合同为入口；[长篇架构背景](../notes/single-agent-harness-design.md)为NON-NORMATIVE按需参考，不默认加载或作为接口authority。本节为待实施规划，不表示模块已存在；下文现有架构仍描述当前代码。
 
 新runtime暂建议置于app/agent，与Electron解耦。Provider拥有模型调用，Runner拥有loop，宿主工具拥有文件/校验/提交权限；Renderer继续只消费已验证投影。复用既有validator/装配/导出，不把会调用模型的旧脚本包成工具形成第二个loop。Core只执行通用宿主Policy，RunState/trace独立于Reading session与人工审批。F31宿主先冻结原文并用现有算法生成registry，拥有领域Context与版本/直接依赖账本；F32按实际proof closure判结构完成，F33独立判质量。Map变化不自动失效Plan；M/P配对证明另记，失效从typed InputRef/proof反向图推导。F31 canonical prompt独占，Context只控制输入权限/前置不调度固定workflow；F32不写prompt充当保证，F33只创建冻结变体与绑定bundle闭包的外部quality证据，不改原包/人工审核。
 

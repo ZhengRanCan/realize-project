@@ -18,7 +18,7 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_
 ## Process preconditions
 
 - 用户要求扩充 Single-Agent Harness，当前仅登记。F26 内核先 passing；工具接口与存储边界在实现前书面确认。
-- [架构草案](../../../../notes/single-agent-harness-design.md)补齐附件未列出的 `write_design_review`：Reading Bundle 必需 Review，不得借默认 Gold 代替。
+- Reading Bundle必需Review，工具须包含write_design_review，不得借默认Gold代替。bootstrap、生命周期、实际read set和直接依赖设计依据本合同及现有规范在本feature内冻结；[旧架构讨论](../../../../notes/single-agent-harness-design.md)仅按需参考，不作为已冻结协议或前置必读。
 - 现有 checkMap/checkPlan/checkBlock/checkOverview 已有导出函数；优先复用。确需固定脚本适配时命令/参数由宿主确定，不把通用执行器暴露给模型。
 
 ## Scope
@@ -35,7 +35,7 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_
 - Source、Contract 和 Artifact 读取工具，仅针对当前 run 文档快照、固定合同与当前产物。
 - inventory、design-review、Map/selection、Plan、Stage2 Block 的写入工具；包含 readingGuide/显式引用及程序注入的固定字段。
 - 对应现有校验工具及可追踪的失败查看；保留原始 verdict/errors/warnings，不复制或放宽判定规则。
-- 依设计草案的直接依赖表登记Draft、有效产物、版本/指纹、生成read set和校验proof；保留失败候选，合法提交与替换有原子边界。
+- 依本feature正式设计的直接依赖模型登记Draft、有效产物、版本/指纹、生成read set和校验proof；保留失败候选，合法提交与替换有原子边界。
 - namespace、run ID、Block ID 和显式 source 绑定；源快照与坐标固定，Map SU 与 Plan SU 不按同名合并。
 - 生成建议由外层Agent产生，领域工具零模型调用。旧生成脚本/assembler不在正常写scope；若确需纯helper提取，先登记具体路径、提取范围、唯一实现位置及旧消费者回归，再做最小改动。
 
@@ -52,7 +52,7 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_
 - [ ] canonical prompt由本feature独占修改，旧生成/assembler无正常写权限；需要纯helper提取时先登记scope并验证旧消费者。
 
 - [ ] Host bootstrap真实读取/冻结当前文档并生成匹配hash的坐标；不是模型产物/Agent Tool，无效输入/取消不启动模型，不串用默认样本。
-- [ ] lifecycle、run layout和direct dependency/proof ledger按设计表实现；生成来源和校验输入分开，修改Map不会自动使Plan失效，namespace/实际读取无隐式合并。
+- [ ] 本feature内明确并冻结lifecycle、run layout和direct dependency/proof ledger，再据此实现；生成来源和校验输入分开，修改Map不会自动使Plan失效，namespace/实际读取无隐式合并。
 - [ ] F31拥有领域Context Policy与system instructions，按允许的输入集组装请求；Core不导入Map/Plan/Stage，候选实际输入集和指纹可取证。
 
 - [ ] 工具以 Registry 的确定签名暴露，原文/合同读取、全部必需产物写入与校验均有真实实现。

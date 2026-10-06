@@ -1,6 +1,14 @@
 # Single-Agent Harness Design Brief
 
-Date: 2026-10-06. Status: task-design draft, not implemented.
+Date: 2026-10-06. Status: optional architecture background; NON-NORMATIVE.
+
+## Reading priority and authority
+
+用户于2026-10-06要求降低本长文的重要性。本文保留跨feature讨论、架构选项和推导背景，仅按需查阅；不是默认上下文、正式接口设计、实施计划或完成门禁的authority，不要求读完整篇才能开始F26设计。
+
+F26默认输入是[当前feature合同](../harness/features/individual_feature/F26-single-agent-harness/feature.md)、同目录verification及用户提供的[详细接口问答草案](../harness/features/individual_feature/F26-single-agent-harness/ref/f26_detailed_interface_design_draft.md)。问答是设计输入，仍需对齐当前合同已确定的TypeScript及状态/停止语义，形成正式详细设计和实施计划。本文与现行合同/Schema/spec冲突时，以对应正式文档为准。
+
+F31/F32接手时依据自身合同和既有数据规范形成各自局部设计；需要追查bootstrap、产物依赖或quality讨论来历时才定位阅读本文章节，不把本文草案表格直接提升为已冻结协议。
 
 ## Intent and source
 

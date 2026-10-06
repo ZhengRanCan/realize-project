@@ -47,7 +47,7 @@ Date: 2026-10-06.
 
 执行顺序为 **F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30**；harness按依赖选任务，编号较小不表示忽略前置。此前聊天“F26”的L1解释修正由F23 v0.2承接；本轮更改的是后来实际登记的AI实验，二者不混。
 
-[设计草案](../notes/single-agent-harness-design.md)记录参考附件、推荐方案与当前待确认的接口边界。本轮开工前反馈已补齐bootstrap、lifecycle、direct dependency/proof closure、workspace、结构/质量状态与trajectory。F31正常scope也已移出旧生成脚本与assembler。canonical领域prompt只由F31维护，F32只读并通过代码反馈completion，F33新建/hash实验变体及外部quality sidecar。Context不是固定workflow，失效从typed read set/proof图推导；故障矩阵归F26–F32。登记不开始产品代码、依赖安装或外部模型运行。F26/F31/F32分别验内核、领域工具与离线完整集成；只有F33对真实模型生成质量作结论。
+默认先读当前feature合同/verification；F26再读[详细接口问答](features/individual_feature/F26-single-agent-harness/ref/f26_detailed_interface_design_draft.md)，按当前TypeScript合同落实正式详细设计与计划。[长篇架构背景](../notes/single-agent-harness-design.md)已降为NON-NORMATIVE按需参考，不是前置必读或冻结接口。本轮开工前反馈已补齐bootstrap、lifecycle、direct dependency/proof closure、workspace、结构/质量状态与trajectory。F31正常scope也已移出旧生成脚本与assembler。canonical领域prompt只由F31维护，F32只读并通过代码反馈completion，F33新建/hash实验变体及外部quality sidecar。Context不是固定workflow，失效从typed read set/proof图推导；故障矩阵归F26–F32。登记不开始产品代码、依赖安装或外部模型运行。F26/F31/F32分别验内核、领域工具与离线完整集成；只有F33对真实模型生成质量作结论。
 
 F28只准备输入，F29接通产品调用；F27/F28自身需要基本可用，F30不作为拖延入口可用性的理由。模型入口采用同一runtime，不在Electron内维护第二个Agent loop。
 

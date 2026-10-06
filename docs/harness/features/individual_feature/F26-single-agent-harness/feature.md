@@ -20,8 +20,8 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 
 - Core无Reading feature强制依赖；F31仅依赖Core，Reading/Bundle/L0/L1/L2前置集中在F32交付集成。领域system prompt归F31，不由Core维护。
 
 - 2026-10-06 用户要求将原 F26 改为 Single-Agent Harness，扩充任务并后移 AI 实验及 F27–F30。本次只调整合同，原实验完整迁到 F33，不丢弃其验收要求。
-- 输入草案已由用户归入 [ref/single-agent-harness-architecture-template.md](ref/single-agent-harness-architecture-template.md)；保留参考原文，其中目录、代码片段和实施建议不是自动执行指令。ref不作为Schema/Contract/完成门禁的authority，正式决策在本合同和设计稿维护。
-- [架构草案](../../../../notes/single-agent-harness-design.md)记录当前边界；这是新运行时，开工前按架构路径确认书面设计和实施计划。登记不意味着批准依赖安装、外部框架引入或模型运行。
+- 默认设计输入：本合同、verification及用户提供的[详细接口问答草案](ref/f26_detailed_interface_design_draft.md)。问答已足以支持详细设计，但其旧版本/可选JS措辞、状态和停止原因须对齐当前TypeScript合同，不能直接当成冻结实现。
+- [原架构模板](ref/single-agent-harness-architecture-template.md)保留参考原文；[长篇架构背景](../../../../notes/single-agent-harness-design.md)已降为NON-NORMATIVE按需参考，不作为前置必读或authority。正式接口与计划应在本feature内维护；新运行时开工前仍确认书面设计/实施计划。
 - F26 只验内核；F31 接领域工具，F32 验完整离线链路和完成门禁，F33 做真实模型实验，F29 后续接入 Electron。
 
 ## Scope

@@ -61,7 +61,7 @@ F22 的明确旧路径映射由 `scripts/helpers/repository-layout.json` 单独�
 
 ## 任务从哪里开始
 
-2026-10-06 阶段切换见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)：Reading 第一版作为使用基线，先F26/F31/F32最小Single-Agent Harness，再F33 DeepSeek实验，之后F27–F30配置/选文档/产品链路与入口UI；合同均not_started。原F26实验迁到F33，编号/迁移和[设计草案](notes/single-agent-harness-design.md)由路线说明；实施设计与计划尚未确认。
+2026-10-06 阶段切换见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)：Reading 第一版作为使用基线，先F26/F31/F32最小Single-Agent Harness，再F33 DeepSeek实验，之后F27–F30配置/选文档/产品链路与入口UI；合同均not_started。原F26实验迁到F33，编号/迁移由路线说明。F26设计先读合同与[详细接口问答](harness/features/individual_feature/F26-single-agent-harness/ref/f26_detailed_interface_design_draft.md)；[长篇架构背景](notes/single-agent-harness-design.md)为NON-NORMATIVE按需参考，不默认加载；正式实施设计与计划尚未确认。
 
 agent 的任务入口与完整文档路由表在仓库根目录 `agent.md`；harness 侧的选择顺序是：
 
