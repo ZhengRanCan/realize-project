@@ -15,6 +15,10 @@
 
 ## Manual paths
 
+- [ ] 交换Inventory/Review合法分支操作顺序均可执行；必要输入缺失则拒绝，不由Host指定固定下一Stage。
+- [ ] operation切换的实际请求无禁止的旧语义历史，tool-call/result合法配对；read set覆盖真正发送内容。
+- [ ] canonical prompt写权限唯一，旧生成/assembler修改例外须有scope/纯helper/旧消费者回归记录。
+
 - [ ] Host准备两份不同文档的冻结原文/完整hash/确定性registry后才启动Agent；取消、解码错误、来源漂移不启动模型或借旧输入。
 - [ ] lifecycle、直接依赖账本及请求read set真实对应；Map变化不会错误使Plan/Block全部失效。
 

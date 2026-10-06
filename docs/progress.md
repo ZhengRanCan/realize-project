@@ -40,14 +40,14 @@
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
 | F24 | L2 Independent Block Reading View | `passing` | 两项反馈修正/真实回归/独立复查完成，用户确认第一版基本完成 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
-| F26 | Single-Agent Harness Core v0.3 | `not_started` | 原实验迁F33；Core删除Reading依赖，只执行通用Context/完成Policy，默认no-tool拒绝两次停止；待实施设计 |
+| F26 | Single-Agent Harness Core v0.3 | `not_started` | 原实验迁F33；Core删除Reading依赖，只执行通用Context/完成Policy，默认no-tool拒绝两次停止；待详细接口设计 |
 | F27 | AI Configuration v0.2 | `not_started` | 保留编号后移，等待F33；消费Harness Provider接口及实验参数结论 |
 | F28 | Document Analysis Entry v0.2 | `not_started` | 等待F27；输入范围和交接结合F33结论细化 |
 | F29 | End-to-end Analysis v0.2 | `not_started` | 等待Harness/F33及F27/F28；Electron消费现成runtime，不另写loop |
 | F30 | Analysis Entry UI Refinement | `not_started` | 等待F29实际入口链路与截图 |
-| F31 | Agent Domain Workspace and Tools v0.2 | `not_started` | 等待F26；Host bootstrap/确定性坐标、领域workspace/Context、生命周期/直接依赖与工具 |
-| F32 | Agent Completion Gate and Bundle Integration | `not_started` | 等待F31；精确proof closure、结构/质量状态分离及bundle集成 |
-| F33 | AI Integration Experiment | `not_started` | 从原F26迁移，等待F32；scope仅driver/eval/agent模板，trajectory与真实DeepSeek行为评价 |
+| F31 | Agent Domain Workspace and Tools v0.3 | `not_started` | 等待F26；Host bootstrap/确定性坐标、领域workspace/Context、生命周期/直接依赖与工具 |
+| F32 | Agent Completion Gate and Bundle Integration v0.3 | `not_started` | 等待F31；精确proof closure、结构/质量状态分离及bundle集成 |
+| F33 | AI Integration Experiment v0.3 | `not_started` | 从原F26迁移，等待F32；scope仅driver/eval/agent模板，trajectory与真实DeepSeek行为评价 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -86,7 +86,7 @@ Renderer 不重新推断 semantic relation
 
 开工前反馈已落实：F26是无Reading依赖的通用Core，F31负责Host原文/坐标bootstrap、领域Context/Workspace与产物直接依赖；F32验证精确proof closure和结构交付，F33收窄为driver/eval、真实DeepSeek行为及trajectory评价。设计稿补齐生命周期/直接依赖表/run布局和状态命名；不按Stage顺序失效全部产物，结构完成不代表质量已评。原实验合同在未开始/无run状态完整迁移；F27–F30目标保留，F29负责产品调用现成runtime。
 
-路线及合同入口见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，职责/附加项目边界见 [设计草案](notes/single-agent-harness-design.md)。本轮没有产品代码、依赖安装或模型调用；书面接口设计与实施计划尚未批准。反馈及修订见 [contract review](harness/incidents/2026-10-06-harness-contract-review.md)。暂停Reading扩展，实际使用后再基于截图讨论解释页顶部。
+路线及合同入口见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，职责/附加项目边界见 [设计草案](notes/single-agent-harness-design.md)。第二轮反馈认可拆分，本轮只清理所有权并核查设计稿：F31移出旧脚本正常写scope，canonical prompt独占；Context与proof图驱动的验收补齐，quality evidence绑定原bundle且不改包。本轮没有产品代码、依赖安装或模型调用；书面接口设计与实施计划尚未批准。反馈及修订见 [contract review](harness/incidents/2026-10-06-harness-contract-review.md)。暂停Reading扩展，实际使用后再基于截图讨论解释页顶部。
 
 ## 历史阶段路线（2026-09-29 登记）
 
@@ -129,7 +129,7 @@ $ npm run verify:harness
 Harness gate: 32 features, 0 errors.        # 2026-10-06，Harness先行拆分/原实验迁移
 
 $ npm run check:docs
-Doc links: 181 markdown files checked, 0 broken.
+Doc links: 182 markdown files checked, 0 broken.
 
 $ npm run check:experiments
 experiments index: 66 units + 17 artifacts, up to date. # 既有检查记录，本轮未改实验目录

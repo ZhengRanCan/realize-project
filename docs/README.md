@@ -18,6 +18,8 @@ docs/
 
 ## 各类文件的边界
 
+feature专用外部参考可放在 `docs/harness/features/individual_feature/<feature>/ref/`，由对应feature合同按需链接。ref保留原始材料，不作为当前规范、已批准设计或实施指令；经过采纳的结论另记合同/设计，读取时不默认加载全部参考。F26的Single-Agent模板已由用户归入ref。
+
 | 位置 | 放什么 | 不放什么 |
 | --- | --- | --- |
 | `docs/harness/**` | 产品范围、约束、架构、设计、初始化契约、feature 合同、incident、lesson | 执行结果、长命令输出 |

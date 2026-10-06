@@ -16,6 +16,9 @@
 
 ## Manual paths
 
+- [ ] canonical prompt不改，实验变体/base/实际发送hash完整；修改被测系统后冻结新基线重跑。
+- [ ] 同bundle不同rubric保存两份sidecar，bundle/human-review保持字节；内容变化不匹配旧评价，搬迁不改变subject。
+
 - [ ] 原文输入 → AI 生产整套数据 → 显式配对 → 打开 L0 导读与图 → L1 主题/解释 → L2 表达 → 回查原文。
 - [ ] 非 Gold 文档同路径，没有手工塞入预备 Review/Plan/Map/Guide，没有复用旧文章坐标。
 - [ ] 抽查关键定义、边界、例外、未决事项与 Current/Target；对比 DeepSeek 重复结果，记录未覆盖的判断及后续跨模型比较方式。

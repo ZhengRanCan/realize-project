@@ -13,6 +13,12 @@ Scope: pre-implementation contracts and design, not a runtime defect.
 - F32结构完成、Core运行停止与F33质量结果分别命名；Generated装配对Review和元数据的真实依赖纳入记录。
 - F33 scope去掉旧generation scripts/assembler/exporter修改权限，明确trajectory计数与真实模型行为评价；不重做底层完整故障矩阵。
 
+## Second feedback — ownership and implementation semantics
+
+用户再次粘贴外部复查：认可四feature分层，建议只清理F31旧脚本与canonical prompt所有权，并把Context非固定workflow、graph-driven失效和quality sidecar绑定作为实现重点。本轮删去F31的旧生成/assembler正常写权限，F32不写canonical prompt，F33仅写新实验变体和eval模板。
+
+同时检查实际设计稿，补齐operation切换不能沿用不允许的完整语义历史、InputRef逻辑身份与proof反向边、发布版本向量及独立quality evidence指纹。仅补设计/验收，不声称运行时已验证，不把外部AI的合同认可当作用户对实现的验收。
+
 ## Verification boundary
 
 本轮仅修改文档、feature版本/索引与验收要求，校验引用、元数据、依赖图及diff。未运行模型、未改变产品行为；设计/计划和各feature的真实实施证据仍待完成。结论与具体规则见[设计稿](../../notes/single-agent-harness-design.md)。

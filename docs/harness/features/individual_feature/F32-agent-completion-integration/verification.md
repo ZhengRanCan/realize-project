@@ -14,6 +14,9 @@
 
 ## Manual paths
 
+- [ ] 匿名资源图验证反向边传递失效/无关分支保留、同hash不同身份、相同字节重复revision；代码无Map/Review type特判。
+- [ ] canonical prompt字节保持，宿主completion有具体缺项；proof向量变化/取消后不能发布旧证明对应新包。
+
 - [ ] stopped / structurally_complete / completionGate / quality_status分别正确；结构PASS与quality unreviewed可同时存在，不冒充内容质量已通过。
 
 - [ ] 受控多轮轨迹完成真实工具生产、装配/验证和打开结果。

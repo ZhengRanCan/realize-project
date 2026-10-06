@@ -1,12 +1,12 @@
 ---
 id: F33
 title: AI Integration Experiment
-version: v0.2
+version: v0.3
 status: not_started
 dependsOn: ["F32"]
-scope: {"code":["scripts/ai-integration-experiment*.js","scripts/helpers/ai-experiment-*.js","prompts/agent-system*.md","prompts/eval*.md","package.json"],"tests":["scripts/test-ai-integration-experiment*.js","scripts/test-ai-experiment-eval*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F33-ai-integration-experiment/**","docs/progress.md","prompts/README.md","artifacts/experiments/**","docs/log/artifacts/F33-ai-integration-experiment/**","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
+scope: {"code":["scripts/ai-integration-experiment*.js","scripts/helpers/ai-experiment-*.js","prompts/experiments/agent-system-*.md","prompts/eval*.md","package.json"],"tests":["scripts/test-ai-integration-experiment*.js","scripts/test-ai-experiment-eval*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F33-ai-integration-experiment/**","docs/progress.md","prompts/README.md","artifacts/experiments/**","docs/log/artifacts/F33-ai-integration-experiment/**","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.2","l3":"required","userPath":["原文 → 当次AI产物 → 校验/装配 → 资料包 → 现有L0/L1/L2与来源"],"integrationEvidence":[],"knownUnverified":["F26/F31/F32尚未实施，待通过后执行真实模型实验","首轮Provider已选DeepSeek；具体模型/端点/接口与预算未确定，未执行新实验","任意文档的Review生成、Map/Plan引用、readingGuide及来源衔接待验证","重复稳定性及完整结果尚无证据","实验driver/eval/trajectory指标尚未实现；真实未观测失败不当成通过"],"humanReviewRequired":["用户确认具体实验输入与运行范围","用户抽查完整结果并接受首版接入建议"]}
+completionGate: {"version":"v0.3","l3":"required","userPath":["原文 → 当次AI产物 → 校验/装配 → 资料包 → 现有L0/L1/L2与来源"],"integrationEvidence":[],"knownUnverified":["F26/F31/F32尚未实施，待通过后执行真实模型实验","首轮Provider已选DeepSeek；具体模型/端点/接口与预算未确定，未执行新实验","任意文档的Review生成、Map/Plan引用、readingGuide及来源衔接待验证","重复稳定性及完整结果尚无证据","实验driver/eval/trajectory指标尚未实现；真实未观测失败不当成通过"],"humanReviewRequired":["用户确认具体实验输入与运行范围","用户抽查完整结果并接受首版接入建议"]}
 ---
 
 # F33 AI Integration Experiment
@@ -28,6 +28,9 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["原文 → 当次
 
 ### Allowed changes
 
+- 仅新建prompts/experiments/agent-system-*.md变体及eval模板；run冻结base hash、变体版本、实际发送文本hash与policy/runtime基线，不改canonical。
+- 独立QualityEvaluation sidecar绑定manifest与不可变文件闭包指纹及evaluator/rubric；同subject可有多份评价，质量状态为匹配评价投影，不写bundle/artifact/human-review。
+
 - 核查现有生成路径对 Gold、样本坐标和人工增强 Map 的依赖，明确每个阶段输入、输出和校验器。
 - 经确认后编写调用F26/F31/F32 runtime的实验驱动和独立质量评估，复用现有装配与资料包导出；运行和记录DeepSeek重复实验。内核/领域工具缺陷返回其所属feature修正。
 - 验证 Review 生成、Map/Plan 显式引用和 readingGuide 的来源绑定，所有数据仍落在现有结构内。
@@ -45,6 +48,9 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["原文 → 当次
 - 重做F26–F32完整离线故障矩阵；本项离线测试只验证实验driver、指标汇总与独立eval自身。
 
 ## Acceptance Criteria
+
+- [ ] 实验不改canonical prompt，每run的base/variant/actual prompt和runtime/policy指纹可追溯；输入集合变体受F31策略约束。
+- [ ] QualityEvaluation仅作为外部sidecar保存，subject绑定实际校验的manifest与不可变文件闭包；换rubric可并存，新文件版本不得套旧评价，原bundle与human-review字节不变。
 
 - [ ] 确定 DeepSeek 的具体模型、端点/接口、文档/重复次数与预算；实际参数、模板/原文指纹和结果可追溯。
 - [ ] 使用同一Single-Agent runtime独立完成真实生产；完整链路不依赖样本 Gold/人工补数据，第二篇文档不串用旧坐标或旧 Review；诊断运行明确标记固定输入。
@@ -70,3 +76,7 @@ completionGate: {"version":"v0.2","l3":"required","userPath":["原文 → 当次
 ## Pre-implementation feedback correction — 2026-10-06
 
 scope缩为实验driver/recorder/eval及明确的agent/eval模板，不允许边实验边改旧生成脚本或runtime。故障矩阵归F26–F32，F33记录真实模型行为与轨迹指标。quality_status独立于结构完成，当前仍not_started。
+
+## Ownership cleanup — 2026-10-06
+
+第二轮反馈认可feature分层。本轮收紧legacy/canonical prompt写权限，补齐Context非固定workflow、graph-driven失效及独立QualityEvaluation绑定验收；仍not_started，未运行模型或实现代码。
