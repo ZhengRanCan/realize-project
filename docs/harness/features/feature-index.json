@@ -170,7 +170,7 @@
   {
     "id": "F26",
     "title": "Single-Agent Harness Core",
-    "status": "not_started",
+    "status": "active",
     "feature_folder": "docs/harness/features/individual_feature/F26-single-agent-harness",
     "version": "v0.4"
   },
@@ -224,3 +224,4 @@
     "version": "v0.3"
   }
 ]
+
