@@ -2,7 +2,7 @@
 
 ## Required commands
 
-2026-10-06 已实施并完成下列技术验证，见 artifact 验证记录；人工阅读验收尚未完成。
+2026-10-06 已完成下列技术验证，见 artifact 验证记录；用户随后明确确认 L0/L1/L2 第一版基本完成，按首版基线收口。
 
 | Layer | Command / check | Required | Evidence |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@
 - [x] Explore → 在阅读中打开 Block → 同一独立 L2 → 返回 Explore → 返回原阅读现场。
 - [x] 有效 Plan Block 缺 Generated/缺单块表达、无 Topic occurrence、Known(0) 等路径不造内容、不丢身份。
 - [x] 640×720、Tab/Enter/Space/Esc、延迟 Source/session 切换、搬迁 Preview、只读和无自动保存通过。
-- [ ] 用户对实际独立 L2 的范围与视觉解释给出验收判断。
+- [x] 用户实际试读并反馈两项修正后确认 L0/L1/L2 第一版基本完成；后续使用反馈继续登记，不声称额外理解测试。
 
 ## Passing evidence
 

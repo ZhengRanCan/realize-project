@@ -3,10 +3,10 @@
 ## Status
 
 - Date: 2026-10-06.
-- Active feature: 无；F24两项实际阅读反馈已修正并验证，blocked待复验；F23 v0.2 / F17 已 passing。
-- Next step: 试读 F24 的流程/对照解释页及 L1 相关解释标签；验收后关闭本项。
-- Latest completed feature: `F23 v0.2` / `F17`（2026-10-06）；用户对 L1 修正版反馈“看着也算还行”并要求继续 L2，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
-- Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前整体阅读体验未验收，暂不合并 main。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 技术交付作为本地检查点保留，未推送、不提前合并 main。
+- Active feature: 无；用户确认 L0/L1/L2 第一版基本完成，F24 收口 passing；F26 AI 接入实验已登记 not_started。
+- Next step: 首轮先用 DeepSeek，确定具体模型/端点、实验输入和范围，推进 F26 完整数据生产实验；暂缓 Reading 扩展。
+- Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
+- Git strategy: 已有 F19–F22 工作在 `codex/f11-f21-conformance`；当前首版已确认，本轮不操作 main 合并。F23/F24 登记为本次返工；F23 技术实现、设计和证据作为本地检查点提交，本轮未推送；F24 技术交付作为本地检查点保留，未推送、不提前合并 main。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
   `framework-map-contract.md` 与历史证据分离；4 个 commit 已推送
   （`50826a8` → `88aeed9` → `eea7662` → `007abff`）。
@@ -38,8 +38,9 @@
 | F21 | Product Maturity（UX / 性能 / 可访问性） | `passing` | 原生键盘、640×720窗口、Gold/压力预算、15轮回归与独立审查通过 |
 | F22 | Entry and Repository Layout | `passing` | 首页折叠、用途分区、样本归拢、完整性和独立审查通过 |
 | F23 | L1 Topic Boundary View v0.2 | `passing` | 解释修正、技术回归、独立复查及用户本轮验收完成 |
-| F24 | L2 Independent Block Reading View | `blocked` | 核查信息移图下，元素直接点击/键盘查出处，原表达和来源路径保留；技术验证通过待用户复验 |
+| F24 | L2 Independent Block Reading View | `passing` | 两项反馈修正/真实回归/独立复查完成，用户确认第一版基本完成 |
 | F25 | L0 Document Orientation and Explanation | `passing` | 用户本轮试读只提出连接解释位置问题；按确认方案修复并收口 |
+| F26 | AI Integration Experiment | `not_started` | 首轮 Provider 已选 DeepSeek；待具体模型/端点与实验范围确认，未运行模型 |
 
 ### 阶段划分（2026-09-29 登记）
 
@@ -70,9 +71,17 @@ Renderer 不重新推断 semantic relation
 高风险 invariants 有机器保护
 ```
 
-以上是完成条件，不是当前完成结论。**用户试用确认 L1/L2 展示仍有缺口，整体分层阅读体验尚未完成验收。** F23/F24 分别补齐边界图和独立解释页，自动化通过不能代替实际可理解性判断。
+首轮试用发现的 L1/L2 缺口已由 F23/F24 修正。2026-10-06 用户确认第一版基本完成，当前以此为使用基线；该确认不表示跨文档通用质量已经验证，后续实际反馈继续登记。
 
-## 下一阶段路线（2026-09-29 登记）
+## 当前下一阶段 — AI 与分析入口（2026-10-06）
+
+用户明确要求暂停主动扩展 Reading，先完成“自己的文档 → AI 分析 → 完整结果”。首轮选择 DeepSeek，先建立重复稳定性/质量基准，其它模型对比后置。
+
+F26 AI 接入实验 → F27 AI 配置 → F28 文档选择入口 → F29 完整分析链路 → F30 入口 UI 整理。只登记 F26，F27–F30 是待实验后细化的建议拆分。现有脚本依赖预备 Review/样本坐标，且 Map 与 Plan、readingGuide 尚未串成完整生产路径；不能把某个模型单阶段成功当成完整结果。
+
+路线与实验提案见 [AI Integration Roadmap](harness/AI_INTEGRATION_ROADMAP.md)，登记合同见 [F26](harness/features/individual_feature/F26-ai-integration-experiment/feature.md)。当前只有文档登记，没有新增产品代码、模型调用或配置存储；具体 Provider 端点/模型仍待确定。实际使用后再基于截图讨论解释页顶部，历史记录/批量分析/复杂参数/Prompt 编辑均暂缓。
+
+## 历史阶段路线（2026-09-29 登记）
 
 从「架构规范形成」切到「**现有实现向规范收敛**」：规范已经成为 conformity criterion，
 代码是被检查对象，不再是从代码反推设计意图。**不是重写，也不是"再跑一遍旧测试"**。
@@ -110,13 +119,13 @@ F15  集成不变量                 renderer 纪律 / Decision B 导航 / Decis
 
 ```text
 $ npm run verify:harness
-Harness gate: 23 features, 0 errors.        # 2026-10-03，登记 F23/F24、重开 F17
+Harness gate: 25 features, 0 errors.        # 2026-10-06，F24 首版收口、登记 F26
 
 $ npm run check:docs
-Doc links: 145 markdown files checked, 0 broken.
+Doc links: 165 markdown files checked, 0 broken.
 
 $ npm run check:experiments
-experiments index: 66 units + 17 artifacts, up to date.
+experiments index: 66 units + 17 artifacts, up to date. # 既有检查记录，本轮未改实验目录
 ```
 
 > 下面的「收口复跑」表是 **2026-09-27 的历史快照**（当时 9 features / 69 docs），
@@ -161,8 +170,7 @@ experiments index: 66 units + 17 artifacts, up to date.
 - 完整 Overview Preview
 - L0 framework map（生成链路 + Electron 一屏两区界面，第一轮 deterministic UI integration）
 
-当前重点是继续完善 **Visual Overview 的人工阅读体验**，随后把 L0 接回 Electron 主流程
-（对应 F08 未关闭的 Phase 3/4/5）。
+当前重点已转为 AI 完整分析与软件入口；L0/L1/L2 第一版作为使用基线。F04–F10 的历史 Gate 与跨文档结论保持原状态，不因本轮用户首版确认自动关闭。
 
 后续阶段再考虑：
 

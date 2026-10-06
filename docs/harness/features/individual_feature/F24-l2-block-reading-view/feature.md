@@ -2,11 +2,11 @@
 id: F24
 title: L2 Independent Block Reading View
 version: v0.1
-status: blocked
+status: passing
 dependsOn: ["F23","F16","F18","F19","F20","F21"]
 scope: {"code":["app/shared/reading-projection.js","app/renderer/app.js","app/renderer/reading-navigation.js","app/renderer/index.html","app/renderer/styles.css","app/main/main.js","scripts/build-preview.js","package.json","app/renderer/l2-block-view.*","app/renderer/l1-topic-view.js"],"tests":["scripts/test-reading-runtime.js","scripts/test-reading-navigation-electron.js","scripts/test-reading-integration.js","scripts/test-reading-integration-electron.js","scripts/test-explore-electron.js","scripts/test-product-maturity-electron.js","scripts/test-reading-bundle-preview.js","scripts/test-l0-preview.js","scripts/test-l2-block-view*.js","scripts/test-l1-boundary-view*.js","scripts/test-l0-orientation-electron.js","scripts/test-reading-bundle-electron.js"],"docs":["docs/harness/DESIGN.md","docs/harness/ARCHITECTURE.md","docs/specs/reading-view-cognitive-contract.md","docs/specs/reading-view-layer-contracts.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F24-l2-block-reading-view/**","docs/log/artifacts/F24-l2-block-reading-view/**","docs/harness/features/individual_feature/F16-l2-runtime/**","docs/harness/features/individual_feature/F17-l1-runtime/**","docs/progress.md","docs/harness/incidents/2026-10-06-f24-reading-view.md"]}
-evidence: {"lastVerifiedAt":"2026-10-06","commands":[{"command":"npm.cmd run test:l2-block","result":"passed","output":"current feedback fix: 21 original expression trees and fragment paths retained; context below, Receipt/matrix native keys/mouse and Back passed"},{"command":"npm.cmd run selftest","result":"passed","output":"final standalone full Electron chain passed; one earlier F19 Map selection failure retained in incident"},{"command":"npm.cmd run test:all","result":"passed","output":"full offline and relocated legacy/enhanced Preview passed"},{"command":"npm.cmd run validate / npm.cmd run audit","result":"passed","output":"fixture and original Overview consistency passed"},{"command":"npm.cmd run check-overview","result":"passed","output":"PASS WITH WARNINGS; existing duplicate17/density1"},{"command":"node --check modified/new JS; git diff --check","result":"passed","output":"current 3 modified JavaScript files and diff passed"},{"command":"npm.cmd run check:docs / npm.cmd run verify:harness","result":"passed","output":"final docs and feature metadata passed"}],"manualSmoke":"用户已试读并反馈核查位置与出处框；按要求修正，真实Receipt/表格Enter/Space/click/Back及21表达/来源path保护通过，修正版待用户复验。"}
-completionGate: {"version":"v0.1","l3":"required","userPath":["L1 → 关联 Block → 单独 L2 → L3 → Back → L2 → L1","Explore → Open in Reading(Block) → 单独 L2 → Back 恢复 Explore","缺 Generated/缺表达、无 Topic occurrence 的有效 Block 仍可打开"],"integrationEvidence":["docs/log/artifacts/F24-l2-block-reading-view/verification-summary.md","docs/log/artifacts/F24-l2-block-reading-view/subagent-review.md","真实Electron/搬迁Preview的单subject与全部表达、L1标签、Block/fragment/Explore/Back、缺资料与no-save通过"],"knownUnverified":["用户实际试读提出的核查位置/出处框已修正；本次元素直接点击与布局待用户复验"],"humanReviewRequired":["用户查看代表性的 L2 流程/对照等内容，确认只展开当前解释单元且视觉表达便于理解"]}
+evidence: {"lastVerifiedAt":"2026-10-06","commands":[{"command":"npm.cmd run test:l2-block","result":"passed","output":"current feedback fix: 21 original expression trees and fragment paths retained; context below, Receipt/matrix native keys/mouse and Back passed"},{"command":"npm.cmd run selftest","result":"passed","output":"final standalone full Electron chain passed; one earlier F19 Map selection failure retained in incident"},{"command":"npm.cmd run test:all","result":"passed","output":"full offline and relocated legacy/enhanced Preview passed"},{"command":"npm.cmd run validate / npm.cmd run audit","result":"passed","output":"fixture and original Overview consistency passed"},{"command":"npm.cmd run check-overview","result":"passed","output":"PASS WITH WARNINGS; existing duplicate17/density1"},{"command":"node --check modified/new JS; git diff --check","result":"passed","output":"current 3 modified JavaScript files and diff passed"},{"command":"npm.cmd run check:docs / npm.cmd run verify:harness","result":"passed","output":"final docs and feature metadata passed"}],"manualSmoke":"2026-10-06 用户明确确认“目前 L0、L1、L2 的第一版基本完成”，以当前修正版作为首版基线并转向AI接入。结合已有真实界面回归与独立复查收口；未新增口头复述或第二篇文档理解测试。"}
+completionGate: {"version":"v0.1","l3":"required","userPath":["L1 → 关联 Block → 单独 L2 → L3 → Back → L2 → L1","Explore → Open in Reading(Block) → 单独 L2 → Back 恢复 Explore","缺 Generated/缺表达、无 Topic occurrence 的有效 Block 仍可打开"],"integrationEvidence":["docs/log/artifacts/F24-l2-block-reading-view/verification-summary.md","docs/log/artifacts/F24-l2-block-reading-view/subagent-review.md","真实Electron/搬迁Preview的单subject与全部表达、L1标签、Block/fragment/Explore/Back、缺资料与no-save通过"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F24 L2 Independent Block Reading View
@@ -54,8 +54,8 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["L1 → 关联 Blo
 - [x] Block/fragment → L3 → Back 恢复该 L2 的展开、滚动、焦点；L2 → Back 恢复原 L1 occurrence，其他来源按共享栈恢复。
 - [x] Explore 的 Open in Reading(Block) 进入同一独立 L2；返回恢复 Explore；旧 session/延迟 Source 不覆盖新页面，无自动保存。
 - [x] 640×720 窗口、键盘、长表达、披露与返回可用；可搬迁只读 Preview 和 Electron 共用展示。
-- [ ] 用户检查代表性的实际 L2 表达，确认阅读范围明确且容易理解；自动化通过不替代人工判断。
-- [ ] 相关单元/真实 Electron/Preview 回归、独立审查、用户验收完成；同步合同/index/dashboard 和 F16 范围说明后才 passing。
+- [x] 用户在实际试读和两项修正后确认 L0/L1/L2 第一版基本完成，以当前版本作为使用基线；不声称额外跨文档理解测试。
+- [x] 相关单元/真实 Electron/Preview 回归、独立审查及本轮首版确认完成，同步合同/index/dashboard 和 F16 范围说明。
 
 ## Risks and compatibility
 
@@ -65,7 +65,7 @@ completionGate: {"version":"v0.1","l3":"required","userPath":["L1 → 关联 Blo
 
 ## Completion evidence
 
-本任务于 2026-10-06 完成技术实施、真实界面/Preview回归与独立复查，当前 blocked 等待用户实际阅读验收。证据登记在 `docs/log/artifacts/F24-l2-block-reading-view/`。
+本任务于 2026-10-06 完成技术实施、真实界面/Preview 回归与独立复查；随后用户确认首版基本完成，现 passing。证据登记在 `docs/log/artifacts/F24-l2-block-reading-view/`。
 只保留设计、计划、verification-summary、独立审查及必要截图，不保留成功校验 txt。
 F16 的数据接入 passing 不代表本 feature 的界面验收；Reading 整体体验需 F23/F24 和实际人工判断完成。
 
@@ -94,3 +94,7 @@ Native审查发现并修复入口滚动隐藏顶部上下文的P2，复查无剩
 ## Feedback fix technical delivery — 2026-10-06
 
 两项实际反馈已修正：核查披露位于表达后，L2移除额外出处框并使原fragment元素成为直接点击/键盘控件。只有已有来源的fragment启用，表格td/th语义保留；旧Overview继续原按钮。Receipt与真实matrix cell的Enter/Space、鼠标label点击及共享L3/Back焦点通过；全部21块剥离纯交互后原表达树和原fragment paths一致。Native独立复查通过，等用户复验。
+
+## First-version acceptance — 2026-10-06
+
+用户在试读反馈修正后明确说“目前 L0、L1、L2 的第一版基本完成”，并要求暂缓扩展、转向 AI 接入及入口流程。本次按该明确确认收口 F24，保留所有原有技术和独立复查证据。没有额外声称口头复述、第二篇文章阅读验收或通用质量结论；此前待复验段落是过程记录，当前状态以本节和 frontmatter 为准。

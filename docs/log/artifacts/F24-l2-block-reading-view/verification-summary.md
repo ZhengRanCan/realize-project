@@ -1,6 +1,6 @@
 # F24 Implementation Verification
 
-Current: 2026-10-06. 技术实施、真实 Electron/Preview 回归与独立审查通过；F24 blocked 等待反馈修正版复验。用户已试读并提出核查位置和出处框问题，本轮已修正。用户批准页面及标签设计（“行，做吧”），不据此声称修正版界面验收。
+Current: 2026-10-06. F24 passing。技术实施、真实 Electron/Preview 回归与独立审查通过；用户试读后提出的两项反馈已修正，随后明确确认“目前 L0、L1、L2 的第一版基本完成”。此为当前首版基线确认，不声称额外口头复述或第二篇文章理解测试。
 
 ## Delivered behavior
 
@@ -43,7 +43,7 @@ Current: 2026-10-06. 技术实施、真实 Electron/Preview 回归与独立审�
 
 本机试读：重启 Electron，打开 `workspace/analyses/context-consumption/f25-reading/reading-bundle.json`，进入“生成链路与消费点”，在右侧“相关解释”打开 O-04 / O-04b。也可打开重建的便携 Preview：`workspace/previews/f24-reading-preview.html`。
 
-F24 当前等待用户对两项反馈修正版复验，原未完成的实际可理解性判据仍保留。原 L2 数据接入由 F16 保障，当前页面由 F24 验收；既有样本内容质量不因技术一致性自动升级。
+F24 已按用户本轮明确的首版确认收口；原 L2 数据接入由 F16 保障，当前页面由 F24 验收。单文档的首版确认不升级为跨文档通用质量结论；后续实际反馈仍需登记。
 
 ## Registration history
 
@@ -70,3 +70,7 @@ Date: 2026-10-03. Status: not_started.
 用户要求资料核查移到框架图后、删除独立出处框并让Receipt等元素可点击。先补真实21块布局/无额外框/原表达树与fragment path保护断言失败，再修正。Receipt label鼠标点击和Receipt/真实matrix cell的Enter、Space各自只产生一个原fragment核查；Back恢复原元素焦点，来源与父Block不变。完整selftest、本轮test:all搬迁Preview与Native复查通过；旧Overview仍使用原出处按钮。
 
 新增[概念页桌面](l2-concepts-desktop.png)及[窄窗口](l2-concepts-narrow.png)实际证据；核查披露在主体后，来源关联未删除。正式图像metadata同步重录hash。未把这次明确修改要求写成最终实际验收。
+
+## First-version acceptance — 2026-10-06
+
+实际用户确认：“目前 L0、L1、L2 的第一版基本完成”。用户要求现阶段暂停扩展，先推进 AI 接入与入口流程。结合已完成的真实界面回归与 Native 独立复查，关闭当前待复验项；没有运行新产品测试或模型实验来替代人工判断。

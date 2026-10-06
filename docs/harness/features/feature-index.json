@@ -156,7 +156,7 @@
   {
     "id": "F24",
     "title": "L2 Independent Block Reading View",
-    "status": "blocked",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F24-l2-block-reading-view",
     "version": "v0.1"
   },
@@ -165,6 +165,13 @@
     "title": "L0 Document Orientation and Explanation",
     "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F25-l0-document-orientation",
+    "version": "v0.1"
+  },
+  {
+    "id": "F26",
+    "title": "AI Integration Experiment",
+    "status": "not_started",
+    "feature_folder": "docs/harness/features/individual_feature/F26-ai-integration-experiment",
     "version": "v0.1"
   }
 ]
