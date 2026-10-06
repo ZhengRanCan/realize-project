@@ -2,7 +2,7 @@
 id: F26
 title: Single-Agent Harness Core
 version: v0.4
-status: not_started
+status: active
 dependsOn: []
 scope: {"code":["app/agent/core/*.ts","app/agent/providers/*.ts","app/agent/tools/registry*.ts","app/agent/trace/*.ts","app/agent/index*.ts","package.json","tsconfig.agent*.json","package-lock.json"],"tests":["scripts/test-agent-core*.js","scripts/test-agent-provider*.js","scripts/test-agent-registry*.js","scripts/test-agent-trace*.js","scripts/test-agent-types*.ts"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F26-single-agent-harness/**","docs/log/artifacts/F26-single-agent-harness/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
@@ -67,6 +67,10 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 
 
 实施后建立 `docs/log/artifacts/F26-single-agent-harness/`，登记内核真实循环、故障矩阵和独立审查。此处的开发 harness 门禁与产品 Agent 的 completion policy 是两个概念，均不等于设计审批或内容质量保证。当前仅任务登记。
 
+## Active implementation — 2026-10-06
+
+用户要求继续推进后，F26 成为唯一 active feature。正式接口以 [detailed-design.md](detailed-design.md) 为准，实施顺序与验证切片见 [implementation-plan.md](implementation-plan.md)。两份文档尚待用户确认；确认前不创建运行时代码或安装 TypeScript 依赖。
+
 ## Pre-implementation feedback correction — 2026-10-06
 
 按用户粘贴的反馈删除Reading依赖与阶段Context规则；默认无工具退出语义、通用停止状态和宿主不透明领域状态已写入设计草案。仅修订合同，仍not_started；不将登记检查当Core完成证据。
@@ -74,3 +78,4 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 
 ## TypeScript boundary — 2026-10-06
 
 用户明确选择新app/agent采用TypeScript，旧Electron模块不迁移。仅更新语言/构建与interop合同，实际tsconfig、开发依赖、源代码和命令在实施时建立；当前仍not_started。
+
