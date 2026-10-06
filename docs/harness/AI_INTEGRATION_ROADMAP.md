@@ -32,12 +32,12 @@ Date: 2026-10-06.
 
 ## Registered feature sequence
 
-2026-10-06 用户补充Single-Agent Harness架构草案，要求原F26改为Harness并扩充分工，原AI实验与F27–F30后移。原F26尚未实现、没有模型run，实验合同与完整质量验收迁到F33；F26更新为v0.2内核合同。F27–F30保留编号，只调整依赖，避免已有引用整体重编号。全部仍为not_started。
+2026-10-06 用户补充Single-Agent Harness架构草案，要求原F26改为Harness并扩充分工，原AI实验与F27–F30后移。原F26尚未实现、没有模型run，实验合同与完整质量验收迁到F33；F26更新为内核合同（本轮反馈后v0.3）。F27–F30保留编号，只调整依赖，避免已有引用整体重编号。全部仍为not_started。
 
 | Order | Feature | Delivery | Required previous feature |
 | --- | --- | --- | --- |
-| 1 | [F26 Single-Agent Harness Core](features/individual_feature/F26-single-agent-harness/feature.md) | 单Agent loop、Provider、Context/State、Registry、基础trace、预算/取消 | 现有Reading基线 |
-| 2 | [F31 Agent Domain Tools](features/individual_feature/F31-agent-domain-tools/feature.md) | Source/Contract、全部必需artifact写入（含Review）、既有validator适配与版本边界 | F26 |
+| 1 | [F26 Single-Agent Harness Core](features/individual_feature/F26-single-agent-harness/feature.md) | 通用loop/Provider/宿主Context Policy/State/Registry/trace/预算；不解释Reading语义 | 无Reading依赖 |
+| 2 | [F31 Agent Domain Workspace and Tools](features/individual_feature/F31-agent-domain-tools/feature.md) | Host原文准备/确定性坐标/run workspace、领域Context、artifact生命周期/直接依赖和validator | F26 |
 | 3 | [F32 Completion Gate and Bundle Integration](features/individual_feature/F32-agent-completion-integration/feature.md) | 当前版本完成门禁、真实装配/export/verify、离线完整工具链与Renderer交接 | F31 |
 | 4 | [F33 AI Integration Experiment](features/individual_feature/F33-ai-integration-experiment/feature.md) | 原F26实验：真实DeepSeek生成、重复稳定性/质量/成本/失败抽查，使用同一runtime | F32 |
 | 5 | [F27 AI Configuration](features/individual_feature/F27-ai-configuration/feature.md) | 基础配置保存/确认；接口和参数依Harness及实验结论 | F33 |
@@ -47,7 +47,7 @@ Date: 2026-10-06.
 
 执行顺序为 **F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30**；harness按依赖选任务，编号较小不表示忽略前置。此前聊天“F26”的L1解释修正由F23 v0.2承接；本轮更改的是后来实际登记的AI实验，二者不混。
 
-[设计草案](../notes/single-agent-harness-design.md)记录参考附件、推荐方案与当前待确认的接口边界。登记不开始产品代码、依赖安装或外部模型运行。F26/F31/F32分别验内核、领域工具与离线完整集成；只有F33对真实模型生成质量作结论。
+[设计草案](../notes/single-agent-harness-design.md)记录参考附件、推荐方案与当前待确认的接口边界。本轮开工前反馈已补齐bootstrap、lifecycle、direct dependency/proof closure、workspace、结构/质量状态与trajectory。F33仅消费runtime，旧生成脚本不在实验修改scope；故障矩阵归F26–F32。登记不开始产品代码、依赖安装或外部模型运行。F26/F31/F32分别验内核、领域工具与离线完整集成；只有F33对真实模型生成质量作结论。
 
 F28只准备输入，F29接通产品调用；F27/F28自身需要基本可用，F30不作为拖延入口可用性的理由。模型入口采用同一runtime，不在Electron内维护第二个Agent loop。
 

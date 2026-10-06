@@ -6,6 +6,7 @@
 | --- | --- | --- | --- |
 | Static | 修改 JS 的 node --check；git diff --check | yes | 实施后登记 |
 | Tools | source/contract/artifact/validation 工具测试，计划登记确切命令 | yes | 实际文件/对象与校验结果 |
+| Bootstrap | Host prepare_run_input与现有registry重建/导出一致性 | yes | 原字节、坐标/hash与run布局；非Agent Tool |
 | Boundaries | run隔离、路径/链接/ID/容量、固定字段与namespace | yes | 拒绝越界及零非预期副作用 |
 | Parity | 现有 test:plan / test:block / test:map / test:grounding及对应工具比较 | yes | 既有判据未变 |
 | Integration | F26真实Runner调用领域工具，Provider为离线受控响应 | yes | 工具结果完整且内部零模型调用 |
@@ -13,6 +14,9 @@
 | Documentation | npm run check:docs；npm run verify:harness | yes | scope和状态一致 |
 
 ## Manual paths
+
+- [ ] Host准备两份不同文档的冻结原文/完整hash/确定性registry后才启动Agent；取消、解码错误、来源漂移不启动模型或借旧输入。
+- [ ] lifecycle、直接依赖账本及请求read set真实对应；Map变化不会错误使Plan/Block全部失效。
 
 - [ ] 读当前文档 → 提交inventory/Review/Map/Plan/Block → 校验与错误定位。
 - [ ] 无效候选不成为通过的产物；失败候选保留，修正版有新版本。

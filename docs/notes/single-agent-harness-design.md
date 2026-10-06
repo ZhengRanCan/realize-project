@@ -29,10 +29,10 @@ Date: 2026-10-06. Status: task-design draft, not implemented.
 | Agent Definition | 目标、系统指令、允许工具与完成策略引用 |
 | Runner | 请求模型、处理工具调用/observation、调用程序状态/预算/取消/完成机制 |
 | Provider | 厂商协议、工具调用序列化、响应/usage/error归一化；首个DeepSeek，离线fake可替换 |
-| Context | 当前输入、可信指令、不可信文档/工具结果、已知状态和剩余预算的明确组装 |
-| RunState | 本run任务身份、当前产物版本、校验依赖、用量、失败和终止原因 |
+| Context | 执行宿主Context Policy，分开可信指令和不可信输入/observation；Core不解释Stage或产物语义 |
+| RunState | 通用run身份、计数/用量、失败和停止原因；领域版本与依赖由F31宿主模块记录，Core只承载其不透明引用 |
 | ToolRegistry / Domain Tools | 参数与权限、Source/Contract/Artifact/Validation/Assembly/Bundle动作 |
-| Completion | 当前文件版本和依赖闭包满足程序规则后才准许完成/发布 |
+| Completion | Core执行宿主策略回调；F32的领域策略核对当前文件/依赖证明，决定结构交付 |
 | Trace | step/请求/tool/结果/版本/校验/终止的可追踪记录；Eval独立评价生成质量 |
 
 Runner 不直接写产品文件或复制语义判定。领域工具不再运行会调用模型的旧 `ai:*` 脚本；可复用它们的任务模板、纯组装和固定字段逻辑，模型通信统一归外层Provider。
@@ -51,13 +51,94 @@ Runner 不直接写产品文件或复制语义判定。领域工具不再运行�
 
 一个Agent在合法工具集合中决定下一步，程序约束阶段前置和依赖。第一版工具写操作串行；多工具响应逐项获得唯一调用/结果记录，不增加第二个Agent或工具里的隐式模型循环。
 
-Context由程序组装，文档中的命令只是分析数据。既有阶段输入约束继续适用：例如已有Stage B路线不重注入原文，Stage2输入依Plan的覆盖范围。最终阶段/工具如何映射这些边界必须在F26/F31书面设计中确认，不能因为换成Agent就默认放弃。
+Context由程序组装，文档中的命令只是分析数据。F26只执行宿主提供的Context Policy，不知道Stage A/B/1/2、Map、Plan或Block。F31负责领域输入集合与system instructions：已有Stage B路线不重注入原文，Stage2范围依Plan的covers/sourceRefs；这些限制由领域宿主落实到每次请求，不只写一句prompt。
 
-模型可以提交修正版，也可请求结束。宿主核对当前inventory/Review/Map/selection/Plan、必需Block、Guide/引用/来源、装配和bundle的有效证明；旧版本校验失效，缺项时返回具体原因。Agent只说“完成了”不会产生completed。
+模型可以提交修正版，也可请求结束。F32宿主核对当前inventory/Review/Map/selection/Plan、必需Block、Guide/引用/来源、装配和bundle的有效证明；旧版本校验失效，缺项时返回具体原因。Core不判断这些领域条件，也不把Agent自称完成当成宿主证明。
+
+默认text-only/no-tool行为明确为：每次无工具响应都询问宿主完成策略；接受则停止。拒绝则记一次completion_rejected并追加带原因的host observation，不伪造带tool_call_id的工具结果；第一次继续下一轮，连续第二次无工具且拒绝则以no_progress停止。有效工具轮次重置该连续计数；工具自身重复/循环仍受总步数、工具次数和时间预算限制。默认阈值2，宿主可在启动时显式配置并记录，取消/预算先于继续生效。
 
 步数/工具次数/时间/输出容量和适用token预算有上限；用量不可得写未知。请求异常、无进展、格式错误、预算耗尽和取消均有明确终止原因。取消传递至Provider/工具，迟到结果不提交；具体数值、重试上限和副作用幂等边界在实施设计确定。
 
 “结构完整并可发布”与“内容质量好”分别评价。已有降级包仍可读，但不能把缺必需产物的部分结果算成完整分析成功；warnings、未知和语义失败按既有契约呈现，不改变validator以迎合模型。
+
+## Run bootstrap and workspace — F31 ownership
+
+F31拥有宿主入口 `prepare_run_input(document)`，不是Agent Tool。CLI、实验驱动及未来Electron交给它已选定的文档或F28提供的冻结快照：受控读取一次 → 核验可支持的UTF-8输入 → 原字节冻结与完整SHA256 → 调用现有buildSourceRegistry/parseDocHeadings → 生成坐标 → 原子建立run输入与状态 → 成功后才启动Agent。
+
+原文、registry及其版本由宿主确定，Agent只能读取，不能生成/修补坐标或写source。原字节不归一化；解码不可无声替换字符，registry里的源hash必须对应同一快照字节。导出继续复用现有算法与source.md逻辑路径，核对导出registry与bootstrap对应的源hash和坐标内容。没有合法输入、坐标漂移或bootstrap中取消时不启动模型，不降级为默认样本；改选原文建立新run。
+
+```text
+workspace/analyses/<document>/<analysis>/
+├── runs/<runId>/
+│   ├── input/source.md                 # Host-owned immutable snapshot
+│   ├── input/source-sections.json      # Host deterministic coordinates
+│   ├── candidates/<kind>/<revision>/   # Failed and unchecked candidates
+│   ├── accepted/<kind>/<revision>/     # Immutable accepted bytes
+│   ├── state.json                     # Active versions and proof references
+│   ├── validations/                    # Structured reports with exact inputs
+│   └── trace/                          # Requests, observations and run report
+└── bundle/                             # Published manifest + existing paired files
+```
+
+本布局是待实施的run目录约定；bundle内仍只有现有协议文件和独立人工审核。inventory/selection、版本账本与trace留在run，不擅自新增manifest文件项。一个analysis只发布一个新bundle目录，重跑/改选建立新analysis/run，不覆盖原包。供模型读取的路径由宿主固定，原用户路径仅为本地元数据。
+
+## Artifact lifecycle — F31 owns records, F32 checks closure
+
+```mermaid
+flowchart LR
+  A[Candidate: bytes saved] --> B[Validate exact input versions]
+  B -->|Blocking errors| C[Rejected: retain candidate and report]
+  B -->|Allowed by existing rules| D[Accepted revision + proof]
+  D --> E[Current pointer]
+  E -->|A recorded dependency changes| F[Proof stale: keep bytes]
+  F --> B
+  E --> G[F32 closure + staged bundle validation]
+  G -->|All required current proofs| H[Publish new bundle]
+```
+
+候选写入不直接替换有效pointer。每次revision不可变；重复同一请求按宿主幂等标记处理，非法变更拒绝。校验失效不删除旧产物，也不自动重跑模型：标记对应证明不可用，允许显式重验同字节候选；原生成来源记录仍保留，不能把新依赖伪写为旧请求当时的输入。质量结论也绑定输入/产物版本，换了受评内容后不得复用旧quality_passed。
+
+## Direct dependency graph and proof definition
+
+以下是v1领域策略草案，约束F31的生产输入与F32的证明闭包。不是“Stage越靠后就依赖所有前面的产物”。**生成来源记录**回答某revision当时给模型/程序的实际输入；**校验证明**回答当前revision在什么精确输入下被校验。两者分开保存；如生产Context增加输入，必须显式改该策略并记入实际read set，不隐藏依赖。
+
+基础名称：S=冻结原文完整字节；C=由S派生的坐标registry；I=inventory；R=Review；P=Plan；B[id]=逐块表达；M=完整Map（含内嵌Guide）；T=selection；G=Generated。普通artifact默认绑定完整原字节SHA256，不能只凭逻辑ID或revision编号。已有mapFingerprint是明确的派生视图（去掉readingGuide的规范指纹），其算法版本与原Map revision同时记录。
+
+| Artifact | v1 producer inputs (direct) | Validation direct inputs | Change invalidates |
+| --- | --- | --- | --- |
+| C: source coordinates | S + 固定source.md逻辑路径 + parser版本 | C + S + parser版本，重建比对 | C/source-binding证明；变更原文需新run |
+| I: semantic inventory | S + C | I + S + C + inventory Schema/检查器 | inventory证明及明确读取I的证明 |
+| R: design-review | S + C；v1不以Map或I为权威 | R + S + C + Review Schema/semanticCheck/source-binding | Review证明、Plan校验、Generated装配和bundle；不使I/Map自身证明失效 |
+| P: overview-plan | S + C + R；独立提取Plan SU，不读取Map/I语义来生产 | P + R + S + C + Plan Schema/checkPlan | Plan证明、所有以完整P为输入的Block证明、Overview证明及Map→Block配对证明；不修改Map字节 |
+| M: framework-map | I + 从C取得heading tree；Guide另用S/C与mapFingerprint，Block链接另用P的显式ID | M + S + C + Map Schema/checkMap/Guide绑定；外部I引用检查按明确namespace单列；P仅参加独立Topic→Block配对检查 | Map/Guide证明、T目标完整性证明、Topic→Block配对与bundle；不使P/Block证明失效 |
+| T: map-selection | I + 同次明确的M结构版本 | T + I + M + selection Schema/完整性检查 | selection证明；不反向使Map/Plan证明失效 |
+| B[id]: Stage2 Block | P + covers/sourceRefs指向的S/C片段；固定字段程序注入 | B[id] + 完整P + S/C（现有检查器实际读取）+ Block Schema/checkBlock/参数 | 该Block证明与G装配；改变B[a]不影响B[b] |
+| G: generated overview | P + 所需B[id]版本 + R（文档摘要/阶段标题）+ 实际生成/校验元数据 | G + P + S/C + checkOverview，装配证明另含R和各Block/元数据版本 | Generated/装配/Overview证明与bundle；不使Plan/Block证明失效 |
+| Reading Bundle | 显式选定S/C/R/P/M/G、analysisId/bindings；不把I/T加入manifest | manifest原字节 + 全部声明文件原字节/路径身份 + 现有导出/加载校验上下文 | bundle完整性/配对/发布证明；人工审核不在不可变清单内 |
+
+I与R/P是独立的源文档分析分支；M与T可同一次请求产出，但证明是“Map自身 + selection与I/Map完整性”，不创建M依赖T再T依赖M的环。M内的Guide不是第二份文件：记录其mapFingerprint与S/C绑定，在M内部检查，不能为Guide制造M全文件hash自引用。
+
+Topic→Block是单独关系证明，其直接输入为当前M和P，不能据此让P依赖M。读取`checkMap(opts.plan)`只允许显式匹配的Map来源空间；默认bundle路径不把Plan SU注入Map，保留现有skipped/Unknown含义。需要检查外部I时必须声明I namespace和完整指纹，不能将I冒充Plan；未执行的检查不得显示PASS。此项工具适配是否具备完整机检边界必须在F31实施设计验证，不改原词表/判断规则来消除skipped。
+
+**Proof key**包含：runId、校验类别、subject原字节hash、所有实际读取的直接输入hash、schema/validator版本、影响结果的参数和Context Policy版本；原始verdict/errors/warnings/skipped完整保留。检查器读完整Plan时必须绑定完整hash，v1不声称能在改Plan某一块后复用另一块的旧Block证明。生成输入片段另记录section key/range、片段hash与S/C指纹。
+
+例：Map v3→v4时，Map、Guide、selection targets、M/P配对和bundle证明需要重验，P与各Block字节/证明保持，除非本次策略明确额外读取了Map。Review改变时Plan证明失效，即使Plan字节没变，也可针对当前Review显式重验，而不是自动重生成全篇。
+
+F32的closure指：每个必需root的证明可用，其subject与所有直接输入均是当前选定字节/明确派生视图，且所需支撑证明递归满足同样条件，图无环且无遗漏/skipped的必需检查。根包括input integrity、inventory、Review、Map/Guide、selection integrity、Plan、全部所需Block、assembly/Overview、M/P配对和staged bundle。F31维护版本、边和证明账本，F32遍历实际记录的边并核对；不能按feature/Stage顺序一刀切失效。
+
+Schema/检查器规则变化只使消费该规则的证明过期；不悄悄改artifact hash。冻结合同快照指纹，不给Agent写权限。现装配脚本还读取request/check-block.txt等元数据；F32适配时明确登记这些输入，改用当前版本的结构化证明来源，不能把旧txt里的PASS当成权威或新增永久成功日志。
+
+## Run, artifact and quality statuses
+
+| State | Owner | Meaning |
+| --- | --- | --- |
+| run_status = created / running / stopped / failed / cancelled | F26 | 循环生命周期；stopped仅表示停止，还必须看termination_reason |
+| termination_reason = completion_policy_satisfied / no_progress / budget_exhausted / provider_error / cancelled 等 | F26，宿主原因作为不透明结果 | 为什么退出；Core不推断领域成功 |
+| artifact_status = incomplete / invalid / stale / structurally_complete | F31/F32 | 产物与当前机器校验/配对闭包状态；structurally_complete包含要求的机检语义规则，但不保证理解质量 |
+| completionGate = NOT_RUN / FAIL / PASS | F32 | 当前版本能否结构交付；PASS不能由模型文本或仅bundle可打开推导 |
+| quality_status = unreviewed / passed / failed / indeterminate | F33独立Eval | 绑定当次原文/产物/评价协议的质量结果，与run是否停止独立 |
+
+F32默认交付可为`run_status=stopped`、`termination_reason=completion_policy_satisfied`、`artifact_status=structurally_complete`、`completionGate=PASS`、`quality_status=unreviewed`。F33再独立记录质量结果；机器validator不能代替人工可读性判断，缺证据则unreviewed/indeterminate，不伪造passed。未来F29/UI消费分别状态，不能把“运行结束”或“结构完成”文案变成“质量已接受”。
 
 ## State, trace and storage
 
@@ -67,12 +148,30 @@ Artifacts 是本次事实产物；RunState 是程序的运行记录；Memory 是
 
 原始公开实验run沿用 `artifacts/experiments/` 并更新索引；本机run状态/trace按run放在 `workspace/analyses/<document>/<analysis>/` 下的独立运行子目录，运行日志不混入不可变bundle清单。最终原文、坐标、Review、Plan、Map和Generated按既有manifest同目录显式配对。成功校验txt不新增永久留存；实际模型失败轨迹是实验证据，按既有规则保留。
 
+## F33 trajectory measurements
+
+F33只消费已冻结runtime，实验变体记录model参数、agent prompt、领域Context Policy及评价协议指纹；模板变体影响输入集合时必须通过F31策略校验，不能以“改prompt”为由绕过阶段/工具权限。runtime/assembler/exporter缺陷返回对应feature修正后建立新实验基线，不边跑边改旧生成脚本。
+
+| Metric | Counting rule |
+| --- | --- |
+| turn_count / request_attempt_count | 前者按Runner发起的模型step，后者按Provider实际请求尝试；重试不假装免费，用唯一ID去重 |
+| tool_call_count / source_read_count | 前者包括进入Registry的成功/拒绝调用，后者为Source读取工具调用；成功/失败分别列出 |
+| validation_failure_count | 原始机器校验阻断结果次数，按validationId计；warnings与未执行不算FAIL |
+| repair_count | 关联具体失败validationId的修订尝试；无因果链接的写入不凭空认作repair，单列未归因 |
+| invalid_tool_call_count | Provider非法调用封装、未知工具或参数校验拒绝；归因request/call ID，避免Provider与Registry重复计同一次拒绝 |
+| completion_rejection_count | 每次宿主完成策略明确拒绝，按策略调用ID计，不靠模型文本猜测 |
+| artifact_rewrite_count | 同logical artifact初次候选后的新写revision次数；有效/失败候选分别记录，重验同字节不是rewrite |
+| tokens / latency / cost | 每请求已知用量/延迟与全run时间；成本含实际尝试，标API账单值或按有日期的费率估算；缺价格/用量/缓存拆分时写未知，不能按0 |
+| termination_reason / artifact_status / quality_status | 分别列循环退出、结构闭包与独立质量结果，评价绑定当前原文/产物/协议hash |
+
+F26–F32负责离线故障矩阵。F33的离线测试只测driver、指标汇总和eval本身；真实API错误、截断、非法tool call、validator恢复与repair loop按实际遇到的行为报告。未遇到的类型写not_observed，不为了凑类别故意消耗请求，也不称已通过。trace不足以确定某指标时显式不可得，不以假计数参与稳定性比较。
+
 ## Feature boundaries and order
 
 | Feature | Delivery | Does not prove |
 | --- | --- | --- |
-| F26 Single-Agent Harness Core v0.2 | 可替换Provider的单Agent loop、State/Context/Registry、预算/取消和基础trace | 完整文档已生成 |
-| F31 Agent Domain Tools | 真实受控Source/Contract/Artifact/validator能力，含Review与Guide路径 | 模型生成质量 |
+| F26 Single-Agent Harness Core v0.3 | 可替换Provider的单Agent loop、State/Context/Registry、预算/取消和基础trace | 完整文档已生成 |
+| F31 Agent Domain Workspace and Tools v0.2 | 真实受控Source/Contract/Artifact/validator能力，含Review与Guide路径 | 模型生成质量 |
 | F32 Completion Gate and Bundle Integration | 当前版本门禁、真实工具/装配/导出/Renderer的离线集成 | 真实模型能独立产出高质量内容 |
 | F33 AI Integration Experiment | 原F26的真实DeepSeek生成/重复/质量/失败实验，消费同一runtime | 所有模型/文档均稳定 |
 | F27 → F28 → F29 → F30 | 配置、选文档、调用现成runtime及入口UI | Harness需在UI里另写一套 |
@@ -86,3 +185,7 @@ Artifacts 是本次事实产物；RunState 是程序的运行记录；Memory 是
 ## Registration checks — 2026-10-06
 
 文档引用检查180 Markdown/0失效；harness元数据32 features/0错误；额外核对依赖图无环、index/合同版本一致，得出F26 → F31 → F32 → F33 → F27 → F28 → F29 → F30；git diff --check通过。只检查任务登记，不是运行时代码、Provider或真实模型的验证证据。
+
+## Feedback revision checks — 2026-10-06
+
+文档检查181 Markdown/0失效；harness元数据32 features/0错误；依赖图无环、index/合同version/title一致、F26无Reading前置、F33 code scope限定已核对；git diff --check通过。仍为文档修订，状态全部not_started，无新增运行时或真实模型测试。

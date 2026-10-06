@@ -172,7 +172,7 @@
     "title": "Single-Agent Harness Core",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F26-single-agent-harness",
-    "version": "v0.2"
+    "version": "v0.3"
   },
   {
     "id": "F27",
@@ -204,23 +204,23 @@
   },
   {
     "id": "F31",
-    "title": "Agent Domain Tools",
+    "title": "Agent Domain Workspace and Tools",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F31-agent-domain-tools",
-    "version": "v0.1"
+    "version": "v0.2"
   },
   {
     "id": "F32",
     "title": "Agent Completion Gate and Bundle Integration",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F32-agent-completion-integration",
-    "version": "v0.1"
+    "version": "v0.2"
   },
   {
     "id": "F33",
     "title": "AI Integration Experiment",
     "status": "not_started",
     "feature_folder": "docs/harness/features/individual_feature/F33-ai-integration-experiment",
-    "version": "v0.1"
+    "version": "v0.2"
   }
 ]

@@ -14,9 +14,11 @@
 
 ## Manual paths
 
+- [ ] stopped / structurally_complete / completionGate / quality_status分别正确；结构PASS与quality unreviewed可同时存在，不冒充内容质量已通过。
+
 - [ ] 受控多轮轨迹完成真实工具生产、装配/验证和打开结果。
 - [ ] 模型说完成但缺项 → 拒绝；修正后按当前版本重新检验。
-- [ ] 已PASS的Plan/原文被修改 → 不能沿用旧Block/来源证明发布。
+- [ ] Plan/Source/Review/规则指纹变化 → 对应proof和closure不能复用；Map变化只重验实际依赖和M/P关系，保留无关Plan/Block。
 - [ ] 取消或写盘失败 → 不覆盖旧结果，无人工审核自动写入。
 - [ ] trace能解释失败与每次版本变更；用户接受完成/交接标准。
 
