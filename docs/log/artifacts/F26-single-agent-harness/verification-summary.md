@@ -18,4 +18,3 @@
 - `check:docs` reports 22 pre-existing missing `workspace/` preview/analysis targets because this handoff directory does not contain those ignored/local files. No reported link originates in the new F26 documents.
 - No external model request was made. DeepSeek uses an injected transport and offline fixtures only.
 - Remaining before passing: independent code review and user acceptance of the core boundary/trace; the workspace-only documentation environment limitation remains explicit.
-

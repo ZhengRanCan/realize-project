@@ -154,4 +154,3 @@ Adapter 使用注入的 transport，便于离线验证请求/响应，不在模�
 ## 10. Non-goals
 
 不含领域工具/workspace/proof closure/bundle、真实模型质量、配置 UI、文档选择、Electron 入口、多 Agent、memory、RAG、skills、checkpoint、后台任务或人工等待状态。
-

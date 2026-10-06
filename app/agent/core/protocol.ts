@@ -194,4 +194,3 @@ export interface CompletionPolicy<TDomainRef> {
     latestResponse: Readonly<ModelResponse>;
   }): Promise<unknown>;
 }
-

@@ -100,4 +100,3 @@ export class AgentRunner<TDomainRef> {
     if (this.#state.stop(reason, code, message)) await this.#trace.append("run_stopped", this.#state.snapshot().stepCount, { payload: { reason, code } });
   }
 }
-

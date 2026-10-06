@@ -54,4 +54,3 @@ npm run verify:harness
 ```
 
 All agent tests are offline. F33, not F26, owns real API experiments.
-

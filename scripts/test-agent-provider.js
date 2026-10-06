@@ -14,4 +14,3 @@ const base = { requestId: "q1", runId: "r1", step: 1, model: "deepseek-test", co
   await assert.rejects(() => new DeepSeekAdapter({ async send() { throw new Error("offline"); } }).request(base), ProviderError);
   console.log("agent provider: passed");
 })().catch((error) => { console.error(error); process.exitCode = 1; });
-

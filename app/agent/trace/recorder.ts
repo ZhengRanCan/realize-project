@@ -30,4 +30,3 @@ export class TraceRecorder {
 
   snapshot(): readonly TraceEvent[] { return this.#events.map((event) => Object.freeze({ ...event })); }
 }
-

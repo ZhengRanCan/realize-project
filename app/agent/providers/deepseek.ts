@@ -55,4 +55,3 @@ function pickProviderOptions(options: Readonly<Record<string, unknown>> | undefi
   const allowed = new Set(["temperature", "top_p", "frequency_penalty", "presence_penalty", "response_format", "stop"]);
   return Object.fromEntries(Object.entries(options).filter(([key]) => allowed.has(key)));
 }
-

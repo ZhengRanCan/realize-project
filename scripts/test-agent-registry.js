@@ -13,4 +13,3 @@ const registry = new ToolRegistry([{ name: "echo", description: "Echo text", inp
   assert.throws(() => new ToolRegistry([{ name: "x", description: "x", inputSchema: { type: "object", patternProperties: {} }, execute() {} }]), /unsupported/);
   console.log("agent registry: passed");
 })().catch((error) => { console.error(error); process.exitCode = 1; });
-

@@ -15,4 +15,3 @@ export class ProviderError extends Error {
 export function isAbortError(value: unknown): boolean {
   return value instanceof Error && (value.name === "AbortError" || value.message === "The operation was aborted");
 }
-

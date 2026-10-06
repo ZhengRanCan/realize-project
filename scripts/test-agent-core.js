@@ -38,4 +38,3 @@ const response = (requestId, toolCalls = [], assistantText = "") => ({ requestId
   const cancelled = await pending; assert.equal(cancelled.state.termination.reason, "cancelled"); assert.equal(cancelled.trace.some((event) => event.type === "late_result_ignored"), true);
   console.log("agent core: passed");
 })().catch((error) => { console.error(error); process.exitCode = 1; });
-

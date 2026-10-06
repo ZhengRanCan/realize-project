@@ -47,4 +47,3 @@ function failure(call: ToolCall, code: "unknown_tool" | "permission_denied" | "t
   return { kind: "tool", callId: call.callId, toolName: call.name, status: "error", error: { code, message } };
 }
 function abortError(): Error { const error = new Error("The operation was aborted"); error.name = "AbortError"; return error; }
-

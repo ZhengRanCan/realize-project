@@ -12,4 +12,3 @@ const { TraceRecorder } = require("../dist/agent");
   assert.equal(broken.snapshot().length, 0);
   console.log("agent trace: passed");
 })().catch((error) => { console.error(error); process.exitCode = 1; });
-

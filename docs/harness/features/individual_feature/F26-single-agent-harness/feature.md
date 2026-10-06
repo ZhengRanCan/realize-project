@@ -80,4 +80,3 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["受控输入 → 
 ## TypeScript boundary — 2026-10-06
 
 用户明确选择新app/agent采用TypeScript，旧Electron模块不迁移。仅更新语言/构建与interop合同，实际tsconfig、开发依赖、源代码和命令在实施时建立；当前仍not_started。
-
