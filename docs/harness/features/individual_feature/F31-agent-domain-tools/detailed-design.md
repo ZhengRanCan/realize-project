@@ -38,6 +38,8 @@ The host selects an operation, not a fixed workflow stage. Each operation declar
 
 There is no generic path, shell, network, model, approval, or human-review tool. `design-review` submissions are checked for pending decisions and forbidden source-verification claims before commit.
 
+The only legacy-script adaptation is the pure `allowedPhrasesFromText` export from `scripts/check-block.js`, so the single-block tool uses the same source-derived forbidden-phrase exception as the CLI/overview validator. It has no I/O or generation behavior; existing consumers keep the same `checkBlock` implementation.
+
 ## Failure semantics
 
 Path/ID/capacity/dependency/validation failures are typed rejections and leave current artifacts unchanged. Candidate evidence and ledger records remain. Cancellation is checked before and after file I/O. All writes use exclusive temporary files followed by rename; credentials and source content are not copied into trace payloads.

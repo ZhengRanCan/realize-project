@@ -602,6 +602,9 @@ function allowedPhrasesFromSource() {
     return new Set();
   }
 }
+function allowedPhrasesFromText(text) {
+  return new Set(FORBIDDEN_PHRASES.filter((phrase) => String(text).includes(phrase)));
+}
 
 /**
  * 兼容性归一化：把"扁平 nodes"归一成 renderer 契约的形状。
@@ -668,6 +671,6 @@ function main() {
   process.exit(0);
 }
 
-module.exports = { checkBlock, collectElements, contentElements, SHAPE_TO_CONTENT_TYPE, THRESHOLDS };
+module.exports = { checkBlock, collectElements, contentElements, allowedPhrasesFromText, SHAPE_TO_CONTENT_TYPE, THRESHOLDS };
 
 if (require.main === module) main();
