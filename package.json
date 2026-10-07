@@ -7,7 +7,7 @@
   "scripts": {
     "typecheck:agent": "tsc --project tsconfig.agent.json --noEmit",
     "build:agent": "tsc --project tsconfig.agent.json",
-    "test:agent": "tsc --project tsconfig.agent.json && node scripts/test-agent-types.js && node scripts/test-agent-registry.js && node scripts/test-agent-provider.js && node scripts/test-agent-trace.js && node scripts/test-agent-core.js",
+    "test:agent": "tsc --project tsconfig.agent.json && node scripts/test-agent-types.js && node scripts/test-agent-registry.js && node scripts/test-agent-provider.js && node scripts/test-agent-trace.js && node scripts/test-agent-core.js && node scripts/test-agent-domain.js",
     "test:agent:clean": "node scripts/test-agent-clean.js",
     "start": "electron .",
     "selftest": "electron . --selftest",
