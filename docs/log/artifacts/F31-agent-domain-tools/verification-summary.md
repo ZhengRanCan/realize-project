@@ -33,3 +33,11 @@
 - Removed `readSet` from the tool schema and made the domain registry require a host `currentReadSet` provider. Accepted and rejected candidates now receive the current request's host-recorded evidence; a model attempt to pass `readSet` is rejected as an additional property before execution.
 - Added regression assertions for forged-read-set rejection and for committed ledger records matching `DomainContextPolicy.lastEvidence.readSet`.
 - `npm run test:agent:clean`, `node scripts/test-check-plan.js`, `node scripts/test-check-block.js`, `node scripts/test-check-map.js`, `node scripts/test-semantic-grounding.js`, `npm run verify:harness`, and `git diff --check`: passed.
+
+## 2026-11-05 — Operation-scoped tool-result pairing
+
+- The next boundary audit found that `DomainContextPolicy` discarded every prior tool observation. A real Agent could call `read_source`, but its next model request could not consume the result; sending a bare tool message would also violate provider call/result pairing.
+- Added domain-neutral structured tool exchanges to the F26 Runner input. An F31 operation now selects explicit call IDs and serializes only those exchanges as an assistant `tool_calls` message followed by its matching tool result. Other operation history is neither serialized nor counted in the read set.
+- Extended the DeepSeek adapter to emit the paired wire representation without exposing unrestricted conversation history. The shared protocol/Runner/validation/provider files were added explicitly to F31 scope before the change.
+- Added direct policy isolation assertions, DeepSeek wire assertions, and a real Runner → DomainContextPolicy two-turn test proving the second request receives the selected `read_source` result with a valid pair.
+- `npm run test:agent:clean`, `npm run verify:harness`, and `git diff --check`: passed.

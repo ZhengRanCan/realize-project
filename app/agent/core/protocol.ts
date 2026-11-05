@@ -17,6 +17,7 @@ export interface ModelMessage {
   role: MessageRole;
   content: string;
   callId?: string;
+  toolCalls?: readonly ToolCall[];
 }
 
 export interface ModelContext {
@@ -99,6 +100,7 @@ export interface ToolError {
 export type ToolObservation =
   | { kind: "tool"; callId: string; toolName: string; status: "success"; output: unknown }
   | { kind: "tool"; callId: string; toolName: string; status: "error"; error: ToolError };
+export interface ToolExchange { call: ToolCall; observation: ToolObservation }
 
 export interface HostObservation {
   kind: "host";
@@ -183,6 +185,7 @@ export interface ContextPolicy<TDomainRef> {
     domainStateRef: TDomainRef;
     recentEvents: readonly TraceEvent[];
     observations: readonly (ToolObservation | HostObservation)[];
+    toolExchanges: readonly ToolExchange[];
     availableTools: readonly ToolSchema[];
   }): Promise<unknown>;
 }

@@ -1,5 +1,5 @@
 import { AgentRuntimeError, ProviderError, isAbortError } from "./errors";
-import type { BudgetLimits, CompletionPolicy, ContextPolicy, HostObservation, ModelResponse, ProviderAdapter, RunState, ToolObservation } from "./protocol";
+import type { BudgetLimits, CompletionPolicy, ContextPolicy, HostObservation, ModelResponse, ProviderAdapter, RunState, ToolExchange, ToolObservation } from "./protocol";
 import { budgetFailure, StateController } from "./state";
 import { validateCompletionDecision, validateModelContext, validateModelResponse } from "./validation";
 import { ToolRegistry } from "../tools/registry";
@@ -11,6 +11,7 @@ export interface RunResult<T> { state: Readonly<RunState<T>>; trace: ReturnType<
 export class AgentRunner<T> {
   readonly #options: RunnerOptions<T>; readonly #state: StateController<T>; readonly #trace: TraceRecorder; readonly #registry: ToolRegistry;
   readonly #abort = new AbortController(); readonly #observations: (ToolObservation | HostObservation)[] = []; readonly #nowMs: () => number; readonly #id: () => string;
+  readonly #toolExchanges: ToolExchange[] = [];
   #startedMs = 0; #running = false; #stopPromise: Promise<void> | null = null; #terminalCommitted = false;
   constructor(options: RunnerOptions<T>) { this.#options = options; this.#nowMs = options.nowMs ?? Date.now; this.#id = options.id ?? (() => crypto.randomUUID()); this.#state = new StateController(options.runId, options.domainStateRef, options.budget ?? {}); this.#trace = options.trace ?? new TraceRecorder({ runId: options.runId }); this.#registry = options.registry ?? new ToolRegistry(); }
   async cancel(message = "Cancelled by host"): Promise<void> { if (this.#state.snapshot().status === "stopped" || this.#terminalCommitted) return; this.#abort.abort(message); await this.#stop("cancelled", "cancelled", message, true); }
@@ -30,7 +31,7 @@ export class AgentRunner<T> {
   }
   async #turn(): Promise<void> {
     this.#refreshTime(); if (await this.#stopForBudget(true)) return; this.#state.beginStep(); const step = this.#state.snapshot().stepCount;
-    const contextRaw = await this.#withDeadline(() => this.#options.contextPolicy.build({ runState: this.#state.snapshot(), domainStateRef: this.#options.domainStateRef, recentEvents: this.#trace.snapshot(), observations: structuredClone(this.#observations), availableTools: this.#registry.schemas() }));
+    const contextRaw = await this.#withDeadline(() => this.#options.contextPolicy.build({ runState: this.#state.snapshot(), domainStateRef: this.#options.domainStateRef, recentEvents: this.#trace.snapshot(), observations: structuredClone(this.#observations), toolExchanges: structuredClone(this.#toolExchanges), availableTools: this.#registry.schemas() }));
     if (await this.#stopIfCancelled()) return; const context = validateModelContext(contextRaw);
     await this.#trace.append("context_built", step, { payload: { messages: context.messages.length, tools: this.#registry.schemas().length } }); const requestId = this.#id(); await this.#trace.append("provider_request_started", step, { requestId });
     let raw: unknown;
@@ -48,7 +49,7 @@ export class AgentRunner<T> {
       const limit = this.#state.snapshot().budget.limits.maxToolCalls; if (limit !== undefined && this.#state.snapshot().toolCallCount >= limit) return void await this.#stop("budget_exhausted", "max_tool_calls", "Maximum tool calls reached");
       this.#state.beginTool(); await this.#trace.append("tool_execution_started", this.#state.snapshot().stepCount, { callId: call.callId });
       const observation = await this.#withDeadline((signal) => this.#registry.execute(call, { signal, runState: this.#state.snapshot() })); if (await this.#ignoreLate({ callId: call.callId })) return;
-      this.#observations.push(observation); await this.#trace.append(observation.status === "error" ? "tool_call_rejected" : "tool_execution_finished", this.#state.snapshot().stepCount, { callId: call.callId, payload: { status: observation.status } }); this.#refreshTime(); if (await this.#stopForBudget(false)) return;
+      this.#observations.push(observation); this.#toolExchanges.push({ call: structuredClone(call), observation: structuredClone(observation) }); await this.#trace.append(observation.status === "error" ? "tool_call_rejected" : "tool_execution_finished", this.#state.snapshot().stepCount, { callId: call.callId, payload: { status: observation.status } }); this.#refreshTime(); if (await this.#stopForBudget(false)) return;
     }
   }
   async #complete(response: ModelResponse): Promise<void> {

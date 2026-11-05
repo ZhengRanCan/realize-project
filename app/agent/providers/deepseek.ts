@@ -9,6 +9,7 @@ export class DeepSeekAdapter implements ProviderAdapter {
       model: request.model,
       messages: [{ role: "system", content: request.context.systemInstructions }, ...request.context.messages.map((message) => message.role === "tool"
         ? { role: "tool", content: message.content, tool_call_id: message.callId }
+        : message.role === "assistant" && message.toolCalls ? { role: "assistant", content: message.content, tool_calls: message.toolCalls.map((call) => ({ id: call.callId, type: "function", function: { name: call.name, arguments: JSON.stringify(call.arguments) } })) }
         : { role: message.role, content: message.content })],
       tools: request.tools.map((tool) => ({ type: "function", function: { name: tool.name, description: tool.description, parameters: tool.inputSchema } })),
       tool_choice: "auto",

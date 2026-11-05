@@ -32,9 +32,9 @@ export function validateModelContext(value: unknown): ModelContext {
     }
     if (message.content.length > MAX_MESSAGE_CHARS) throw new AgentRuntimeError("context_capacity_exceeded", `messages[${index}] is too large`);
     if (message.role === "tool" && message.callId === undefined) throw new AgentRuntimeError("invalid_context", `messages[${index}].callId is required for tool messages`);
-    return message.callId === undefined
-      ? { role: message.role as "system" | "user" | "assistant" | "tool", content: message.content }
-      : { role: message.role as "system" | "user" | "assistant" | "tool", content: message.content, callId: string(message.callId, `messages[${index}].callId`) };
+    if (message.toolCalls !== undefined && (message.role !== "assistant" || !Array.isArray(message.toolCalls))) throw new AgentRuntimeError("invalid_context", `messages[${index}].toolCalls is invalid`);
+    const toolCalls = Array.isArray(message.toolCalls) ? message.toolCalls.map(validateToolCall) : undefined;
+    return { role: message.role as "system" | "user" | "assistant" | "tool", content: message.content, ...(message.callId === undefined ? {} : { callId: string(message.callId, `messages[${index}].callId`) }), ...(toolCalls === undefined ? {} : { toolCalls }) };
   });
   if (messages.some((message) => message.role === "system")) throw new AgentRuntimeError("invalid_context", "system messages must use systemInstructions, not task messages");
   const metadata = item.metadata;

@@ -14,5 +14,7 @@ const base = { requestId: "q1", runId: "r1", step: 1, model: "deepseek-test", co
   await assert.rejects(() => new DeepSeekAdapter({ async send() { throw new Error("offline"); } }).request(base), ProviderError);
   await adapter.request({ ...base, context: { ...base.context, messages: [{ role: "tool", content: "done", callId: "wire-1" }] } });
   assert.equal(sent.messages[1].tool_call_id, "wire-1"); assert.equal("callId" in sent.messages[1], false);
+  await adapter.request({ ...base, context: { ...base.context, messages: [{ role: "assistant", content: "", toolCalls: [{ callId: "wire-2", name: "echo", arguments: { text: "paired" } }] }, { role: "tool", content: "done", callId: "wire-2" }] } });
+  assert.equal(sent.messages[1].tool_calls[0].id, "wire-2"); assert.equal(sent.messages[1].tool_calls[0].function.arguments, '{"text":"paired"}'); assert.equal(sent.messages[2].tool_call_id, "wire-2");
   console.log("agent provider: passed");
 })().catch((error) => { console.error(error); process.exitCode = 1; });

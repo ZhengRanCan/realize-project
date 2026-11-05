@@ -28,6 +28,8 @@ Dependencies are explicit `{kind, version, sha256}` tuples. They are checked whe
 
 The host selects an operation, not a fixed workflow stage. Each operation declares the only source/contracts/artifacts that may be serialized. The policy reads those resources through the workspace, returns a fresh context without prior hidden conversation, and emits a read-set fingerprint. Inventory and Review are independent branches and may be produced in either order.
 
+Tool results are not carried as an unrestricted conversation transcript. The Runner exposes structured call/result exchanges to the policy; the current operation selects explicit call IDs, and the policy emits each selected exchange as a correctly paired assistant tool call plus tool result. Unselected results from an earlier operation are absent from both the request and its read set.
+
 ## Tool surface
 
 - `read_source`: bounded reads from the frozen source snapshot by registered section/range.
