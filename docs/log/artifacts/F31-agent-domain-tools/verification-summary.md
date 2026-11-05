@@ -26,3 +26,10 @@
 - `npm run verify:harness`: passed with 32 features and 0 errors; `git diff --check`: passed.
 - `npm run test:all` passed repository layout, Plan/Block/Map validator suites, gateway safety, semantic-grounding safety, and L0 view/layout/preview suites before `check:docs` stopped the command on 22 links to intentionally untracked local `workspace/` bundles/previews from F23–F25. No F31 link or changed file was involved, and no placeholder local evidence was fabricated to make the command green.
 - F31 remains `active`: the automated domain boundary/parity evidence is green, while independent code review and the user's tool-boundary acceptance remain required before `passing`.
+
+## 2026-11-05 — Host-owned read-set repair
+
+- A focused boundary audit found that `write_artifact` still exposed `readSet` as a model-supplied argument. That allowed a candidate to omit or fabricate the resources actually serialized by the Context Policy, contrary to the F31 host-evidence contract.
+- Removed `readSet` from the tool schema and made the domain registry require a host `currentReadSet` provider. Accepted and rejected candidates now receive the current request's host-recorded evidence; a model attempt to pass `readSet` is rejected as an additional property before execution.
+- Added regression assertions for forged-read-set rejection and for committed ledger records matching `DomainContextPolicy.lastEvidence.readSet`.
+- `npm run test:agent:clean`, `node scripts/test-check-plan.js`, `node scripts/test-check-block.js`, `node scripts/test-check-map.js`, `node scripts/test-semantic-grounding.js`, `npm run verify:harness`, and `git diff --check`: passed.

@@ -33,7 +33,7 @@ The host selects an operation, not a fixed workflow stage. Each operation declar
 - `read_source`: bounded reads from the frozen source snapshot by registered section/range.
 - `read_contract`: reads one allow-listed repository contract captured by the host.
 - `read_artifact`: reads one current version from this run.
-- `write_artifact`: submits JSON for an allow-listed artifact kind with explicit dependency tuples.
+- `write_artifact`: submits JSON for an allow-listed artifact kind with explicit dependency tuples. The model cannot supply its own read set; the registry obtains the current request's actual read set from the host Context Policy and records that evidence on both accepted and rejected candidates.
 - `validate_artifact`: invokes the existing exported validator for Map, Plan, Block, or Overview and returns its original verdict structure.
 
 There is no generic path, shell, network, model, approval, or human-review tool. `design-review` submissions are checked for pending decisions and forbidden source-verification claims before commit.
