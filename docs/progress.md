@@ -2,6 +2,8 @@
 
 ## Status
 
+- 2026-11-05 F31 checkpoint: verified the active line is `codex/f26-f33-agent-ui` tracking its same-named origin branch. Agent clean integration and harness gate pass; the full offline suite reaches `check:docs`, which reports only 22 pre-existing links to intentionally untracked F23–F25 workspace evidence. F31 still awaits independent review and user tool-boundary acceptance.
+
 - Date: 2026-10-06.
 - Active feature: `F31`；Host bootstrap、隔离workspace/版本账本、领域Context Policy与受控工具已完成首轮实现和离线集成验证。
 - Next step: 扩充F31对抗/validator parity回归，完成独立审查与用户工具边界验收后收口。后续顺序 F31 → F32 → F33 → F27 → F28 → F29 → F30。
