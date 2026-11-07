@@ -24,6 +24,8 @@ Each submitted candidate gets an immutable monotonically increasing version. A s
 
 Dependencies are explicit `{kind, version, sha256}` tuples. They are checked when a candidate is submitted. Updating an unrelated artifact does not invalidate another candidate; a consumer is current only when every dependency tuple still resolves to the recorded bytes. Map and Plan identities remain separate namespaces even when their local IDs have the same text.
 
+The host injects dependencies that its validator actually reads: Plan validation binds the current Design Review, while Block and Overview validation bind the current Plan. Model-declared generation dependencies are additive and cannot conflict with those host-owned tuples. F31 records direct edges only; F32 is responsible for checking the transitive completion closure.
+
 ## Context policy
 
 The host selects an operation, not a fixed workflow stage. Each operation declares the only source/contracts/artifacts that may be serialized. The policy reads those resources through the workspace, returns a fresh context without prior hidden conversation, and emits a read-set fingerprint. Inventory and Review are independent branches and may be produced in either order.

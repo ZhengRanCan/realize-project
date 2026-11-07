@@ -41,3 +41,10 @@
 - Extended the DeepSeek adapter to emit the paired wire representation without exposing unrestricted conversation history. The shared protocol/Runner/validation/provider files were added explicitly to F31 scope before the change.
 - Added direct policy isolation assertions, DeepSeek wire assertions, and a real Runner → DomainContextPolicy two-turn test proving the second request receives the selected `read_source` result with a valid pair.
 - `npm run test:agent:clean`, `npm run verify:harness`, and `git diff --check`: passed.
+
+## 2026-11-07 — Validator-owned direct dependencies
+
+- A dependency audit found that model arguments could omit artifacts read implicitly by validation. A Plan could therefore pass against the current Design Review without recording that direct edge; Block and Overview had the same gap for the current Plan.
+- The host now injects the validator-owned direct tuples (`overview-plan` → `design-review`; `stage2-block` / `overview` → `overview-plan`). Model-declared generation inputs remain additive, and a conflicting tuple is rejected while preserving the failed candidate.
+- Added regressions proving automatic dependency injection and conflicting-dependency retention. Transitive closure remains explicitly assigned to F32.
+- The machine's `npm` launcher currently points at a missing roaming `npm-cli.js`; verification therefore used the repository-local compiler and direct Node entrypoints. `node scripts/test-agent-clean.js`, Plan/Block/Map parity suites, semantic-grounding regression, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
