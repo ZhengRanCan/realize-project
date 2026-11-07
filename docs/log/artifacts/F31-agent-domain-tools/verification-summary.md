@@ -48,3 +48,9 @@
 - The host now injects the validator-owned direct tuples (`overview-plan` → `design-review`; `stage2-block` / `overview` → `overview-plan`). Model-declared generation inputs remain additive, and a conflicting tuple is rejected while preserving the failed candidate.
 - Added regressions proving automatic dependency injection and conflicting-dependency retention. Transitive closure remains explicitly assigned to F32.
 - The machine's `npm` launcher currently points at a missing roaming `npm-cli.js`; verification therefore used the repository-local compiler and direct Node entrypoints. `node scripts/test-agent-clean.js`, Plan/Block/Map parity suites, semantic-grounding regression, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
+
+## 2026-11-07 — Dependency tuple normalization
+
+- Rejected self-dependencies, which would make a newly written current artifact stale against its own previous version, and duplicate dependency kinds, which would make a direct edge ambiguous.
+- Semantic dependency failures now enter the same rejected-candidate retention path instead of escaping before evidence capture.
+- Added regressions for both cases. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.

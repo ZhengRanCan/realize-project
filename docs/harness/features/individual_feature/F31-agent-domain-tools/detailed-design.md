@@ -26,6 +26,8 @@ Dependencies are explicit `{kind, version, sha256}` tuples. They are checked whe
 
 The host injects dependencies that its validator actually reads: Plan validation binds the current Design Review, while Block and Overview validation bind the current Plan. Model-declared generation dependencies are additive and cannot conflict with those host-owned tuples. F31 records direct edges only; F32 is responsible for checking the transitive completion closure.
 
+A candidate cannot depend on an older version of its own kind, and each dependency kind may appear at most once. These restrictions prevent a newly committed current pointer from being stale immediately and keep the direct-edge ledger unambiguous.
+
 ## Context policy
 
 The host selects an operation, not a fixed workflow stage. Each operation declares the only source/contracts/artifacts that may be serialized. The policy reads those resources through the workspace, returns a fresh context without prior hidden conversation, and emits a read-set fingerprint. Inventory and Review are independent branches and may be produced in either order.
