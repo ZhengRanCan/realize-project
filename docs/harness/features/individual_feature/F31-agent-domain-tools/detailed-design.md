@@ -22,6 +22,9 @@ F31 is the document-domain host around the F26 runtime. `prepareRunInput` is a h
 
 Each submitted candidate gets an immutable monotonically increasing version. A successful atomic `current.json` replacement points at the same bytes; rejected validation never advances current. Ledger events record candidate SHA-256, declared dependencies, actual read set, validator verdict and resulting status.
 
+Every source and current-artifact read recomputes the stored byte hash before returning content. A drifted source snapshot or candidate is an integrity failure, not a new implicit version.
+`current.json` is runtime-checked against the requested kind and its deterministic candidate path; a stored pointer cannot redirect reads elsewhere in the run or outside it.
+
 Dependencies are explicit `{kind, version, sha256}` tuples. They are checked when a candidate is submitted. Updating an unrelated artifact does not invalidate another candidate; a consumer is current only when every dependency tuple still resolves to the recorded bytes. Map and Plan identities remain separate namespaces even when their local IDs have the same text.
 
 The host injects dependencies that its validator actually reads: Plan validation binds the current Design Review, while Block and Overview validation bind the current Plan. Model-declared generation dependencies are additive and cannot conflict with those host-owned tuples. F31 records direct edges only; F32 is responsible for checking the transitive completion closure.

@@ -54,3 +54,9 @@
 - Rejected self-dependencies, which would make a newly written current artifact stale against its own previous version, and duplicate dependency kinds, which would make a direct edge ambiguous.
 - Semantic dependency failures now enter the same rejected-candidate retention path instead of escaping before evidence capture.
 - Added regressions for both cases. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
+
+## 2026-11-07 — Frozen-byte and current-pointer integrity
+
+- The workspace previously recorded source and candidate hashes but did not recompute them on reads. Added fail-closed byte verification for the frozen source and every current artifact candidate.
+- Added runtime validation for `current.json`: kind, status, version, SHA, dependency/read-set containers, and the deterministic candidate path must match the requested namespace. A drifted pointer cannot redirect reads to another run path or artifact file.
+- Added source drift, candidate drift, and pointer-redirection regressions. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
