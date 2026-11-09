@@ -1,6 +1,7 @@
 import type { InputRef } from "../domain/dependencies";
 import type { ProofRecord } from "../domain/dependencies";
 import * as fs from "node:fs";
+import { createHash } from "node:crypto";
 
 interface ExportOptions { source: string; design: string; plan: string; generated: string; map: string; out: string; analysisId: string }
 interface ExportResult { manifestPath: string }
@@ -9,7 +10,9 @@ export async function publishReadingBundle(options: ExportOptions & { repository
   const exporter = require(`${options.repositoryRoot}/scripts/export-reading-bundle.js`) as { exportReadingBundle(options: Record<string, unknown>): Promise<ExportResult> };
   const reader = require(`${options.repositoryRoot}/app/main/reading-bundle.js`) as { readReadingBundle(path: string): Promise<{ ok: boolean; stage: string; errors: string[] }> };
   const expected = vectorFingerprint(options.frozenVersionVector);
-  const result = await exporter.exportReadingBundle({ source: options.source, design: options.design, plan: options.plan, generated: options.generated, map: options.map, out: options.out, analysisId: options.analysisId, signal: options.signal, commit: ({ staging, out }: { staging: string; out: string }) => { if (options.signal?.aborted) throw abortError(); if (options.readEpoch() !== options.frozenEpoch) throw new Error("publication_epoch_changed"); if (vectorFingerprint(options.readVersionVector()) !== expected) throw new Error("publication_vector_changed"); if (fs.existsSync(out)) throw new Error("输出目录已存在，拒绝覆盖"); fs.renameSync(staging, out); } });
+  const expectedMap = options.frozenVersionVector.find((input) => input.namespace === "framework-map" && input.subject === "singleton");
+  if (expectedMap === undefined) throw new Error("publication_map_input_missing");
+  const result = await exporter.exportReadingBundle({ source: options.source, design: options.design, plan: options.plan, generated: options.generated, map: options.map, out: options.out, analysisId: options.analysisId, signal: options.signal, commit: ({ staging, out }: { staging: string; out: string }) => { if (options.signal?.aborted) throw abortError(); if (options.readEpoch() !== options.frozenEpoch) throw new Error("publication_epoch_changed"); if (vectorFingerprint(options.readVersionVector()) !== expected) throw new Error("publication_vector_changed"); if (createHash("sha256").update(fs.readFileSync(options.map)).digest("hex") !== expectedMap.sha256) throw new Error("publication_map_path_stale"); if (fs.existsSync(out)) throw new Error("输出目录已存在，拒绝覆盖"); fs.renameSync(staging, out); } });
   const readBack = await reader.readReadingBundle(result.manifestPath); if (!readBack.ok) throw new Error(`published_bundle_readback_failed:${readBack.errors.join(";")}`);
   return { manifestPath: result.manifestPath, readBackStage: readBack.stage, proof: { proofId: "bundle-readback", subject: "bundle", directInputs: options.frozenVersionVector, supportProofIds: options.supportProofIds, ruleFingerprint: "reading-bundle-v1", status: "passed" } };
 }
