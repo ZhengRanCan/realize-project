@@ -60,3 +60,9 @@
 - The workspace previously recorded source and candidate hashes but did not recompute them on reads. Added fail-closed byte verification for the frozen source and every current artifact candidate.
 - Added runtime validation for `current.json`: kind, status, version, SHA, dependency/read-set containers, and the deterministic candidate path must match the requested namespace. A drifted pointer cannot redirect reads to another run path or artifact file.
 - Added source drift, candidate drift, and pointer-redirection regressions. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
+
+## 2026-11-09 — Contract link containment
+
+- The contract allow-list previously enforced lexical repository containment but still followed an in-repository link or junction to an external target.
+- Contract reads now resolve both the repository root and selected file to real paths and reject any resolved target outside the real root.
+- Added a real Windows junction escape regression. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
