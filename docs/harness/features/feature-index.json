@@ -212,14 +212,14 @@
   {
     "id": "F32",
     "title": "Agent Completion Gate and Bundle Integration",
-    "status": "active",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F32-agent-completion-integration",
     "version": "v0.4"
   },
   {
     "id": "F33",
     "title": "AI Integration Experiment",
-    "status": "not_started",
+    "status": "active",
     "feature_folder": "docs/harness/features/individual_feature/F33-ai-integration-experiment",
     "version": "v0.3"
   }

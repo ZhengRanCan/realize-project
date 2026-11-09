@@ -2,7 +2,7 @@
 id: F33
 title: AI Integration Experiment
 version: v0.3
-status: not_started
+status: active
 dependsOn: ["F32"]
 scope: {"code":["scripts/ai-integration-experiment*.js","scripts/helpers/ai-experiment-*.js","prompts/experiments/agent-system-*.md","prompts/eval*.md","package.json"],"tests":["scripts/test-ai-integration-experiment*.js","scripts/test-ai-experiment-eval*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F33-ai-integration-experiment/**","docs/progress.md","prompts/README.md","artifacts/experiments/**","docs/log/artifacts/F33-ai-integration-experiment/**","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}

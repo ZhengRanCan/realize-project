@@ -2,11 +2,11 @@
 id: F32
 title: Agent Completion Gate and Bundle Integration
 version: v0.4
-status: active
+status: passing
 dependsOn: ["F31","F18","F23","F24","F25"]
 scope: {"code":["app/agent/tools/assembly*.ts","app/agent/tools/bundle*.ts","app/agent/trace/*.ts","app/agent/index*.ts","scripts/assemble-overview.js","scripts/export-reading-bundle.js","scripts/agent-run*.js","package.json","app/agent/domain/completion*.ts","app/agent/domain/dependencies*.ts"],"tests":["scripts/test-agent-completion*.js","scripts/test-agent-integration*.js","scripts/test-reading-bundle*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F32-agent-completion-integration/**","docs/log/artifacts/F32-agent-completion-integration/**","docs/progress.md","workspace/README.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
-evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
-completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模型驱动真实内核/工具/校验 → 装配 → verify_bundle → 现有L0/L1/L2","伪完成/上游变更/缺Block/取消 → 不完成、不发布旧校验对应的新包"],"integrationEvidence":[],"knownUnverified":["直接依赖/当前校验闭包与结构/质量状态已有设计草案，接口和实施计划尚未确认","真实模型生成质量独立归F33；结构交付默认为quality_status=unreviewed"],"humanReviewRequired":["用户确认程序完成标准、轨迹和原Renderer结果交接；不把结构完成称为语义理解通过"]}
+evidence: {"lastVerifiedAt":"2026-11-09","commands":["node scripts/test-agent-clean.js","node scripts/test-reading-bundle.js","node scripts/harness-gate.mjs","git diff --check"],"manualSmoke":"离线受控 Provider 经真实 Workspace/validator/assembly/export/read-back 完成 21 Block 资料包；旧 Map、缺证明、取消、重复提交均拒绝。"}
+completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模型驱动真实内核/工具/校验 → 装配 → verify_bundle → 现有L0/L1/L2","伪完成/上游变更/缺Block/取消 → 不完成、不发布旧校验对应的新包"],"integrationEvidence":["docs/log/artifacts/F32-agent-completion-integration/verification-summary.md","docs/log/artifacts/F32-agent-completion-integration/subagent-review.md"],"knownUnverified":["真实模型生成质量独立归F33；结构交付默认为quality_status=unreviewed"],"humanReviewRequired":[]}
 ---
 
 # F32 Agent Completion Gate and Bundle Integration
