@@ -105,7 +105,7 @@ async function assembleOverviewFromPaths(options) {
           ? 'FAIL'
           : 'UNKNOWN';
 
-    if (verdict === 'FAIL') failures.push(planBlock.id);
+    if (verdict !== 'PASS' && verdict !== 'PASS_WITH_WARNINGS') failures.push(planBlock.id);
 
     // 展开 sourceRefs 的 section 标签，作为 renderer 的 sources 字段
     const sources = [...new Set((planBlock.sourceRefs || []).map((r) => r.section))];

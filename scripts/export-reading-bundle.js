@@ -38,7 +38,7 @@ async function exportReadingBundle(options) {
   if(options.beforeCommit) await options.beforeCommit({staging,manifestPath:joinRepositoryPath(staging,'reading-bundle.json'),check});
   throwIfAborted(options.signal);
   try{await fs.access(out);throw new Error('输出目录已存在，拒绝覆盖');}catch(e){if(e.code!=='ENOENT') throw e;}
-  await fs.rename(staging,out);staging=null;return {manifestPath:joinRepositoryPath(out,'reading-bundle.json')};
+  if(options.commit) await options.commit({staging,out}); else await fs.rename(staging,out);staging=null;return {manifestPath:joinRepositoryPath(out,'reading-bundle.json')};
  }finally{
   if(staging) {const rel=path.relative(parent,resolveRepositoryPath(staging));if(rel && !rel.startsWith('..') && !path.isAbsolute(rel) && path.basename(staging).includes('-staging-')) await fs.rm(staging,{recursive:true,force:true});}
   await lock.close();await fs.unlink(lockPath);

@@ -5,9 +5,9 @@ export interface ProofClosureResult { ok: boolean; failures: readonly ProofFailu
 
 export function inputKey(ref: Pick<InputRef, "namespace" | "subject">): string { return `${ref.namespace}:${ref.subject}`; }
 export function evaluateProofClosure(options: { requiredRootProofIds: readonly string[]; proofs: readonly ProofRecord[]; currentInputs: readonly InputRef[]; requiredRuleFingerprints?: Readonly<Record<string, string>> }): ProofClosureResult {
-  const proofMap = uniqueMap(options.proofs, (proof) => proof.proofId, "duplicate_proof"), inputMap = uniqueMap(options.currentInputs, inputKey, "duplicate_input"), failures: ProofFailure[] = [], visited = new Set<string>(), visiting = new Set<string>(), vector = new Map<string, InputRef>();
+  const proofMap = uniqueMap(options.proofs, (proof) => proof.proofId, "duplicate_proof"), inputMap = uniqueMap(options.currentInputs, inputKey, "duplicate_input"), failures: ProofFailure[] = [], results = new Map<string, boolean>(), visiting = new Set<string>(), vector = new Map<string, InputRef>();
   const visit = (proofId: string, root = false): boolean => {
-    if (visited.has(proofId)) return !failures.some((failure) => failure.id === proofId);
+    if (results.has(proofId)) return results.get(proofId)!;
     const proof = proofMap.get(proofId); if (!proof) { failures.push({ code: root ? "missing_root" : "missing_proof", id: proofId, detail: `${proofId} is absent` }); return false; }
     if (visiting.has(proofId)) { failures.push({ code: "cycle", id: proofId, detail: `${proofId} participates in a proof cycle` }); return false; }
     visiting.add(proofId); let ok = true;
@@ -16,10 +16,10 @@ export function evaluateProofClosure(options: { requiredRootProofIds: readonly s
     const requiredRule = options.requiredRuleFingerprints?.[proofId]; if (requiredRule !== undefined && requiredRule !== proof.ruleFingerprint) { failures.push({ code: "stale_rule", id: proofId, detail: `${proofId} rule fingerprint is stale` }); ok = false; }
     for (const expected of proof.directInputs) { const key = inputKey(expected), current = inputMap.get(key); if (!current) { failures.push({ code: "missing_input", id: proofId, detail: `${key} is absent` }); ok = false; } else if (current.revision !== expected.revision || current.sha256 !== expected.sha256) { failures.push({ code: "stale_input", id: proofId, detail: `${key} expected r${expected.revision}/${expected.sha256} but is r${current.revision}/${current.sha256}` }); ok = false; } else vector.set(key, current); }
     for (const supportId of proof.supportProofIds) if (!visit(supportId)) ok = false;
-    visiting.delete(proofId); visited.add(proofId); return ok;
+    visiting.delete(proofId); results.set(proofId, ok); return ok;
   };
   const validRoots = options.requiredRootProofIds.filter((root) => visit(root, true));
-  return { ok: validRoots.length === options.requiredRootProofIds.length && failures.length === 0, failures, versionVector: [...vector.values()].sort(compareInput), validProofIds: [...visited].filter((id) => !failures.some((failure) => failure.id === id)).sort() };
+  return { ok: validRoots.length === options.requiredRootProofIds.length && failures.length === 0, failures, versionVector: [...vector.values()].sort(compareInput), validProofIds: [...results].filter(([, ok]) => ok).map(([id]) => id).sort() };
 }
 
 export function invalidatedProofIds(changedInputs: readonly Pick<InputRef, "namespace" | "subject">[], proofs: readonly ProofRecord[]): readonly string[] {
