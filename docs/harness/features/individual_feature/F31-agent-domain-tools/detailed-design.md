@@ -24,6 +24,7 @@ Each submitted candidate gets an immutable monotonically increasing version. A s
 
 Every source and current-artifact read recomputes the stored byte hash before returning content. A drifted source snapshot or candidate is an integrity failure, not a new implicit version.
 `current.json` is runtime-checked against the requested kind and its deterministic candidate path; a stored pointer cannot redirect reads elsewhere in the run or outside it.
+Stored dependency tuples and read-set entries are also validated before dependency paths are constructed; malformed, duplicate, self, or unknown dependency kinds fail closed.
 
 Dependencies are explicit `{kind, version, sha256}` tuples. They are checked when a candidate is submitted. Updating an unrelated artifact does not invalidate another candidate; a consumer is current only when every dependency tuple still resolves to the recorded bytes. Map and Plan identities remain separate namespaces even when their local IDs have the same text.
 

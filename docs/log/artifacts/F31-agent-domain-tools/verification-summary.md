@@ -66,3 +66,9 @@
 - The contract allow-list previously enforced lexical repository containment but still followed an in-repository link or junction to an external target.
 - Contract reads now resolve both the repository root and selected file to real paths and reject any resolved target outside the real root.
 - Added a real Windows junction escape regression. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
+
+## 2026-11-09 — Stored dependency fail-closed validation
+
+- `current.json` previously checked that `dependencies` was an array but did not validate its stored tuples before using `dependency.kind` to construct a path.
+- Current reads now validate every dependency kind/version/SHA, reject unknown, duplicate and self kinds, and validate all read-set entries before any dependency file access.
+- Added a tampered on-disk dependency path regression. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
