@@ -8,6 +8,7 @@ const ROOT=resolveRepositoryPath(__dirname,'..');
 const names={source:'source.md',design:'design-review.json',plan:'overview-plan.json',generated:'overview.generated.json',map:'framework-map.json'};
 const keys={source:'source',design:'designReview',plan:'plan',generated:'generated',map:'frameworkMap'};
 async function exportReadingBundle(options) {
+ throwIfAborted(options.signal);
  const out=resolveRepositoryPath(options.out),parent=path.dirname(out);
  if(!options.analysisId || !options.source || !options.design || !options.plan) throw new Error('必须显式提供 source / design / plan / analysis-id / out');
  await fs.mkdir(parent,{recursive:true});
@@ -16,6 +17,7 @@ async function exportReadingBundle(options) {
  try {
   try {await fs.access(out);throw new Error('输出目录已存在，拒绝覆盖');}catch(e){if(e.code!=='ENOENT') throw e;}
   staging=await fs.mkdtemp(joinRepositoryPath(parent,`.${path.basename(out)}-staging-`));
+  throwIfAborted(options.signal);
   const raw={},manifest={bundleVersion:1,analysisId:options.analysisId,bindings:{},files:{}};
   for(const [option,filename] of Object.entries(names)) if(options[option]) {
    raw[option]=await fs.readFile(resolveRepositoryPath(options[option]));
@@ -33,6 +35,8 @@ async function exportReadingBundle(options) {
   await fs.writeFile(joinRepositoryPath(staging,'source-sections.json'),registry);manifest.files.sourceSections={path:'source-sections.json',sha256:sha256(registry)};
   await fs.writeFile(joinRepositoryPath(staging,'reading-bundle.json'),JSON.stringify(manifest,null,2)+'\n');
   const check=await readReadingBundle(joinRepositoryPath(staging,'reading-bundle.json'));if(!check.ok) throw new Error(check.errors.join('\n'));
+  if(options.beforeCommit) await options.beforeCommit({staging,manifestPath:joinRepositoryPath(staging,'reading-bundle.json'),check});
+  throwIfAborted(options.signal);
   try{await fs.access(out);throw new Error('输出目录已存在，拒绝覆盖');}catch(e){if(e.code!=='ENOENT') throw e;}
   await fs.rename(staging,out);staging=null;return {manifestPath:joinRepositoryPath(out,'reading-bundle.json')};
  }finally{
@@ -40,6 +44,7 @@ async function exportReadingBundle(options) {
   await lock.close();await fs.unlink(lockPath);
  }
 }
+function throwIfAborted(signal){if(signal?.aborted){const error=new Error('The operation was aborted');error.name='AbortError';throw error;}}
 function parseArgs(argv) {const args={};for(let i=0;i<argv.length;i++){if(!argv[i].startsWith('--') || !argv[i+1]) throw new Error('参数必须为 --name value');args[argv[i].slice(2)]=argv[++i];}args.analysisId=args['analysis-id'];return args;}
 module.exports={exportReadingBundle};
 if(require.main===module) exportReadingBundle(parseArgs(process.argv.slice(2))).then(r=>console.log(r.manifestPath)).catch(e=>{console.error(e.message);process.exitCode=1;});

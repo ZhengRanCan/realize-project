@@ -8,6 +8,8 @@ export * from "./providers/fake";
 export * from "./tools/registry";
 export * from "./tools/domain";
 export * from "./tools/validation-domain";
+export * from "./tools/bundle";
+export * from "./tools/assembly";
 export * from "./trace/recorder";
 export * from "./domain/bootstrap";
 export * from "./domain/context";

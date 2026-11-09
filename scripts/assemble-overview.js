@@ -59,11 +59,11 @@ const args = parseArgs(process.argv.slice(2));
  * 组装
  * ------------------------------------------------------------------ */
 
-async function main() {
-  const planPath = resolveRepositoryPath(ROOT, args.plan);
-  const blocksDir = resolveRepositoryPath(ROOT, args.blocks);
-  const outPath = resolveRepositoryPath(ROOT, args.out);
-  const designPath = resolveRepositoryPath(ROOT, args.design);
+async function assembleOverviewFromPaths(options) {
+  const planPath = resolveRepositoryPath(ROOT, options.plan);
+  const blocksDir = resolveRepositoryPath(ROOT, options.blocks);
+  const outPath = resolveRepositoryPath(ROOT, options.out);
+  const designPath = resolveRepositoryPath(ROOT, options.design);
 
   const planRaw = fs.readFileSync(planPath, 'utf8');
   const plan = JSON.parse(planRaw);
@@ -170,7 +170,7 @@ async function main() {
       failedBlocks: failures,
       missingBlocks: missing,
       extraBlocks: extra,
-      assembledAt: new Date().toISOString(),
+      assembledAt: (options.now || (() => new Date().toISOString()))(),
     },
     stages,
     blocks,
@@ -189,11 +189,12 @@ async function main() {
   const stageCounts = stages.map((s) => `${s.id}=${s.blockIds.length}`).join(' ');
   console.log(`stages    ${stageCounts}`);
 
-  if(args['bundle-out']) {
-    const result=await require('./export-reading-bundle').exportReadingBundle({source:args.source,design:designPath,plan:planPath,generated:outPath,map:args.map,out:args['bundle-out'],analysisId:args['analysis-id']});
+  if(options['bundle-out']) {
+    const result=await require('./export-reading-bundle').exportReadingBundle({source:options.source,design:designPath,plan:planPath,generated:outPath,map:options.map,out:options['bundle-out'],analysisId:options['analysis-id']});
     console.log('bundle    '+result.manifestPath);
   }
-  return 0;
+  return {outPath,output};
 }
 
-if(require.main===module) main().catch(error=>{console.error(error.message);process.exitCode=1;});
+module.exports={assembleOverviewFromPaths};
+if(require.main===module) assembleOverviewFromPaths(args).catch(error=>{console.error(error.message);process.exitCode=1;});
