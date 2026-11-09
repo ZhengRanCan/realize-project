@@ -13,6 +13,8 @@ F31 is the document-domain host around the F26 runtime. `prepareRunInput` is a h
   meta/run-input.json
   artifacts/<kind>/candidate-000001.json
   artifacts/<kind>/current.json
+  artifacts/stage2-block/<blockId>/candidate-000001.json
+  artifacts/stage2-block/<blockId>/current.json
   ledger/events.jsonl
 ```
 
@@ -34,6 +36,7 @@ Dependencies are explicit `{kind, version, sha256}` tuples. They are checked whe
 The host injects dependencies that its validator actually reads: Plan validation binds the current Design Review, while Block and Overview validation bind the current Plan. Model-declared generation dependencies are additive and cannot conflict with those host-owned tuples. F31 records direct edges only; F32 is responsible for checking the transitive completion closure.
 
 A candidate cannot depend on an older version of its own kind, and each dependency kind may appear at most once. These restrictions prevent a newly committed current pointer from being stale immediately and keep the direct-edge ledger unambiguous.
+`stage2-block` is the one multi-subject kind: its validated Block ID is part of the artifact key, directory and dependency tuple. The candidate `id` must equal that subject. Singleton kinds reject a subject, while distinct Block subjects may coexist and be depended on independently.
 
 ## Context policy
 

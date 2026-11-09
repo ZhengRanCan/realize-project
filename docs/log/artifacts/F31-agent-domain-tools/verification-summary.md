@@ -80,3 +80,9 @@
 - Consumer reads now byte-verify every direct dependency candidate without pre-implementing F32 transitive closure.
 - Bootstrap now rejects source inputs above 4 MiB before workspace creation and rechecks the bytes read.
 - Added fault-injection, dependency-tamper and oversized-source regressions. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed. Narrow independent re-review pending.
+
+## 2026-11-09 — Multi-Block namespace correction
+
+- F32 pre-implementation inspection found that all `stage2-block` candidates shared one current pointer, so a document could not retain multiple current Blocks. F31 was reopened rather than allowing F32 to infer current state from candidate history.
+- Added subject-aware artifact identity and dependency tuples. `stage2-block:<blockId>` now has an isolated directory/current pointer; singleton kinds reject subjects, Block candidates must match their subject, and Context Policy/tool reads can address a specific Block.
+- Added two real Block writes (`O-01`, `O-02`) and simultaneous current-read assertions. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed. Independent narrow review pending.

@@ -2,7 +2,7 @@
 id: F32
 title: Agent Completion Gate and Bundle Integration
 version: v0.4
-status: not_started
+status: active
 dependsOn: ["F31","F18","F23","F24","F25"]
 scope: {"code":["app/agent/tools/assembly*.ts","app/agent/tools/bundle*.ts","app/agent/trace/*.ts","app/agent/index*.ts","scripts/assemble-overview.js","scripts/export-reading-bundle.js","scripts/agent-run*.js","package.json","app/agent/domain/completion*.ts","app/agent/domain/dependencies*.ts"],"tests":["scripts/test-agent-completion*.js","scripts/test-agent-integration*.js","scripts/test-reading-bundle*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F32-agent-completion-integration/**","docs/log/artifacts/F32-agent-completion-integration/**","docs/progress.md","workspace/README.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
 evidence: {"lastVerifiedAt":"","commands":[],"manualSmoke":""}
@@ -69,6 +69,10 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模�
 ## Completion evidence
 
 实施后在 `docs/log/artifacts/F32-agent-completion-integration/` 记录真实离线工具链、版本失效反例、bundle/render与独立审查。产品结果留在本地分析目录；本轮仅登记。
+
+## Activation — 2026-11-09
+
+用户授权自主推进至 F33。首次激活后的实现勘察发现 F31 `stage2-block` 缺少 Block ID current namespace；F31 已补齐 subject-aware current/依赖并通过独立窄复查，F32 现重新激活。已写设计作为实现输入，真实模型能力仍不在本项内。
 
 ## Pre-implementation feedback correction — 2026-10-06
 
