@@ -13,3 +13,5 @@ export * from "./domain/bootstrap";
 export * from "./domain/context";
 export * from "./domain/types";
 export * from "./domain/workspace";
+export * from "./domain/dependencies";
+export * from "./domain/completion";
