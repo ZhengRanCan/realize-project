@@ -1,16 +1,18 @@
 import { createHash } from "node:crypto";
-import { access, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { assertRunId, type DomainWorkspaceRef, type RunInputManifest } from "./types";
 
 export interface PrepareRunInputOptions { runId: string; sourcePath: string; runsRoot: string; repositoryRoot: string; signal?: AbortSignal; now?: () => string }
+const MAX_SOURCE_BYTES = 4 * 1024 * 1024;
 export async function prepareRunInput(options: PrepareRunInputOptions): Promise<DomainWorkspaceRef> {
   assertRunId(options.runId); throwIfAborted(options.signal);
   const root = path.resolve(options.runsRoot, options.runId); const expectedParent = path.resolve(options.runsRoot) + path.sep;
   if (!root.startsWith(expectedParent)) throw new Error("run_path_escape");
   try { await access(root); throw new Error("run_already_exists"); } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
   const temporary = `${root}.preparing-${process.pid}-${Date.now()}`;
-  const bytes = await readFile(path.resolve(options.sourcePath)); throwIfAborted(options.signal);
+  const sourceFile = path.resolve(options.sourcePath); if ((await stat(sourceFile)).size > MAX_SOURCE_BYTES) throw new Error("source_capacity_exceeded");
+  const bytes = await readFile(sourceFile); if (bytes.length > MAX_SOURCE_BYTES) throw new Error("source_capacity_exceeded"); throwIfAborted(options.signal);
   const sourceText = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
   const sourceSha256 = createHash("sha256").update(bytes).digest("hex");
   const coordinates = loadCoordinates(options.repositoryRoot).buildSourceRegistry(sourceText, { sourcePath: "input/source.md" });

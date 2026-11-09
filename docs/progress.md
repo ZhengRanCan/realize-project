@@ -5,8 +5,8 @@
 - 2026-11-05 F31 checkpoint: verified the active line is `codex/f26-f33-agent-ui` tracking its same-named origin branch. Agent clean integration and harness gate pass; the full offline suite reaches `check:docs`, which reports only 22 pre-existing links to intentionally untracked F23–F25 workspace evidence. F31 still awaits independent review and user tool-boundary acceptance.
 
 - Date: 2026-10-06.
-- Active feature: `F31`；Host bootstrap、隔离workspace/版本账本、领域Context Policy与受控工具已完成首轮实现和离线集成验证。
-- Next step: 扩充F31对抗/validator parity回归，完成独立审查与用户工具边界验收后收口。后续顺序 F31 → F32 → F33 → F27 → F28 → F29 → F30。
+- Active feature: none；F31 已于 2026-11-09 完成边界修复、validator parity、独立审查与用户授权验收并收口。
+- Next step: 激活 F32 Agent Completion Gate and Bundle Integration；后续顺序 F32 → F33 → F27 → F28 → F29 → F30。
 - Latest completed feature: `F24`（2026-10-06）；用户在实际试读和修正后确认“目前 L0、L1、L2 的第一版基本完成”，结合既有回归和独立审查收口。没有记录额外口头复述或第二篇文章理解测试。
 - Git strategy: 用户要求本轮将全部当前交接提交推送到`origin/codex/f11-f21-conformance`，包括此前未推送的Reading实现与规划文档；不合并main。推送确认以Git远端结果为准。
 - 2026-09-29 文档层收口：Reading Contract v1 落盘并拆为 umbrella / layer contracts / evidence appendix；
@@ -47,7 +47,7 @@
 | F28 | Document Analysis Entry v0.2 | `not_started` | 等待F27；输入范围和交接结合F33结论细化 |
 | F29 | End-to-end Analysis v0.3 | `not_started` | 等待Harness/F33及F27/F28；Electron消费现成runtime，不另写loop |
 | F30 | Analysis Entry UI Refinement | `not_started` | 等待F29实际入口链路与截图 |
-| F31 | Agent Domain Workspace and Tools v0.4 | `active` | bootstrap/workspace/Context/窄工具与直接依赖账本首轮实现通过；待扩大验证、独立审查和用户边界验收 |
+| F31 | Agent Domain Workspace and Tools v0.4 | `passing` | Host bootstrap、隔离workspace、operation-scoped Context、受控工具、直接依赖账本、故障/完整性边界与独立复查通过 |
 | F32 | Agent Completion Gate and Bundle Integration v0.4 | `not_started` | 等待F31；精确proof closure、结构/质量状态分离及bundle集成 |
 | F33 | AI Integration Experiment v0.3 | `not_started` | 从原F26迁移，等待F32；scope仅driver/eval/agent模板，trajectory与真实DeepSeek行为评价 |
 

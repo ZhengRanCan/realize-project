@@ -1,18 +1,19 @@
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { JsonValue } from "../core/protocol";
 import { assertKind, type ArtifactKind, type ArtifactRecord, type ArtifactRef, type DomainWorkspaceRef } from "./types";
 
 const MAX_ARTIFACT_BYTES = 4 * 1024 * 1024;
 export class DomainWorkspace {
-  constructor(readonly ref: DomainWorkspaceRef) {}
+  readonly #appendLedger: (file: string, line: string) => Promise<void>;
+  constructor(readonly ref: DomainWorkspaceRef, options: { appendLedger?: (file: string, line: string) => Promise<void> } = {}) { this.#appendLedger = options.appendLedger ?? ((file, line) => appendFile(file, line, "utf8")); }
   async readSource(): Promise<string> { const bytes = await readFile(path.join(this.ref.root, "input", "source.md")); if (sha256(bytes) !== this.ref.sourceSha256) throw new Error("source_integrity_mismatch"); return bytes.toString("utf8"); }
   async readRegistry(): Promise<JsonValue> { return readJson(path.join(this.ref.root, "input", "source-registry.json")); }
   async readCurrent(kindValue: string): Promise<{ record: ArtifactRecord; value: JsonValue }> {
-    assertKind(kindValue); const record = currentRecord(await readJson(path.join(this.ref.root, "artifacts", kindValue, "current.json")), kindValue);
-    for (const dependency of record.dependencies) { const current = await this.#readRecord(dependency.kind); if (current.version !== dependency.version || current.sha256 !== dependency.sha256) throw new Error("stale_dependency"); }
-    const candidate = path.join(this.ref.root, record.candidatePath); const bytes = await readFile(candidate); if (sha256(bytes) !== record.sha256) throw new Error("artifact_integrity_mismatch"); return { record, value: JSON.parse(bytes.toString("utf8")) as JsonValue };
+    assertKind(kindValue); const result = await this.#readVerified(kindValue);
+    for (const dependency of result.record.dependencies) { const current = (await this.#readVerified(dependency.kind)).record; if (current.version !== dependency.version || current.sha256 !== dependency.sha256) throw new Error("stale_dependency"); }
+    return result;
   }
   async submit(kindValue: string, value: unknown, dependencies: readonly ArtifactRef[] = [], readSet: readonly string[] = [], verdict?: JsonValue): Promise<ArtifactRecord> {
     assertKind(kindValue); const kind: ArtifactKind = kindValue; validateJsonValue(value); const encoded = encode(value);
@@ -20,16 +21,18 @@ export class DomainWorkspace {
     const directory = path.join(this.ref.root, "artifacts", kind); await mkdir(directory, { recursive: true }); const version = await nextVersion(directory); const name = `candidate-${String(version).padStart(6, "0")}.json`; const relative = path.join("artifacts", kind, name).replaceAll("\\", "/"); const candidate = path.join(directory, name);
     await writeFile(candidate, encoded, { encoding: "utf8", flag: "wx" }); const sha256 = createHash("sha256").update(encoded).digest("hex");
     const record: ArtifactRecord = { kind, version, sha256, status: "current", candidatePath: relative, dependencies: structuredClone(dependencies), readSet: [...new Set(readSet)].sort(), ...(verdict === undefined ? {} : { verdict }) };
-    const temp = path.join(directory, `.current-${process.pid}-${Date.now()}.tmp`); await writeFile(temp, `${JSON.stringify(record, null, 2)}\n`, { encoding: "utf8", flag: "wx" }); await rename(temp, path.join(directory, "current.json")); await this.#ledger("artifact_committed", record); return record;
+    const currentFile = path.join(directory, "current.json"), temp = path.join(directory, `.current-${process.pid}-${Date.now()}.tmp`), previous = await readOptional(currentFile); await writeFile(temp, `${JSON.stringify(record, null, 2)}\n`, { encoding: "utf8", flag: "wx" }); await rename(temp, currentFile); try { await this.#ledger("artifact_committed", record); } catch (error) { await restorePointer(currentFile, previous); throw error; } return record;
   }
   async reject(kindValue: string, value: unknown, dependencies: readonly ArtifactRef[] = [], readSet: readonly string[] = [], verdict?: JsonValue): Promise<ArtifactRecord> { assertKind(kindValue); validateJsonValue(value); const kind: ArtifactKind = kindValue, encoded = encode(value), directory = path.join(this.ref.root, "artifacts", kind); await mkdir(directory, { recursive: true }); const version = await nextVersion(directory), name = `candidate-${String(version).padStart(6, "0")}.json`, relative = path.join("artifacts", kind, name).replaceAll("\\", "/"); await writeFile(path.join(directory, name), encoded, { encoding: "utf8", flag: "wx" }); const record: ArtifactRecord = { kind, version, sha256: createHash("sha256").update(encoded).digest("hex"), status: "rejected", candidatePath: relative, dependencies: structuredClone(dependencies), readSet: [...new Set(readSet)].sort(), ...(verdict === undefined ? {} : { verdict }) }; await this.#ledger("artifact_rejected", record); return record; }
-  async #ledger(type: string, record: ArtifactRecord): Promise<void> { await appendFile(path.join(this.ref.root, "ledger", "events.jsonl"), `${JSON.stringify({ type, at: new Date().toISOString(), ...record })}\n`, "utf8"); }
-  async #readRecord(kind: ArtifactKind): Promise<ArtifactRecord> { return currentRecord(await readJson(path.join(this.ref.root, "artifacts", kind, "current.json")), kind); }
+  async #ledger(type: string, record: ArtifactRecord): Promise<void> { await this.#appendLedger(path.join(this.ref.root, "ledger", "events.jsonl"), `${JSON.stringify({ type, at: new Date().toISOString(), ...record })}\n`); }
+  async #readVerified(kind: ArtifactKind): Promise<{ record: ArtifactRecord; value: JsonValue }> { const record = currentRecord(await readJson(path.join(this.ref.root, "artifacts", kind, "current.json")), kind), bytes = await readFile(path.join(this.ref.root, record.candidatePath)); if (sha256(bytes) !== record.sha256) throw new Error("artifact_integrity_mismatch"); return { record, value: JSON.parse(bytes.toString("utf8")) as JsonValue }; }
 }
 function sha256(value: string | Buffer): string { return createHash("sha256").update(value).digest("hex"); }
 function currentRecord(value: JsonValue, expectedKind: ArtifactKind): ArtifactRecord { if (typeof value !== "object" || value === null || Array.isArray(value)) throw new Error("invalid_current_record"); const item = value as Record<string, JsonValue>; const version = item.version; const expectedPath = Number.isInteger(version) && (version as number) > 0 ? `artifacts/${expectedKind}/candidate-${String(version).padStart(6, "0")}.json` : ""; if (item.kind !== expectedKind || item.status !== "current" || !Number.isInteger(version) || (version as number) < 1 || typeof item.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(item.sha256) || item.candidatePath !== expectedPath || !Array.isArray(item.dependencies) || !validStoredDependencies(item.dependencies, expectedKind) || !Array.isArray(item.readSet) || item.readSet.some((entry) => typeof entry !== "string")) throw new Error("invalid_current_record"); return value as unknown as ArtifactRecord; }
 function validStoredDependencies(values: JsonValue[], ownerKind: ArtifactKind): boolean { const seen = new Set<string>(); return values.every((value) => { if (typeof value !== "object" || value === null || Array.isArray(value)) return false; const item = value as Record<string, JsonValue>; if (typeof item.kind !== "string" || item.kind === ownerKind || seen.has(item.kind)) return false; try { assertKind(item.kind); } catch { return false; } seen.add(item.kind); return Number.isInteger(item.version) && (item.version as number) > 0 && typeof item.sha256 === "string" && /^[a-f0-9]{64}$/.test(item.sha256); }); }
 async function nextVersion(directory: string): Promise<number> { const names = await readdir(directory); return 1 + names.reduce((max, name) => { const match = /^candidate-(\d{6})\.json$/.exec(name); return match ? Math.max(max, Number(match[1])) : max; }, 0); }
 async function readJson(file: string): Promise<JsonValue> { return JSON.parse(await readFile(file, "utf8")) as JsonValue; }
+async function readOptional(file: string): Promise<Buffer | null> { try { return await readFile(file); } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; } }
+async function restorePointer(file: string, previous: Buffer | null): Promise<void> { if (previous === null) { await rm(file, { force: true }); return; } const rollback = `${file}.rollback-${process.pid}-${Date.now()}.tmp`; await writeFile(rollback, previous, { flag: "wx" }); await rename(rollback, file); }
 function validateJsonValue(value: unknown): asserts value is JsonValue { try { const text = JSON.stringify(value); if (text === undefined) throw new Error(); JSON.parse(text); } catch { throw new Error("invalid_json_value"); } }
 function encode(value: unknown): string { const encoded = `${JSON.stringify(value, null, 2)}\n`; if (Buffer.byteLength(encoded) > MAX_ARTIFACT_BYTES) throw new Error("artifact_capacity_exceeded"); return encoded; }

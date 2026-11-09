@@ -205,7 +205,7 @@
   {
     "id": "F31",
     "title": "Agent Domain Workspace and Tools",
-    "status": "active",
+    "status": "passing",
     "feature_folder": "docs/harness/features/individual_feature/F31-agent-domain-tools",
     "version": "v0.4"
   },

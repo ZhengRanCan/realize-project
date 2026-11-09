@@ -72,3 +72,11 @@
 - `current.json` previously checked that `dependencies` was an array but did not validate its stored tuples before using `dependency.kind` to construct a path.
 - Current reads now validate every dependency kind/version/SHA, reject unknown, duplicate and self kinds, and validate all read-set entries before any dependency file access.
 - Added a tampered on-disk dependency path regression. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed.
+
+## 2026-11-09 — Independent review repairs
+
+- Independent read-only review found no P1 and three P2 items: current-pointer rollback on ledger failure, direct dependency candidate byte verification, and missing bootstrap source capacity.
+- Added injected ledger-failure rollback so a tool error cannot leave the failed candidate current; the rejected-candidate path remains available after rollback.
+- Consumer reads now byte-verify every direct dependency candidate without pre-implementing F32 transitive closure.
+- Bootstrap now rejects source inputs above 4 MiB before workspace creation and rechecks the bytes read.
+- Added fault-injection, dependency-tamper and oversized-source regressions. `node scripts/test-agent-clean.js`, `node scripts/harness-gate.mjs`, and `git diff --check`: passed. Narrow independent re-review pending.

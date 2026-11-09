@@ -2,11 +2,11 @@
 id: F31
 title: Agent Domain Workspace and Tools
 version: v0.4
-status: active
+status: passing
 dependsOn: ["F26"]
 scope: {"code":["app/agent/tools/source*.ts","app/agent/tools/contract*.ts","app/agent/tools/artifact*.ts","app/agent/tools/validation*.ts","app/agent/tools/domain*.ts","app/agent/core/protocol.ts","app/agent/core/runner.ts","app/agent/core/validation.ts","app/agent/providers/deepseek.ts","scripts/check-map.js","scripts/check-plan.js","scripts/check-block.js","scripts/check-overview.js","prompts/agent-system*.md","package.json","app/agent/domain/*.ts"],"tests":["scripts/test-agent-domain*.js","scripts/test-agent-provider.js","scripts/test-agent-core.js","scripts/test-agent-artifact*.js","scripts/test-check-map.js","scripts/test-check-plan.js","scripts/test-check-block.js","scripts/test-semantic-grounding.js","scripts/test-agent-bootstrap*.js","scripts/test-agent-dependencies*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F31-agent-domain-tools/**","docs/log/artifacts/F31-agent-domain-tools/**","docs/progress.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
-evidence: {"lastVerifiedAt":"2026-10-07","commands":[{"command":"node scripts/test-agent-clean.js","result":"passed"},{"command":"node scripts/test-check-plan.js && node scripts/test-check-block.js && node scripts/test-check-map.js && node scripts/test-semantic-grounding.js","result":"passed"}],"manualSmoke":"真实F26 Runner通过Domain Registry读取冻结source并由宿主CompletionPolicy终止；零模型调用。"}
-completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_input → 原字节/hash/确定性coordinates/run workspace → Agent starts","Agent调用受控Source/Contract/Artifact工具 → 当前run产物 → 既有validator结果","不允许的读取/写入/引用/参数 → 明确拒绝且不改旧文件"],"integrationEvidence":["scripts/test-agent-domain.js","docs/log/artifacts/F31-agent-domain-tools/verification-summary.md"],"knownUnverified":["首轮实现已完成；仍待更广对抗/parity验证和独立代码审查"],"humanReviewRequired":["用户确认领域工具足以生产现有资料包必需数据且权限边界清楚"]}
+evidence: {"lastVerifiedAt":"2026-11-09","commands":[{"command":"node scripts/test-agent-clean.js","result":"passed"},{"command":"node scripts/test-check-plan.js && node scripts/test-check-block.js && node scripts/test-check-map.js && node scripts/test-semantic-grounding.js","result":"passed"},{"command":"node scripts/harness-gate.mjs","result":"passed"}],"manualSmoke":"真实F26 Runner通过Domain Registry读取冻结source、消费配对tool结果并由宿主CompletionPolicy终止；用户授权边界验收，零模型调用。"}
+completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_input → 原字节/hash/确定性coordinates/run workspace → Agent starts","Agent调用受控Source/Contract/Artifact工具 → 当前run产物 → 既有validator结果","不允许的读取/写入/引用/参数 → 明确拒绝且不改旧文件"],"integrationEvidence":["scripts/test-agent-domain.js","docs/log/artifacts/F31-agent-domain-tools/verification-summary.md","docs/log/artifacts/F31-agent-domain-tools/subagent-review.md"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F31 Agent Domain Workspace and Tools
@@ -47,22 +47,22 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_
 
 ## Acceptance Criteria
 
-- [ ] Context Policy只控制操作的合法输入/实际read set和前置，不固定生成顺序；Agent可选择当前合法操作，交换Inventory/Review独立分支顺序均可执行，依赖不足明确拒绝。
-- [ ] operation切换不能把禁止输入作为全量conversation偷偷带回请求；Host记录真实序列化输入/指纹，保留正确tool调用配对和原始trace。
-- [ ] canonical prompt由本feature独占修改，旧生成/assembler无正常写权限；需要纯helper提取时先登记scope并验证旧消费者。
+- [x] Context Policy只控制操作的合法输入/实际read set和前置，不固定生成顺序；Agent可选择当前合法操作，交换Inventory/Review独立分支顺序均可执行，依赖不足明确拒绝。
+- [x] operation切换不能把禁止输入作为全量conversation偷偷带回请求；Host记录真实序列化输入/指纹，保留正确tool调用配对和原始trace。
+- [x] canonical prompt由本feature独占修改，旧生成/assembler无正常写权限；需要纯helper提取时先登记scope并验证旧消费者。
 
-- [ ] Host bootstrap真实读取/冻结当前文档并生成匹配hash的坐标；不是模型产物/Agent Tool，无效输入/取消不启动模型，不串用默认样本。
-- [ ] 本feature内明确并冻结lifecycle、run layout和direct dependency/proof ledger，再据此实现；生成来源和校验输入分开，修改Map不会自动使Plan失效，namespace/实际读取无隐式合并。
-- [ ] F31拥有领域Context Policy与system instructions，按允许的输入集组装请求；Core不导入Map/Plan/Stage，候选实际输入集和指纹可取证。
+- [x] Host bootstrap真实读取/冻结当前文档并生成匹配hash的坐标；不是模型产物/Agent Tool，无效输入/取消不启动模型，不串用默认样本。
+- [x] 本feature内明确并冻结lifecycle、run layout和direct dependency/proof ledger，再据此实现；生成来源和校验输入分开，修改Map不会自动使Plan失效，namespace/实际读取无隐式合并。
+- [x] F31拥有领域Context Policy与system instructions，按允许的输入集组装请求；Core不导入Map/Plan/Stage，候选实际输入集和指纹可取证。
 
-- [ ] 工具以 Registry 的确定签名暴露，原文/合同读取、全部必需产物写入与校验均有真实实现。
-- [ ] 包含当前文档自己的 Review 生产入口，决策恒 pending、原文声明不变成 source-verified；无模型审批写入。
-- [ ] 只允许当前run已声明文件/对象；越界路径、链接、异常ID、超容量、未知工具拒绝且无不应有副作用。
-- [ ] 模型提交内容不覆盖程序固定字段/来源空间；draft/commit失败、重复请求和版本变化行为明确可追踪。
-- [ ] 来源、Map/Plan身份及引用遵守现有合同；不把 Unknown 转为空集，不默认读取旧样本/坐标。
-- [ ] validator工具与现有函数/脚本对同一输入给出相同结果；错误/警告可定位到实际版本，原始失败保留。
-- [ ] 工具内部零模型调用，不复制生成loop；与F26真实Runner的调用/observation组合离线通过。
-- [ ] 边界/故障测试、既有回归、独立审查及用户工具边界验收通过后 passing。
+- [x] 工具以 Registry 的确定签名暴露，原文/合同读取、全部必需产物写入与校验均有真实实现。
+- [x] 包含当前文档自己的 Review 生产入口，决策恒 pending、原文声明不变成 source-verified；无模型审批写入。
+- [x] 只允许当前run已声明文件/对象；越界路径、链接、异常ID、超容量、未知工具拒绝且无不应有副作用。
+- [x] 模型提交内容不覆盖程序固定字段/来源空间；draft/commit失败、重复请求和版本变化行为明确可追踪。
+- [x] 来源、Map/Plan身份及引用遵守现有合同；不把 Unknown 转为空集，不默认读取旧样本/坐标。
+- [x] validator工具与现有函数/脚本对同一输入给出相同结果；错误/警告可定位到实际版本，原始失败保留。
+- [x] 工具内部零模型调用，不复制生成loop；与F26真实Runner的调用/observation组合离线通过。
+- [x] 边界/故障测试、既有回归、独立审查及用户工具边界验收通过后 passing。
 
 ## Risks and compatibility
 
@@ -70,7 +70,7 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["Host prepare_run_
 
 ## Completion evidence
 
-实施后记入 `docs/log/artifacts/F31-agent-domain-tools/`，包括真实工具/validator parity、当前run隔离与独立审查；当前没有工具代码或完成证据。
+完成证据见 `docs/log/artifacts/F31-agent-domain-tools/verification-summary.md` 与 `subagent-review.md`。
 
 ## Pre-implementation feedback correction — 2026-10-06
 
