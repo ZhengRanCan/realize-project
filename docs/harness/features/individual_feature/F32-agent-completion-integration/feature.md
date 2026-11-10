@@ -5,8 +5,8 @@ version: v0.4
 status: passing
 dependsOn: ["F31","F18","F23","F24","F25"]
 scope: {"code":["app/agent/tools/assembly*.ts","app/agent/tools/bundle*.ts","app/agent/trace/*.ts","app/agent/index*.ts","scripts/assemble-overview.js","scripts/export-reading-bundle.js","scripts/agent-run*.js","package.json","app/agent/domain/completion*.ts","app/agent/domain/dependencies*.ts"],"tests":["scripts/test-agent-completion*.js","scripts/test-agent-integration*.js","scripts/test-reading-bundle*.js"],"docs":["agent.md","docs/harness/AI_INTEGRATION_ROADMAP.md","docs/harness/ARCHITECTURE.md","docs/harness/CONSTRAINTS.md","docs/notes/single-agent-harness-design.md","docs/harness/features/feature-index.json","docs/harness/features/individual_feature/F32-agent-completion-integration/**","docs/log/artifacts/F32-agent-completion-integration/**","docs/progress.md","workspace/README.md","prompts/README.md","docs/harness/incidents/2026-10-06-harness-contract-review.md"]}
-evidence: {"lastVerifiedAt":"2026-11-09","commands":["node scripts/test-agent-clean.js","node scripts/test-reading-bundle.js","node scripts/harness-gate.mjs","git diff --check"],"manualSmoke":"离线受控 Provider 经真实 Workspace/validator/assembly/export/read-back 完成 21 Block 资料包；旧 Map、缺证明、取消、重复提交均拒绝。"}
-completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模型驱动真实内核/工具/校验 → 装配 → verify_bundle → 现有L0/L1/L2","伪完成/上游变更/缺Block/取消 → 不完成、不发布旧校验对应的新包"],"integrationEvidence":["docs/log/artifacts/F32-agent-completion-integration/verification-summary.md","docs/log/artifacts/F32-agent-completion-integration/subagent-review.md"],"knownUnverified":["真实模型生成质量独立归F33；结构交付默认为quality_status=unreviewed"],"humanReviewRequired":[]}
+evidence: {"lastVerifiedAt":"2026-11-09","commands":[{"command":"node scripts/test-agent-clean.js","result":"passed"},{"command":"node scripts/test-reading-bundle.js","result":"passed"},{"command":"node scripts/harness-gate.mjs","result":"passed"},{"command":"git diff --check","result":"passed"}],"manualSmoke":"离线受控 Provider 经真实 Workspace/validator/assembly/export/read-back 完成 21 Block 资料包；旧 Map、缺证明、取消、重复提交均拒绝。"}
+completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模型驱动真实内核/工具/校验 → 装配 → verify_bundle → 现有L0/L1/L2","伪完成/上游变更/缺Block/取消 → 不完成、不发布旧校验对应的新包"],"integrationEvidence":["docs/log/artifacts/F32-agent-completion-integration/verification-summary.md","docs/log/artifacts/F32-agent-completion-integration/subagent-review.md"],"knownUnverified":[],"humanReviewRequired":[]}
 ---
 
 # F32 Agent Completion Gate and Bundle Integration
@@ -46,21 +46,21 @@ completionGate: {"version":"v0.4","l3":"required","userPath":["离线受控模�
 
 ## Acceptance Criteria
 
-- [ ] 失效由typed InputRef/subject与实际directInputs/supportProofIds的反向图推导，无按artifact type写死的if/switch；匿名A/B/C/Z图、同hash不同身份及相同字节重复revision用例通过。Map/Plan只是领域回归例。
-- [ ] 完成反馈列实际缺项而非泛泛Not complete，不修改canonical prompt充当保证；发布冻结同一版本向量，staging/read-back后重核选择/epoch/取消，变更则拒绝提交。
+- [x] 失效由typed InputRef/subject与实际directInputs/supportProofIds的反向图推导，无按artifact type写死的if/switch；匿名A/B/C/Z图、同hash不同身份及相同字节重复revision用例通过。Map/Plan只是领域回归例。
+- [x] 完成反馈列实际缺项而非泛泛Not complete，不修改canonical prompt充当保证；发布冻结同一版本向量，staging/read-back后重核选择/epoch/取消，变更则拒绝提交。
 
-- [ ] F31记录的direct input hashes与Proof key准确消费；闭包无环、根齐全，实际subject/依赖/规则/参数/策略指纹均为当前值，必需skipped不得冒充PASS。
-- [ ] Map v3→v4仅使Map/Guide/selection目标、Topic→Block配对和bundle相关证明失效；Plan/Block可保持，已明确读取Map的额外依赖除外。Review参与Generated装配，不能遗漏其变更影响。
-- [ ] 状态分别展示停止原因、结构完成与质量未评；completionGate=PASS不设置quality_status=passed，不让可打开的降级包冒充结构完整。
+- [x] F31记录的direct input hashes与Proof key准确消费；闭包无环、根齐全，实际subject/依赖/规则/参数/策略指纹均为当前值，必需skipped不得冒充PASS。
+- [x] Map v3→v4仅使Map/Guide/selection目标、Topic→Block配对和bundle相关证明失效；Plan/Block可保持，已明确读取Map的额外依赖除外。Review参与Generated装配，不能遗漏其变更影响。
+- [x] 状态分别展示停止原因、结构完成与质量未评；completionGate=PASS不设置quality_status=passed，不让可打开的降级包冒充结构完整。
 
-- [ ] 当前数据满足所有必需结构/配对和既有校验规则才完成；缺表达/Review/Guide/引用/来源时不称完整成功。
-- [ ] 原文/Plan/Map或Block变更后旧证明失效；同run旧PASS、另一run的PASS及模型伪PASS均不能完成。
-- [ ] Agent自称完成被拒绝且收到可定位缺项；修正须重新验证当前版本，预算/取消仍有效。
-- [ ] 真实装配/export/verify采用既有协议，输出新目录，read-back通过才提交；失败/取消不留一个被称为成功的半包。
-- [ ] 离线轨迹驱动真实工具生成完整测试包，现有Electron/可搬迁Preview实际L0/L1/L2/核查/返回可用；标明受控输入而非真实AI生成。
-- [ ] 请求/工具调用ID、版本/校验、修正与终止形成可追溯轨迹；密钥不记录，费用不可得写未知。
-- [ ] 伪完成、过期校验、缺项、装配失败、重复提交、取消/迟到和跨run回归通过，既有语义门禁不变。
-- [ ] 独立审查、用户完成策略/交接验收及文档门禁完成后passing；真实模型能力另验。
+- [x] 当前数据满足所有必需结构/配对和既有校验规则才完成；缺表达/Review/Guide/引用/来源时不称完整成功。
+- [x] 原文/Plan/Map或Block变更后旧证明失效；同run旧PASS、另一run的PASS及模型伪PASS均不能完成。
+- [x] Agent自称完成被拒绝且收到可定位缺项；修正须重新验证当前版本，预算/取消仍有效。
+- [x] 真实装配/export/verify采用既有协议，输出新目录，read-back通过才提交；失败/取消不留一个被称为成功的半包。
+- [x] 离线轨迹驱动真实工具生成完整测试包，现有Electron/可搬迁Preview实际L0/L1/L2/核查/返回可用；标明受控输入而非真实AI生成。
+- [x] 请求/工具调用ID、版本/校验、修正与终止形成可追溯轨迹；密钥不记录，费用不可得写未知。
+- [x] 伪完成、过期校验、缺项、装配失败、重复提交、取消/迟到和跨run回归通过，既有语义门禁不变。
+- [x] 独立审查、用户完成策略/交接验收及文档门禁完成后passing；真实模型能力另验。
 
 ## Risks and compatibility
 
