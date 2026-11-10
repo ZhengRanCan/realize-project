@@ -1,0 +1,6 @@
+"use strict";
+const fs=require("node:fs"),crypto=require("node:crypto");
+const sha=(value)=>crypto.createHash("sha256").update(value).digest("hex");
+function createCompatibleTransport({baseUrl,apiKey,fetchImpl=fetch}){if(!/^https:\/\//.test(baseUrl||""))throw new Error("https_base_url_required");if(!apiKey)throw new Error("api_key_required");return {async send(payload,signal){const response=await fetchImpl(`${baseUrl.replace(/\/$/,"")}/chat/completions`,{method:"POST",headers:{authorization:`Bearer ${apiKey}`,"content-type":"application/json"},body:JSON.stringify(payload),signal});const text=await response.text();if(!response.ok)throw new Error(`provider_http_${response.status}`);try{return JSON.parse(text);}catch{throw new Error("provider_invalid_json");}}};}
+function freezeRunConfig({model,baseUrl,promptPath,sourcePath,runtimeFiles,parameters={}}){const prompt=fs.readFileSync(promptPath),source=fs.readFileSync(sourcePath),runtime=runtimeFiles.map((file)=>({path:file,sha256:sha(fs.readFileSync(file))})).sort((a,b)=>a.path.localeCompare(b.path));return {configVersion:1,model,endpointHost:new URL(baseUrl).host,parameters,actualPromptSha256:sha(prompt),sourceSha256:sha(source),runtime,policySha256:sha(JSON.stringify({parameters,runtime}))};}
+module.exports={createCompatibleTransport,freezeRunConfig,sha};
